@@ -30,3 +30,21 @@ need to be user extendable -> no enum class?
 #### apdu
  
 ### BBMD stuff
+
+
+file and folder structure
+-------------------------
+
+examples
+
+bacnet::bvlc::frame::result
+bacnet::bvlc::frame::write-boradcast-distribution-table
+bacnet::bvlc::frame::read-boradcast-distribution-table
+bacnet::bvlc::frame::read-boradcast-distribution-table-ack
+bacnet::bvlc::frame::...
+
+
+
+bacnet::npdu::
+
+bacnet::apdu::
