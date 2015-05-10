@@ -18,43 +18,32 @@
  * Authors: Daniel Friedrich
  */
 
+#ifndef SRC_BACNET_BVLL_DETAIL_GRAMMAR_HPP_
+#define SRC_BACNET_BVLL_DETAIL_GRAMMAR_HPP_
 
 
-
-#include <iostream>
+#include <cstdint>
 #include <string>
+#include <vector>
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-
-#include <bacnet/bacnet.hpp>
+#include <bacnet/bvll/frames.hpp>
 
 
 
-int main(int argc, char* argv[])
-{
-  try
-  {
-    if (argc != 3)
-    {
-      std::cerr << "Usage: receiver <listen_address> <multicast_address>\n";
-      std::cerr << "  For IPv4, try:\n";
-      std::cerr << "    receiver 0.0.0.0 239.255.0.1\n";
-      std::cerr << "  For IPv6, try:\n";
-      std::cerr << "    receiver 0::0 ff31::8000:1234\n";
-      return 1;
-    }
 
-    boost::asio::io_service io_service;
-    receiver r(io_service,
-        boost::asio::ip::address::from_string(argv[1]),
-        boost::asio::ip::address::from_string(argv[2]));
-    io_service.run();
-  }
-  catch (std::exception& e)
-  {
-    std::cerr << "Exception: " << e.what() << "\n";
-  }
+namespace bacnet { namespace bvll { namespace detail {
 
-  return 0;
-}
+
+
+
+
+
+
+
+
+
+
+}}}
+
+
+#endif /* SRC_BACNET_BVLL_DETAIL_GRAMMAR_HPP_ */
