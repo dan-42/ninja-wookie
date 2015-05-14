@@ -29,6 +29,20 @@
 #include <boost/bind.hpp>
 
 #include <bacnet/bacnet.hpp>
+#include <bacnet/bvll/frames.hpp>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 namespace bacnet { namespace  bvll {
@@ -102,10 +116,52 @@ private:
 
 
 
+
+
+
+
+
+
 int main(int argc, char* argv[])
 {
   try
   {
+
+	  std::string bin_data_to_parse{};
+	  std::string bin_data_to_generate{};
+
+	  bin_data_to_parse.push_back(0xC0);
+	  bin_data_to_parse.push_back(0xA8);
+	  bin_data_to_parse.push_back(0x0A);
+	  bin_data_to_parse.push_back(0x0A);
+
+	  bin_data_to_parse.push_back(0xBA);
+	  bin_data_to_parse.push_back(0xC0);
+
+
+	  bin_data_to_parse.push_back(0xAA);
+	  bin_data_to_parse.push_back(0xAA);
+
+	  bin_data_to_parse.push_back(0xDD);
+	  bin_data_to_parse.push_back(0xDD);
+
+
+
+
+	  bacnet::bvll::bvlc::foreign_device_table_entry entry{};
+
+
+	  bacnet::bvll::bvlc::parser::parse(bin_data_to_parse, entry);
+
+	  bacnet::bvll::bvlc::generator::generate(bin_data_to_generate, entry);
+
+	  if(bin_data_to_parse.compare(bin_data_to_generate) == 0){
+		  std::cout << "juhu!" << std::endl;
+	  }
+
+
+
+
 
     boost::asio::io_service io_service;
     bacnet::bvll::controller controller(io_service);

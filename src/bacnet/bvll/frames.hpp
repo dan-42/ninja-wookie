@@ -48,6 +48,9 @@
 #include <boost/phoenix/bind/bind_member_variable.hpp>
 
 
+#include <bacnet/bvll/bacnet_ip_address.hpp>
+
+
 namespace bacnet { namespace bvll { namespace bvlc {
 
 
@@ -196,70 +199,6 @@ std::ostream& operator<<(std::ostream& os, const result_code& rc) {
 
 }}}
 
-//xxx might be used elsewhere, so should be in global bacnet namespace?
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(bvlc),bacnet_ip_address,
-	(uint32_t, ip_address)
-	(uint16_t, port)
-)
-
-namespace bacnet { namespace bvll { namespace bvlc { namespace generator {
-
-using namespace boost::spirit;
-using namespace boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
-
-template<typename Iterator>
-struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
-
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, uint32_t()> ip_address_v4_rule;
-	rule<Iterator, uint16_t()> port_rule;
-
-	bacnet_ip_address_grammar() : bacnet_ip_address_grammar::base_type(bacnet_ip_address_rule) {
-
-		bacnet_ip_address_rule = ip_address_v4_rule > port_rule;
-
-		ip_address_v4_rule = big_dword;
-		port_rule = big_word;
-
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-		ip_address_v4_rule.name("ip_address_v4_rule");
-		port_rule.name("port_rule");
-	}
-};
-
-}}}}
-
-
-namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
-
-template<typename Iterator>
-struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address> {
-
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, uint32_t()> ip_address_v4_rule;
-	rule<Iterator, uint16_t()> port_rule;
-
-	bacnet_ip_address_grammar() : bacnet_ip_address_grammar::base_type(bacnet_ip_address_rule) {
-
-		bacnet_ip_address_rule = ip_address_v4_rule < port_rule;
-
-		ip_address_v4_rule = big_dword;
-		port_rule = big_word;
-
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-		ip_address_v4_rule.name("ip_address_v4_rule");
-		port_rule.name("port_rule");
-	}
-};
-
-}}}}
-
 
 
 
@@ -272,6 +211,37 @@ BOOST_FUSION_DEFINE_STRUCT(
 namespace bacnet { namespace bvll { namespace bvlc {
  typedef std::vector<bacnet::bvll::bvlc::broadcast_distribution_table_entry> broadcast_distribution_table;
 }}}
+
+namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
+
+using namespace ::boost::spirit;
+using namespace ::boost::spirit::qi;
+using namespace bacnet::bvll::bvlc;
+
+template<typename Iterator>
+struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_distribution_table_entry> {
+
+	rule<Iterator, broadcast_distribution_table_entry()> broadcast_distribution_table_entry_rule;
+	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
+	rule<Iterator, uint32_t()> broadcast_distribution_mask_rule;
+
+	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(bacnet_ip_address_rule) {
+
+		bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+
+		broadcast_distribution_table_entry_rule = bacnet_ip_address_rule < broadcast_distribution_mask_rule;
+
+		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
+		broadcast_distribution_mask_rule = big_word;
+
+		broadcast_distribution_table_entry_rule.name("broadcast_distribution_table_entry_rule");
+		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
+		broadcast_distribution_mask_rule.name("broadcast_distribution_mask_rule");
+	}
+};
+
+}}}}
+
 
 
 
@@ -288,6 +258,113 @@ namespace bacnet { namespace bvll { namespace bvlc {
 
 
 
+
+
+namespace bacnet { namespace bvll { namespace bvlc { namespace generator {
+
+using namespace boost::spirit;
+using namespace boost::spirit::karma;
+using namespace bacnet::bvll::bvlc;
+
+template<typename Iterator>
+struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_table_entry()> {
+
+	bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+
+	rule<Iterator, foreign_device_table_entry()> foreign_device_table_entry_rule;
+	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
+	rule<Iterator, uint16_t()> time_to_live_in_sec_rule;
+	rule<Iterator, uint16_t()> time_to_purge_in_sec_rule;
+
+	foreign_device_table_entry_grammar() : foreign_device_table_entry_grammar::base_type(foreign_device_table_entry_rule) {
+
+		foreign_device_table_entry_rule = bacnet_ip_address_rule << time_to_live_in_sec_rule << time_to_purge_in_sec_rule;
+
+		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
+		time_to_live_in_sec_rule = big_word;
+		time_to_purge_in_sec_rule = big_word;
+
+
+		foreign_device_table_entry_rule.name("foreign_device_table_entry_rule");
+		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
+		time_to_live_in_sec_rule.name("time_to_live_in_sec_rule");
+		time_to_purge_in_sec_rule.name("time_to_purge_in_sec_rule");
+	}
+};
+
+
+template<typename Container>
+bool generate(Container c, foreign_device_table_entry &v) {
+	std::back_insert_iterator<decltype(c)> sink(c);
+	bacnet::bvll::bvlc::generator::foreign_device_table_entry_grammar<decltype(sink)> g;
+	return boost::spirit::karma::generate(sink, g, v);
+}
+
+}}}}
+
+
+namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
+
+using namespace ::boost::spirit;
+using namespace ::boost::spirit::qi;
+using namespace bacnet::bvll::bvlc;
+
+template<typename Iterator>
+struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_table_entry()> {
+
+	bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+
+	rule<Iterator, foreign_device_table_entry()> foreign_device_table_entry_rule;
+	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
+	rule<Iterator, uint16_t()> time_to_live_in_sec_rule;
+	rule<Iterator, uint16_t()> time_to_purge_in_sec_rule;
+
+	foreign_device_table_entry_grammar() : foreign_device_table_entry_grammar::base_type(foreign_device_table_entry_rule) {
+
+		foreign_device_table_entry_rule = bacnet_ip_address_rule > time_to_live_in_sec_rule > time_to_purge_in_sec_rule;
+
+		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
+		time_to_live_in_sec_rule = big_word;
+		time_to_purge_in_sec_rule = big_word;
+
+
+		foreign_device_table_entry_rule.name("foreign_device_table_entry_rule");
+		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
+		time_to_live_in_sec_rule.name("time_to_live_in_sec_rule");
+		time_to_purge_in_sec_rule.name("time_to_purge_in_sec_rule");
+	}
+};
+
+
+template<typename Container>
+bool parse(Container i, foreign_device_table_entry &v){
+
+	auto start = i.begin();
+	auto end = i.end();
+	foreign_device_table_entry_grammar<decltype(start)> grammar;
+
+	return boost::spirit::qi::parse(start, end, grammar, v);
+}
+
+}}}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),bvlc_result,
 	(bacnet::bvll::bvlc::result_code, result_code)
@@ -388,6 +465,6 @@ BOOST_FUSION_DEFINE_STRUCT(
 )
 
 
-
+*/
 
 #endif /* SRC_BACNET_BVLL_FRAMES_HPP_ */
