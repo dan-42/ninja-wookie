@@ -36,7 +36,79 @@
 
 
 
+namespace bacnet { namespace  bvll { namespace detail {
 
+
+class transporter {
+
+public:
+
+	const uint16_t DEFAULT_PORT = 0xBAC0;
+	const std::string DEFAULT_ADDRESS{"255.255.255.255"};
+
+
+	transporter(boost::asio::io_service &io_service) : io_service_(io_service), socket_(io_service) {
+		init();
+	}
+
+	transporter(boost::asio::io_service &io_service, uint16_t port) : io_service_(io_service), socket_(io_service), port_(port) {
+		init();
+	}
+
+	transporter(boost::asio::io_service &io_service, const std::string multicast_address, uint16_t port) :
+		io_service_(io_service), socket_(io_service), port_(port), multicast_address_(boost::asio::ip::address::from_string(multicast_address)) {
+		init();
+	}
+
+
+
+
+	template<typename Buffer,typename Handler>
+	void async_receive_from(const Buffer &buffer, boost::asio::ip::udp::endpoint &sender, const Handler &handler) {
+		std::cout << "async_receive_from(): " << std::endl;
+		socket_.async_receive_from( buffer, sender, handler);
+	}
+
+
+
+
+
+
+
+
+
+private:
+	//xxx to be setable by user for specific interface?
+	const boost::asio::ip::address listen_address_ = boost::asio::ip::address::from_string("0.0.0.0");
+
+	void init() {
+		std::cout << "init(): " << std::endl;
+		listen_endpoint = boost::asio::ip::udp::endpoint(listen_address_, port_);
+
+		socket_.open(listen_endpoint.protocol());
+		socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
+		socket_.bind(listen_endpoint);
+
+
+		if(multicast_address_.to_string().compare(DEFAULT_ADDRESS) != 0) {
+			//socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));
+		}
+
+
+	}
+
+
+	boost::asio::ip::address multicast_address_= boost::asio::ip::address::from_string(DEFAULT_ADDRESS);
+	uint16_t port_ = DEFAULT_PORT;
+
+	boost::asio::io_service &io_service_;
+	boost::asio::ip::udp::socket socket_;
+	boost::asio::ip::udp::endpoint listen_endpoint;
+};
+
+
+
+}}}
 
 
 
@@ -47,57 +119,34 @@
 
 namespace bacnet { namespace  bvll {
 
-const uint16_t DEFAULT_PORT = 0xBAC0;
+
 
 class controller {
 
 public:
 
-	controller(boost::asio::io_service &ios) : io_service_(ios), socket_(ios) {
-
-		//auto multicast_address = boost::asio::ip::address::from_string("255.255.255.255");
-		auto multicast_address = boost::asio::ip::address::from_string("239.255.0.1");
-
-
-		boost::asio::ip::udp::endpoint multicast_endpoint(multicast_address	, DEFAULT_PORT);
-
-
-		boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::address::from_string("0.0.0.0")	, DEFAULT_PORT);
-		socket_.open(listen_endpoint.protocol());
-		socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
-		socket_.bind(listen_endpoint);
-
-		//socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address));
-
-
-		socket_.async_receive_from(
-				boost::asio::buffer(data_, max_length), sender_endpoint_,
-					boost::bind(&controller::handle_receive_from, this,  boost::asio::placeholders::error,  boost::asio::placeholders::bytes_transferred));
-
-
-
-
-
-
+	controller(boost::asio::io_service &ios) : io_service_(ios), transporter_(ios) {
+		auto callback = boost::bind(&controller::handle_receive_from, this,  boost::asio::placeholders::error,     boost::asio::placeholders::bytes_transferred);
+		transporter_.async_receive_from( boost::asio::buffer(data_, max_length), sender_endpoint_, callback);
 	}
 
+	controller(boost::asio::io_service &ios, uint16_t port) : io_service_(ios), transporter_(ios, port) {
+			auto callback = boost::bind(&controller::handle_receive_from, this,  boost::asio::placeholders::error,     boost::asio::placeholders::bytes_transferred);
+			transporter_.async_receive_from( boost::asio::buffer(data_, max_length), sender_endpoint_, callback);
+	}
 
 	void handle_receive_from(const boost::system::error_code& error,   size_t bytes_recvd)	  {
-	    if (!error)	    {
-
-
+		std::cout << "handle_receive_from(): " << std::endl;
+	    if (!error) {
+	    	std::cout << "received from: " << sender_endpoint_.address().to_string() << ":" << sender_endpoint_.port() << std::endl;
 			for(std::size_t idx = 0; idx < bytes_recvd; idx++){
 				std::bitset<8> b(data_[idx]);
 				std::cout << b.to_string();
 			}
 			std::cout << std::endl;
 
-
-	      socket_.async_receive_from(
-	          boost::asio::buffer(data_, max_length), sender_endpoint_,
-	          boost::bind(&controller::handle_receive_from, this,
-	            boost::asio::placeholders::error,
-	            boost::asio::placeholders::bytes_transferred));
+			auto callback = boost::bind(&controller::handle_receive_from, this,  boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+			transporter_.async_receive_from( boost::asio::buffer(data_, max_length), sender_endpoint_, callback);
 	    }
 	  }
 
@@ -105,10 +154,11 @@ public:
 private:
 
 	boost::asio::io_service &io_service_;
-	boost::asio::ip::udp::socket socket_;
 	boost::asio::ip::udp::endpoint sender_endpoint_;
 	enum { max_length = std::numeric_limits<uint16_t>::max()};
 	char data_[max_length];
+
+	bacnet::bvll::detail::transporter transporter_;
 };
 
 
@@ -118,8 +168,9 @@ private:
 
 
 
-
-
+void received(){
+	std::cout << "received()" << std::endl;
+}
 
 
 int main(int argc, char* argv[])
@@ -161,10 +212,11 @@ int main(int argc, char* argv[])
 
 
 
-
-
     boost::asio::io_service io_service;
-    bacnet::bvll::controller controller(io_service);
+
+
+
+    bacnet::bvll::controller controller(io_service, 9595);
 
     io_service.run();
   }

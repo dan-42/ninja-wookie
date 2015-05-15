@@ -8,11 +8,7 @@
 #ifndef SRC_BACNET_BVLL_BACNET_IP_ADDRESS_HPP_
 #define SRC_BACNET_BVLL_BACNET_IP_ADDRESS_HPP_
 
-
-
 #include <boost/fusion/include/define_struct.hpp>
-
-
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
@@ -52,8 +48,8 @@ struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
 
 template<typename Container>
 bool generate(Container c, bacnet_ip_address &v) {
-	std::back_insert_iterator<decltype(c)> sink(c);
-	bacnet::bvll::bvlc::generator::foreign_device_table_entry_grammar<decltype(sink)> g;
+	std::back_insert_iterator<Container> sink(c);
+	bacnet::bvll::bvlc::generator::bacnet_ip_address_grammar<decltype(sink)> g;
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
@@ -88,9 +84,9 @@ struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
 
 
 template<typename Container>
-bool parse(Container i, bacnet_ip_address &v){
+bool parse(Container &i, bacnet_ip_address &v){
 	auto start = i.begin(); auto end = i.end();
-	foreign_device_table_entry_grammar<decltype(start)> grammar;
+	bacnet_ip_address_grammar<decltype(start)> grammar;
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
