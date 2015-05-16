@@ -60,22 +60,11 @@ public:
 		init();
 	}
 
-
-
-
 	template<typename Buffer,typename Handler>
 	void async_receive_from(const Buffer &buffer, boost::asio::ip::udp::endpoint &sender, const Handler &handler) {
 		std::cout << "async_receive_from(): " << std::endl;
 		socket_.async_receive_from( buffer, sender, handler);
 	}
-
-
-
-
-
-
-
-
 
 private:
 	//xxx to be setable by user for specific interface?
@@ -91,12 +80,11 @@ private:
 
 
 		if(multicast_address_.to_string().compare(DEFAULT_ADDRESS) != 0) {
-			//socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));
+			socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));
 		}
 
 
 	}
-
 
 	boost::asio::ip::address multicast_address_= boost::asio::ip::address::from_string(DEFAULT_ADDRESS);
 	uint16_t port_ = DEFAULT_PORT;
@@ -109,10 +97,6 @@ private:
 
 
 }}}
-
-
-
-
 
 
 
@@ -136,7 +120,6 @@ public:
 	}
 
 	void handle_receive_from(const boost::system::error_code& error,   size_t bytes_recvd)	  {
-		std::cout << "handle_receive_from(): " << std::endl;
 	    if (!error) {
 	    	std::cout << "received from: " << sender_endpoint_.address().to_string() << ":" << sender_endpoint_.port() << std::endl;
 			for(std::size_t idx = 0; idx < bytes_recvd; idx++){
@@ -144,6 +127,10 @@ public:
 				std::cout << b.to_string();
 			}
 			std::cout << std::endl;
+
+			std::string input(data_, bytes_recvd);
+			frame::possible_bvll_frame f;
+			parser::parse(input, f);
 
 			auto callback = boost::bind(&controller::handle_receive_from, this,  boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 			transporter_.async_receive_from( boost::asio::buffer(data_, max_length), sender_endpoint_, callback);
@@ -216,7 +203,7 @@ int main(int argc, char* argv[])
 
 
 
-    bacnet::bvll::controller controller(io_service, 9595);
+    bacnet::bvll::controller controller(io_service);
 
     io_service.run();
   }

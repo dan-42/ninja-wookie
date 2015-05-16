@@ -27,9 +27,10 @@
 
 #include <iostream>
 #include <iomanip>
-
 #include <vector>
 #include <string>
+
+
 
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
@@ -48,9 +49,30 @@
 #include <boost/phoenix/bind/bind_member_variable.hpp>
 
 
+
+
+
+
+
+
+
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 #include <bacnet/bvll/foreign_device_table_entry.hpp>
+#include <bacnet/bvll/foreign_device_table.hpp>
+#include <bacnet/bvll/broadcast_distribution_table_entry.hpp>
+#include <bacnet/bvll/broadcast_distribution_table.hpp>
 
+#include <bacnet/bvll/frame/bvlc_result.hpp>
+#include <bacnet/bvll/frame/read_broadcast_distribution_table_ack.hpp>
+#include <bacnet/bvll/frame/write_broadcast_distribution_table.hpp>
+#include <bacnet/bvll/frame/forwarded_npdu.hpp>
+#include <bacnet/bvll/frame/register_foreign_device.hpp>
+#include <bacnet/bvll/frame/original_broadcast_npdu.hpp>
+#include <bacnet/bvll/frame/original_unicast_npdu.hpp>
+#include <bacnet/bvll/frame/distribute_broadcast_to_network.hpp>
+
+
+#include <bacnet/bvll/bvlc/result_code.hpp>
 
 namespace bacnet { namespace bvll { namespace bvlc {
 
@@ -144,110 +166,6 @@ std::ostream& operator<<(std::ostream& os, const function& f) {
 	return os;
 }
 
-
-
-
-
-
-
-
-enum class result_code : uint16_t {
-	successful_completion					= 0x0000,
-	write_broadcast_distribution_table_nak	= 0x0010,
-	read_broadcast_distribution_table_nak	= 0x0020,
-	register_foreign_device_nak				= 0x0030,
-	read_foreign_device_table_nak			= 0x0040,
-	delete_foreign_device_table_entry_nak	= 0x0050,
-	distribute_broadcast_to_network_nak		= 0x0060
-};
-
-uint16_t base_type(const result_code& rc){
-	return static_cast<uint16_t>(rc);
-}
-
-
-std::ostream& operator<<(std::ostream& os, const result_code& rc) {
-	switch(rc){
-	  case result_code::successful_completion :
-		os << "successful_completion(0x0000)";
-		break;
-	  case result_code::write_broadcast_distribution_table_nak :
-		os << "write_broadcast_distribution_table_nak(0x0010)";
-		break;
-	  case result_code::read_broadcast_distribution_table_nak :
-		os << "read_broadcast_distribution_table_nak(0x0020)";
-		break;
-	  case result_code::register_foreign_device_nak :
-		os << "register_foreign_device_nak(0x0030)";
-		break;
-	  case result_code::read_foreign_device_table_nak :
-		os << "read_foreign_device_table_nak(0x0040)";
-		break;
-	  case result_code::delete_foreign_device_table_entry_nak :
-		os << "delete_foreign_device_table_entry_nak(0x0050)";
-		break;
-	  case result_code::distribute_broadcast_to_network_nak :
-		os << "distribute_broadcast_to_network_nak(0x0060)";
-		break;
-	  default:
-		os << "unknown result_code  (0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(rc) << ")";
-	}
-	return os;
-}
-
-
-
-
-}}}
-
-
-
-
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(bvlc),broadcast_distribution_table_entry,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address)
-	(uint32_t, broadcast_distribution_mask)
-)
-namespace bacnet { namespace bvll { namespace bvlc {
- typedef std::vector<bacnet::bvll::bvlc::broadcast_distribution_table_entry> broadcast_distribution_table;
-}}}
-
-namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
-
-template<typename Iterator>
-struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_distribution_table_entry> {
-
-	rule<Iterator, broadcast_distribution_table_entry()> broadcast_distribution_table_entry_rule;
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, uint32_t()> broadcast_distribution_mask_rule;
-
-	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(bacnet_ip_address_rule) {
-
-		bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
-
-		broadcast_distribution_table_entry_rule = bacnet_ip_address_rule < broadcast_distribution_mask_rule;
-
-		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
-		broadcast_distribution_mask_rule = big_word;
-
-		broadcast_distribution_table_entry_rule.name("broadcast_distribution_table_entry_rule");
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-		broadcast_distribution_mask_rule.name("broadcast_distribution_mask_rule");
-	}
-};
-
-}}}}
-
-
-
-// xxx put it into a Fusion struct as well?
-namespace bacnet { namespace bvll { namespace bvlc {
- typedef std::vector<bacnet::bvll::bvlc::foreign_device_table_entry> foreign_device_table;
 }}}
 
 
@@ -257,227 +175,16 @@ namespace bacnet { namespace bvll { namespace bvlc {
 
 
 
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),bvlc_result,
-	(bacnet::bvll::bvlc::result_code, result_code)
-)
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),write_broadcast_distribution_table,
-	(bacnet::bvll::bvlc::broadcast_distribution_table, broadcast_distribution_table_)
-)
-
-/*
+/* not working
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),read_broadcast_distribution_table,
 )*/
 
-namespace bacnet { namespace bvll { namespace frame {           \
-                                                                                \
-    struct read_broadcast_distribution_table                                                                 \
-    {                                                                           \
-        typedef read_broadcast_distribution_table self_type;                                                 \
-                                                                                \
-        template<typename Seq>                                                  \
-                                         \
-        read_broadcast_distribution_table(Seq const&)                                                        \
-        {}                                                                      \
-                                                                                \
-        template<typename Seq>                                                  \
-                                   \
-        self_type&                                                              \
-        operator=(Seq const& seq)                                               \
-        {                                                                       \
-            return *this;                                                       \
-        }                     \
-    };                                                                          \
-                                                                                \
-    } } }                                                                      \
-                                                                                \
-    namespace boost                                                                 \
-{                                                                               \
-    namespace fusion                                                            \
-    {                                                                           \
-        namespace traits                                                        \
-        {                                                                       \
-            template<                                                                   \
-           \
-    >                                                                           \
-    struct tag_of<bacnet:: bvll:: frame::   read_broadcast_distribution_table >     \
-    {                                                                           \
-        typedef struct_tag type;                                                       \
-    };           \
-            template<                                                                   \
-           \
-    >                                                                           \
-    struct tag_of<bacnet:: bvll:: frame::   read_broadcast_distribution_table const>     \
-    {                                                                           \
-        typedef struct_tag type;                                                       \
-    };                      \
-        }                                                                       \
-                                                                                \
-        namespace extension                                                     \
-        {                                                                       \
-                                      \
-                                                                                \
-            template<                                                           \
-                                                        \
-            >                                                                   \
-            struct struct_size<bacnet:: bvll:: frame::   read_broadcast_distribution_table> \
-              : mpl::int_<0>      \
-            {};                                                                 \
-                                                                                \
-            template<                                                           \
-                                                        \
-            >                                                                   \
-            struct struct_is_view<                                              \
-                bacnet:: bvll:: frame::   read_broadcast_distribution_table                 \
-            >                                                                   \
-              : mpl::false_                          \
-            {};                                                                 \
-        }                                                                       \
-    }                                                                           \
-                                                                                \
-    namespace mpl                                                               \
-    {                                                                           \
-        template<typename>                                                      \
-        struct sequence_tag;                                                    \
-                                                                                \
-        template<                                                               \
-                                                        \
-        >                                                                       \
-        struct sequence_tag<bacnet:: bvll:: frame::   read_broadcast_distribution_table>    \
-        {                                                                       \
-            typedef fusion::fusion_sequence_tag type;                           \
-        };                                                                      \
-                                                                                \
-        template<                                                               \
-                                                        \
-        >                                                                       \
-        struct sequence_tag<                                                    \
-            bacnet:: bvll:: frame::   read_broadcast_distribution_table const               \
-        >                                                                       \
-        {                                                                       \
-            typedef fusion::fusion_sequence_tag type;                           \
-        };                                                                      \
-    }                                                                           \
-}
-
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),read_broadcast_distribution_table_ack,
-	(bacnet::bvll::bvlc::broadcast_distribution_table, broadcast_distribution_table_)
-)
-
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),forwarded_npdu,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address_of_origin_device)
-	(std::string, npdu_data_from_origin_device)
-)
-
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),register_foreign_device,
-	(uint16_t, time_to_live_in_sec)
-)
-
-/*
+/* not workin :0
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),read_foreign_device_table,
 )
 */
-namespace bacnet { namespace bvll { namespace frame {           \
-                                                                                \
-    struct read_foreign_device_table                                                                 \
-    {                                                                           \
-        typedef read_foreign_device_table self_type;                                                 \
-                                                                                \
-        template<typename Seq>                                                  \
-                                         \
-        read_foreign_device_table(Seq const&)                                                        \
-        {}                                                                      \
-                                                                                \
-        template<typename Seq>                                                  \
-                                   \
-        self_type&                                                              \
-        operator=(Seq const& seq)                                               \
-        {                                                                       \
-            return *this;                                                       \
-        }                     \
-    };                                                                          \
-                                                                                \
-    } } }                                                                      \
-                                                                                \
-    namespace boost                                                                 \
-{                                                                               \
-    namespace fusion                                                            \
-    {                                                                           \
-        namespace traits                                                        \
-        {                                                                       \
-            template<                                                                   \
-           \
-    >                                                                           \
-    struct tag_of<bacnet:: bvll:: frame::   read_foreign_device_table >     \
-    {                                                                           \
-        typedef struct_tag type;                                                       \
-    };           \
-            template<                                                                   \
-           \
-    >                                                                           \
-    struct tag_of<bacnet:: bvll:: frame::   read_foreign_device_table const>     \
-    {                                                                           \
-        typedef struct_tag type;                                                       \
-    };                      \
-        }                                                                       \
-                                                                                \
-        namespace extension                                                     \
-        {                                                                       \
-                                      \
-                                                                                \
-            template<                                                           \
-                                                        \
-            >                                                                   \
-            struct struct_size<bacnet:: bvll:: frame::   read_foreign_device_table> \
-              : mpl::int_<0>      \
-            {};                                                                 \
-                                                                                \
-            template<                                                           \
-                                                        \
-            >                                                                   \
-            struct struct_is_view<                                              \
-                bacnet:: bvll:: frame::   read_foreign_device_table                 \
-            >                                                                   \
-              : mpl::false_                          \
-            {};                                                                 \
-        }                                                                       \
-    }                                                                           \
-                                                                                \
-    namespace mpl                                                               \
-    {                                                                           \
-        template<typename>                                                      \
-        struct sequence_tag;                                                    \
-                                                                                \
-        template<                                                               \
-                                                        \
-        >                                                                       \
-        struct sequence_tag<bacnet:: bvll:: frame::   read_foreign_device_table>    \
-        {                                                                       \
-            typedef fusion::fusion_sequence_tag type;                           \
-        };                                                                      \
-                                                                                \
-        template<                                                               \
-                                                        \
-        >                                                                       \
-        struct sequence_tag<                                                    \
-            bacnet:: bvll:: frame::   read_foreign_device_table const               \
-        >                                                                       \
-        {                                                                       \
-            typedef fusion::fusion_sequence_tag type;                           \
-        };                                                                      \
-    }                                                                           \
-}
 
 
 BOOST_FUSION_DEFINE_STRUCT(
@@ -491,22 +198,6 @@ BOOST_FUSION_DEFINE_STRUCT(
 )
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),distribute_broadcast_to_network,
-	(std::string, npdu_data)
-)
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),original_unicast_npdu,
-	(std::string, npdu_data)
-)
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),original_broadcast_npdu,
-	(std::string, npdu_data)
-)
-
-
-BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),original_secure_bvll,
 	(std::string, security_wrapped_data)
 )
@@ -515,11 +206,11 @@ namespace bacnet { namespace bvll { namespace frame {
  typedef boost::variant<
 			bvlc_result,
 			write_broadcast_distribution_table,
-			read_broadcast_distribution_table,
+			//read_broadcast_distribution_table,
 			read_broadcast_distribution_table_ack,
 			forwarded_npdu,
 			register_foreign_device,
-			read_foreign_device_table,
+			//read_foreign_device_table,
 			read_foreign_device_table_ack,
 			delete_foreign_device_table_entry,
 			distribute_broadcast_to_network,
@@ -531,7 +222,8 @@ namespace bacnet { namespace bvll { namespace frame {
 
 
 
-
+//xx do I need this?
+/*
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),bvll_frame,
 	(bacnet::bvll::bvlc::type, type)
@@ -539,8 +231,93 @@ BOOST_FUSION_DEFINE_STRUCT(
 	(uint16_t, length)
 	(bacnet::bvll::frame::possible_bvll_frame, payload)
 )
+*/
+
+namespace bacnet { namespace bvll { namespace parser {
+
+using namespace ::boost::spirit;
+using namespace ::boost::spirit::qi;
+using boost::phoenix::construct;
+using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll::frame;
+using namespace bacnet::bvll::frame::parser;
 
 
+
+template<typename Iterator>
+struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
+
+	rule<Iterator, possible_bvll_frame()> possible_bvll_frame_rule;
+	//rule<Iterator, type()> type_rule;
+	//rule<Iterator, function()> function_rule;
+	rule<Iterator, uint16_t()> length_rule;
+
+
+	rule<Iterator, bvlc_result()> bvlc_result_rule;
+	rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
+	/*
+	rule<Iterator, read_broadcast_distribution_table()> read_broadcast_distribution_table_rule;
+	rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
+	rule<Iterator, forwarded_npdu()> forwarded_npdu_rule;
+	rule<Iterator, register_foreign_device()> register_foreign_device_rule;
+	rule<Iterator, read_foreign_device_table()> read_foreign_device_table_rule;
+	rule<Iterator, read_foreign_device_table_ack()> read_foreign_device_table_ack_rule;
+	rule<Iterator, delete_foreign_device_table_entry()> delete_foreign_device_table_entry_rule;
+	rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
+	rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
+	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
+	rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
+	*/
+
+
+
+	bvll_grammar() : bvll_grammar::base_type(possible_bvll_frame_rule) {
+
+
+		bvlc_result_grammar<Iterator> bvlc_result_grammar;
+		write_broadcast_distribution_table_grammar<Iterator> write_broadcast_distribution_table_grammar;
+		/*
+		//read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar;
+		read_broadcast_distribution_table_ack_grammar<Iterator> read_broadcast_distribution_table_ack_grammar;
+		forwarded_npdu_grammar<Iterator> forwarded_npdu_grammar;
+		register_foreign_device_grammar<Iterator> register_foreign_device_grammar;
+		//read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar;
+		read_foreign_device_table_ack_grammar<Iterator> read_foreign_device_table_ack_grammar;
+		delete_foreign_device_table_entry_grammar<Iterator> delete_foreign_device_table_entry_grammar;
+		distribute_broadcast_to_network_grammar<Iterator> distribute_broadcast_to_network_grammar;
+		original_unicast_npdu_grammar<Iterator> original_unicast_npdu_grammar;
+		original_broadcast_npdu_grammar<Iterator> original_broadcast_npdu_grammar;
+		original_secure_bvl_grammar<Iterator> original_secure_bvl_grammar;
+		*/
+
+
+		//bvll_frame_rule = type_rule > function_rule > length_rule >  payload_rule;
+		possible_bvll_frame_rule = (byte_(static_cast<uint8_t>(type::bvll_bacnet_ip_v4)) >> byte_(static_cast<uint8_t>(function::bvlc_result)) >> length_rule >> bvlc_result_rule )[_val = boost::spirit::_2];
+								// ||(type_rule(static_cast<uint8_t>(type::bvll_bacnet_ip_v4)) > function_rule(static_cast<uint8_t>(function::write_broadcast_distribution_table)) > length_rule > write_broadcast_distribution_table_rule );
+
+
+
+
+		bvlc_result_rule = bvlc_result_grammar;
+		write_broadcast_distribution_table_rule = write_broadcast_distribution_table_grammar;
+
+
+		//type_rule = byte_;
+		//function_rule = byte_;
+		length_rule = big_word;
+	}
+};
+
+
+template<typename Container>
+bool parse(Container &i, possible_bvll_frame &v){
+	auto start = i.begin(); auto end = i.end();
+	bvll_grammar<decltype(start)> grammar;
+	return boost::spirit::qi::parse(start, end, grammar, v);
+}
+
+
+}}}
 
 
 #endif /* SRC_BACNET_BVLL_FRAMES_HPP_ */
