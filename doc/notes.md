@@ -48,3 +48,15 @@ bacnet::bvlc::frame::...
 bacnet::npdu::
 
 bacnet::apdu::
+
+
+
+
+
+
+
+
+## Interfaces
+ using boost::static_visitors<> as api interface? might be cool idea?
+ why do i neer seperate byte_ rule for parsing into std::string
+ 
