@@ -24,6 +24,7 @@
 #include <iostream>
 #include <bitset>
 #include <string>
+#include <iomanip>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -103,6 +104,56 @@ private:
 
 namespace bacnet { namespace  bvll {
 
+class inbound_router : public boost::static_visitor<> {
+
+public:
+	void operator()(frame::bvlc_result request) {
+		std::cout << "inbound_router bvlc_result" << std::endl;
+	}
+	void operator()(frame::write_broadcast_distribution_table request) {
+			std::cout << "inbound_router write_broadcast_distribution_table" << std::endl;
+	}
+/*	void operator()(frame::read_broadcast_distribution_table request) {
+			std::cout << "inbound_router read_broadcast_distribution_table" << std::endl;
+	}
+*/
+	void operator()(frame::read_broadcast_distribution_table_ack request) {
+			std::cout << "inbound_router read_broadcast_distribution_table" << std::endl;
+	}
+	void operator()(frame::forwarded_npdu request) {
+			std::cout << "inbound_router forwarded_npdu" << std::endl;
+	}
+	void operator()(frame::register_foreign_device request) {
+			std::cout << "inbound_router register_foreign_device" << std::endl;
+	}
+/*	void operator()(frame::read_foreign_device_table request) {
+			std::cout << "inbound_router read_foreign_device_table" << std::endl;
+	}
+*/
+/*	void operator()(frame::read_foreign_device_table_ack request) {
+				std::cout << "inbound_router read_foreign_device_table_ack" << std::endl;
+	}
+*/
+/*	void operator()(frame::delete_foreign_device_table_entry request) {
+			std::cout << "inbound_router delete_foreign_device_table_entry" << std::endl;
+	}
+*/
+	void operator()(frame::distribute_broadcast_to_network request) {
+			std::cout << "inbound_router distribute_broadcast_to_network" << std::endl;
+	}
+	void operator()(frame::original_unicast_npdu request) {
+				std::cout << "inbound_router original_unicast_npdu" << std::endl;
+	}
+	void operator()(frame::original_broadcast_npdu request) {
+				std::cout << "inbound_router original_broadcast_npdu" << std::endl;
+	}
+/*	void operator()(frame::original_secure_bvll request) {
+				std::cout << "inbound_router original_secure_bvll" << std::endl;
+	}
+*/
+
+};
+
 
 
 class controller {
@@ -122,15 +173,21 @@ public:
 	void handle_receive_from(const boost::system::error_code& error,   size_t bytes_recvd)	  {
 	    if (!error) {
 	    	std::cout << "received from: " << sender_endpoint_.address().to_string() << ":" << sender_endpoint_.port() << std::endl;
+	    	std::string input;
 			for(std::size_t idx = 0; idx < bytes_recvd; idx++){
 				std::bitset<8> b(data_[idx]);
 				std::cout << b.to_string();
+				input.push_back(data_[idx]);
+			}
+			std::cout << std::endl;
+			for(std::size_t idx = 0; idx < bytes_recvd; idx++){
+				std::cout  << std::hex << (int)data_[idx] << " ";
 			}
 			std::cout << std::endl;
 
-			std::string input(data_, bytes_recvd);
-			frame::possible_bvll_frame f;
-			parser::parse(input, f);
+			//std::string input(data_, bytes_recvd);
+			frame::possible_bvll_frame f = parser::parse(input);
+			boost::apply_visitor(inbound_router_, f);
 
 			auto callback = boost::bind(&controller::handle_receive_from, this,  boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
 			transporter_.async_receive_from( boost::asio::buffer(data_, max_length), sender_endpoint_, callback);
@@ -146,6 +203,7 @@ private:
 	char data_[max_length];
 
 	bacnet::bvll::detail::transporter transporter_;
+	inbound_router inbound_router_;
 };
 
 

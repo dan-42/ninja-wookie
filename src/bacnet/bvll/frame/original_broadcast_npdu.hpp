@@ -70,14 +70,17 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
 
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
 	rule<Iterator, std::string()> npdu_data_rule;
+	rule<Iterator, char()> byte_rule;
 
 	original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
 		original_broadcast_npdu_rule = npdu_data_rule;
-		npdu_data_rule = *byte_;
+		npdu_data_rule = repeat[byte_rule];
+		byte_rule = byte_;
 
 		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
 		npdu_data_rule.name("npdu_data_rule");
+		byte_rule.name("byte_rule");
 	}
 };
 
