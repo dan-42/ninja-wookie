@@ -315,79 +315,79 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
 		bvlc_result_rule = (
 							   byte_(base_type(function::bvlc_result))
-							  > big_word
+							  > omit[big_word]
 							  > bvlc_result_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 
 		write_broadcast_distribution_table_rule = (
 							   byte_(base_type(function::write_broadcast_distribution_table))
-							  > big_word
+							  > omit[big_word]
 							  > write_broadcast_distribution_table_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 
 		/*
 		read_broadcast_distribution_table_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table))
-							  > big_word
+							  > omit[big_word]
 							  > read_broadcast_distribution_table_grammar
-						   )[_val = boost::spirit::_2];
+						   );
 		*/
 
 		read_broadcast_distribution_table_ack_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table_ack))
-							  > big_word
+							  > omit[big_word]
 							  > read_broadcast_distribution_table_ack_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 
 		forwarded_npdu_rule = (
 							   byte_(base_type(function::forwarded_npdu))
-							  > big_word
+							  > omit[big_word]
 							  > forwarded_npdu_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 
 		register_foreign_device_rule = (
 							   byte_(base_type(function::register_foreign_device))
-							  > big_word
+							  > omit[big_word]
 							  > register_foreign_device_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 		/*
 		read_foreign_device_table_rule = (
 							   byte_(base_type(function::read_foreign_device_table))
-							  > big_word
+							  > omit[big_word]
 							  > read_foreign_device_table_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 		*/
 		/*
 		read_foreign_device_table_ack_rule = (
 							   byte_(base_type(function::read_foreign_device_table_ack))
-							  > big_word
+							  > omit[big_word]
 							  > read_foreign_device_table_acke_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 		*/
 		/*
 		delete_foreign_device_table_entry_rule = (
 							   byte_(base_type(function::delete_foreign_device_table_entry))
-							  > big_word
+							  > omit[big_word]
 							  > delete_foreign_device_table_entry_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 		*/
 		distribute_broadcast_to_network_rule = (
 							   byte_(base_type(function::distribute_broadcast_to_network))
-							  > big_word
+							  > omit[big_word]
 							  > distribute_broadcast_to_network_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 
 		original_unicast_npdu_rule = (
 							   byte_(base_type(function::original_unicast_npdu))
-							  > big_word
+							  > omit[big_word]
 							  > original_unicast_npdu_grammar_
-						   )[_val = boost::spirit::_2];
+						   );
 
 		original_broadcast_npdu_rule = (
 							   byte_(base_type(function::original_broadcast_npdu))
 							  > omit[big_word]
 							  > original_broadcast_npdu_grammar_
-						   );//[_val = boost::spirit::_1];
+						   );
 		/*
 		original_secure_bvll_rule = (
 							   byte_(base_type(function::original_secure_bvll))

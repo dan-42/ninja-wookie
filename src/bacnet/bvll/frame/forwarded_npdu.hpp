@@ -33,7 +33,7 @@
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),forwarded_npdu,
 	(bacnet::bvll::bvlc::bacnet_ip_address, address_of_origin_device)
-	(std::string, npdu_data_from_origin_device)
+	(bacnet::binary_data, npdu_data_from_origin_device)
 )
 
 
@@ -49,7 +49,7 @@ struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
 
 	rule<Iterator, forwarded_npdu()> forwarded_npdu_rule;
 	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, std::string()> npdu_data_from_origin_device_rule;
+	rule<Iterator, bacnet::binary_data()> npdu_data_from_origin_device_rule;
 
 	forwarded_npdu_grammar() : forwarded_npdu_grammar::base_type(forwarded_npdu_rule) {
 
@@ -80,7 +80,7 @@ struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
 
 	rule<Iterator, forwarded_npdu()> forwarded_npdu_rule;
 	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, std::string()> npdu_data_from_origin_device_rule;
+	rule<Iterator, bacnet::binary_data()> npdu_data_from_origin_device_rule;
 
 	forwarded_npdu_grammar() : forwarded_npdu_grammar::base_type(forwarded_npdu_rule) {
 

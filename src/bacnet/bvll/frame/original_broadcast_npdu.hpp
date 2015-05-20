@@ -33,8 +33,8 @@
 ///*
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),original_broadcast_npdu,
-	(std::vector<uint8_t>, npdu_data)
-	(uint32_t,  unused_dummy)
+	(bacnet::binary_data, npdu_data)
+	(bacnet::unused_type,  unused)
 )
 // */
 
@@ -50,7 +50,7 @@ template<typename Iterator>
 struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
 
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-	rule<Iterator, std::string()> npdu_data_rule;
+	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
 	original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
@@ -75,22 +75,19 @@ template<typename Iterator>
 struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
 
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-	rule<Iterator, std::vector<uint8_t>()> npdu_data_rule;
-	rule<Iterator, uint8_t()> byte_rule;
+	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
+
 
 	original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-		original_broadcast_npdu_rule =  npdu_data_rule > attr(42);
-		npdu_data_rule = repeat[byte_rule];
-		byte_rule = byte_;
+		original_broadcast_npdu_rule =  npdu_data_rule >> attr(0);
+		npdu_data_rule = *byte_;
 
 		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
 		npdu_data_rule.name("npdu_data_rule");
-		byte_rule.name("byte_rule");
 
 		debug(original_broadcast_npdu_rule);
 		debug(npdu_data_rule);
-	//	debug(byte_rule);
 	}
 };
 

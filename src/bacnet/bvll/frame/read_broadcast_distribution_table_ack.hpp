@@ -32,6 +32,7 @@
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),read_broadcast_distribution_table_ack,
 	(bacnet::bvll::bvlc::broadcast_distribution_table, broadcast_distribution_table_)
+	(bacnet::unused_type,  unused)
 )
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {
@@ -47,12 +48,12 @@ struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_br
 	rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
 	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
+	broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
+
 	read_broadcast_distribution_table_ack_grammar() : read_broadcast_distribution_table_ack_grammar::base_type(read_broadcast_distribution_table_ack_rule) {
 
-		broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar;
-
 		read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule;
-		broadcast_distribution_table_rule = broadcast_distribution_table_grammar;
+		broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
 		read_broadcast_distribution_table_ack_rule.name("read_broadcast_distribution_table_ack_rule");
 		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");
@@ -75,12 +76,12 @@ struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_br
 	rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
 	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
+	broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
+
 	read_broadcast_distribution_table_ack_grammar() : read_broadcast_distribution_table_ack_grammar::base_type(read_broadcast_distribution_table_ack_rule) {
 
-		broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar;
-
-		read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule;
-		broadcast_distribution_table_rule = broadcast_distribution_table_grammar;
+		read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule >> attr(0);
+		broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
 		read_broadcast_distribution_table_ack_rule.name("read_broadcast_distribution_table_ack_rule");
 		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");

@@ -31,6 +31,7 @@
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),register_foreign_device,
 	(uint16_t, time_to_live_in_sec)
+	(bacnet::unused_type,  unused)
 )
 
 
@@ -75,7 +76,7 @@ struct register_foreign_device_grammar : grammar<Iterator, register_foreign_devi
 
 	register_foreign_device_grammar() : register_foreign_device_grammar::base_type(register_foreign_device_rule) {
 
-		register_foreign_device_rule = time_to_live_in_sec_rule;
+		register_foreign_device_rule = time_to_live_in_sec_rule >> attr(0);
 		time_to_live_in_sec_rule = big_word;
 
 		register_foreign_device_rule.name("register_foreign_device_rule");

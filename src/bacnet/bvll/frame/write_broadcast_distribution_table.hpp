@@ -32,6 +32,7 @@
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),write_broadcast_distribution_table,
 	(bacnet::bvll::bvlc::broadcast_distribution_table, broadcast_distribution_table_)
+	(bacnet::unused_type,  unused)
 )
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {
@@ -47,12 +48,12 @@ struct write_broadcast_distribution_table_grammar : grammar<Iterator, write_broa
 	rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
 	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
+	broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
+
 	write_broadcast_distribution_table_grammar() : write_broadcast_distribution_table_grammar::base_type(write_broadcast_distribution_table_rule) {
 
-		broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar;
-
 		write_broadcast_distribution_table_rule = broadcast_distribution_table_rule;
-		broadcast_distribution_table_rule = broadcast_distribution_table_grammar;
+		broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
 		write_broadcast_distribution_table_rule.name("write_broadcast_distribution_table_rule");
 		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");
@@ -75,12 +76,12 @@ struct write_broadcast_distribution_table_grammar : grammar<Iterator, write_broa
 	rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
 	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
+	broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
+
 	write_broadcast_distribution_table_grammar() : write_broadcast_distribution_table_grammar::base_type(write_broadcast_distribution_table_rule) {
 
-		broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar;
-
-		write_broadcast_distribution_table_rule = broadcast_distribution_table_rule;
-		broadcast_distribution_table_rule = broadcast_distribution_table_grammar;
+		write_broadcast_distribution_table_rule = broadcast_distribution_table_rule >> attr(0);
+		broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
 		write_broadcast_distribution_table_rule.name("write_broadcast_distribution_table_rule");
 		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");

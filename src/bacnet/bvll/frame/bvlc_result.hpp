@@ -31,6 +31,7 @@
 
 #include <bacnet/bvll/bvlc/result_code.hpp>
 
+#include <bacnet/detail/common/types.hpp>
 
 
 
@@ -52,6 +53,7 @@ namespace boost { namespace spirit { namespace traits {
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),bvlc_result,
 	(uint16_t, result_code)
+	(bacnet::unused_type, unused)
 )
 
 
@@ -96,7 +98,7 @@ struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
 
 	bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
 
-		bvlc_result_rule = result_code_rule;
+		bvlc_result_rule = result_code_rule >> attr(0);
 		result_code_rule = big_word;
 
 		bvlc_result_rule.name("bvlc_result_rule");
