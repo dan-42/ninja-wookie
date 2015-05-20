@@ -45,14 +45,12 @@ struct broadcast_distribution_table_grammar : grammar<Iterator, broadcast_distri
 	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 	rule<Iterator, broadcast_distribution_table_entry()> broadcast_distribution_table_entry_rule;
 
+	broadcast_distribution_table_entry_grammar<Iterator> broadcast_distribution_table_entry_grammar_;
 
 	broadcast_distribution_table_grammar() : broadcast_distribution_table_grammar::base_type(broadcast_distribution_table_rule) {
 
-		broadcast_distribution_table_entry_grammar<Iterator> broadcast_distribution_table_entry_grammar;
-
 		broadcast_distribution_table_rule = *broadcast_distribution_table_entry_rule;
-		broadcast_distribution_table_entry_rule = broadcast_distribution_table_entry_grammar;
-
+		broadcast_distribution_table_entry_rule = broadcast_distribution_table_entry_grammar_;
 
 		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");
 		broadcast_distribution_table_entry_rule.name("broadcast_distribution_table_entry_rule");
@@ -83,13 +81,12 @@ struct broadcast_distribution_table_grammar : grammar<Iterator, broadcast_distri
 	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 	rule<Iterator, broadcast_distribution_table_entry()> broadcast_distribution_table_entry_rule;
 
+	broadcast_distribution_table_entry_grammar<Iterator> broadcast_distribution_table_entry_grammar_;
 
 	broadcast_distribution_table_grammar() : broadcast_distribution_table_grammar::base_type(broadcast_distribution_table_rule) {
 
-		broadcast_distribution_table_entry_grammar<Iterator> broadcast_distribution_table_entry_grammar;
-
 		broadcast_distribution_table_rule = *broadcast_distribution_table_entry_rule;
-		broadcast_distribution_table_entry_rule = broadcast_distribution_table_entry_grammar;
+		broadcast_distribution_table_entry_rule = broadcast_distribution_table_entry_grammar_;
 
 
 		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");

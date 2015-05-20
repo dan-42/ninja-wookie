@@ -44,15 +44,12 @@ struct foreign_device_table_grammar : grammar<Iterator, foreign_device_table()> 
 
 	rule<Iterator, foreign_device_table()> foreign_device_table_rule;
 	rule<Iterator, foreign_device_table_entry()> foreign_device_table_entry_rule;
-
+	foreign_device_table_entry_grammar<Iterator> foreign_device_table_entry_grammar_;
 
 	foreign_device_table_grammar() : foreign_device_table_grammar::base_type(foreign_device_table_rule) {
 
-		foreign_device_table_entry_grammar<Iterator> foreign_device_table_entry_grammar;
-
 		foreign_device_table_rule = *foreign_device_table_entry_rule;
-		foreign_device_table_entry_rule = foreign_device_table_entry_grammar;
-
+		foreign_device_table_entry_rule = foreign_device_table_entry_grammar_;
 
 		foreign_device_table_rule.name("foreign_device_table");
 		foreign_device_table_entry_rule.name("foreign_device_table_entry_rule");
@@ -82,14 +79,12 @@ struct foreign_device_table_grammar : grammar<Iterator, foreign_device_table()> 
 
 	rule<Iterator, foreign_device_table()> foreign_device_table_rule;
 	rule<Iterator, foreign_device_table_entry()> foreign_device_table_entry_rule;
-
+	foreign_device_table_entry_grammar<Iterator> foreign_device_table_entry_grammar_;
 
 	foreign_device_table_grammar() : foreign_device_table_grammar::base_type(foreign_device_table_rule) {
 
-		foreign_device_table_entry_grammar<Iterator> foreign_device_table_entry_grammar;
-
 		foreign_device_table_rule = *foreign_device_table_entry_rule;
-		foreign_device_table_entry_rule = foreign_device_table_entry_grammar;
+		foreign_device_table_entry_rule = foreign_device_table_entry_grammar_;
 
 
 		foreign_device_table_rule.name("foreign_device_table");

@@ -22,16 +22,22 @@
 #ifndef SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_
 #define SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_
 
-#include <string>
+#include <vector>
 
 #include <boost/fusion/include/define_struct.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
+
+///*
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),original_broadcast_npdu,
-	(std::string, npdu_data)
+	(std::vector<uint8_t>, npdu_data)
+	(uint32_t,  unused_dummy)
 )
+// */
+
 
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {
@@ -61,28 +67,49 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
 
 namespace bacnet { namespace bvll { namespace frame { namespace parser {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
+using namespace boost::spirit;
+using namespace boost::spirit::qi;
 using namespace bacnet::bvll::frame;
 
 template<typename Iterator>
 struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
 
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-	rule<Iterator, std::string()> npdu_data_rule;
-	rule<Iterator, char()> byte_rule;
+	rule<Iterator, std::vector<uint8_t>()> npdu_data_rule;
+	rule<Iterator, uint8_t()> byte_rule;
 
 	original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-		original_broadcast_npdu_rule = npdu_data_rule;
+		original_broadcast_npdu_rule =  npdu_data_rule > attr(42);
 		npdu_data_rule = repeat[byte_rule];
 		byte_rule = byte_;
 
 		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
 		npdu_data_rule.name("npdu_data_rule");
 		byte_rule.name("byte_rule");
+
+		debug(original_broadcast_npdu_rule);
+		debug(npdu_data_rule);
+	//	debug(byte_rule);
 	}
 };
+
+
+bool parse(const std::string &data_to_parse, original_broadcast_npdu &parsed){
+	auto start = data_to_parse.begin();
+	auto end = data_to_parse.end();
+
+	original_broadcast_npdu_grammar<decltype(start)> grammar;
+	bool result = false;
+	try {
+		result = boost::spirit::qi::parse(start, end, grammar, parsed);
+	}
+	catch(std::exception &e) {
+		std::cerr << "exception: frames.hpp parse(Container &i, original_broadcast_npdu_grammar &v) " << e.what() << std::endl;
+	}
+	return result;
+
+}
 
 
 }}}}

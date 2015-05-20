@@ -180,12 +180,12 @@ public:
 				input.push_back(data_[idx]);
 			}
 			std::cout << std::endl;
+
 			for(std::size_t idx = 0; idx < bytes_recvd; idx++){
 				std::cout  << std::hex << (int)data_[idx] << " ";
 			}
 			std::cout << std::endl;
 
-			//std::string input(data_, bytes_recvd);
 			frame::possible_bvll_frame f = parser::parse(input);
 			boost::apply_visitor(inbound_router_, f);
 
@@ -222,47 +222,27 @@ int main(int argc, char* argv[])
 {
   try
   {
-
-	  std::string bin_data_to_parse{};
-	  std::string bin_data_to_generate{};
-
-	  bin_data_to_parse.push_back(0xC0);
-	  bin_data_to_parse.push_back(0xA8);
-	  bin_data_to_parse.push_back(0x0A);
-	  bin_data_to_parse.push_back(0x0A);
-
-	  bin_data_to_parse.push_back(0xBA);
-	  bin_data_to_parse.push_back(0xC0);
-
-
-	  bin_data_to_parse.push_back(0xAA);
-	  bin_data_to_parse.push_back(0xAA);
-
-	  bin_data_to_parse.push_back(0xDD);
-	  bin_data_to_parse.push_back(0xDD);
+/*
+	  std::string binary;
+	  binary.push_back(0x81);
+	  binary.push_back(0x0b);
+	  binary.push_back(0x00);
+	  binary.push_back(0x0c);
+	  binary.push_back(0x01);
+	  binary.push_back(0x20);
+	  binary.push_back(0xff);
+	  binary.push_back(0xff);
 
 
+	  //bacnet::bvll::frame::original_broadcast_npdu frame;
 
+	  //bacnet::bvll::frame::parser::parse(binary, frame);
 
-	  bacnet::bvll::bvlc::foreign_device_table_entry entry{};
-
-
-	  bacnet::bvll::bvlc::parser::parse(bin_data_to_parse, entry);
-
-	  bacnet::bvll::bvlc::generator::generate(bin_data_to_generate, entry);
-
-	  if(bin_data_to_parse.compare(bin_data_to_generate) == 0){
-		  std::cout << "juhu!" << std::endl;
-	  }
-
-
-
+	  bacnet::bvll::frame::possible_bvll_frame f ;
+	  bool r = bacnet::bvll::parser::parse(binary, f);
+*/
     boost::asio::io_service io_service;
-
-
-
     bacnet::bvll::controller controller(io_service);
-
     io_service.run();
   }
   catch (std::exception& e)

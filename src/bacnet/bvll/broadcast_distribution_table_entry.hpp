@@ -51,9 +51,9 @@ struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_
 	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
 	rule<Iterator, uint32_t()> broadcast_distribution_mask_rule;
 
-	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(broadcast_distribution_table_entry_rule) {
+	bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
 
-		bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(broadcast_distribution_table_entry_rule) {
 
 		broadcast_distribution_table_entry_rule = bacnet_ip_address_rule << broadcast_distribution_mask_rule;
 
@@ -92,9 +92,10 @@ struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_
 	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
 	rule<Iterator, uint32_t()> broadcast_distribution_mask_rule;
 
+	bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+
 	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(broadcast_distribution_table_entry_rule) {
 
-		bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
 
 		broadcast_distribution_table_entry_rule = bacnet_ip_address_rule > broadcast_distribution_mask_rule;
 
