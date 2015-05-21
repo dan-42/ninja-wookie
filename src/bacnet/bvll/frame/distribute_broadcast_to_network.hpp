@@ -39,7 +39,7 @@ namespace bacnet { namespace bvll { namespace frame { namespace generator {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::frame;
+using namespace bacnet::bvll::bvlc::generator;
 
 template<typename Iterator>
 struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_broadcast_to_network()> {

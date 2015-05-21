@@ -66,12 +66,16 @@
 
 #include <bacnet/bvll/frame/bvlc_result.hpp>
 #include <bacnet/bvll/frame/read_broadcast_distribution_table_ack.hpp>
+#include <bacnet/bvll/frame/read_broadcast_distribution_table.hpp>
 #include <bacnet/bvll/frame/write_broadcast_distribution_table.hpp>
 #include <bacnet/bvll/frame/forwarded_npdu.hpp>
 #include <bacnet/bvll/frame/register_foreign_device.hpp>
 #include <bacnet/bvll/frame/original_broadcast_npdu.hpp>
 #include <bacnet/bvll/frame/original_unicast_npdu.hpp>
 #include <bacnet/bvll/frame/distribute_broadcast_to_network.hpp>
+#include <bacnet/bvll/frame/read_foreign_device_table_ack.hpp>
+#include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
+#include <bacnet/bvll/frame/original_secure_bvll.hpp>
 
 
 #include <bacnet/bvll/bvlc/result_code.hpp>
@@ -177,29 +181,49 @@ std::ostream& operator<<(std::ostream& os, const function& f) {
 
 
 
+
 /* not working
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),read_broadcast_distribution_table,
 )*/
+namespace bacnet { namespace bvll { namespace frame {
+	struct read_broadcast_distribution_table {
+	};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::read_broadcast_distribution_table,
+)
+
+
+
+
+
+
 
 /* not workin :0
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),read_foreign_device_table,
 )
 */
+namespace bacnet { namespace bvll { namespace frame {
+	struct read_foreign_device_table {
+	};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::read_foreign_device_table,
+)
+
+
+
+
+
 
 
 
 /*
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),read_foreign_device_table_ack,
-	(bacnet::bvll::bvlc::foreign_device_table, foreign_device_table_)
-)
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),delete_foreign_device_table_entry,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address_to_delete)
-)
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),original_secure_bvll,
@@ -215,7 +239,7 @@ namespace bacnet { namespace bvll { namespace frame {
 			read_broadcast_distribution_table_ack,
 			forwarded_npdu,
 			register_foreign_device,
-			//read_foreign_device_table,
+			read_foreign_device_table,
 			//read_foreign_device_table_ack,
 			//delete_foreign_device_table_entry,
 			distribute_broadcast_to_network,
@@ -243,6 +267,8 @@ namespace bacnet { namespace bvll { namespace parser {
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
 using boost::phoenix::construct;
+
+
 using namespace bacnet::bvll::bvlc;
 using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::frame::parser;
@@ -253,39 +279,36 @@ template<typename Iterator>
 struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
 	rule<Iterator, possible_bvll_frame()> possible_bvll_frame_rule;
-	//rule<Iterator, type()> type_rule;
-	//rule<Iterator, function()> function_rule;
-	//rule<Iterator, uint16_t()> length_rule;
 
 
 	rule<Iterator, bvlc_result()> bvlc_result_rule;
 	rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
-//	rule<Iterator, read_broadcast_distribution_table()> read_broadcast_distribution_table_rule;
+	rule<Iterator, read_broadcast_distribution_table()> read_broadcast_distribution_table_rule;
 	rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
 	rule<Iterator, forwarded_npdu()> forwarded_npdu_rule;
 	rule<Iterator, register_foreign_device()> register_foreign_device_rule;
-//	rule<Iterator, read_foreign_device_table()> read_foreign_device_table_rule;
-//	rule<Iterator, read_foreign_device_table_ack()> read_foreign_device_table_ack_rule;
-//	rule<Iterator, delete_foreign_device_table_entry()> delete_foreign_device_table_entry_rule;
+	rule<Iterator, read_foreign_device_table()> read_foreign_device_table_rule;
+	rule<Iterator, read_foreign_device_table_ack()> read_foreign_device_table_ack_rule;
+	rule<Iterator, delete_foreign_device_table_entry()> delete_foreign_device_table_entry_rule;
 	rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
 	rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-//	rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
+	rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
 
 
 	bvlc_result_grammar<Iterator> bvlc_result_grammar_;
 	write_broadcast_distribution_table_grammar<Iterator> write_broadcast_distribution_table_grammar_;
-	//read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar_;
+	read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar_;
 	read_broadcast_distribution_table_ack_grammar<Iterator> read_broadcast_distribution_table_ack_grammar_;
 	forwarded_npdu_grammar<Iterator> forwarded_npdu_grammar_;
 	register_foreign_device_grammar<Iterator> register_foreign_device_grammar_;
-	//read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar_;
-	//read_foreign_device_table_ack_grammar<Iterator> read_foreign_device_table_ack_grammar_;
-//		delete_foreign_device_table_entry_grammar<Iterator> delete_foreign_device_table_entry_grammar_;
+	read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar_;
+	read_foreign_device_table_ack_grammar<Iterator> read_foreign_device_table_ack_grammar_;
+	delete_foreign_device_table_entry_grammar<Iterator> delete_foreign_device_table_entry_grammar_;
 	distribute_broadcast_to_network_grammar<Iterator> distribute_broadcast_to_network_grammar_;
 	original_unicast_npdu_grammar<Iterator> original_unicast_npdu_grammar_;
 	original_broadcast_npdu_grammar<Iterator> original_broadcast_npdu_grammar_;
-//		original_secure_bvl_grammar<Iterator> original_secure_bvl_grammar_;
+	original_secure_bvl_grammar<Iterator> original_secure_bvl_grammar_;
 
 
 
@@ -299,17 +322,17 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 						(
 								bvlc_result_rule
 							|	write_broadcast_distribution_table_rule
-						//	|	read_broadcast_distribution_table_rule
+							|	read_broadcast_distribution_table_rule
 							|	read_broadcast_distribution_table_ack_rule
 							|	forwarded_npdu_rule
 							|	register_foreign_device_rule
-						//	|	read_foreign_device_table_rule
-						//	|	read_foreign_device_table_ack_rule
-						//	|	delete_foreign_device_table_entry_rule
+							|	read_foreign_device_table_rule
+							|	read_foreign_device_table_ack_rule
+							|	delete_foreign_device_table_entry_rule
 							|	distribute_broadcast_to_network_rule
 							|	original_unicast_npdu_rule
 							|	original_broadcast_npdu_rule
-						//	|	original_secure_bvll_rule
+							|	original_secure_bvll_rule
 						);
 
 
@@ -325,13 +348,12 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							  > write_broadcast_distribution_table_grammar_
 						   );
 
-		/*
+
 		read_broadcast_distribution_table_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table))
 							  > omit[big_word]
 							  > read_broadcast_distribution_table_grammar
 						   );
-		*/
 
 		read_broadcast_distribution_table_ack_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table_ack))
@@ -350,27 +372,27 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							  > omit[big_word]
 							  > register_foreign_device_grammar_
 						   );
-		/*
+
 		read_foreign_device_table_rule = (
 							   byte_(base_type(function::read_foreign_device_table))
 							  > omit[big_word]
 							  > read_foreign_device_table_grammar_
 						   );
-		*/
-		/*
+
+
 		read_foreign_device_table_ack_rule = (
 							   byte_(base_type(function::read_foreign_device_table_ack))
 							  > omit[big_word]
 							  > read_foreign_device_table_acke_grammar_
 						   );
-		*/
-		/*
+
+
 		delete_foreign_device_table_entry_rule = (
 							   byte_(base_type(function::delete_foreign_device_table_entry))
 							  > omit[big_word]
 							  > delete_foreign_device_table_entry_grammar_
 						   );
-		*/
+
 		distribute_broadcast_to_network_rule = (
 							   byte_(base_type(function::distribute_broadcast_to_network))
 							  > omit[big_word]
@@ -388,13 +410,13 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							  > omit[big_word]
 							  > original_broadcast_npdu_grammar_
 						   );
-		/*
+
 		original_secure_bvll_rule = (
 							   byte_(base_type(function::original_secure_bvll))
-							  > big_word
+							  > omit[big_word]
 							  > original_secure_bvll_grammar_
-						   )[_val = boost::spirit::_2];
-		*/
+						   );
+
 
 		bvlc_result_rule.name("bvlc_result_rule");
 		write_broadcast_distribution_table_rule.name("write_broadcast_distribution_table_rule");
@@ -415,12 +437,6 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		debug(original_unicast_npdu_rule);
 		debug(original_broadcast_npdu_rule);
 // */
-
-
-
-		//type_rule = byte_;
-		//function_rule = byte_;
-		//length_rule = big_word;
 	}
 };
 
