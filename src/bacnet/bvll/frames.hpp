@@ -257,7 +257,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							|	original_unicast_npdu_rule
 							|	original_broadcast_npdu_rule
 							|	original_secure_bvll_rule
-						) ) | raw_rule;
+						) ) /* | raw_rule */;
 
 
 		bvlc_result_rule = (
@@ -372,9 +372,9 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
 
 
-possible_bvll_frame parse(std::string i){
-	auto start = i.begin();
-	auto end = i.end();
+possible_bvll_frame parse(bacnet::binary_data data){
+	auto start = data.begin();
+	auto end = data.end();
 	possible_bvll_frame frame;
 	bvll_grammar<decltype(start)> grammar;
 	bool result = false;
