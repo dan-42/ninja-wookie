@@ -30,14 +30,12 @@
 #include <boost/spirit/include/karma.hpp>
 
 
-///*
+
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),original_broadcast_npdu,
 	(bacnet::binary_data, npdu_data)
 	(bacnet::unused_type,  unused)
 )
-// */
-
 
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {

@@ -18,25 +18,22 @@
  * Authors: Daniel Friedrich
  */
 
-
 #ifndef SRC_BACNET_BVLL_DELET_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
 #define SRC_BACNET_BVLL_DELET_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
-
 
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 
-
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 #include <bacnet/detail/common/types.hpp>
 
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),delete_foreign_device_table_entry,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address_to_delete)
-	(bacnet::unused_type, unused)
+    (bacnet)(bvll)(frame), delete_foreign_device_table_entry,
+    (bacnet::bvll::bvlc::bacnet_ip_address, address_to_delete)
+    (bacnet::unused_type, unused)
 )
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {
@@ -47,22 +44,23 @@ using namespace bacnet::bvll::bvlc;
 using namespace bacnet::bvll::bvlc::generator;
 
 template<typename Iterator>
-struct delete_foreign_device_table_enry_grammar : grammar<Iterator, delete_foreign_device_table_enry()> {
+struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_foreign_device_table_entry()> {
 
 
-	rule<Iterator, delete_foreign_device_table_enry()> delete_foreign_device_table_enry_rule;
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
+  rule<Iterator, delete_foreign_device_table_entry()> delete_foreign_device_table_entry_rule;
+  rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
 
-        bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+  bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
 
-	delete_foreign_device_table_enry_grammar() : delete_foreign_device_table_enry_grammar::base_type(delete_foreign_device_table_enry_rule) {
+  delete_foreign_device_table_entry_grammar() : delete_foreign_device_table_entry_grammar::base_type(
+      delete_foreign_device_table_entry_rule) {
 
-		delete_foreign_device_table_enry_rule = bacnet_ip_address_rule;
-  		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
+    delete_foreign_device_table_entry_rule = bacnet_ip_address_rule;
+    bacnet_ip_address_rule = bacnet_ip_address_grammar_;
 
-		delete_foreign_device_table_enry_rule.name("delete_foreign_device_table_enry_rule");
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-	}
+    delete_foreign_device_table_entry_rule.name("delete_foreign_device_table_entry_rule");
+    bacnet_ip_address_rule.name("bacnet_ip_address_rule");
+  }
 };
 
 }}}}
@@ -76,23 +74,25 @@ using namespace bacnet::bvll::bvlc;
 using namespace bacnet::bvll::bvlc;
 using namespace bacnet::bvll::bvlc::parser;
 
+
 template<typename Iterator>
-struct delete_foreign_device_table_enry_grammar : grammar<Iterator, delete_foreign_device_table_enry()> {
+struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_foreign_device_table_entry()> {
 
 
-	rule<Iterator, delete_foreign_device_table_enry()> delete_foreign_device_table_enry_rule;
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
+  rule<Iterator, delete_foreign_device_table_entry()> delete_foreign_device_table_entry_rule;
+  rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
 
-        bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+  bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
 
-	delete_foreign_device_table_enry_grammar() : delete_foreign_device_table_enry_grammar::base_type(delete_foreign_device_table_enry_rule) {
+  delete_foreign_device_table_entry_grammar() : delete_foreign_device_table_entry_grammar::base_type(
+      delete_foreign_device_table_entry_rule) {
 
-		delete_foreign_device_table_enry_rule = bacnet_ip_address_rule >> attr(0);
-  		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
+    delete_foreign_device_table_entry_rule = bacnet_ip_address_rule >> attr(0);
+    bacnet_ip_address_rule = bacnet_ip_address_grammar_;
 
-		delete_foreign_device_table_enry_rule.name("delete_foreign_device_table_enry_rule");
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-	}
+    delete_foreign_device_table_entry_rule.name("delete_foreign_device_table_entry_rule");
+    bacnet_ip_address_rule.name("bacnet_ip_address_rule");
+  }
 };
 
 

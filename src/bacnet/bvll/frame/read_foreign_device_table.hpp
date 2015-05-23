@@ -19,8 +19,8 @@
  */
 
 
-#ifndef SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_HPP_
-#define SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_HPP_
+#ifndef SRC_BACNET_BVLL_FRAME_READ_FOREIGN_DEVICE_TABLE_HPP_
+#define SRC_BACNET_BVLL_FRAME_READ_FOREIGN_DEVICE_TABLE_HPP_
 
 
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -29,13 +29,13 @@
 
 
 namespace bacnet { namespace bvll { namespace frame {
-struct read_broadcast_distribution_table {
+struct read_foreign_device_table {
 };
 }}}
 
 BOOST_FUSION_ADAPT_STRUCT(
-		bacnet::bvll::frame::read_broadcast_distribution_table,
+		bacnet::bvll::frame::read_foreign_device_table,
 )
 
-#endif /* SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_HPP_ */
+#endif /* SRC_BACNET_BVLL_FRAME_READ_FORWIGN_DEVICE_TABLE_HPP_ */
 

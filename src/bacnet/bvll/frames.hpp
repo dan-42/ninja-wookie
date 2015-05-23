@@ -18,10 +18,6 @@
  * Authors: Daniel Friedrich
  */
 
-
-
-
-
 #ifndef SRC_BACNET_BVLL_FRAMES_HPP_
 #define SRC_BACNET_BVLL_FRAMES_HPP_
 
@@ -29,8 +25,6 @@
 #include <iomanip>
 #include <vector>
 #include <string>
-
-
 
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
@@ -42,21 +36,9 @@
 #include <boost/tuple/tuple_io.hpp>
 
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/repository/include/qi_advance.hpp>
-
 #include <boost/spirit/include/karma.hpp>
 
 #include <boost/spirit/include/phoenix.hpp>
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/phoenix/bind/bind_member_variable.hpp>
-
-
-
-
-
-
-
-
 
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 #include <bacnet/bvll/foreign_device_table_entry.hpp>
@@ -74,8 +56,10 @@
 #include <bacnet/bvll/frame/original_unicast_npdu.hpp>
 #include <bacnet/bvll/frame/distribute_broadcast_to_network.hpp>
 #include <bacnet/bvll/frame/read_foreign_device_table_ack.hpp>
+#include <bacnet/bvll/frame/read_foreign_device_table.hpp>
 #include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
 #include <bacnet/bvll/frame/original_secure_bvll.hpp>
+#include <bacnet/bvll/frame/raw.hpp>
 
 
 #include <bacnet/bvll/bvlc/result_code.hpp>
@@ -179,88 +163,26 @@ std::ostream& operator<<(std::ostream& os, const function& f) {
 
 
 
-
-
-
-/* not working
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),read_broadcast_distribution_table,
-)*/
-namespace bacnet { namespace bvll { namespace frame {
-	struct read_broadcast_distribution_table {
-	};
-}}}
-
-BOOST_FUSION_ADAPT_STRUCT(
-		bacnet::bvll::frame::read_broadcast_distribution_table,
-)
-
-
-
-
-
-
-
-/* not workin :0
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),read_foreign_device_table,
-)
-*/
-namespace bacnet { namespace bvll { namespace frame {
-	struct read_foreign_device_table {
-	};
-}}}
-
-BOOST_FUSION_ADAPT_STRUCT(
-		bacnet::bvll::frame::read_foreign_device_table,
-)
-
-
-
-
-
-
-
-
-/*
-
-
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),original_secure_bvll,
-	(std::string, security_wrapped_data)
-)
-*/
-
 namespace bacnet { namespace bvll { namespace frame {
  typedef boost::variant<
 			bvlc_result,
 			write_broadcast_distribution_table,
-			//read_broadcast_distribution_table,
+			read_broadcast_distribution_table,
 			read_broadcast_distribution_table_ack,
 			forwarded_npdu,
 			register_foreign_device,
 			read_foreign_device_table,
-			//read_foreign_device_table_ack,
-			//delete_foreign_device_table_entry,
+			read_foreign_device_table_ack,
+			delete_foreign_device_table_entry,
 			distribute_broadcast_to_network,
 			original_unicast_npdu,
-			original_broadcast_npdu
-			//original_secure_bvll
+			original_broadcast_npdu,
+			original_secure_bvll,
+      raw
 		 > possible_bvll_frame;
 }}}
 
 
-
-//xx do I need this?
-/*
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),bvll_frame,
-	(bacnet::bvll::bvlc::type, type)
-	(bacnet::bvll::bvlc::function, function)
-	(uint16_t, length)
-	(bacnet::bvll::frame::possible_bvll_frame, payload)
-)
-*/
 
 namespace bacnet { namespace bvll { namespace parser {
 
@@ -294,21 +216,23 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 	rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
 	rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
+  rule<Iterator, raw()> raw_rule;
 
 
 	bvlc_result_grammar<Iterator> bvlc_result_grammar_;
 	write_broadcast_distribution_table_grammar<Iterator> write_broadcast_distribution_table_grammar_;
-	read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar_;
+	//read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar_;
 	read_broadcast_distribution_table_ack_grammar<Iterator> read_broadcast_distribution_table_ack_grammar_;
 	forwarded_npdu_grammar<Iterator> forwarded_npdu_grammar_;
 	register_foreign_device_grammar<Iterator> register_foreign_device_grammar_;
-	read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar_;
+	//read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar_;
 	read_foreign_device_table_ack_grammar<Iterator> read_foreign_device_table_ack_grammar_;
 	delete_foreign_device_table_entry_grammar<Iterator> delete_foreign_device_table_entry_grammar_;
 	distribute_broadcast_to_network_grammar<Iterator> distribute_broadcast_to_network_grammar_;
 	original_unicast_npdu_grammar<Iterator> original_unicast_npdu_grammar_;
 	original_broadcast_npdu_grammar<Iterator> original_broadcast_npdu_grammar_;
-	original_secure_bvl_grammar<Iterator> original_secure_bvl_grammar_;
+	original_secure_bvll_grammar<Iterator> original_secure_bvll_grammar_;
+  raw_grammar<Iterator> raw_grammar_;
 
 
 
@@ -318,7 +242,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
 
 		//bvll_frame_rule = type_rule > function_rule > length_rule >  payload_rule;
-		possible_bvll_frame_rule = byte_(base_type(type::bvll_bacnet_ip_v4)) >
+		possible_bvll_frame_rule = ( byte_(base_type(type::bvll_bacnet_ip_v4)) >
 						(
 								bvlc_result_rule
 							|	write_broadcast_distribution_table_rule
@@ -333,7 +257,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							|	original_unicast_npdu_rule
 							|	original_broadcast_npdu_rule
 							|	original_secure_bvll_rule
-						);
+						) ) | raw_rule;
 
 
 		bvlc_result_rule = (
@@ -352,8 +276,8 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		read_broadcast_distribution_table_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table))
 							  > omit[big_word]
-							  > read_broadcast_distribution_table_grammar
-						   );
+							  //> read_broadcast_distribution_table_grammar
+						   )[_val = boost::phoenix::construct<read_broadcast_distribution_table>()];
 
 		read_broadcast_distribution_table_ack_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table_ack))
@@ -376,14 +300,14 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		read_foreign_device_table_rule = (
 							   byte_(base_type(function::read_foreign_device_table))
 							  > omit[big_word]
-							  > read_foreign_device_table_grammar_
-						   );
+							  //> read_foreign_device_table_grammar_
+						   )[_val = boost::phoenix::construct<read_foreign_device_table>()];
 
 
 		read_foreign_device_table_ack_rule = (
 							   byte_(base_type(function::read_foreign_device_table_ack))
 							  > omit[big_word]
-							  > read_foreign_device_table_acke_grammar_
+							  > read_foreign_device_table_ack_grammar_
 						   );
 
 
@@ -417,6 +341,10 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							  > original_secure_bvll_grammar_
 						   );
 
+    raw_rule = (
+                  raw_grammar_
+          );
+
 
 		bvlc_result_rule.name("bvlc_result_rule");
 		write_broadcast_distribution_table_rule.name("write_broadcast_distribution_table_rule");
@@ -426,8 +354,10 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		distribute_broadcast_to_network_rule.name("distribute_broadcast_to_network_rule");
 		original_unicast_npdu_rule.name("original_unicast_npdu_rule");
 		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
+    raw_rule.name("raw_rule");
 
-// /*
+//
+/*
 		debug(bvlc_result_rule);
 		debug(write_broadcast_distribution_table_rule);
 		debug(read_broadcast_distribution_table_ack_rule);
@@ -437,7 +367,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		debug(original_unicast_npdu_rule);
 		debug(original_broadcast_npdu_rule);
 // */
-	}
+	};
 };
 
 

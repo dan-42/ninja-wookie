@@ -28,6 +28,9 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
+#include <bacnet/detail/common/types.hpp>
+
+
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),distribute_broadcast_to_network,
 	(bacnet::binary_data, npdu_data)
@@ -57,7 +60,7 @@ struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_br
 	}
 };
 
-}}}}
+}}}} /* namespaces */
 
 
 namespace bacnet { namespace bvll { namespace frame { namespace parser {
@@ -82,10 +85,6 @@ struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_br
 	}
 };
 
-}}}}
-
-
-
-
+}}}} /* namespaces */
 
 #endif /* SRC_BACNET_BVLL_FRAME_DISTRIBUTE_BROADCAST_TO_NETWORK_HPP_ */

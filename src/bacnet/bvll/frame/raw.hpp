@@ -18,71 +18,73 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef SRC_BACNET_BVLL_BVLC_RESULT_HPP_
-#define SRC_BACNET_BVLL_BVLC_RESULT_HPP_
+
+#ifndef SRC_BACNET_BVLL_FRAME_RAW_HPP_
+#define SRC_BACNET_BVLL_FRAME_RAW_HPP_
+
+#include <string>
 
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/phoenix.hpp>
 
-#include <bacnet/bvll/bvlc/result_code.hpp>
-#include <bacnet/detail/common/types.hpp>
-
+#include <bacnet/bvll/bacnet_ip_address.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),bvlc_result,
-	(uint16_t, result_code)
+	(bacnet)(bvll)(frame),raw,
+	(bacnet::binary_data, data)
 	(bacnet::unused_type, unused)
 )
+
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll::frame;
 
 template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
+struct raw_grammar : grammar<Iterator, raw()> {
 
-	rule<Iterator, bvlc_result()> bvlc_result_rule;
-	rule<Iterator, uint16_t()> result_code_rule;
+	rule<Iterator, raw()> raw_rule;
+	rule<Iterator, bacnet::binary_data()> data_rule;
 
-	bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
+	raw_grammar() : raw_grammar::base_type(raw_rule) {
 
-		bvlc_result_rule = result_code_rule;
-		result_code_rule = big_word;
+		raw_rule = data_rule;
+		data_rule = *byte_;
 
-		bvlc_result_rule.name("bvlc_result_rule");
-		result_code_rule.name("result_code_rule");
+		raw_rule.name("raw_rule");
+		data_rule.name("data_rule");
 	}
 };
 
-}}}} /* namespaces */
+}}}}
 
 
 namespace bacnet { namespace bvll { namespace frame { namespace parser {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll::frame;
 
 template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
+struct raw_grammar : grammar<Iterator, raw()> {
 
-	rule<Iterator, bvlc_result()> bvlc_result_rule;
-	rule<Iterator, uint16_t()> result_code_rule;
+	rule<Iterator, raw()> raw_rule;
+	rule<Iterator, bacnet::binary_data()> data_rule;
 
-	bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
+	raw_grammar() : raw_grammar::base_type(raw_rule) {
 
-		bvlc_result_rule = result_code_rule >> attr(0);
-		result_code_rule = big_word;
+		raw_rule = data_rule >> attr(0);
+		data_rule = *byte_;
 
-		bvlc_result_rule.name("bvlc_result_rule");
-		result_code_rule.name("result_code_rule");
+		raw_rule.name("raw_rule");
+		data_rule.name("data_rule");
 	}
 };
 
-}}}} /* namespaces */
 
-#endif /* SRC_BACNET_BVLL_BVLC_RESULT_HPP_ */
+}}}}
+
+#endif /* SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_ */
