@@ -28,7 +28,8 @@ namespace bacnet {
 namespace bvll {
 
 enum class type : uint8_t {
-  bvll_bacnet_ip_v4 = 0x81
+  bvll_bacnet_ip_v4 = 0x81,
+  bvll_bacnet_ip_v6 = 0x82
 };
 
 static uint8_t base_type(const type &t);
