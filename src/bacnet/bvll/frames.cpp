@@ -18,11 +18,9 @@
  * Authors: Daniel Friedrich
  */
 
+#include <bacnet/bvll/frames.hpp>
 
-
-namespace bacnet {
-namespace bvll {
-namespace parser {
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace bacnet::bvll::frame;
 
@@ -41,9 +39,7 @@ possible_bvll_frame parse(bacnet::binary_data data) {
   return frame;
 }
 
-}
-}
-}
+}}}
 
 
 
