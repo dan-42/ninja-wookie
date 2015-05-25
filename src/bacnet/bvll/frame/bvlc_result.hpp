@@ -22,67 +22,14 @@
 #define SRC_BACNET_BVLL_BVLC_RESULT_HPP_
 
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/phoenix.hpp>
 
-#include <bacnet/bvll/bvlc/result_code.hpp>
+#include <bacnet/bvll/result_code.hpp>
 #include <bacnet/detail/common/types.hpp>
-
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),bvlc_result,
 	(uint16_t, result_code)
 	(bacnet::unused_type, unused)
 )
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
-
-template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
-
-	rule<Iterator, bvlc_result()> bvlc_result_rule;
-	rule<Iterator, uint16_t()> result_code_rule;
-
-	bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
-
-		bvlc_result_rule = result_code_rule;
-		result_code_rule = big_word;
-
-		bvlc_result_rule.name("bvlc_result_rule");
-		result_code_rule.name("result_code_rule");
-	}
-};
-
-}}}} /* namespaces */
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
-
-template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
-
-	rule<Iterator, bvlc_result()> bvlc_result_rule;
-	rule<Iterator, uint16_t()> result_code_rule;
-
-	bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
-
-		bvlc_result_rule = result_code_rule >> attr(0);
-		result_code_rule = big_word;
-
-		bvlc_result_rule.name("bvlc_result_rule");
-		result_code_rule.name("result_code_rule");
-	}
-};
-
-}}}} /* namespaces */
 
 #endif /* SRC_BACNET_BVLL_BVLC_RESULT_HPP_ */

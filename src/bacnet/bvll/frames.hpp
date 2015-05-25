@@ -26,14 +26,8 @@
 #include <vector>
 #include <string>
 
-#include <boost/fusion/include/define_struct.hpp>
-#include <boost/fusion/include/io.hpp>
-#include <boost/fusion/include/map.hpp>
-#include <boost/fusion/include/boost_tuple.hpp>
 
 #include <boost/variant.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/tuple/tuple_io.hpp>
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
@@ -60,105 +54,11 @@
 #include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
 #include <bacnet/bvll/frame/original_secure_bvll.hpp>
 #include <bacnet/bvll/frame/raw.hpp>
+#include <bacnet/bvll/frame/detail/combined.hpp>
 
-
-#include <bacnet/bvll/bvlc/result_code.hpp>
-
-namespace bacnet { namespace bvll { namespace bvlc {
-
-
-enum class type: uint8_t {
-	bvll_bacnet_ip_v4 = 0x81
-};
-
-uint8_t base_type(const type& t){
-	return static_cast<uint8_t>(t);
-}
-
-std::ostream& operator<<(std::ostream& os, const type& t) {
-	switch(t){
-	  case type::bvll_bacnet_ip_v4 :
-		os << "bvll_bacnet_ip_v4(0x81)";
-		break;
-	  default:
-		  os << "unknown bvlc type (0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(t) << ")";
-	}
-	return os;
-}
-
-
-
-
-enum class function : uint8_t {
-  bvlc_result 							= 0x00,
-  write_broadcast_distribution_table 	= 0x01,
-  read_broadcast_distribution_table 	= 0x02,
-  read_broadcast_distribution_table_ack = 0x03,
-  forwarded_npdu 						= 0x04,
-  register_foreign_device				= 0x05,
-  read_foreign_device_table				= 0x06,
-  read_foreign_device_table_ack			= 0x07,
-  delete_foreign_device_table_entry		= 0x08,
-  distribute_broadcast_to_network		= 0x09,
-  original_unicast_npdu					= 0x0A,
-  original_broadcast_npdu				= 0x0B,
-  original_secure_bvll					= 0x0C
-};
-
-uint8_t base_type(const function& f){
-	return static_cast<uint8_t>(f);
-}
-
-std::ostream& operator<<(std::ostream& os, const function& f) {
-	switch(f){
-	  case function::bvlc_result :
-		os << "bvlc_result(0x00)";
-		break;
-	  case function::write_broadcast_distribution_table :
-	  		os << "write_broadcast_distribution_table(0x01)";
-	  		break;
-	  case function::read_broadcast_distribution_table :
-	  		os << "read_broadcast_distribution_table(0x02)";
-	  		break;
-	  case function::read_broadcast_distribution_table_ack :
-	  		os << "read_broadcast_distribution_table_ack(0x03)";
-	  		break;
-	  case function::forwarded_npdu :
-	  		os << "forwarded_npdu(0x04)";
-	  		break;
-	  case function::register_foreign_device :
-	  		os << "register_foreign_device(0x05)";
-	  		break;
-	  case function::read_foreign_device_table :
-	  		os << "read_foreign_device_table(0x06)";
-	  		break;
-	  case function::read_foreign_device_table_ack :
-	  		os << "read_foreign_device_table_ack(0x07)";
-	  		break;
-	  case function::delete_foreign_device_table_entry :
-	  		os << "delete_foreign_device_table_entry(0x08)";
-	  		break;
-	  case function::distribute_broadcast_to_network :
-	  		os << "distribute_broadcast_to_network(0x09)";
-	  		break;
-	  case function::original_unicast_npdu :
-	  		os << "original_unicast_npdu(0x0A)";
-	  		break;
-	  case function::original_broadcast_npdu :
-	  	  	os << "original_broadcast_npdu(0x0B)";
-	  	  	break;
-	  case function::original_secure_bvll :
-	  	  	os << "original_secure_bvll(0x0C)";
-	  	  	break;
-	  default:
-		  os << "unknown bvlc function (0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(f) << ")";
-	}
-	return os;
-}
-
-}}}
-
-
+#include <bacnet/bvll/result_code.hpp>
+#include <bacnet/bvll/type.hpp>
+#include <bacnet/bvll/function.hpp>
 
 
 
@@ -191,9 +91,10 @@ using namespace ::boost::spirit::qi;
 using boost::phoenix::construct;
 
 
-using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll;
 using namespace bacnet::bvll::frame;
-using namespace bacnet::bvll::frame::parser;
+using namespace bacnet::bvll::frame::detail::parser;
+
 
 
 
@@ -257,7 +158,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							|	original_unicast_npdu_rule
 							|	original_broadcast_npdu_rule
 							|	original_secure_bvll_rule
-						) ) /* | raw_rule */;
+            )) /* xxx make this the last possible option  | raw_rule */;
 
 
 		bvlc_result_rule = (
@@ -370,24 +271,18 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 	};
 };
 
-
-
-possible_bvll_frame parse(bacnet::binary_data data){
-	auto start = data.begin();
-	auto end = data.end();
-	possible_bvll_frame frame;
-	bvll_grammar<decltype(start)> grammar;
-	bool result = false;
-	try {
-		result = boost::spirit::qi::parse(start, end, grammar, frame);
-	}
-	catch(std::exception &e) {
-		std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;
-	}
-	return frame;
-
+}
+}
 }
 
+
+namespace bacnet {
+namespace bvll {
+namespace parser {
+
+using namespace bacnet::bvll::frame;
+
+possible_bvll_frame parse(bacnet::binary_data data);
 
 }}}
 

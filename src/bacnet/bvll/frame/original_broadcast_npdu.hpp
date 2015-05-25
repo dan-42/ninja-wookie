@@ -22,12 +22,9 @@
 #ifndef SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_
 #define SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_
 
-#include <vector>
-
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
+
+#include <bacnet/detail/common/types.hpp>
 
 
 
@@ -36,79 +33,5 @@ BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet::binary_data, npdu_data)
 	(bacnet::unused_type,  unused)
 )
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
-
-	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
-
-	original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
-
-		original_broadcast_npdu_rule = npdu_data_rule;
-		npdu_data_rule = *byte_;
-
-		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
-		npdu_data_rule.name("npdu_data_rule");
-	}
-};
-
-}}}}
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace boost::spirit;
-using namespace boost::spirit::qi;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
-
-	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
-
-
-	original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
-
-		original_broadcast_npdu_rule =  npdu_data_rule >> attr(0);
-		npdu_data_rule = *byte_;
-
-		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
-		npdu_data_rule.name("npdu_data_rule");
-
-		debug(original_broadcast_npdu_rule);
-		debug(npdu_data_rule);
-	}
-};
-
-
-bool parse(const std::string &data_to_parse, original_broadcast_npdu &parsed){
-	auto start = data_to_parse.begin();
-	auto end = data_to_parse.end();
-
-	original_broadcast_npdu_grammar<decltype(start)> grammar;
-	bool result = false;
-	try {
-		result = boost::spirit::qi::parse(start, end, grammar, parsed);
-	}
-	catch(std::exception &e) {
-		std::cerr << "exception: frames.hpp parse(Container &i, original_broadcast_npdu_grammar &v) " << e.what() << std::endl;
-	}
-	return result;
-
-}
-
-
-}}}}
-
-
 
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_ */

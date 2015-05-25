@@ -22,69 +22,14 @@
 #ifndef SRC_BACNET_BVLL_FRAME_DISTRIBUTE_BROADCAST_TO_NETWORK_HPP_
 #define SRC_BACNET_BVLL_FRAME_DISTRIBUTE_BROADCAST_TO_NETWORK_HPP_
 
-#include <string>
-
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),distribute_broadcast_to_network,
 	(bacnet::binary_data, npdu_data)
 	(bacnet::unused_type, unused)
 )
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::bvlc::generator;
-
-template<typename Iterator>
-struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_broadcast_to_network()> {
-
-	rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
-	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
-
-	distribute_broadcast_to_network_grammar() : distribute_broadcast_to_network_grammar::base_type(distribute_broadcast_to_network_rule) {
-
-		distribute_broadcast_to_network_rule = npdu_data_rule;
-		npdu_data_rule = *byte_;
-
-		distribute_broadcast_to_network_rule.name("distribute_broadcast_to_network_rule");
-		npdu_data_rule.name("npdu_data_rule");
-	}
-};
-
-}}}} /* namespaces */
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_broadcast_to_network()> {
-
-	rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
-	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
-
-	distribute_broadcast_to_network_grammar() : distribute_broadcast_to_network_grammar::base_type(distribute_broadcast_to_network_rule) {
-
-		distribute_broadcast_to_network_rule = npdu_data_rule >> attr(0);
-		npdu_data_rule = *byte_;
-
-		distribute_broadcast_to_network_rule.name("distribute_broadcast_to_network_rule");
-		npdu_data_rule.name("npdu_data_rule");
-	}
-};
-
-}}}} /* namespaces */
 
 #endif /* SRC_BACNET_BVLL_FRAME_DISTRIBUTE_BROADCAST_TO_NETWORK_HPP_ */

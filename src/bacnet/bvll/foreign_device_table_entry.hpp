@@ -30,18 +30,20 @@
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(bvlc),foreign_device_table_entry,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address)
+		(bacnet)(bvll), foreign_device_table_entry,
+		(bacnet::bvll::bacnet_ip_address, address)
 	(uint16_t, time_to_live_in_sec)
 	(uint16_t, time_to_purge_in_sec)
 )
 
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace generator {
+namespace bacnet {
+namespace bvll {
+namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_table_entry()> {
@@ -73,18 +75,22 @@ struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_tab
 template<typename Container>
 bool generate(Container &c, foreign_device_table_entry &v) {
 	std::back_insert_iterator<Container> sink(c);
-	bacnet::bvll::bvlc::generator::foreign_device_table_entry_grammar<decltype(sink)> g;
+	bacnet::bvll::generator::foreign_device_table_entry_grammar<decltype(sink)> g;
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}}}}
+}
+}
+}
 
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
+namespace bacnet {
+namespace bvll {
+namespace parser {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
+using namespace boost::spirit;
+using namespace boost::spirit::qi;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_table_entry()> {
@@ -104,7 +110,6 @@ struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_tab
 		time_to_live_in_sec_rule = big_word;
 		time_to_purge_in_sec_rule = big_word;
 
-
 		foreign_device_table_entry_rule.name("foreign_device_table_entry_rule");
 		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
 		time_to_live_in_sec_rule.name("time_to_live_in_sec_rule");
@@ -120,7 +125,9 @@ bool parse(Container &i, foreign_device_table_entry &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}}}}
+}
+}
+}
 
 
 

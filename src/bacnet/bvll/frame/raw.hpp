@@ -22,69 +22,14 @@
 #ifndef SRC_BACNET_BVLL_FRAME_RAW_HPP_
 #define SRC_BACNET_BVLL_FRAME_RAW_HPP_
 
-#include <string>
-
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
 
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/detail/common/types.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),raw,
 	(bacnet::binary_data, data)
 	(bacnet::unused_type, unused)
 )
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct raw_grammar : grammar<Iterator, raw()> {
-
-	rule<Iterator, raw()> raw_rule;
-	rule<Iterator, bacnet::binary_data()> data_rule;
-
-	raw_grammar() : raw_grammar::base_type(raw_rule) {
-
-		raw_rule = data_rule;
-		data_rule = *byte_;
-
-		raw_rule.name("raw_rule");
-		data_rule.name("data_rule");
-	}
-};
-
-}}}}
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct raw_grammar : grammar<Iterator, raw()> {
-
-	rule<Iterator, raw()> raw_rule;
-	rule<Iterator, bacnet::binary_data()> data_rule;
-
-	raw_grammar() : raw_grammar::base_type(raw_rule) {
-
-		raw_rule = data_rule >> attr(0);
-		data_rule = *byte_;
-
-		raw_rule.name("raw_rule");
-		data_rule.name("data_rule");
-	}
-};
-
-
-}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_ */

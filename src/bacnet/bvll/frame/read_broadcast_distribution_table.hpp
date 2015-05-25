@@ -24,8 +24,6 @@
 
 
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
 
 
 namespace bacnet { namespace bvll { namespace frame {

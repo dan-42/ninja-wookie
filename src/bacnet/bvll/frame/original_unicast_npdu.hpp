@@ -22,66 +22,14 @@
 #ifndef SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_
 #define SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_
 
-#include <string>
-
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
+
+#include <bacnet/detail/common/types.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),original_unicast_npdu,
 	(bacnet::binary_data, npdu_data)
 	(bacnet::unused_type,  unused)
 )
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct original_unicast_npdu_grammar : grammar<Iterator, original_unicast_npdu()> {
-
-	rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
-	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
-
-	original_unicast_npdu_grammar() : original_unicast_npdu_grammar::base_type(original_unicast_npdu_rule) {
-
-		original_unicast_npdu_rule = npdu_data_rule;
-		npdu_data_rule = *byte_;
-
-		original_unicast_npdu_rule.name("original_unicast_npdu_rule");
-		npdu_data_rule.name("npdu_data_rule");
-	}
-};
-
-}}}}
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct original_unicast_npdu_grammar : grammar<Iterator, original_unicast_npdu()> {
-
-	rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
-	rule<Iterator, bacnet::binary_data()> npdu_data_rule;
-
-	original_unicast_npdu_grammar() : original_unicast_npdu_grammar::base_type(original_unicast_npdu_rule) {
-
-		original_unicast_npdu_rule = npdu_data_rule  >> attr(0);
-		npdu_data_rule = *byte_;
-
-		original_unicast_npdu_rule.name("original_unicast_npdu_rule");
-		npdu_data_rule.name("npdu_data_rule");
-	}
-};
-
-
-}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_ */

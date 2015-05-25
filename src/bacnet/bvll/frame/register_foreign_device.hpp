@@ -23,68 +23,14 @@
 #define SRC_BACNET_BVLL_FRAME_REGISTER_FOREIGN_DEVICE_HPP_
 
 #include <cstdint>
-
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
+
+#include <bacnet/detail/common/types.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),register_foreign_device,
 	(uint16_t, time_to_live_in_sec)
 	(bacnet::unused_type,  unused)
 )
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct register_foreign_device_grammar : grammar<Iterator, register_foreign_device()> {
-
-	rule<Iterator, register_foreign_device()> register_foreign_device_rule;
-	rule<Iterator, uint16_t()> time_to_live_in_sec_rule;
-
-
-	register_foreign_device_grammar() : register_foreign_device_grammar::base_type(register_foreign_device_rule) {
-
-		register_foreign_device_rule = time_to_live_in_sec_rule;
-		time_to_live_in_sec_rule = big_word;
-
-		register_foreign_device_rule.name("register_foreign_device_rule");
-		time_to_live_in_sec_rule.name("time_to_live_in_sec_rule");
-	}
-};
-
-}}}}
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::frame;
-
-template<typename Iterator>
-struct register_foreign_device_grammar : grammar<Iterator, register_foreign_device()> {
-
-	rule<Iterator, register_foreign_device()> register_foreign_device_rule;
-	rule<Iterator, uint16_t()> time_to_live_in_sec_rule;
-
-
-	register_foreign_device_grammar() : register_foreign_device_grammar::base_type(register_foreign_device_rule) {
-
-		register_foreign_device_rule = time_to_live_in_sec_rule >> attr(0);
-		time_to_live_in_sec_rule = big_word;
-
-		register_foreign_device_rule.name("register_foreign_device_rule");
-		time_to_live_in_sec_rule.name("time_to_live_in_sec_rule");
-	}
-};
-
-
-}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_REGISTER_FOREIGN_DEVICE_HPP_ */

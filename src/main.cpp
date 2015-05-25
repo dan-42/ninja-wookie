@@ -18,21 +18,16 @@
  * Authors: Daniel Friedrich
  */
 
-
-
-
 #include <iostream>
 #include <bitset>
-#include <string>
 #include <array>
 #include <iomanip>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/variant/static_visitor.hpp>
 
-#include <bacnet/bacnet.hpp>
 #include <bacnet/bvll/frames.hpp>
-
 
 namespace bacnet {   namespace  bvll {  namespace detail {
 
@@ -166,7 +161,7 @@ namespace bacnet {
               std::cout << "inbound_router original_secure_bvll" << std::endl;
       }
       void operator()(frame::raw request) {
-        std::cout << "inbound_router raw" << std::endl;
+        std::cout << "inbound_router raw data" << std::endl;
       }
 
     private:
@@ -197,7 +192,7 @@ namespace bacnet {
       void handle_receive_from(const boost::system::error_code &error, size_t bytes_recvd) {
         if (!error) {
           std::cout << "received from: " << sender_endpoint_.address().to_string()
-                    << ":" << sender_endpoint_.port() << std::endl;
+                                            << ":" << (int) sender_endpoint_.port() << std::endl;
           bacnet::binary_data input(data_.begin(), data_.begin()+bytes_recvd);
 
           for(auto c : data_){
@@ -253,7 +248,7 @@ int main(int argc, char *argv[]) {
 	  binary.push_back(0xff);
 
 
-	  //bacnet::bvll::frame::original_broadcast_npdu frame;
+	  //bacnet::bvll::frame::original_broadcast_npdu_grammar frame;
 
 	  //bacnet::bvll::frame::parser::parse(binary, frame);
 

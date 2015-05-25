@@ -29,16 +29,18 @@
 
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(bvlc),bacnet_ip_address,
+		(bacnet)(bvll), bacnet_ip_address,
 	(uint32_t, ip_address)
 	(uint16_t, port)
 )
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace generator {
+namespace bacnet {
+namespace bvll {
+namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
@@ -63,18 +65,22 @@ struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
 template<typename Container>
 bool generate(Container c, bacnet_ip_address &v) {
 	std::back_insert_iterator<Container> sink(c);
-	bacnet::bvll::bvlc::generator::bacnet_ip_address_grammar<decltype(sink)> g;
+	bacnet::bvll::generator::bacnet_ip_address_grammar<decltype(sink)> g;
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}}}}
+}
+}
+}
 
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
+namespace bacnet {
+namespace bvll {
+namespace parser {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
@@ -105,7 +111,9 @@ bool parse(Container &i, bacnet_ip_address &v){
 }
 
 
-}}}}
+}
+}
+}
 
 
 

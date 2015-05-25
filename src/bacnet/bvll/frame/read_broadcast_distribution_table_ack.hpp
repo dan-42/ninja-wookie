@@ -22,73 +22,15 @@
 #ifndef SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_
 #define SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_
 
-
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
 
+#include <bacnet/detail/common/types.hpp>
 #include <bacnet/bvll/broadcast_distribution_table.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),read_broadcast_distribution_table_ack,
-	(bacnet::bvll::bvlc::broadcast_distribution_table, broadcast_distribution_table_)
+	(bacnet::bvll::broadcast_distribution_table, broadcast_distribution_table_)
 	(bacnet::unused_type,  unused)
 )
-
-namespace bacnet { namespace bvll { namespace frame { namespace generator {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::frame;
-using namespace bacnet::bvll::bvlc::generator;
-
-template<typename Iterator>
-struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_broadcast_distribution_table_ack()> {
-
-	rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
-	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
-
-	broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
-
-	read_broadcast_distribution_table_ack_grammar() : read_broadcast_distribution_table_ack_grammar::base_type(read_broadcast_distribution_table_ack_rule) {
-
-		read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule;
-		broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
-
-		read_broadcast_distribution_table_ack_rule.name("read_broadcast_distribution_table_ack_rule");
-		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");
-	}
-};
-
-}}}}
-
-
-namespace bacnet { namespace bvll { namespace frame { namespace parser {
-
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::frame;
-using namespace bacnet::bvll::bvlc::parser;
-
-template<typename Iterator>
-struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_broadcast_distribution_table_ack()> {
-
-	rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
-	rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
-
-	broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
-
-	read_broadcast_distribution_table_ack_grammar() : read_broadcast_distribution_table_ack_grammar::base_type(read_broadcast_distribution_table_ack_rule) {
-
-		read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule >> attr(0);
-		broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
-
-		read_broadcast_distribution_table_ack_rule.name("read_broadcast_distribution_table_ack_rule");
-		broadcast_distribution_table_rule.name("broadcast_distribution_table_rule");
-	}
-};
-
-
-}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_ */

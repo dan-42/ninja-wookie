@@ -32,17 +32,17 @@
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),forwarded_npdu,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address_of_origin_device)
+	(bacnet::bvll::bacnet_ip_address, address_of_origin_device)
 	(bacnet::binary_data, npdu_data_from_origin_device)
 )
 
 
 namespace bacnet { namespace bvll { namespace frame { namespace generator {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
+using namespace boost::spirit;
+using namespace boost::spirit::karma;
 using namespace bacnet::bvll::frame;
-using namespace bacnet::bvll::bvlc::generator;
+using namespace bacnet::bvll::generator;
 
 template<typename Iterator>
 struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
@@ -70,10 +70,10 @@ struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
 
 namespace bacnet { namespace bvll { namespace frame { namespace parser {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
+using namespace boost::spirit;
+using namespace boost::spirit::qi;
 using namespace bacnet::bvll::frame;
-using namespace bacnet::bvll::bvlc::parser;
+using namespace bacnet::bvll::parser;
 
 template<typename Iterator>
 struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
@@ -95,8 +95,6 @@ struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
 		npdu_data_from_origin_device_rule.name("npdu_data_from_origin_device_rule");
 	}
 };
-
-
 
 }}}}
 

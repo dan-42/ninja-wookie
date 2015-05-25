@@ -29,15 +29,19 @@
 #include <bacnet/bvll/foreign_device_table_entry.hpp>
 
 // xxx put it into a Fusion struct as well?
-namespace bacnet { namespace bvll { namespace bvlc {
- typedef std::vector<bacnet::bvll::bvlc::foreign_device_table_entry> foreign_device_table;
-}}}
+namespace bacnet {
+namespace bvll {
+typedef std::vector<bacnet::bvll::foreign_device_table_entry> foreign_device_table;
+}
+}
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace generator {
+namespace bacnet {
+namespace bvll {
+namespace generator {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
+using namespace boost::spirit;
+using namespace boost::spirit::karma;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct foreign_device_table_grammar : grammar<Iterator, foreign_device_table()> {
@@ -61,18 +65,22 @@ struct foreign_device_table_grammar : grammar<Iterator, foreign_device_table()> 
 template<typename Container>
 bool generate(Container &c, foreign_device_table &v) {
 	std::back_insert_iterator<Container> sink(c);
-	bacnet::bvll::bvlc::generator::foreign_device_table_grammar<decltype(sink)> g;
+	bacnet::bvll::generator::foreign_device_table_grammar<decltype(sink)> g;
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}}}}
+}
+}
+}
 
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
+namespace bacnet {
+namespace bvll {
+namespace parser {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
+using namespace boost::spirit;
+using namespace boost::spirit::qi;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct foreign_device_table_grammar : grammar<Iterator, foreign_device_table()> {
@@ -99,7 +107,9 @@ bool parse(Container &i, foreign_device_table &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}}}}
+}
+}
+}
 
 
 

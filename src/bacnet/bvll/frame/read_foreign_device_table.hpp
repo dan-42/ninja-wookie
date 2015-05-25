@@ -22,11 +22,7 @@
 #ifndef SRC_BACNET_BVLL_FRAME_READ_FOREIGN_DEVICE_TABLE_HPP_
 #define SRC_BACNET_BVLL_FRAME_READ_FOREIGN_DEVICE_TABLE_HPP_
 
-
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
-
 
 namespace bacnet { namespace bvll { namespace frame {
 struct read_foreign_device_table {

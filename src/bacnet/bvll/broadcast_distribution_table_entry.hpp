@@ -31,17 +31,19 @@
 
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(bvlc),broadcast_distribution_table_entry,
-	(bacnet::bvll::bvlc::bacnet_ip_address, address)
+		(bacnet)(bvll), broadcast_distribution_table_entry,
+		(bacnet::bvll::bacnet_ip_address, address)
 	(uint32_t, broadcast_distribution_mask)
 )
 
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace generator {
+namespace bacnet {
+namespace bvll {
+namespace generator {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::karma;
-using namespace bacnet::bvll::bvlc;
+using namespace boost::spirit;
+using namespace boost::spirit::karma;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_distribution_table_entry()> {
@@ -71,18 +73,22 @@ struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_
 template<typename Container>
 bool generate(Container &c, broadcast_distribution_table_entry &v) {
 	std::back_insert_iterator<Container> sink(c);
-	bacnet::bvll::bvlc::generator::broadcast_distribution_table_entry_grammar<decltype(sink)> g;
+	bacnet::bvll::generator::broadcast_distribution_table_entry_grammar<decltype(sink)> g;
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}}}}
+}
+}
+}
 
 
-namespace bacnet { namespace bvll { namespace bvlc { namespace parser {
+namespace bacnet {
+namespace bvll {
+namespace parser {
 
-using namespace ::boost::spirit;
-using namespace ::boost::spirit::qi;
-using namespace bacnet::bvll::bvlc;
+using namespace boost::spirit;
+using namespace boost::spirit::qi;
+using namespace bacnet::bvll;
 
 template<typename Iterator>
 struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_distribution_table_entry()> {
@@ -115,7 +121,9 @@ bool parse(Container &i, broadcast_distribution_table_entry &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}}}}
+}
+}
+}
 
 
 
