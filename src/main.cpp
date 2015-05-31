@@ -37,18 +37,26 @@ void test_npdu_parser_1() {
   binary.push_back(0xDD);
   binary.push_back(0xDD);
 
-
   auto start = binary.begin();
   auto end = binary.end();
 
 
   bacnet::npdu::frame frame_;
-  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
   auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
 
-  std::cout << "Local BACnet APDU, no addrs, reply expected:" << std::endl;
-  std::cout <<  frame_ << std::endl;
-  std::cout << "----------------------- " << std::endl;
+  std::string binary_regenerated;
+  std::back_insert_iterator<std::string> sink(binary_regenerated);
+  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
+  boost::spirit::karma::generate(sink, g, frame_);
+
+  if(binary.compare(binary_regenerated) == 0) {
+    std::cout << "TEST 1: Local BACnet APDU, no addrs, reply expected: SUCCESS" << std::endl;
+  }
+  else {
+    std::cout << "TEST 1: Local BACnet APDU, no addrs, reply expected: FAILED" << std::endl;
+  }
+
 
 }
 
@@ -80,12 +88,23 @@ void test_npdu_parser_2() {
   auto end = binary.end();
 
   bacnet::npdu::frame frame_;
-  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
   auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
 
-  std::cout << "Remote BACnet NPDU directed to router prio normale, reply expected:" << std::endl;
-  std::cout <<  frame_ << std::endl;
-  std::cout << "----------------------- " << std::endl;
+
+
+
+  std::string binary_regenerated;
+  std::back_insert_iterator<std::string> sink(binary_regenerated);
+  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
+  boost::spirit::karma::generate(sink, g, frame_);
+
+  if(binary.compare(binary_regenerated) == 0) {
+    std::cout << "TEST 2: Remote BACnet NPDU directed to router prio normale, reply expected: SUCCESS" << std::endl;
+  }
+  else {
+    std::cout << "TEST 2: Remote BACnet NPDU directed to router prio normale, reply expected: FAILED" << std::endl;
+  }
 
 }
 
@@ -123,13 +142,22 @@ void test_npdu_parser_3() {
   auto end = binary.end();
 
   bacnet::npdu::frame frame_;
-  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
   auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
 
-  std::cout << "BACnet NPDU passwd between routers prio urgent:" << std::endl;
-  std::cout <<  frame_ << std::endl;
-  std::cout << "----------------------- " << std::endl;
 
+
+  std::string binary_regenerated;
+  std::back_insert_iterator<std::string> sink(binary_regenerated);
+  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
+  boost::spirit::karma::generate(sink, g, frame_);
+
+  if(binary.compare(binary_regenerated) == 0) {
+    std::cout << "TEST 3: BACnet NPDU passwd between routers prio urgent: SUCCESS" << std::endl;
+  }
+  else {
+    std::cout << "TEST 3: BACnet NPDU passwd between routers prio urgent: FAILED" << std::endl;
+  }
 }
 
 
@@ -163,13 +191,22 @@ void test_npdu_parser_4() {
   auto end = binary.end();
 
   bacnet::npdu::frame frame_;
-  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
   auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
 
-  std::cout << "Remote BACnet NPDU send from router to final dest prio life_safty:" << std::endl;
-  std::cout <<  frame_ << std::endl;
-  std::cout << "----------------------- " << std::endl;
 
+
+  std::string binary_regenerated;
+  std::back_insert_iterator<std::string> sink(binary_regenerated);
+  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
+  boost::spirit::karma::generate(sink, g, frame_);
+
+  if(binary.compare(binary_regenerated) == 0) {
+    std::cout << "TEST 4: Remote BACnet NPDU send from router to final dest prio life_safty: SUCCESS" << std::endl;
+  }
+  else {
+    std::cout << "TEST 4: Remote BACnet NPDU send from router to final dest prio life_safty: FAILED" << std::endl;
+  }
 }
 
 void test_npdu_parser_5() {
@@ -188,7 +225,7 @@ void test_npdu_parser_5() {
   binary.push_back(0x01); //SLEN
   binary.push_back(0x0F);
 
-  binary.push_back(0x10);
+  binary.push_back(0x10); //hop
 
   binary.push_back(0xDD); //apdu data
   binary.push_back(0xDD);
@@ -200,13 +237,21 @@ void test_npdu_parser_5() {
   auto end = binary.end();
 
   bacnet::npdu::frame frame_;
-  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
   auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
 
-  std::cout << "Broadcast message by router of prio normal:" << std::endl;
-  std::cout <<  frame_ << std::endl;
-  std::cout << "----------------------- " << std::endl;
 
+  std::string binary_regenerated;
+  std::back_insert_iterator<std::string> sink(binary_regenerated);
+  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
+  boost::spirit::karma::generate(sink, g, frame_);
+
+  if(binary.compare(binary_regenerated) == 0) {
+    std::cout << "TEST 5: Broadcast message by router of prio normal: SUCCESS" << std::endl;
+  }
+  else {
+    std::cout << "TEST 5: Broadcast message by router of prio normal: FAILED" << std::endl;
+  }
 }
 
 
@@ -220,6 +265,7 @@ int main(int argc, char *argv[]) {
     test_npdu_parser_3();
     test_npdu_parser_4();
     test_npdu_parser_5();
+
 
 
     boost::asio::io_service io_service;
