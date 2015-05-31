@@ -23,29 +23,205 @@
 #include <boost/asio.hpp>
 #include <bacnet/bvll/controller.hpp>
 
+#include <bacnet/npdu/controller.hpp>
+
+void test_npdu_parser_1() {
+
+  std::string binary;
+  binary.push_back(0x01); //version
+  binary.push_back(0x04); //control
+
+  binary.push_back(0xDD); //apdu data
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+
+
+  auto start = binary.begin();
+  auto end = binary.end();
+
+
+  bacnet::npdu::frame frame_;
+  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
+
+  std::cout << "Local BACnet APDU, no addrs, reply expected:" << std::endl;
+  std::cout <<  frame_ << std::endl;
+  std::cout << "----------------------- " << std::endl;
+
+}
+
+void test_npdu_parser_2() {
+
+  std::string binary;
+  binary.push_back(0x01); //version
+  binary.push_back(0x24); //control
+
+  binary.push_back(0x00); //DNET
+  binary.push_back(0x01); //DNET
+  binary.push_back(0x04); //DLEN
+  binary.push_back(0x01);
+  binary.push_back(0x01);
+  binary.push_back(0x01);
+  binary.push_back(0x01);
+
+  /*no source*/
+
+  binary.push_back(0x10); //hop count
+
+  binary.push_back(0xDD); //apdu data
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+
+  auto start = binary.begin();
+  auto end = binary.end();
+
+  bacnet::npdu::frame frame_;
+  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
+
+  std::cout << "Remote BACnet NPDU directed to router prio normale, reply expected:" << std::endl;
+  std::cout <<  frame_ << std::endl;
+  std::cout << "----------------------- " << std::endl;
+
+}
+
+void test_npdu_parser_3() {
+
+  std::string binary;
+  binary.push_back(0x01); //version
+  binary.push_back(0x29); //control
+
+  binary.push_back(0x00); //DNET
+  binary.push_back(0x01); //DNET
+  binary.push_back(0x01); //DLEN
+  binary.push_back(0x01);
+
+
+  binary.push_back(0x00); //SNET
+  binary.push_back(0x01); //SNET
+  binary.push_back(0x06); //SLEN
+  binary.push_back(0x0F);
+  binary.push_back(0x0F);
+  binary.push_back(0x0F);
+  binary.push_back(0x0F);
+  binary.push_back(0xBA);
+  binary.push_back(0xC0);
+
+  binary.push_back(0x10); //hop count
+
+  binary.push_back(0xDD); //apdu data
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+
+  auto start = binary.begin();
+  auto end = binary.end();
+
+  bacnet::npdu::frame frame_;
+  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
+
+  std::cout << "BACnet NPDU passwd between routers prio urgent:" << std::endl;
+  std::cout <<  frame_ << std::endl;
+  std::cout << "----------------------- " << std::endl;
+
+}
+
+
+void test_npdu_parser_4() {
+
+  std::string binary;
+  binary.push_back(0x01); //version
+  binary.push_back(0x0B); //control
+
+  /* no destination -> BROADCAST*/
+
+  binary.push_back(0x00); //SNET
+  binary.push_back(0x01); //SNET
+  binary.push_back(0x06); //SLEN
+  binary.push_back(0x0F);
+  binary.push_back(0x0F);
+  binary.push_back(0x0F);
+  binary.push_back(0x0F);
+  binary.push_back(0xBA);
+  binary.push_back(0xC0);
+
+  /* no HOP COUNT*/
+
+  binary.push_back(0xDD); //apdu data
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+
+  auto start = binary.begin();
+  auto end = binary.end();
+
+  bacnet::npdu::frame frame_;
+  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
+
+  std::cout << "Remote BACnet NPDU send from router to final dest prio life_safty:" << std::endl;
+  std::cout <<  frame_ << std::endl;
+  std::cout << "----------------------- " << std::endl;
+
+}
+
+void test_npdu_parser_5() {
+
+  std::string binary;
+  binary.push_back(0x01); //version
+  binary.push_back(0x28); //control
+
+  binary.push_back(0xFF); //DNET
+  binary.push_back(0xFF); //DNET
+  binary.push_back(0x00); //DLEN
+
+
+  binary.push_back(0x00); //SNET
+  binary.push_back(0x01); //SNET
+  binary.push_back(0x01); //SLEN
+  binary.push_back(0x0F);
+
+  binary.push_back(0x10);
+
+  binary.push_back(0xDD); //apdu data
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+  binary.push_back(0xDD);
+
+  auto start = binary.begin();
+  auto end = binary.end();
+
+  bacnet::npdu::frame frame_;
+  bacnet::npdu::npdu_grammar<decltype(start)> grammar;
+  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
+
+  std::cout << "Broadcast message by router of prio normal:" << std::endl;
+  std::cout <<  frame_ << std::endl;
+  std::cout << "----------------------- " << std::endl;
+
+}
+
+
+
 
 
 int main(int argc, char *argv[]) {
   try {
-/*
-	  std::string binary;
-	  binary.push_back(0x81);
-	  binary.push_back(0x0b);
-	  binary.push_back(0x00);
-	  binary.push_back(0x0c);
-	  binary.push_back(0x01);
-	  binary.push_back(0x20);
-	  binary.push_back(0xff);
-	  binary.push_back(0xff);
+    test_npdu_parser_1();
+    test_npdu_parser_2();
+    test_npdu_parser_3();
+    test_npdu_parser_4();
+    test_npdu_parser_5();
 
 
-	  //bacnet::bvll::frame::original_broadcast_npdu_grammar frame;
-
-	  //bacnet::bvll::frame::parser::parse(binary, frame);
-
-	  bacnet::bvll::frame::possible_bvll_frame f ;
-	  bool r = bacnet::bvll::parser::parse(binary, f);
-*/
     boost::asio::io_service io_service;
     bacnet::bvll::controller controller(io_service);
     io_service.run();
