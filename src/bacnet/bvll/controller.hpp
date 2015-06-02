@@ -81,6 +81,17 @@ public:
     }
   }
 
+  template<typename Handler>
+  void async_send_broadcast(const bacnet::binary_data &payload, const Handler &handler){
+
+    frame::original_broadcast_npdu frame;
+    frame.npdu_data = payload;
+    frame::possible_bvll_frame f(frame);
+
+    bacnet::binary_data binary_frame = generator::generate(f);
+    transporter_.async_send_broadcast(boost::asio::buffer(binary_frame), handler);
+  }
+
 
 private:
 

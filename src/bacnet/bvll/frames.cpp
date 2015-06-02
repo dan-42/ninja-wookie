@@ -41,6 +41,30 @@ possible_bvll_frame parse(bacnet::binary_data data) {
 
 }}}
 
+namespace bacnet { namespace bvll { namespace generator {
+
+bacnet::binary_data generate(const possible_bvll_frame& frame) {
+    bacnet::binary_data binary_frame;
+
+    std::back_insert_iterator<bacnet::binary_data> sink(binary_frame);
+    bvll_grammar<decltype(sink)> generator;
+    bool result = false;
+    try{
+      result = boost::spirit::karma::generate(sink, generator, frame);
+    }
+    catch (std::exception &e) {
+      std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;
+    }
+    if(!result){
+      return bacnet::binary_data();
+    }
+    return binary_frame;
+}
+
+
+
+}}}
+
 
 
 

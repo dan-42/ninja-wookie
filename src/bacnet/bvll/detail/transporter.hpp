@@ -66,6 +66,13 @@ public:
   }
 
 
+  template<typename Buffer, typename Handler>
+  void async_send_broadcast(const Buffer &buffer, const Handler &handler) {
+    std::cout << "async_send_to(): " << std::endl;
+    boost::asio::ip::udp::endpoint receiver(multicast_address_, port_);
+    socket_.async_send_to(buffer, receiver, handler);
+  }
+
 private:
   //xxx to be setable by user for specific interface?
   const boost::asio::ip::address listen_address_ = boost::asio::ip::address::from_string("0.0.0.0");

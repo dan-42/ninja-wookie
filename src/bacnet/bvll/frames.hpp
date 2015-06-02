@@ -271,14 +271,117 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 	};
 };
 
-}
-}
-}
+}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace parser {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////GENERATOR////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+namespace bacnet { namespace bvll { namespace generator {
+
+using namespace ::boost::spirit;
+using namespace ::boost::spirit::karma;
+using boost::phoenix::construct;
+
+
+using namespace bacnet::bvll;
+using namespace bacnet::bvll::frame;
+using namespace bacnet::bvll::frame::detail::generator;
+
+
+
+
+template<typename Iterator>
+struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
+
+	rule<Iterator, possible_bvll_frame()> possible_bvll_frame_rule;
+
+	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
+
+
+
+
+	original_broadcast_npdu_grammar<Iterator> original_broadcast_npdu_grammar_;
+
+
+	bvll_grammar() : bvll_grammar::base_type(possible_bvll_frame_rule) {
+
+		//bvll_frame_rule = type_rule > function_rule > length_rule >  payload_rule;
+		possible_bvll_frame_rule = ( byte_(base_type(type::bvll_bacnet_ip_v4)) <<
+																	original_broadcast_npdu_rule
+														);
+
+
+
+
+		original_broadcast_npdu_rule = (
+				byte_(base_type(function::original_broadcast_npdu))
+				<< big_word(uint16_t{12})
+				<< original_broadcast_npdu_grammar_
+		);
+
+		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
+
+
+//
+/*
+		debug(bvlc_result_rule);
+		debug(write_broadcast_distribution_table_rule);
+		debug(read_broadcast_distribution_table_ack_rule);
+		debug(forwarded_npdu_rule);
+		debug(register_foreign_device_rule);
+		debug(distribute_broadcast_to_network_rule);
+		debug(original_unicast_npdu_rule);
+		debug(original_broadcast_npdu_rule);
+// */
+	};
+};
+
+}}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace bacnet::bvll::frame;
 
@@ -286,5 +389,13 @@ possible_bvll_frame parse(bacnet::binary_data data);
 
 }}}
 
+
+namespace bacnet { namespace bvll { namespace generator {
+
+using namespace bacnet::bvll::frame;
+
+bacnet::binary_data generate(const possible_bvll_frame& frame);
+
+}}}
 
 #endif /* SRC_BACNET_BVLL_FRAMES_HPP_ */

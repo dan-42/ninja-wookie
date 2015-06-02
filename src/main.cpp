@@ -255,6 +255,9 @@ void test_npdu_parser_5() {
 }
 
 
+void handler(const boost::system::error_code& error_code, const std::size_t &bytes_transfered){
+  std::cout << "handler " <<  error_code.message() << std::endl;
+}
 
 
 
@@ -267,10 +270,19 @@ int main(int argc, char *argv[]) {
     test_npdu_parser_5();
 
 
-
     boost::asio::io_service io_service;
-    bacnet::bvll::controller controller(io_service);
+    bacnet::bvll::controller bvll_controller(io_service);
+    bacnet::npdu::controller<> npdu_controller(bvll_controller);
+
+    bacnet::binary_data whoi_is_frame;
+    whoi_is_frame.push_back(0x01);
+    whoi_is_frame.push_back(0x08);
+
+    npdu_controller.async_send_broadcast(whoi_is_frame, &handler);
+
     io_service.run();
+
+
   }
   catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";

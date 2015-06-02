@@ -45,7 +45,7 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
 
   original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-    original_broadcast_npdu_rule = npdu_data_rule;
+    original_broadcast_npdu_rule = npdu_data_rule << eps;
     npdu_data_rule = *byte_;
 
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
@@ -90,10 +90,9 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
   }
 };
 
-}
-}
-}
-}
-}
+
+
+
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_GRAMMAR_HPP_ */

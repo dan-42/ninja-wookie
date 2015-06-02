@@ -453,4 +453,63 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
 }}}
 
+namespace bacnet { namespace npdu { namespace generator {
+///xxx but in cpp file
+bacnet::binary_data generate(const npdu::frame &f){
+
+  bacnet::binary_data binary_frame;
+
+  std::back_insert_iterator<bacnet::binary_data> sink(binary_frame);
+  npdu_grammar<decltype(sink)> generator;
+  bool result = false;
+  try{
+    result = boost::spirit::karma::generate(sink, generator, f);
+  }
+  catch (std::exception &e) {
+    std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;
+  }
+  if(!result){
+    return bacnet::binary_data();
+  }
+  return binary_frame;
+}
+
+}}}
+
+
+
+namespace bacnet { namespace npdu {
+
+
+template<class Underlying_layer = bacnet::bvll::controller>
+class controller {
+
+public:
+  controller(Underlying_layer &underlying_layer) : underlying_layer_(underlying_layer) {
+
+  }
+
+  template<typename Handler>
+  void async_send_broadcast(const bacnet::binary_data & payload, const Handler &handler){
+
+    npdu::frame frame;
+    frame.protocol_version = 1;
+    frame.control_field.has_destination_specifier_ = 1;
+    frame.destination.network_number = 65535;
+    frame.hop_count = 255;
+    frame.apdu_data = payload;
+
+    bacnet::binary_data binary_frame = generator::generate(frame);
+
+    underlying_layer_.async_send_broadcast(binary_frame, handler);
+  }
+
+
+private:
+  Underlying_layer &underlying_layer_;
+
+};
+
+}}
+
 #endif /* NINJA_WOOKIE_NPDU_CONTROLLER_HPP */
