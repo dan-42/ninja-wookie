@@ -22,16 +22,45 @@
 #ifndef SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_
 #define SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_
 
-#include <boost/fusion/include/define_struct.hpp>
+#include <utility>
 
 #include <bacnet/detail/common/types.hpp>
 
+namespace bacnet { namespace bvll { namespace frame {
 
+struct original_broadcast_npdu{
+  bacnet::binary_data npdu_data;
+
+  original_broadcast_npdu() = default;
+
+  explicit original_broadcast_npdu(bacnet::binary_data data) : npdu_data(std::move(data))  {
+
+  }
+
+  original_broadcast_npdu(original_broadcast_npdu const& other_self)  : npdu_data( other_self.npdu_data) {
+  }
+
+};
+
+
+}}}
+
+#include <boost/fusion/include/adapt_struct.hpp>
+
+BOOST_FUSION_ADAPT_STRUCT(
+    bacnet::bvll::frame::original_broadcast_npdu,
+    (bacnet::binary_data, npdu_data)
+)
+
+
+/*
+
+#include <boost/fusion/include/define_struct.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),original_broadcast_npdu,
+	(bacnet)(bvll)(frame ),original_broadcast_npdu,
 	(bacnet::binary_data, npdu_data)
 	(bacnet::unused_type,  unused)
 )
-
+*/
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_BROADCAST_NPDU_HPP_ */

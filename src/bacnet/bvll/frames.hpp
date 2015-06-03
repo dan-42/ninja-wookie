@@ -89,7 +89,8 @@ namespace bacnet { namespace bvll { namespace parser {
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
 using boost::phoenix::construct;
-
+using boost::spirit::qi::_1;
+using boost::spirit::qi::_2;
 
 using namespace bacnet::bvll;
 using namespace bacnet::bvll::frame;
@@ -234,7 +235,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							   byte_(base_type(function::original_broadcast_npdu))
 							  > omit[big_word]
 							  > original_broadcast_npdu_grammar_
-						   );
+						   )[_val = boost::phoenix::construct<read_foreign_device_table>(_2)];
 
 		original_secure_bvll_rule = (
 							   byte_(base_type(function::original_secure_bvll))
@@ -297,6 +298,14 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
 
 
+namespace boost { namespace spirit { namespace traits {
+template <>
+struct transform_attribute<bacnet::bvll::frame::possible_bvll_frame const, bacnet::bvll::frame::original_broadcast_npdu, boost::spirit::karma::domain>
+{
+  typedef bacnet::bvll::frame::original_broadcast_npdu type;
+  static bacnet::bvll::frame::original_broadcast_npdu pre(bacnet::bvll::frame::possible_bvll_frame const& d) { return boost::get<type>(d); }
+};
+}}}
 
 
 
@@ -330,9 +339,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 	bvll_grammar() : bvll_grammar::base_type(possible_bvll_frame_rule) {
 
 		//bvll_frame_rule = type_rule > function_rule > length_rule >  payload_rule;
-		possible_bvll_frame_rule = ( byte_(base_type(type::bvll_bacnet_ip_v4)) <<
-																	original_broadcast_npdu_rule
-														);
+		possible_bvll_frame_rule =  byte_(base_type(type::bvll_bacnet_ip_v4)) <<	original_broadcast_npdu_rule	;
 
 
 

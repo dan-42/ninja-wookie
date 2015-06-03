@@ -27,15 +27,13 @@
 
 #include <bacnet/bvll/frame/original_broadcast_npdu.hpp>
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace bacnet::bvll::frame;
+
+using boost::spirit::karma::_1;
 
 template<typename Iterator>
 struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
@@ -45,7 +43,7 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
 
   original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-    original_broadcast_npdu_rule = npdu_data_rule << eps;
+    original_broadcast_npdu_rule = npdu_data_rule ;
     npdu_data_rule = *byte_;
 
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
@@ -53,22 +51,17 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
   }
 };
 
-}
-}
-}
-}
-}
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace bacnet::bvll::frame;
+using namespace boost::phoenix;
+
+using boost::spirit::qi::_1;
 
 template<typename Iterator>
 struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
@@ -79,7 +72,7 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
 
   original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-    original_broadcast_npdu_rule = npdu_data_rule >> attr(0);
+    original_broadcast_npdu_rule = npdu_data_rule[_val = construct<original_broadcast_npdu>(_1)];
     npdu_data_rule = *byte_;
 
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
