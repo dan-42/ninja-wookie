@@ -324,10 +324,64 @@ using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::frame::detail::generator;
 
 struct frame_size : public boost::static_visitor<uint32_t> {
-  template<typename T>
-  uint32_t operator()(const T &operand )   {
+
+
+  uint32_t operator()(const bvlc_result &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const write_broadcast_distribution_table &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const read_broadcast_distribution_table &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const read_broadcast_distribution_table_ack &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const forwarded_npdu &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const register_foreign_device &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const read_foreign_device_table &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const read_foreign_device_table_ack &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const delete_foreign_device_table_entry &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const distribute_broadcast_to_network &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const original_unicast_npdu &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const original_broadcast_npdu &operand )   {
     return 8;
   }
+
+  uint32_t operator()(const original_secure_bvll &operand )   {
+    return 255;
+  }
+
+  uint32_t operator()(const raw &operand )   {
+    return 255;
+  }
+
 };
 
 
