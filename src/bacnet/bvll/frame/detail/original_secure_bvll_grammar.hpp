@@ -23,15 +23,11 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/original_secure_bvll.hpp>
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -43,9 +39,11 @@ struct original_secure_bvll_grammar : grammar<Iterator, original_secure_bvll()> 
   rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
   rule<Iterator, bacnet::binary_data()> binary_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   original_secure_bvll_grammar() : original_secure_bvll_grammar::base_type(original_secure_bvll_rule) {
 
-    original_secure_bvll_rule = binary_data_rule;
+    original_secure_bvll_rule = binary_data_rule << unused_grammar_;
     binary_data_rule = *byte_;
 
     original_secure_bvll_rule.name("original_secure_bvll_rule");
@@ -53,18 +51,10 @@ struct original_secure_bvll_grammar : grammar<Iterator, original_secure_bvll()> 
   }
 };
 
-}
-}
-}
-}
-}
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -76,9 +66,11 @@ struct original_secure_bvll_grammar : grammar<Iterator, original_secure_bvll()> 
   rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
   rule<Iterator, bacnet::binary_data()> binary_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   original_secure_bvll_grammar() : original_secure_bvll_grammar::base_type(original_secure_bvll_rule) {
 
-    original_secure_bvll_rule = binary_data_rule >> attr(0);
+    original_secure_bvll_rule = binary_data_rule >> unused_grammar_;
     binary_data_rule = *byte_;
 
     original_secure_bvll_rule.name("original_secure_bvll_rule");
@@ -87,10 +79,8 @@ struct original_secure_bvll_grammar : grammar<Iterator, original_secure_bvll()> 
 };
 
 
-}
-}
-}
-}
-}
+
+
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_ORGINAL_SECURE_BVLL_GRAMMAR_HPP_ */

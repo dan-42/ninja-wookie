@@ -25,15 +25,11 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/raw.hpp>
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -45,9 +41,11 @@ struct raw_grammar : grammar<Iterator, raw()> {
   rule<Iterator, raw()> raw_rule;
   rule<Iterator, bacnet::binary_data()> data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   raw_grammar() : raw_grammar::base_type(raw_rule) {
 
-    raw_rule = data_rule;
+    raw_rule = data_rule << unused_grammar_;
     data_rule = *byte_;
 
     raw_rule.name("raw_rule");
@@ -55,18 +53,11 @@ struct raw_grammar : grammar<Iterator, raw()> {
   }
 };
 
-}
-}
-}
-}
-}
+
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -78,9 +69,11 @@ struct raw_grammar : grammar<Iterator, raw()> {
   rule<Iterator, raw()> raw_rule;
   rule<Iterator, bacnet::binary_data()> data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   raw_grammar() : raw_grammar::base_type(raw_rule) {
 
-    raw_rule = data_rule >> attr(0);
+    raw_rule = data_rule >> unused_grammar_;
     data_rule = *byte_;
 
     raw_rule.name("raw_rule");
@@ -89,10 +82,6 @@ struct raw_grammar : grammar<Iterator, raw()> {
 };
 
 
-}
-}
-}
-}
-}
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_RAW_GRAMMAR_HPP_ */

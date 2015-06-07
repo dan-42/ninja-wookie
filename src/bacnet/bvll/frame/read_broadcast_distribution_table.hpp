@@ -27,8 +27,8 @@
 
 
 namespace bacnet { namespace bvll { namespace frame {
-struct read_broadcast_distribution_table {
-};
+	struct read_broadcast_distribution_table {
+	};
 }}}
 
 BOOST_FUSION_ADAPT_STRUCT(

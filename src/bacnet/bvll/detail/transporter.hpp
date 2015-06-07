@@ -68,8 +68,9 @@ public:
 
   template<typename Buffer, typename Handler>
   void async_send_broadcast(const Buffer &buffer, const Handler &handler) {
-    std::cout << "async_send_to(): " << std::endl;
+
     boost::asio::ip::udp::endpoint receiver(multicast_address_, port_);
+    std::cout << "async_send_to(): " << receiver <<  std::endl;
     socket_.async_send_to(buffer, receiver, handler);
   }
 
@@ -83,8 +84,8 @@ private:
 
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
+    socket_.set_option(boost::asio::socket_base::broadcast(true));
     socket_.bind(listen_endpoint);
-
 
     if (multicast_address_.to_string().compare(DEFAULT_ADDRESS) != 0) {
       socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));

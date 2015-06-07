@@ -31,7 +31,10 @@
 #include <bacnet/bvll/frame/detail/original_broadcast_npdu_grammar.hpp>
 #include <bacnet/bvll/frame/detail/original_unicast_npdu_grammar.hpp>
 #include <bacnet/bvll/frame/detail/distribute_broadcast_to_network_grammar.hpp>
+#include <bacnet/bvll/frame/detail/read_foreign_device_table_grammar.hpp>
 #include <bacnet/bvll/frame/detail/read_foreign_device_table_ack_grammar.hpp>
+#include <bacnet/bvll/frame/detail/read_broadcast_distribution_table_grammar.hpp>
+#include <bacnet/bvll/frame/detail/read_broadcast_distribution_table_ack_grammar.hpp>
 #include <bacnet/bvll/frame/detail/delete_foreign_device_table_entry_grammar.hpp>
 #include <bacnet/bvll/frame/detail/original_secure_bvll_grammar.hpp>
 #include <bacnet/bvll/frame/detail/raw_grammar.hpp>

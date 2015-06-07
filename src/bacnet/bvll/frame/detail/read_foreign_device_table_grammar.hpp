@@ -18,17 +18,14 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef SRC_BACNET_BVLL_BVLC_RESULT_GRAMMAR_HPP_
-#define SRC_BACNET_BVLL_BVLC_RESULT_GRAMMAR_HPP_
-
+#ifndef NINJA_WOOKIE_READ_FOREIGN_DEVICE_TABLE_GRAMMAR_HPP
+#define NINJA_WOOKIE_READ_FOREIGN_DEVICE_TABLE_GRAMMAR_HPP
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
-#include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/frame/bvlc_result.hpp>
-#include <bacnet/bvll/result_code.hpp>
-#include <util/boost/spirit/unused_type.hpp>
+#include <bacnet/bvll/frame/read_broadcast_distribution_table.hpp>
+
 
 namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
@@ -37,23 +34,18 @@ using namespace boost::spirit::karma;
 using namespace bacnet::bvll;
 
 template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
+struct read_foreign_device_table_grammar : grammar<Iterator, read_foreign_device_table()> {
 
-  rule<Iterator, bvlc_result()> bvlc_result_rule;
-  rule<Iterator, uint16_t()> result_code_rule;
+  rule<Iterator, read_foreign_device_table()> read_foreign_device_table_rule;
 
-  unused_grammar<Iterator> unused_grammar_;
+  read_foreign_device_table_grammar()
+      : read_foreign_device_table_grammar::base_type(read_foreign_device_table_rule) {
 
-  bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
+    read_foreign_device_table_rule = eps;
 
-    bvlc_result_rule = result_code_rule << unused_grammar_;
-    result_code_rule = big_word;
-
-    bvlc_result_rule.name("bvlc_result_rule");
-    result_code_rule.name("result_code_rule");
+    read_foreign_device_table_rule.name("read_foreign_device_table_rule");
   }
 };
-
 
 }}}}} /* namespaces */
 
@@ -65,23 +57,19 @@ using namespace boost::spirit::qi;
 using namespace bacnet::bvll;
 
 template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
+struct read_foreign_device_table_grammar : grammar<Iterator, read_foreign_device_table()> {
 
-  rule<Iterator, bvlc_result()> bvlc_result_rule;
-  rule<Iterator, uint16_t()> result_code_rule;
+  rule<Iterator, read_foreign_device_table()> read_foreign_device_table_rule;
 
-  unused_grammar<Iterator> unused_grammar_;
+  read_foreign_device_table_grammar()
+      : read_foreign_device_table_grammar::base_type(read_foreign_device_table_rule) {
 
-  bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
+    read_foreign_device_table_rule = eps;
 
-    bvlc_result_rule = result_code_rule >> unused_grammar_;
-    result_code_rule = big_word;
-
-    bvlc_result_rule.name("bvlc_result_rule");
-    result_code_rule.name("result_code_rule");
+    read_foreign_device_table_rule.name("read_foreign_device_table_rule");
   }
 };
 
 }}}}} /* namespaces */
 
-#endif /* SRC_BACNET_BVLL_BVLC_RESULT_GRAMMAR_HPP_ */
+#endif //NINJA_WOOKIE_READ_FOREIGN_DEVICE_TABLE_GRAMMAR_HPP

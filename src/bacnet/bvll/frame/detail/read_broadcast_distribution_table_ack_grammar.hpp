@@ -25,14 +25,10 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/read_broadcast_distribution_table_ack.hpp>
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -46,11 +42,12 @@ struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_br
   rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
   broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
+  unused_grammar<Iterator> unused_grammar_;
 
   read_broadcast_distribution_table_ack_grammar() : read_broadcast_distribution_table_ack_grammar::base_type(
       read_broadcast_distribution_table_ack_rule) {
 
-    read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule;
+    read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule << unused_grammar_;
     broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
     read_broadcast_distribution_table_ack_rule.name("read_broadcast_distribution_table_ack_rule");
@@ -58,18 +55,11 @@ struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_br
   }
 };
 
-}
-}
-}
-}
-}
+
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -83,11 +73,12 @@ struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_br
   rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
   broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
+  unused_grammar<Iterator> unused_grammar_;
 
   read_broadcast_distribution_table_ack_grammar() : read_broadcast_distribution_table_ack_grammar::base_type(
       read_broadcast_distribution_table_ack_rule) {
 
-    read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule >> attr(0);
+    read_broadcast_distribution_table_ack_rule = broadcast_distribution_table_rule >> unused_grammar_;
     broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
     read_broadcast_distribution_table_ack_rule.name("read_broadcast_distribution_table_ack_rule");
@@ -96,10 +87,6 @@ struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_br
 };
 
 
-}
-}
-}
-}
-}
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_GRAMMAR_HPP_ */

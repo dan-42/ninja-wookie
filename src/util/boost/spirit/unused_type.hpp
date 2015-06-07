@@ -18,22 +18,45 @@
  * Authors: Daniel Friedrich
  */
 
+#ifndef TEST_SPIRIT_UNUSED_TYPE_HPP
+#define TEST_SPIRIT_UNUSED_TYPE_HPP
 
-#ifndef SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_
-#define SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_
+#include <cstdint>
 
-#include <string>
-
-#include <boost/fusion/include/define_struct.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
-#include <bacnet/bvll/bacnet_ip_address.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),forwarded_npdu,
-	(bacnet::bvll::bacnet_ip_address, address_of_origin_device)
-	(bacnet::binary_data, npdu_data_from_origin_device)
-)
+typedef uint8_t unused_t;
+//typedef boost::spirit::unused_type unused_t;
 
-#endif /* SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_ */
+namespace boost { namespace spirit { namespace qi {
+
+
+template<typename Iterator>
+struct unused_grammar : grammar<Iterator, unused_t()> {
+
+  rule<Iterator, unused_t()> start;
+
+  unused_grammar() : unused_grammar::base_type(start) {
+    start = attr(uint8_t{0});
+  }
+};
+}}}
+
+
+namespace boost { namespace spirit { namespace karma {
+
+  template<typename Iterator>
+  struct unused_grammar : grammar<Iterator, unused_t()> {
+
+    rule<Iterator, unused_t()> start;
+
+    unused_grammar() : unused_grammar::base_type(start) {
+      start = omit[byte_(0x00)];
+    }
+};
+}}}
+
+
+#endif //TEST_SPIRIT_UNUSED_TYPE_HPP

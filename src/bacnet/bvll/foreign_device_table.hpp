@@ -29,15 +29,11 @@
 #include <bacnet/bvll/foreign_device_table_entry.hpp>
 
 // xxx put it into a Fusion struct as well?
-namespace bacnet {
-namespace bvll {
+namespace bacnet { namespace bvll {
 typedef std::vector<bacnet::bvll::foreign_device_table_entry> foreign_device_table;
-}
-}
+}}
 
-namespace bacnet {
-namespace bvll {
-namespace generator {
+namespace bacnet { namespace bvll { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -62,6 +58,7 @@ struct foreign_device_table_grammar : grammar<Iterator, foreign_device_table()> 
 
 
 
+
 template<typename Container>
 bool generate(Container &c, foreign_device_table &v) {
 	std::back_insert_iterator<Container> sink(c);
@@ -69,14 +66,9 @@ bool generate(Container &c, foreign_device_table &v) {
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}
-}
-}
+}}}
 
-
-namespace bacnet {
-namespace bvll {
-namespace parser {
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -107,11 +99,7 @@ bool parse(Container &i, foreign_device_table &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}
-}
-}
-
-
+}}}
 
 
 #endif /* SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_ */

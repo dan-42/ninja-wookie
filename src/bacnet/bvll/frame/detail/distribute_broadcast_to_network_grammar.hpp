@@ -27,13 +27,11 @@
 #include <boost/spirit/include/karma.hpp>
 
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 #include<bacnet/bvll/frame/distribute_broadcast_to_network.hpp>
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -45,10 +43,12 @@ struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_br
   rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
   rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   distribute_broadcast_to_network_grammar() : distribute_broadcast_to_network_grammar::base_type(
       distribute_broadcast_to_network_rule) {
 
-    distribute_broadcast_to_network_rule = npdu_data_rule;
+    distribute_broadcast_to_network_rule = npdu_data_rule << unused_grammar_;
     npdu_data_rule = *byte_;
 
     distribute_broadcast_to_network_rule.name("distribute_broadcast_to_network_rule");
@@ -56,18 +56,10 @@ struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_br
   }
 };
 
-}
-}
-}
-}
-} /* namespaces */
+}}}}} /* namespaces */
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -79,10 +71,12 @@ struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_br
   rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
   rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   distribute_broadcast_to_network_grammar() : distribute_broadcast_to_network_grammar::base_type(
       distribute_broadcast_to_network_rule) {
 
-    distribute_broadcast_to_network_rule = npdu_data_rule >> attr(0);
+    distribute_broadcast_to_network_rule = npdu_data_rule >> unused_grammar_;
     npdu_data_rule = *byte_;
 
     distribute_broadcast_to_network_rule.name("distribute_broadcast_to_network_rule");
@@ -90,10 +84,7 @@ struct distribute_broadcast_to_network_grammar : grammar<Iterator, distribute_br
   }
 };
 
-}
-}
-}
-}
-} /* namespaces */
+
+}}}}} /* namespaces */
 
 #endif /* SRC_BACNET_BVLL_FRAME_DISTRIBUTE_BROADCAST_TO_NETWORK_GRAMMAR_HPP_ */

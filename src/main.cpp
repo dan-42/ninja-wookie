@@ -263,6 +263,7 @@ void handler(const boost::system::error_code& error_code, const std::size_t &byt
 
 int main(int argc, char *argv[]) {
   try {
+
     test_npdu_parser_1();
     test_npdu_parser_2();
     test_npdu_parser_3();
@@ -275,7 +276,7 @@ int main(int argc, char *argv[]) {
     bacnet::npdu::controller<> npdu_controller(bvll_controller);
 
     bacnet::binary_data whoi_is_frame;
-    whoi_is_frame.push_back(0x01);
+    whoi_is_frame.push_back(0x10);
     whoi_is_frame.push_back(0x08);
 
     npdu_controller.async_send_broadcast(whoi_is_frame, &handler);

@@ -22,15 +22,26 @@
 #ifndef SRC_BACNET_BVLL_FRAME_REGISTER_FOREIGN_DEVICE_HPP_
 #define SRC_BACNET_BVLL_FRAME_REGISTER_FOREIGN_DEVICE_HPP_
 
+
+#include <utility>
 #include <cstdint>
-#include <boost/fusion/include/define_struct.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
-#include <bacnet/detail/common/types.hpp>
+namespace bacnet { namespace bvll { namespace frame {
+struct register_foreign_device {
+	explicit register_foreign_device(uint16_t d) : time_to_live_in_sec(std::move(d))  { }
+	register_foreign_device() = default;
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),register_foreign_device,
-	(uint16_t, time_to_live_in_sec)
-	(bacnet::unused_type,  unused)
+	uint16_t time_to_live_in_sec;
+	unused_t unused;
+};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::register_foreign_device,
+		(uint16_t, time_to_live_in_sec)
+		(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_REGISTER_FOREIGN_DEVICE_HPP_ */

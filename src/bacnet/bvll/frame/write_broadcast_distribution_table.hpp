@@ -22,14 +22,24 @@
 #define SRC_BACNET_BVLL_FRAME_WRITE_BROADCAST_DISTRIBUTION_TABLE_HPP_
 
 #include <boost/fusion/include/define_struct.hpp>
-
-#include <bacnet/detail/common/types.hpp>
 #include <bacnet/bvll/broadcast_distribution_table.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),write_broadcast_distribution_table,
-	(bacnet::bvll::broadcast_distribution_table, broadcast_distribution_table_)
-	(bacnet::unused_type,  unused)
+namespace bacnet { namespace bvll { namespace frame {
+struct write_broadcast_distribution_table{
+	explicit write_broadcast_distribution_table(bacnet::bvll::broadcast_distribution_table d)
+			: broadcast_distribution_table_(std::move(d)) { }
+	write_broadcast_distribution_table() = default;
+
+	bacnet::bvll::broadcast_distribution_table broadcast_distribution_table_;
+	unused_t unused;
+};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::write_broadcast_distribution_table,
+		(bacnet::bvll::broadcast_distribution_table, broadcast_distribution_table_)
+		(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_WRITE_BROADCAST_DISTRIBUTION_TABLE_HPP_ */

@@ -24,8 +24,7 @@
 
 #include <iostream>
 
-namespace bacnet {
-namespace bvll {
+namespace bacnet { namespace bvll {
 
 enum class type : uint8_t {
   bvll_bacnet_ip_v4 = 0x81,
@@ -35,8 +34,8 @@ enum class type : uint8_t {
 static uint8_t base_type(const type &t);
 
 static std::ostream &operator<<(std::ostream &os, const type &t);
-}
-}
+
+}}
 
 
 #include <bacnet/bvll/impl/type.ipp>

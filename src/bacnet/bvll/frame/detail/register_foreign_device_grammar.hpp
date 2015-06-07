@@ -24,15 +24,11 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/register_foreign_device.hpp>
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -44,10 +40,11 @@ struct register_foreign_device_grammar : grammar<Iterator, register_foreign_devi
   rule<Iterator, register_foreign_device()> register_foreign_device_rule;
   rule<Iterator, uint16_t()> time_to_live_in_sec_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
 
   register_foreign_device_grammar() : register_foreign_device_grammar::base_type(register_foreign_device_rule) {
 
-    register_foreign_device_rule = time_to_live_in_sec_rule;
+    register_foreign_device_rule = time_to_live_in_sec_rule << unused_grammar_;
     time_to_live_in_sec_rule = big_word;
 
     register_foreign_device_rule.name("register_foreign_device_rule");
@@ -55,18 +52,10 @@ struct register_foreign_device_grammar : grammar<Iterator, register_foreign_devi
   }
 };
 
-}
-}
-}
-}
-}
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -78,10 +67,11 @@ struct register_foreign_device_grammar : grammar<Iterator, register_foreign_devi
   rule<Iterator, register_foreign_device()> register_foreign_device_rule;
   rule<Iterator, uint16_t()> time_to_live_in_sec_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
 
   register_foreign_device_grammar() : register_foreign_device_grammar::base_type(register_foreign_device_rule) {
 
-    register_foreign_device_rule = time_to_live_in_sec_rule >> attr(0);
+    register_foreign_device_rule = time_to_live_in_sec_rule >> unused_grammar_;
     time_to_live_in_sec_rule = big_word;
 
     register_foreign_device_rule.name("register_foreign_device_rule");
@@ -89,11 +79,6 @@ struct register_foreign_device_grammar : grammar<Iterator, register_foreign_devi
   }
 };
 
-
-}
-}
-}
-}
-}
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_REGISTER_FOREIGN_DEVICE_GRAMMAR_HPP_ */

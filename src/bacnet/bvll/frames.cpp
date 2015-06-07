@@ -46,8 +46,11 @@ namespace bacnet { namespace bvll { namespace generator {
 bacnet::binary_data generate(const possible_bvll_frame& frame) {
     bacnet::binary_data binary_frame;
 
+    frame_size fs;
+    uint32_t size = boost::apply_visitor( fs, frame );
+  std::cout << "size:" << size << std::endl;
     std::back_insert_iterator<bacnet::binary_data> sink(binary_frame);
-    bvll_grammar<decltype(sink)> generator;
+    bvll_grammar<decltype(sink)> generator(size);
     bool result = false;
     try{
       result = boost::spirit::karma::generate(sink, generator, frame);

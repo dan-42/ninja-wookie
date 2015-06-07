@@ -29,14 +29,13 @@
 
 
 BOOST_FUSION_DEFINE_STRUCT(
-		(bacnet)(bvll), bacnet_ip_address,
+	(bacnet)(bvll), bacnet_ip_address,
 	(uint32_t, ip_address)
 	(uint16_t, port)
 )
 
-namespace bacnet {
-namespace bvll {
-namespace generator {
+
+namespace bacnet { namespace bvll { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -62,6 +61,8 @@ struct bacnet_ip_address_grammar : grammar<Iterator, bacnet_ip_address()> {
 	}
 };
 
+
+
 template<typename Container>
 bool generate(Container c, bacnet_ip_address &v) {
 	std::back_insert_iterator<Container> sink(c);
@@ -69,14 +70,10 @@ bool generate(Container c, bacnet_ip_address &v) {
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}
-}
-}
+}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace parser {
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
@@ -111,11 +108,7 @@ bool parse(Container &i, bacnet_ip_address &v){
 }
 
 
-}
-}
-}
-
-
+}}}
 
 
 #endif /* SRC_BACNET_BVLL_BACNET_IP_ADDRESS_HPP_ */

@@ -22,15 +22,13 @@
 #define SRC_BACNET_BVLL_DELET_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
 
 #include <boost/fusion/include/define_struct.hpp>
-
-#include <bacnet/detail/common/types.hpp>
 #include <bacnet/bvll/bacnet_ip_address.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
     (bacnet)(bvll)(frame), delete_foreign_device_table_entry,
     (bacnet::bvll::bacnet_ip_address, address_to_delete)
-    (bacnet::unused_type, unused)
+    (unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_DELET_FOREIGN_DEVICE_TABLE_ENTRY_HPP_ */

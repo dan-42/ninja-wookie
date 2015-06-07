@@ -25,11 +25,12 @@
 #include <boost/fusion/include/define_struct.hpp>
 
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),distribute_broadcast_to_network,
 	(bacnet::binary_data, npdu_data)
-	(bacnet::unused_type, unused)
+	(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_DISTRIBUTE_BROADCAST_TO_NETWORK_HPP_ */

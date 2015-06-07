@@ -21,16 +21,26 @@
 
 #ifndef SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_
 #define SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_
-
-#include <boost/fusion/include/define_struct.hpp>
-
+#include <utility>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/broadcast_distribution_table.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),read_broadcast_distribution_table_ack,
-	(bacnet::bvll::broadcast_distribution_table, broadcast_distribution_table_)
-	(bacnet::unused_type,  unused)
+namespace bacnet { namespace bvll { namespace frame {
+struct read_broadcast_distribution_table_ack {
+	explicit read_broadcast_distribution_table_ack(bacnet::bvll::broadcast_distribution_table d) : broadcast_distribution_table_(std::move(d))  { }
+	read_broadcast_distribution_table_ack() = default;
+
+	bacnet::bvll::broadcast_distribution_table broadcast_distribution_table_;
+	unused_t unused;
+};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::read_broadcast_distribution_table_ack,
+		(bacnet::bvll::broadcast_distribution_table, broadcast_distribution_table_)
+		(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_ */

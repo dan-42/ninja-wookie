@@ -22,14 +22,25 @@
 #ifndef SRC_BACNET_BVLL_FRAME_RAW_HPP_
 #define SRC_BACNET_BVLL_FRAME_RAW_HPP_
 
-#include <boost/fusion/include/define_struct.hpp>
-
+#include <utility>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),raw,
-	(bacnet::binary_data, data)
-	(bacnet::unused_type, unused)
+namespace bacnet { namespace bvll { namespace frame {
+struct raw {
+	explicit raw(bacnet::binary_data d) : data(std::move(d))  { }
+	raw() = default;
+
+	bacnet::binary_data data;
+	unused_t unused;
+};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::raw,
+		(bacnet::binary_data, data)
+		(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_ */

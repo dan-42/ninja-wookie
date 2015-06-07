@@ -30,16 +30,15 @@
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 
 
+
 BOOST_FUSION_DEFINE_STRUCT(
-		(bacnet)(bvll), broadcast_distribution_table_entry,
-		(bacnet::bvll::bacnet_ip_address, address)
+	(bacnet)(bvll), broadcast_distribution_table_entry,
+	(bacnet::bvll::bacnet_ip_address, address)
 	(uint32_t, broadcast_distribution_mask)
 )
 
 
-namespace bacnet {
-namespace bvll {
-namespace generator {
+namespace bacnet { namespace bvll { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -69,7 +68,6 @@ struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_
 };
 
 
-
 template<typename Container>
 bool generate(Container &c, broadcast_distribution_table_entry &v) {
 	std::back_insert_iterator<Container> sink(c);
@@ -77,14 +75,10 @@ bool generate(Container &c, broadcast_distribution_table_entry &v) {
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}
-}
-}
+}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace parser {
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -121,9 +115,7 @@ bool parse(Container &i, broadcast_distribution_table_entry &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}
-}
-}
+}}}
 
 
 

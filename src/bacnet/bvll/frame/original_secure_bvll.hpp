@@ -21,14 +21,25 @@
 #ifndef SRC_BACNET_BVLL_ORIGINAL_SECURE_BVLL_HPP_
 #define SRC_BACNET_BVLL_ORIGINAL_SECURE_BVLL_HPP_
 
-#include <boost/fusion/include/define_struct.hpp>
-
+#include <utility>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),original_secure_bvll,
+namespace bacnet { namespace bvll { namespace frame {
+struct original_secure_bvll {
+	explicit original_secure_bvll(bacnet::binary_data data) : security_wrapped_data(std::move(data))  { }
+	original_secure_bvll() = default;
+
+	bacnet::binary_data security_wrapped_data;
+	unused_t unused;
+};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+	bacnet::bvll::frame::original_secure_bvll,
 	(bacnet::binary_data, security_wrapped_data)
-	(bacnet::unused_type, unused)
+	(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_ORGINAL_SECURE_BVLL_HPP_ */

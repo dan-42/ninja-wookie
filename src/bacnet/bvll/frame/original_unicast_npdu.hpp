@@ -22,14 +22,25 @@
 #ifndef SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_
 #define SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_
 
-#include <boost/fusion/include/define_struct.hpp>
-
+#include <utility>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),original_unicast_npdu,
-	(bacnet::binary_data, npdu_data)
-	(bacnet::unused_type,  unused)
+namespace bacnet { namespace bvll { namespace frame {
+struct original_unicast_npdu {
+	explicit original_unicast_npdu(bacnet::binary_data data) : npdu_data(std::move(data))  { }
+	original_unicast_npdu() = default;
+
+	bacnet::binary_data npdu_data;
+	unused_t unused;
+};
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+		bacnet::bvll::frame::original_unicast_npdu,
+		(bacnet::binary_data, npdu_data)
+		(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_ */

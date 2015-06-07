@@ -29,11 +29,7 @@
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -61,18 +57,10 @@ struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
   }
 };
 
-}
-}
-}
-}
-}
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -101,10 +89,6 @@ struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
 };
 
 
-}
-}
-}
-}
-}
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_GRAMMAR_HPP_ */

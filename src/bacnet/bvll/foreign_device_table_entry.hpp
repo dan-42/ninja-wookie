@@ -29,17 +29,16 @@
 
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 
+
 BOOST_FUSION_DEFINE_STRUCT(
-		(bacnet)(bvll), foreign_device_table_entry,
-		(bacnet::bvll::bacnet_ip_address, address)
+	(bacnet)(bvll), foreign_device_table_entry,
+	(bacnet::bvll::bacnet_ip_address, address)
 	(uint16_t, time_to_live_in_sec)
 	(uint16_t, time_to_purge_in_sec)
 )
 
 
-namespace bacnet {
-namespace bvll {
-namespace generator {
+namespace bacnet  { namespace bvll { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -72,6 +71,9 @@ struct foreign_device_table_entry_grammar : grammar<Iterator, foreign_device_tab
 };
 
 
+
+
+
 template<typename Container>
 bool generate(Container &c, foreign_device_table_entry &v) {
 	std::back_insert_iterator<Container> sink(c);
@@ -79,14 +81,10 @@ bool generate(Container &c, foreign_device_table_entry &v) {
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}
-}
-}
+}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace parser {
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -125,9 +123,7 @@ bool parse(Container &i, foreign_device_table_entry &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}
-}
-}
+}}}
 
 
 

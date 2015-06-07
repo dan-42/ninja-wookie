@@ -28,16 +28,12 @@
 
 #include <bacnet/bvll/broadcast_distribution_table_entry.hpp>
 
-namespace bacnet {
-namespace bvll {
-typedef std::vector<bacnet::bvll::broadcast_distribution_table_entry> broadcast_distribution_table;
-}
-}
+namespace bacnet { namespace bvll {
+	typedef std::vector<bacnet::bvll::broadcast_distribution_table_entry> broadcast_distribution_table;
+}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace generator {
+namespace bacnet { namespace bvll { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -70,14 +66,10 @@ bool generate(Container &c, broadcast_distribution_table &v) {
 	return boost::spirit::karma::generate(sink, g, v);
 }
 
-}
-}
-}
+}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace parser {
+namespace bacnet { namespace bvll { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -109,10 +101,6 @@ bool parse(Container &i, broadcast_distribution_table &v){
 	return boost::spirit::qi::parse(start, end, grammar, v);
 }
 
-}
-}
-}
-
-
+}}}
 
 #endif /* SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_ */

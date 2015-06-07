@@ -23,13 +23,12 @@
 
 #include <boost/fusion/include/define_struct.hpp>
 
-#include <bacnet/bvll/result_code.hpp>
-#include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame),bvlc_result,
+	(bacnet)(bvll)(frame), bvlc_result,
 	(uint16_t, result_code)
-	(bacnet::unused_type, unused)
+	(unused_t, unused)
 )
 
 #endif /* SRC_BACNET_BVLL_BVLC_RESULT_HPP_ */

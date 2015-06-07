@@ -34,6 +34,8 @@
 
 #include <boost/spirit/include/phoenix.hpp>
 
+#include <boost/bind.hpp>
+
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 #include <bacnet/bvll/foreign_device_table_entry.hpp>
 #include <bacnet/bvll/foreign_device_table.hpp>
@@ -54,6 +56,7 @@
 #include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
 #include <bacnet/bvll/frame/original_secure_bvll.hpp>
 #include <bacnet/bvll/frame/raw.hpp>
+
 #include <bacnet/bvll/frame/detail/combined.hpp>
 
 #include <bacnet/bvll/result_code.hpp>
@@ -123,11 +126,11 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
 	bvlc_result_grammar<Iterator> bvlc_result_grammar_;
 	write_broadcast_distribution_table_grammar<Iterator> write_broadcast_distribution_table_grammar_;
-	//read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar_;
+	read_broadcast_distribution_table_grammar<Iterator> read_broadcast_distribution_table_grammar_;
 	read_broadcast_distribution_table_ack_grammar<Iterator> read_broadcast_distribution_table_ack_grammar_;
 	forwarded_npdu_grammar<Iterator> forwarded_npdu_grammar_;
 	register_foreign_device_grammar<Iterator> register_foreign_device_grammar_;
-	//read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar_;
+	read_foreign_device_table_grammar<Iterator> read_foreign_device_table_grammar_;
 	read_foreign_device_table_ack_grammar<Iterator> read_foreign_device_table_ack_grammar_;
 	delete_foreign_device_table_entry_grammar<Iterator> delete_foreign_device_table_entry_grammar_;
 	distribute_broadcast_to_network_grammar<Iterator> distribute_broadcast_to_network_grammar_;
@@ -178,8 +181,8 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		read_broadcast_distribution_table_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table))
 							  > omit[big_word]
-							  //> read_broadcast_distribution_table_grammar
-						   )[_val = boost::phoenix::construct<read_broadcast_distribution_table>()];
+							  > read_broadcast_distribution_table_grammar_
+						   );
 
 		read_broadcast_distribution_table_ack_rule = (
 							   byte_(base_type(function::read_broadcast_distribution_table_ack))
@@ -202,8 +205,8 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		read_foreign_device_table_rule = (
 							   byte_(base_type(function::read_foreign_device_table))
 							  > omit[big_word]
-							  //> read_foreign_device_table_grammar_
-						   )[_val = boost::phoenix::construct<read_foreign_device_table>()];
+							  > read_foreign_device_table_grammar_
+						   );
 
 
 		read_foreign_device_table_ack_rule = (
@@ -235,7 +238,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 							   byte_(base_type(function::original_broadcast_npdu))
 							  > omit[big_word]
 							  > original_broadcast_npdu_grammar_
-						   )[_val = boost::phoenix::construct<read_foreign_device_table>(_2)];
+						   );
 
 		original_secure_bvll_rule = (
 							   byte_(base_type(function::original_secure_bvll))
@@ -320,35 +323,32 @@ using namespace bacnet::bvll;
 using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::frame::detail::generator;
 
-
+struct frame_size : public boost::static_visitor<uint32_t> {
+  template<typename T>
+  uint32_t operator()(const T &operand )   {
+    return 8;
+  }
+};
 
 
 template<typename Iterator>
 struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
+  static constexpr uint32_t frame_size_offset = 4;
+
 	rule<Iterator, possible_bvll_frame()> possible_bvll_frame_rule;
 
 	rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
 
-
-
-
 	original_broadcast_npdu_grammar<Iterator> original_broadcast_npdu_grammar_;
 
 
-	bvll_grammar() : bvll_grammar::base_type(possible_bvll_frame_rule) {
+	bvll_grammar(const uint32_t &size) : bvll_grammar::base_type(possible_bvll_frame_rule), size_(size) {
+    size_ += frame_size_offset;
+    std::cout << "size:" << size_ << std::endl;
+		possible_bvll_frame_rule =  original_broadcast_npdu_rule;
 
-		//bvll_frame_rule = type_rule > function_rule > length_rule >  payload_rule;
-		possible_bvll_frame_rule =  byte_(base_type(type::bvll_bacnet_ip_v4)) <<	original_broadcast_npdu_rule	;
-
-
-
-
-		original_broadcast_npdu_rule = (
-				byte_(base_type(function::original_broadcast_npdu))
-				<< big_word(uint16_t{12})
-				<< original_broadcast_npdu_grammar_
-		);
+		original_broadcast_npdu_rule = byte_(base_type(type::bvll_bacnet_ip_v4)) <<	byte_(base_type(function::original_broadcast_npdu))		<< big_word[_1 = boost::phoenix::ref(size_)]		<< original_broadcast_npdu_grammar_;
 
 		original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
 
@@ -364,7 +364,11 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 		debug(original_unicast_npdu_rule);
 		debug(original_broadcast_npdu_rule);
 // */
-	};
+
+
+	}
+
+  uint32_t size_;
 };
 
 }}}

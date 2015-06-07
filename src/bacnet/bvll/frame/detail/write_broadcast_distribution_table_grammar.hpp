@@ -24,14 +24,10 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/write_broadcast_distribution_table.hpp>
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -44,12 +40,13 @@ struct write_broadcast_distribution_table_grammar : grammar<Iterator, write_broa
   rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
   rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
   broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
 
   write_broadcast_distribution_table_grammar() : write_broadcast_distribution_table_grammar::base_type(
       write_broadcast_distribution_table_rule) {
 
-    write_broadcast_distribution_table_rule = broadcast_distribution_table_rule;
+    write_broadcast_distribution_table_rule = broadcast_distribution_table_rule << unused_grammar_;
     broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
     write_broadcast_distribution_table_rule.name("write_broadcast_distribution_table_rule");
@@ -57,18 +54,10 @@ struct write_broadcast_distribution_table_grammar : grammar<Iterator, write_broa
   }
 };
 
-}
-}
-}
-}
-}
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
@@ -81,12 +70,13 @@ struct write_broadcast_distribution_table_grammar : grammar<Iterator, write_broa
   rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
   rule<Iterator, broadcast_distribution_table()> broadcast_distribution_table_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
   broadcast_distribution_table_grammar<Iterator> broadcast_distribution_table_grammar_;
 
   write_broadcast_distribution_table_grammar() : write_broadcast_distribution_table_grammar::base_type(
       write_broadcast_distribution_table_rule) {
 
-    write_broadcast_distribution_table_rule = broadcast_distribution_table_rule >> attr(0);
+    write_broadcast_distribution_table_rule = broadcast_distribution_table_rule >> unused_grammar_;
     broadcast_distribution_table_rule = broadcast_distribution_table_grammar_;
 
     write_broadcast_distribution_table_rule.name("write_broadcast_distribution_table_rule");

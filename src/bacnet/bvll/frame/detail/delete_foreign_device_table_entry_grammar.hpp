@@ -27,13 +27,9 @@
 #include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 #include <bacnet/detail/common/types.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
-
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -48,11 +44,12 @@ struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_fore
   rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
 
   bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+  unused_grammar<Iterator> unused_grammar_;
 
   delete_foreign_device_table_entry_grammar() : delete_foreign_device_table_entry_grammar::base_type(
       delete_foreign_device_table_entry_rule) {
 
-    delete_foreign_device_table_entry_rule = bacnet_ip_address_rule;
+    delete_foreign_device_table_entry_rule = bacnet_ip_address_rule << unused_grammar_;
     bacnet_ip_address_rule = bacnet_ip_address_grammar_;
 
     delete_foreign_device_table_entry_rule.name("delete_foreign_device_table_entry_rule");
@@ -60,18 +57,11 @@ struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_fore
   }
 };
 
-}
-}
-}
-}
-}
+
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
@@ -87,11 +77,12 @@ struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_fore
   rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
 
   bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
+  unused_grammar<Iterator> unused_grammar_;
 
   delete_foreign_device_table_entry_grammar() : delete_foreign_device_table_entry_grammar::base_type(
       delete_foreign_device_table_entry_rule) {
 
-    delete_foreign_device_table_entry_rule = bacnet_ip_address_rule >> attr(0);
+    delete_foreign_device_table_entry_rule = bacnet_ip_address_rule >> unused_grammar_;
     bacnet_ip_address_rule = bacnet_ip_address_grammar_;
 
     delete_foreign_device_table_entry_rule.name("delete_foreign_device_table_entry_rule");
@@ -100,10 +91,6 @@ struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_fore
 };
 
 
-}
-}
-}
-}
-}
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_DELET_FOREIGN_DEVICE_TABLE_ENTRY_GRAMMAR_HPP_ */

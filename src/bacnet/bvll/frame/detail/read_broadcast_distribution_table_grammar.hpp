@@ -18,17 +18,15 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef SRC_BACNET_BVLL_BVLC_RESULT_GRAMMAR_HPP_
-#define SRC_BACNET_BVLL_BVLC_RESULT_GRAMMAR_HPP_
+#ifndef SRC_BACNET_BVLL_BVLC_READ_BROADCAST_DISTRIBUTION_TABLE_GRAMMAR_HPP_
+#define SRC_BACNET_BVLL_BVLC_READ_BROADCAST_DISTRIBUTION_TABLE_GRAMMAR_HPP_
 
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
-#include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/frame/bvlc_result.hpp>
-#include <bacnet/bvll/result_code.hpp>
-#include <util/boost/spirit/unused_type.hpp>
+#include <bacnet/bvll/frame/read_broadcast_distribution_table.hpp>
+
 
 namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
@@ -37,20 +35,16 @@ using namespace boost::spirit::karma;
 using namespace bacnet::bvll;
 
 template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
+struct read_broadcast_distribution_table_grammar : grammar<Iterator, read_broadcast_distribution_table()> {
 
-  rule<Iterator, bvlc_result()> bvlc_result_rule;
-  rule<Iterator, uint16_t()> result_code_rule;
+  rule<Iterator, read_broadcast_distribution_table()> read_broadcast_distribution_table_rule;
 
-  unused_grammar<Iterator> unused_grammar_;
+  read_broadcast_distribution_table_grammar()
+      : read_broadcast_distribution_table_grammar::base_type(read_broadcast_distribution_table_rule) {
 
-  bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
+    read_broadcast_distribution_table_rule = eps;
 
-    bvlc_result_rule = result_code_rule << unused_grammar_;
-    result_code_rule = big_word;
-
-    bvlc_result_rule.name("bvlc_result_rule");
-    result_code_rule.name("result_code_rule");
+    read_broadcast_distribution_table_rule.name("read_broadcast_distribution_table_rule");
   }
 };
 
@@ -65,23 +59,19 @@ using namespace boost::spirit::qi;
 using namespace bacnet::bvll;
 
 template<typename Iterator>
-struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
+struct read_broadcast_distribution_table_grammar : grammar<Iterator, read_broadcast_distribution_table()> {
 
-  rule<Iterator, bvlc_result()> bvlc_result_rule;
-  rule<Iterator, uint16_t()> result_code_rule;
+  rule<Iterator, read_broadcast_distribution_table()> read_broadcast_distribution_table_rule;
 
-  unused_grammar<Iterator> unused_grammar_;
+  read_broadcast_distribution_table_grammar()
+      : read_broadcast_distribution_table_grammar::base_type(read_broadcast_distribution_table_rule) {
 
-  bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
+    read_broadcast_distribution_table_rule = eps;
 
-    bvlc_result_rule = result_code_rule >> unused_grammar_;
-    result_code_rule = big_word;
-
-    bvlc_result_rule.name("bvlc_result_rule");
-    result_code_rule.name("result_code_rule");
+    read_broadcast_distribution_table_rule.name("read_broadcast_distribution_table_rule");
   }
 };
 
 }}}}} /* namespaces */
 
-#endif /* SRC_BACNET_BVLL_BVLC_RESULT_GRAMMAR_HPP_ */
+#endif /* SRC_BACNET_BVLL_BVLC_READ_BROADCAST_DISTRIBUTION_TABLE_GRAMMAR_HPP_ */

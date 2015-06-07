@@ -24,14 +24,10 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/original_unicast_npdu.hpp>
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace generator {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
@@ -43,9 +39,11 @@ struct original_unicast_npdu_grammar : grammar<Iterator, original_unicast_npdu()
   rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
   rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   original_unicast_npdu_grammar() : original_unicast_npdu_grammar::base_type(original_unicast_npdu_rule) {
 
-    original_unicast_npdu_rule = npdu_data_rule;
+    original_unicast_npdu_rule = npdu_data_rule << unused_grammar_;
     npdu_data_rule = *byte_;
 
     original_unicast_npdu_rule.name("original_unicast_npdu_rule");
@@ -53,18 +51,11 @@ struct original_unicast_npdu_grammar : grammar<Iterator, original_unicast_npdu()
   }
 };
 
-}
-}
-}
-}
-}
+
+}}}}}
 
 
-namespace bacnet {
-namespace bvll {
-namespace frame {
-namespace detail {
-namespace parser {
+namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -76,9 +67,11 @@ struct original_unicast_npdu_grammar : grammar<Iterator, original_unicast_npdu()
   rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
   rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   original_unicast_npdu_grammar() : original_unicast_npdu_grammar::base_type(original_unicast_npdu_rule) {
 
-    original_unicast_npdu_rule = npdu_data_rule >> attr(0);
+    original_unicast_npdu_rule = npdu_data_rule >> unused_grammar_;
     npdu_data_rule = *byte_;
 
     original_unicast_npdu_rule.name("original_unicast_npdu_rule");
@@ -87,10 +80,6 @@ struct original_unicast_npdu_grammar : grammar<Iterator, original_unicast_npdu()
 };
 
 
-}
-}
-}
-}
-}
+}}}}}
 
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_GRAMMAR_HPP_ */

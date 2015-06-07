@@ -25,6 +25,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/original_broadcast_npdu.hpp>
 
 namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
@@ -41,9 +42,11 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
   rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
   rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
+
   original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-    original_broadcast_npdu_rule = npdu_data_rule ;
+    original_broadcast_npdu_rule = npdu_data_rule << unused_grammar_;
     npdu_data_rule = *byte_;
 
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
@@ -59,9 +62,6 @@ namespace bacnet { namespace bvll { namespace frame { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace bacnet::bvll::frame;
-using namespace boost::phoenix;
-
-using boost::spirit::qi::_1;
 
 template<typename Iterator>
 struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_npdu()> {
@@ -69,10 +69,11 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
   rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
   rule<Iterator, bacnet::binary_data()> npdu_data_rule;
 
+  unused_grammar<Iterator> unused_grammar_;
 
   original_broadcast_npdu_grammar() : original_broadcast_npdu_grammar::base_type(original_broadcast_npdu_rule) {
 
-    original_broadcast_npdu_rule = npdu_data_rule[_val = construct<original_broadcast_npdu>(_1)];
+    original_broadcast_npdu_rule = npdu_data_rule >>  unused_grammar_;
     npdu_data_rule = *byte_;
 
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
@@ -82,8 +83,6 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
     debug(npdu_data_rule);
   }
 };
-
-
 
 
 }}}}}
