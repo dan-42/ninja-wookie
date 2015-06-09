@@ -65,8 +65,9 @@ public:
       bacnet::binary_data input(data_.begin(), data_.begin()+bytes_recvd);
 
       for(auto c : data_){
-        std::bitset<8> b(c);
-        std::cout << b.to_string();
+        //std::bitset<8> b(c);
+        //std::cout << b.to_string();
+        std::cout << " 0x" << std::setw(2) << std::setfill('0') << std::hex << (int) c ;
       }
       std::cout << std::endl;
 
