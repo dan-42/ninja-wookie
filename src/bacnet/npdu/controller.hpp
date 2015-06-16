@@ -487,6 +487,8 @@ class controller {
 public:
   controller(Underlying_layer &underlying_layer) : underlying_layer_(underlying_layer) {
 
+    underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1));
+
   }
 
   template<typename Handler>
@@ -502,6 +504,23 @@ public:
     bacnet::binary_data binary_frame = generator::generate(frame);
 
     underlying_layer_.async_send_broadcast(binary_frame, handler);
+  }
+
+  void async_receive_broadcast_handler(const bacnet::binary_data& data) {
+    std::cout << "npdu_controller " << "async_receive_broadcast_handler" << std::endl;
+
+    bacnet::npdu::frame frame_;
+    auto start = data.begin();
+    auto end = data.end();
+
+    bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
+    auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
+
+    if(has_success){
+      std::cout << "npdu_controller " << "BAM parsed npdu! "  << std::endl;
+      frame_.
+    }
+
   }
 
 

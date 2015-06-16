@@ -137,7 +137,7 @@ struct frame_size : public boost::static_visitor<uint32_t> {
   }
 
   uint32_t operator()(const original_broadcast_npdu &operand) {
-    return 8;
+    return operand.npdu_data.size();
   }
 
   uint32_t operator()(const original_secure_bvll &operand) {

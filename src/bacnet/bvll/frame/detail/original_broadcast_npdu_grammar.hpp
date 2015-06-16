@@ -79,8 +79,8 @@ struct original_broadcast_npdu_grammar : grammar<Iterator, original_broadcast_np
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
     npdu_data_rule.name("npdu_data_rule");
 
-    debug(original_broadcast_npdu_rule);
-    debug(npdu_data_rule);
+    //debug(original_broadcast_npdu_rule);
+    //debug(npdu_data_rule);
   }
 };
 

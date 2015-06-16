@@ -23,6 +23,7 @@
 #define NINJA_WOOKIE_CONTROLLER_HPP
 
 #include <vector>
+#include <array>
 #include <iostream>
 #include <iomanip>
 #include <bitset>
@@ -31,27 +32,39 @@
 #include <boost/asio.hpp>
 
 #include <bacnet/bvll/frames.hpp>
+#include <bacnet/bvll/api.hpp>
 
 #include <bacnet/bvll/detail/inbound_router.hpp>
 #include <bacnet/bvll/detail/transporter.hpp>
+#include <bacnet/bvll/detail/callback_manager.hpp>
 
 
 namespace bacnet { namespace  bvll {
+
+
+
 
 class controller {
 
 public:
 
-  controller(boost::asio::io_service &ios) : io_service_(ios), transporter_(ios), inbound_router_(transporter_) {
+  controller(boost::asio::io_service &ios) : io_service_(ios), transporter_(ios), inbound_router_(callback_manager_) {
     start();
   }
 
-  controller(boost::asio::io_service &ios, uint16_t port) : io_service_(ios), transporter_(ios, port), inbound_router_(transporter_)  {
+  controller(boost::asio::io_service &ios, uint16_t port) : io_service_(ios), transporter_(ios, port), inbound_router_(callback_manager_)  {
     start();
+  }
+
+  void register_async_receive_broadcast_callback(const async_receive_broadcast_callback_t &callback){
+    callback_manager_.async_receive_broadcast_callback_ = callback;
+  }
+
+  void register_async_receive_unicast_callback(const async_receive_unicast_callback_t &callback){
+    callback_manager_.async_receive_unicast_callback_ = callback;
   }
 
   void start() {
-    data_.reserve(std::numeric_limits<uint16_t>::max());
 
     auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,
                                 boost::asio::placeholders::bytes_transferred);
@@ -60,11 +73,12 @@ public:
 
   void handle_receive_from(const boost::system::error_code &error, size_t bytes_recvd) {
     if (!error) {
-      std::cout << "received from: " << sender_endpoint_.address().to_string()
-      << ":" << (int) sender_endpoint_.port() << std::endl;
+      std::cout << "handle_receive_from: " << sender_endpoint_.address().to_string()
+      << ":" << (int) sender_endpoint_.port() << " bytes: " << bytes_recvd << std::endl;
+
       bacnet::binary_data input(data_.begin(), data_.begin()+bytes_recvd);
 
-      for(auto c : data_){
+      for(auto c : input){
         //std::bitset<8> b(c);
         //std::cout << b.to_string();
         std::cout << " 0x" << std::setw(2) << std::setfill('0') << std::hex << (int) c ;
@@ -74,8 +88,6 @@ public:
       frame::possible_bvll_frame f = parser::parse(input);
       boost::apply_visitor(inbound_router_, f);
 
-      data_.clear();
-      data_.reserve(std::numeric_limits<uint16_t>::max());
       auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,
                                   boost::asio::placeholders::bytes_transferred);
       transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
@@ -99,10 +111,12 @@ private:
   boost::asio::io_service &io_service_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
 
-  std::vector<uint8_t> data_;
+  std::array<uint8_t, std::numeric_limits<uint16_t>::max()> data_;
 
   bacnet::bvll::detail::transporter transporter_;
   bacnet::bvll::detail::inbound_router inbound_router_;
+  bacnet::bvll::detail::callback_manager callback_manager_;
+
 };
 
 
