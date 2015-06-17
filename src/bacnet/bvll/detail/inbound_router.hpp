@@ -40,7 +40,8 @@
 #include <bacnet/bvll/frame/raw.hpp>
 
 #include <bacnet/bvll/detail/transporter.hpp>
-
+#include <bacnet/bvll/detail/callback_manager.hpp>
+#include <bacnet/bvll/controller.hpp>
 
 
 namespace bacnet { namespace  bvll { namespace  detail {
@@ -49,7 +50,7 @@ class inbound_router : public boost::static_visitor<> {
 
 public:
 
-  inbound_router(bacnet::bvll::detail::transporter& transporter) : transporter_(transporter) {
+  inbound_router(bacnet::bvll::detail::callback_manager& cm) : callback_manager_(cm) {
 
   }
 
@@ -67,10 +68,6 @@ public:
 
   void operator()(frame::read_broadcast_distribution_table_ack request) {
     std::cout << "inbound_router read_broadcast_distribution_table" << std::endl;
-  }
-
-  void operator()(frame::forwarded_npdu request) {
-    std::cout << "inbound_router forwarded_npdu" << std::endl;
   }
 
   void operator()(frame::register_foreign_device request) {
@@ -92,13 +89,25 @@ public:
     std::cout << "inbound_router distribute_broadcast_to_network" << std::endl;
   }
 
+  void operator()(frame::forwarded_npdu request) {
+    std::cout << "inbound_router forwarded_npdu" << std::endl;
+  }
+
   void operator()(frame::original_unicast_npdu request) {
     std::cout << "inbound_router original_unicast_npdu" << std::endl;
+
+    if(!callback_manager_.async_receive_unicast_callback_.empty()){
+      callback_manager_.async_receive_unicast_callback_(request.npdu_data);
+    }
   }
 
   void operator()(frame::original_broadcast_npdu request) {
     std::cout << "inbound_router original_broadcast_npdu" << std::endl;
+    if(!callback_manager_.async_receive_broadcast_callback_.empty()) {
+      callback_manager_.async_receive_broadcast_callback_(request.npdu_data);
+    }
   }
+
   void operator()(frame::original_secure_bvll request) {
     std::cout << "inbound_router original_secure_bvll" << std::endl;
   }
@@ -107,7 +116,7 @@ public:
   }
 
 private:
-  bacnet::bvll::detail::transporter& transporter_;
+  bacnet::bvll::detail::callback_manager&  callback_manager_;
 };
 
 

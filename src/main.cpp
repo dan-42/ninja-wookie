@@ -261,6 +261,69 @@ void handler(const boost::system::error_code& error_code, const std::size_t &byt
 
 
 
+
+
+namespace  bacnet { namespace apdu { namespace service {
+
+struct who_is {
+
+  bacnet::binary_data generate() {
+      bacnet::binary_data who_is_frame;
+      who_is_frame.push_back(0x10);
+      who_is_frame.push_back(0x08);
+      return who_is_frame;
+  }
+
+};
+
+struct i_am {
+
+  bacnet::binary_data generate() {
+    bacnet::binary_data whoi_is_frame;
+    whoi_is_frame.push_back(0x00);
+    whoi_is_frame.push_back(0x00);
+    return whoi_is_frame;
+  }
+
+};
+
+typedef boost::variant<who_is, i_am> possible_service;
+
+
+struct generate_frame : public boost::static_visitor<bacnet::binary_data> {
+  template<typename T>
+  bacnet::binary_data operator()( T op){
+    return op.generate();
+  }
+};
+
+}}}
+
+namespace bacnet { namespace apdu {
+
+template<class UnderlyingLayerController>
+struct controller {
+
+  controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
+      io_service_(io_service), underlying_controller_(underlying_controller) {
+
+  }
+
+  void service(const service::possible_service& service_) {
+
+    service::generate_frame gf;
+    auto data = service_.apply_visitor(gf);
+    underlying_controller_.async_send_broadcast(data, &handler);
+  }
+
+private:
+  boost::asio::io_service &io_service_;
+  UnderlyingLayerController underlying_controller_;
+};
+
+}}
+
+
 int main(int argc, char *argv[]) {
   try {
 
@@ -274,15 +337,15 @@ int main(int argc, char *argv[]) {
     boost::asio::io_service io_service;
     bacnet::bvll::controller bvll_controller(io_service);
     bacnet::npdu::controller<> npdu_controller(bvll_controller);
+    bacnet::apdu::controller<bacnet::npdu::controller<>> apdu_controller(io_service, npdu_controller);
 
-    bacnet::binary_data whoi_is_frame;
-    whoi_is_frame.push_back(0x10);
-    whoi_is_frame.push_back(0x08);
+    bacnet::apdu::service::who_is who_is_;
+    apdu_controller.service(who_is_);
 
-    npdu_controller.async_send_broadcast(whoi_is_frame, &handler);
+
+
 
     io_service.run();
-
 
   }
   catch (std::exception &e) {
