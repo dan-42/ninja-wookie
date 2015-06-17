@@ -518,7 +518,7 @@ public:
 
     if(has_success){
       std::cout << "npdu_controller " << "BAM parsed npdu! "  << std::endl;
-      frame_.
+
     }
 
   }
