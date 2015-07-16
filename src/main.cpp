@@ -27,10 +27,6 @@
 
 
 
-
-
-
-
 int main(int argc, char *argv[]) {
   try {
 
@@ -42,11 +38,15 @@ int main(int argc, char *argv[]) {
     bacnet::apdu::service::who_is who_is_;
     apdu_controller.service(who_is_);
 
+
+
     io_service.run();
+
 
   }
   catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";
+    throw;
   }
 
   return 0;

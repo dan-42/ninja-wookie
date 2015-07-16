@@ -27,7 +27,7 @@
 
 #include <boost/fusion/include/define_struct.hpp>
 
-#include <boost/phoenix/bind/bind_member_function.hpp>
+//#include <boost/phoenix/bind/bind_member_function.hpp>
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 #include <bacnet/detail/common/types.hpp>
@@ -110,7 +110,7 @@ std::ostream &operator<<(std::ostream &os, const bacnet::npdu::address &a) {
 }
 
 namespace  bacnet { namespace npdu {
-struct alignas(1) control_information {
+struct  control_information {
   uint8_t priority_                  : 2;
   uint8_t has_confirmedReq_or_ComplxAck_or_expectingReply_ : 1;
   uint8_t has_source_specifier_      : 1;
