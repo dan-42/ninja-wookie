@@ -21,6 +21,8 @@
 #ifndef NINJA_WOOKIE_APDU_CONTROLLER_HPP
 #define NINJA_WOOKIE_APDU_CONTROLLER_HPP
 
+#include <iostream>
+
 #include <boost/asio.hpp>
 #include <boost/variant.hpp>
 #include <boost/bind.hpp>
@@ -60,7 +62,7 @@ struct controller {
   void async_received_apdu_handler(bacnet::binary_data data) {
     std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
     frame::possible_frame f = frame::parser::parse(data);
-    /* todo: add parser for apdu */
+    /* todo: add router */
 
 
 

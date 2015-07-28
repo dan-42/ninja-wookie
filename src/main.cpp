@@ -19,6 +19,7 @@
  */
 
 #include <iostream>
+#include <exception>
 
 #include <boost/asio.hpp>
 #include <bacnet/bvll/controller.hpp>
