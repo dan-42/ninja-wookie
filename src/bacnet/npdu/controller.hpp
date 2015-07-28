@@ -18,8 +18,6 @@
  * Authors: Daniel Friedrich
  */
 
-
-
 #ifndef NINJA_WOOKIE_NPDU_CONTROLLER_HPP
 #define NINJA_WOOKIE_NPDU_CONTROLLER_HPP
 
@@ -27,7 +25,6 @@
 
 #include <boost/fusion/include/define_struct.hpp>
 
-//#include <boost/phoenix/bind/bind_member_function.hpp>
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 #include <bacnet/detail/common/types.hpp>

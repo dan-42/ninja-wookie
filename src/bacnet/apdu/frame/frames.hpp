@@ -18,7 +18,6 @@
  * Authors: Daniel Friedrich
  */
 
-
 #ifndef NINJA_WOOKIE_APDU_FRAMES_HPP
 #define NINJA_WOOKIE_APDU_FRAMES_HPP
 
