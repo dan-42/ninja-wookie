@@ -22,8 +22,6 @@
 
 
 
-
-
 #include <bacnet/npdu/network_priority.hpp>
 #include <bacnet/npdu/protocol_version.hpp>
 #include <bacnet/npdu/vendor_specific_message_type_adr.hpp>

@@ -23,69 +23,13 @@
 
 #include <boost/asio.hpp>
 #include <boost/variant.hpp>
+#include <boost/bind.hpp>
+
+
 #include <bacnet/apdu/service/services.hpp>
-
-
-
-namespace bacnet { namespace  apdu { namespace detail { namespace pdu_type {
-
-/*
- * the pdu_type is a 4bit value
- * and is encoded in the hi_nibble
- * of the first byte in the apdu-header
- */
-
-constexpr uint8_t  confirmed_request          = 0x00;
-constexpr uint8_t  unconfirmed_request        = 0x01;
-constexpr uint8_t  simple_ack                 = 0x02;
-constexpr uint8_t  complex_ack                = 0x03;
-constexpr uint8_t  segment_ack                = 0x04;
-constexpr uint8_t  error                      = 0x05;
-constexpr uint8_t  reject                     = 0x06;
-constexpr uint8_t  abort                      = 0x07;
-
-static std::ostream &operator<<(std::ostream &os, const uint8_t &pdu_type){
-
-  switch (pdu_type) {
-    case pdu_type::confirmed_request :
-      os << "confirmed_request(0x00)";
-      break;
-    case pdu_type::unconfirmed_request :
-      os << "unconfirmed_request(0x01)";
-      break;
-    case pdu_type::simple_ack :
-      os << "simple_ack(0x02)";
-      break;
-    case pdu_type::complex_ack :
-      os << "complex_ack(0x03)";
-      break;
-    case pdu_type::segment_ack :
-      os << "segment_ack(0x04)";
-      break;
-    case pdu_type::error :
-      os << "error(0x05)";
-      break;
-    case pdu_type::reject :
-      os << "reject(0x06)";
-      break;
-    case pdu_type::abort :
-      os << "abort(0x07)";
-      break;
-    default:
-      os  << "unknown pdu_type  (0x" << std::hex
-          << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(pdu_type)
-          << ")";
-  }
-  return os;
-}
-
-}}}}
-
-
-
-
-
-
+#include <bacnet/apdu/detail/pdu_type.hpp>
+#include <bacnet/apdu/frame/frames.hpp>
+#include <bacnet/apdu/frame/grammar.hpp>
 
 
 void handler(const boost::system::error_code& error_code, const std::size_t &bytes_transfered){
@@ -102,6 +46,8 @@ struct controller {
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
       io_service_(io_service), underlying_controller_(underlying_controller) {
 
+	  underlying_controller.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1));
+
   }
 
   void service(const service::possible_service& service_) {
@@ -111,9 +57,18 @@ struct controller {
     underlying_controller_.async_send_broadcast(data, &handler);
   }
 
+  void async_received_apdu_handler(bacnet::binary_data data) {
+    std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
+    frame::possible_frame f = frame::parser::parse(data);
+    /* todo: add parser for apdu */
+
+
+
+  }
+
 private:
   boost::asio::io_service &io_service_;
-  UnderlyingLayerController underlying_controller_;
+  UnderlyingLayerController& underlying_controller_;
 };
 
 }}

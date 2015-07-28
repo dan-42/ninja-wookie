@@ -35,6 +35,9 @@
 
 #include <bacnet/npdu/frame.hpp>
 #include <bacnet/npdu/grammar.hpp>
+#include <bacnet/npdu/api.hpp>
+#include <bacnet/npdu/detail/callback_manager.hpp>
+#include <bacnet/npdu/detail/inbound_router.hpp>
 
 namespace bacnet { namespace npdu {
 
@@ -43,11 +46,26 @@ template<class Underlying_layer = bacnet::bvll::controller>
 class controller {
 
 public:
-  controller(Underlying_layer &underlying_layer) : underlying_layer_(underlying_layer) {
+  controller(Underlying_layer &underlying_layer) : underlying_layer_(underlying_layer), inbound_router_(callback_manager_) {
 
     underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1));
 
   }
+
+
+  void register_async_receive_broadcast_callback(const async_receive_broadcast_callback_t &callback){
+    callback_manager_.async_receive_broadcast_callback_ = callback;
+  }
+
+  void register_async_receive_unicast_callback(const async_receive_unicast_callback_t &callback){
+    callback_manager_.async_receive_unicast_callback_ = callback;
+  }
+
+  void register_async_received_apdu_callback(const async_received_apdu_callback_t &callback){
+    callback_manager_.async_received_apdu_callback_ = callback;
+  }
+
+
 
   template<typename Handler>
   void async_send_broadcast(const bacnet::binary_data & payload, const Handler &handler){
@@ -68,13 +86,15 @@ public:
     std::cout << "npdu_controller " << "async_receive_broadcast_handler" << std::endl;
 
     auto frame = npdu::parser::parse(data);
-
     std::cout << "bacnet::npdu::parser::parse parsed "   << std::endl;
+    inbound_router_.route(frame);
   }
 
 
 private:
   Underlying_layer &underlying_layer_;
+  detail::callback_manager callback_manager_;
+  detail::inbound_router inbound_router_;
 
 };
 

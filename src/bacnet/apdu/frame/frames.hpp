@@ -19,68 +19,38 @@
  */
 
 
-#include <bitset>
-#include <boost/fusion/include/define_struct.hpp>
-#include <bacnet/detail/common/types.hpp>
-#include <util/boost/spirit/unused_type.hpp>
-
-#include <bacnet/apdu/detail/headers.hpp>
-
-#include <boost/dynamic_bitset.hpp>
 #ifndef NINJA_WOOKIE_APDU_FRAMES_HPP
 #define NINJA_WOOKIE_APDU_FRAMES_HPP
 
 
 
+#include <boost/variant.hpp>
 
-namespace bacnet { namespace  apdu { namespace frame {
+#include <bacnet/apdu/frame/confirmed_request.hpp>
+#include <bacnet/apdu/frame/unconfirmed_request.hpp>
+#include <bacnet/apdu/frame/simple_ack.hpp>
+#include <bacnet/apdu/frame/complex_ack.hpp>
+#include <bacnet/apdu/frame/segmented_ack.hpp>
+#include <bacnet/apdu/frame/error.hpp>
+#include <bacnet/apdu/frame/abort.hpp>
+#include <bacnet/apdu/frame/reject.hpp>
 
-struct alignas(1) segmentation {
-  uint8_t unused_                          : 1;
-  uint8_t max_segments_                    : 3;
-  uint8_t _     : 1;
-  uint8_t is_segmented_response_accepted_  : 1;
-  uint8_t unused_                          : 1;
 
-  confirmed_request() : pdu_type_(0),
-                        is_segmented_(0),
-                        has_more_segments_following_(0),
-                        is_segmented_response_accepted_(0),
-                        unused_(0) {
-  }
+namespace bacnet { namespace apdu  { namespace frame {
 
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-  bool is_segmented(){
-    return is_segmented_==true;
-  }
-  bool has_more_segments_following(){
-    return has_more_segments_following_==true;
-  }
-  bool is_segmented_response_accepted(){
-    return is_segmented_response_accepted_==true;
-  }
-};
 
+typedef boost::variant<
+    confirmed_request,
+    unconfirmed_request,
+    simple_ack,
+    complex_ack,
+    segmented_ack,
+    error,
+    abort,
+    reject
+    > possible_frame;
 
 }}}
-
-
-
-
-BOOST_FUSION_DEFINE_STRUCT(
-        (bacnet)(apdu)(frame),confirmed_request,
-        (bacnet::binary_data, npdu_data)
-        (unused_t, unused)
-)
-
-
-
-
-
-
-
 
 
 #endif

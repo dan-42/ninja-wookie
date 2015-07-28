@@ -2,8 +2,8 @@
 // Created by schoko on 6/16/15.
 //
 
-#ifndef NINJA_WOOKIE_CALLBACK_MANAGER_HPP
-#define NINJA_WOOKIE_CALLBACK_MANAGER_HPP
+#ifndef NINJA_WOOKIE_BVLL_CALLBACK_MANAGER_HPP
+#define NINJA_WOOKIE_BVLL_CALLBACK_MANAGER_HPP
 
 #include <bacnet/bvll/api.hpp>
 
@@ -20,4 +20,4 @@ struct callback_manager {
 }}}
 
 
-#endif //NINJA_WOOKIE_CALLBACK_MANAGER_HPP
+#endif //NINJA_WOOKIE_BVLL_CALLBACK_MANAGER_HPP

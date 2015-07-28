@@ -90,6 +90,8 @@ public:
 
       auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,
                                   boost::asio::placeholders::bytes_transferred);
+
+
       transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
     }
   }

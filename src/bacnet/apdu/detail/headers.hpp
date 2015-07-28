@@ -22,165 +22,86 @@
 #define NINJA_WOOKIE_APDU_HEADERS_HPP
 
 
-
+#include <cstdint>
 
 namespace bacnet { namespace  apdu { namespace detail { namespace  header {
 
-struct alignas(1) confirmed_request {
-  uint8_t pdu_type_                        : 4;
-  uint8_t is_segmented_                    : 1;
-  uint8_t has_more_segments_following_     : 1;
-  uint8_t is_segmented_response_accepted_  : 1;
-  uint8_t unused_                          : 1;
+/**
+ * the first byte in the APDU has a 4bit pdu_type
+ * and then depending on the pdu_type the following 4 bit
+ * have different meanings. default the must be 0 if not used
+ */
+struct pdu_type_and_control_information_t {
+	uint8_t pdu_type_   					                            : 4;
+	uint8_t is_segmented_       			                        : 1;
+	uint8_t has_more_segments_following_                      : 1;
+	uint8_t is_segmented_response_accepted_OR_is_normal_ack_  : 1;
+	uint8_t is_send_by_server_  			                        : 1;
 
-  confirmed_request() : pdu_type_(0),
-                        is_segmented_(0),
-                        has_more_segments_following_(0),
-                        is_segmented_response_accepted_(0),
-                        unused_(0) {
-  }
+	pdu_type_and_control_information_t() : pdu_type_(0),
+										is_segmented_(0),
+										has_more_segments_following_(0),
+										is_segmented_response_accepted_OR_is_normal_ack_(0),
+										is_send_by_server_(0) {
+	}
 
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-  bool is_segmented(){
-    return is_segmented_==true;
-  }
-  bool has_more_segments_following(){
-    return has_more_segments_following_==true;
-  }
-  bool is_segmented_response_accepted(){
-    return is_segmented_response_accepted_==true;
-  }
-};
+	uint8_t pdu_type(){
+		return pdu_type_;
+	}
 
-struct alignas(1) unconfirmed_request {
-  uint8_t pdu_type_                        : 4;
-  uint8_t unused_                          : 4;
+	bool is_segmented(){
+		return is_segmented_==true;
+	}
 
-  unconfirmed_request() : pdu_type_(0),
-                          unused_(0) {
-  }
+	bool has_more_segments_following(){
+		return has_more_segments_following_==true;
+	}
 
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-};
 
-struct alignas(1) simple_ack {
-  uint8_t pdu_type_                        : 4;
-  uint8_t unused_                          : 4;
+	//used by all
+	bool is_segmented_response_accepted(){
+		return is_segmented_response_accepted_OR_is_normal_ack_==true;
+	}
+	//for segment_ack only
+	bool is_normal_ack(){
+		return is_segmented_response_accepted_OR_is_normal_ack_==true;
+	}
 
-  simple_ack() : pdu_type_(0),
-                 unused_(0) {
-  }
+	//for segment_ack &&  abort
+	bool is_send_by_server(){
+		return is_send_by_server_==true;
+	}
 
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
 };
 
 
-struct alignas(1) complex_ack {
-  uint8_t pdu_type_                        : 4;
-  uint8_t is_segmented_                    : 1;
-  uint8_t has_more_segments_following_     : 1;
-  uint8_t unused_                          : 2;
 
-  complex_ack() : pdu_type_(0),
-                  is_segmented_(0),
-                  has_more_segments_following_(0),
-                  unused_(0) {
-  }
 
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-  bool is_segmented(){
-    return is_segmented_==true;
-  }
-  bool has_more_segments_following(){
-    return has_more_segments_following_==true;
-  }
-};
 
-struct alignas(1) segment_ack {
-  uint8_t pdu_type_                        : 4;
-  uint8_t unused_                          : 2;
-  uint8_t is_normal_ack_                   : 1;
-  uint8_t is_send_by_server_               : 1;
+struct  segmentation_t {
+  uint8_t unused_                : 1;
+  uint8_t max_segments_          : 3;
+  uint8_t max_accepted_apdu_     : 4;
 
-  segment_ack() : pdu_type_(0),
-                  unused_(0),
-                  is_normal_ack_(0),
-                  is_send_by_server_(0) {
+
+  segmentation_t() : unused_(0),
+                   max_segments_(0),
+                   max_accepted_apdu_(0)  {
   }
 
-  uint8_t pdu_type(){
-    return pdu_type_;
+  uint8_t max_segments() {
+    return max_segments_;
   }
-  bool is_normal_ack(){
-    return is_normal_ack_==true;
+
+  uint8_t max_accepted_apdu() {
+    return max_accepted_apdu_;
   }
-  bool is_send_by_server(){
-    return is_send_by_server_==true;
-  }
+
 };
 
 
-struct alignas(1) error {
-  uint8_t pdu_type_                        : 4;
-  uint8_t unused_                          : 4;
-
-  error() : pdu_type_(0),
-            unused_(0)  {
-  }
-
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-};
-
-struct alignas(1) reject {
-  uint8_t pdu_type_                        : 4;
-  uint8_t unused_                          : 4;
-
-  reject() : pdu_type_(0),
-             unused_(0)  {
-  }
-
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-};
-
-struct alignas(1) abort {
-  uint8_t pdu_type_                        : 4;
-  uint8_t unused_                          : 3;
-  uint8_t is_send_by_server_               : 1;
-
-  abort() : pdu_type_(0),
-            unused_(0),
-            is_send_by_server_(0){
-  }
-
-  uint8_t pdu_type(){
-    return pdu_type_;
-  }
-
-  bool is_send_by_server(){
-    return is_send_by_server_==true;
-  }
-
-};
 
 }}}}
-
-
-
-
-
-
 
 
 
