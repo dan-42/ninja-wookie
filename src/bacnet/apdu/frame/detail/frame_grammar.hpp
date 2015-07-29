@@ -28,6 +28,10 @@
 #include <bacnet/apdu/frame/detail/unconfirmed_request_grammar.hpp>
 #include <bacnet/apdu/frame/detail/simple_ack_grammar.hpp>
 #include <bacnet/apdu/frame/detail/complex_ack_grammar.hpp>
+#include <bacnet/apdu/frame/detail/segment_ack_grammar.hpp>
+#include <bacnet/apdu/frame/detail/error_grammar.hpp>
+#include <bacnet/apdu/frame/detail/reject_grammar.hpp>
+#include <bacnet/apdu/frame/detail/abort_grammar.hpp>
 
 
 namespace bacnet { namespace  apdu { namespace frame { namespace detail { namespace parser {
@@ -54,6 +58,10 @@ struct frame_grammar : grammar<Iterator, possible_frame() >{
   unconfirmed_request_grammar<Iterator>   unconfirmed_request_grammar_;
   simple_ack_grammar<Iterator>            simple_ack_grammar_;
   complex_ack_grammar<Iterator>           complex_ack_grammar_;
+  segment_ack_grammar<Iterator>           segment_ack_grammar_;
+  error_grammar<Iterator>                 error_grammar_;
+  reject_grammar<Iterator>                reject_grammar_;
+  abort_grammar<Iterator>                 abort_grammar_;
 
 
   frame_grammar() : frame_grammar::base_type(possible_frame_rule){
@@ -62,6 +70,10 @@ struct frame_grammar : grammar<Iterator, possible_frame() >{
                          | unconfirmed_request_grammar_
                          | simple_ack_grammar_
                          | complex_ack_grammar_
+                         | segment_ack_grammar_
+                         | error_grammar_
+                         | reject_grammar_
+                         | abort_grammar_
                          | eps;
 
     possible_frame_rule.name("possible_frame_rule");

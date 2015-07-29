@@ -18,8 +18,8 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef SRC_BACNET_APDU_FRAME_SEGMENTED_ACK_HPP_
-#define SRC_BACNET_APDU_FRAME_SEGMENTED_ACK_HPP_
+#ifndef SRC_BACNET_APDU_FRAME_SEGMENT_ACK_HPP_
+#define SRC_BACNET_APDU_FRAME_SEGMENT_ACK_HPP_
 
 
 #include <cstdint>
@@ -31,7 +31,7 @@
 
 
 BOOST_FUSION_DEFINE_STRUCT(
-        (bacnet)(apdu)(frame), segmented_ack,
+        (bacnet)(apdu)(frame), segment_ack,
         (bacnet::apdu::detail::header::pdu_type_and_control_information_t, pdu_type_and_control_information)
         (uint8_t, original_invoke_id)
         (uint8_t, sequence_number)
@@ -39,4 +39,4 @@ BOOST_FUSION_DEFINE_STRUCT(
 )
 
 
-#endif /* SRC_BACNET_APDU_FRAME_SEGMENTED_ACK_HPP_ */
+#endif /* SRC_BACNET_APDU_FRAME_SEGMENT_ACK_HPP_ */

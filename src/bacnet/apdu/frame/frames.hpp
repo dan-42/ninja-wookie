@@ -29,10 +29,10 @@
 #include <bacnet/apdu/frame/unconfirmed_request.hpp>
 #include <bacnet/apdu/frame/simple_ack.hpp>
 #include <bacnet/apdu/frame/complex_ack.hpp>
-#include <bacnet/apdu/frame/segmented_ack.hpp>
 #include <bacnet/apdu/frame/error.hpp>
 #include <bacnet/apdu/frame/abort.hpp>
 #include <bacnet/apdu/frame/reject.hpp>
+#include <bacnet/apdu/frame/segment_ack.hpp>
 
 
 namespace bacnet { namespace apdu  { namespace frame {
@@ -43,7 +43,7 @@ typedef boost::variant<
     unconfirmed_request,
     simple_ack,
     complex_ack,
-    segmented_ack,
+    segment_ack,
     error,
     abort,
     reject
