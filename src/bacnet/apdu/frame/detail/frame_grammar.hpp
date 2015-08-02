@@ -111,15 +111,23 @@ struct frame_grammar : grammar<Iterator, possible_frame() >{
   unconfirmed_request_grammar<Iterator>   unconfirmed_request_grammar_;
   simple_ack_grammar<Iterator>            simple_ack_grammar_;
   complex_ack_grammar<Iterator>           complex_ack_grammar_;
+  segment_ack_grammar<Iterator>           segment_ack_grammar_;
+  error_grammar<Iterator>                 error_grammar_;
+  reject_grammar<Iterator>                reject_grammar_;
+  abort_grammar<Iterator>                 abort_grammar_;
 
 
   frame_grammar() : frame_grammar::base_type(possible_frame_rule){
 
     possible_frame_rule  = confirmed_request_grammar_
-                         | unconfirmed_request_grammar_
-                         | simple_ack_grammar_
-                         | complex_ack_grammar_
-                         | eps;
+                             | unconfirmed_request_grammar_
+                             | simple_ack_grammar_
+                             | complex_ack_grammar_
+                             | segment_ack_grammar_
+                             | error_grammar_
+                             | reject_grammar_
+                             | abort_grammar_
+                             | eps;
 
     possible_frame_rule.name("possible_frame_rule");
 
