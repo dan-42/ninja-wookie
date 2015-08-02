@@ -28,16 +28,33 @@
 
 
 
+
 int main(int argc, char *argv[]) {
   try {
+/*
+    bacnet::config::device device_config;
+    device_config.apdu.device_object_id = 1;
+    device_config.apdu.support_segmentation = false;
+    device_config.apdu.max_segments_accepted= bacnet::apdu::segments::TWO_SEGMENTS;
+    device_config.npdu.network_number = 1;
+
+*/
+
 
     boost::asio::io_service io_service;
     bacnet::bvll::controller bvll_controller(io_service);
     bacnet::npdu::controller<> npdu_controller(bvll_controller);
-    bacnet::apdu::controller<bacnet::npdu::controller<>> apdu_controller(io_service, npdu_controller);
+    bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller);
+   // bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
-    bacnet::apdu::service::who_is who_is_;
-    apdu_controller.service(who_is_);
+    //service_controller.create_service("who_is").send();
+
+    //bacnet::apdu::service::who_is who_is_;
+
+    bacnet::binary_data who_is_frame;
+
+    apdu_controller.send_unconfirmed_request_as_broadcast(0x08, who_is_frame);
+
 
 
 

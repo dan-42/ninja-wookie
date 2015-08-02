@@ -87,7 +87,7 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
                            >> service_data_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
 
 
     segmentation_rule         = segmentation_grammar;
@@ -191,7 +191,7 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
                            << service_data_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
 
 
     segmentation_rule         = segmentation_grammar;

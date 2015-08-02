@@ -34,6 +34,7 @@ BOOST_FUSION_DEFINE_STRUCT(
         (bacnet)(apdu)(frame), confirmed_request,
         (bacnet::apdu::detail::header::pdu_type_and_control_information_t, pdu_type_and_control_information)
         (bacnet::apdu::detail::header::segmentation_t, segmentation)
+        //(uint8_t, segmentation)
         (uint8_t, invoke_id)
         (uint8_t, sequence_number)
         (uint8_t, proposed_window_size)

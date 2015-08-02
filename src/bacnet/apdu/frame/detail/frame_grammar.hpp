@@ -129,6 +129,7 @@ struct frame_grammar : grammar<Iterator, possible_frame() >{
                              | abort_grammar_
                              | eps;
 
+
     possible_frame_rule.name("possible_frame_rule");
 
     /*

@@ -65,7 +65,6 @@ struct complex_ack_grammar : grammar<Iterator, complex_ack() >{
 
 
   bit_field<Iterator, pdu_type_and_control_information_t> pdu_type_and_control_information_grammar;
-  bit_field<Iterator, segmentation_t>                     segmentation_grammar;
 
   complex_ack_grammar() : complex_ack_grammar::base_type(complex_ack_rule){
 
@@ -77,7 +76,7 @@ struct complex_ack_grammar : grammar<Iterator, complex_ack() >{
                            >> service_ack_data_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
 
 
     invoke_id_rule            = byte_;
@@ -161,7 +160,6 @@ struct complex_ack_grammar : grammar<Iterator, complex_ack() >{
   rule<Iterator>                        pdu_type_check_rule;
 
   bit_field<Iterator, pdu_type_and_control_information_t> pdu_type_and_control_information_grammar;
-  bit_field<Iterator, segmentation_t>                     segmentation_grammar;
 
   complex_ack_grammar() : complex_ack_grammar::base_type(complex_ack_rule){
 
@@ -173,7 +171,7 @@ struct complex_ack_grammar : grammar<Iterator, complex_ack() >{
                            << service_ack_data_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
 
 
     original_invoke_id_rule   = byte_;

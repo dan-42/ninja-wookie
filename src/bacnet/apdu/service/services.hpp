@@ -32,7 +32,6 @@ struct who_is {
 
   bacnet::binary_data generate() {
     bacnet::binary_data who_is_frame;
-    who_is_frame.push_back(0x10);
     who_is_frame.push_back(0x08);
     return who_is_frame;
   }

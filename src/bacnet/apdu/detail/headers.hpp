@@ -23,6 +23,9 @@
 
 
 #include <cstdint>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 
 namespace bacnet { namespace  apdu { namespace detail { namespace  header {
 
@@ -32,11 +35,11 @@ namespace bacnet { namespace  apdu { namespace detail { namespace  header {
  * have different meanings. default the must be 0 if not used
  */
 struct pdu_type_and_control_information_t {
-	uint8_t pdu_type_   					                            : 4;
 	uint8_t is_segmented_       			                        : 1;
 	uint8_t has_more_segments_following_                      : 1;
 	uint8_t is_segmented_response_accepted_OR_is_normal_ack_  : 1;
 	uint8_t is_send_by_server_  			                        : 1;
+	uint8_t pdu_type_                                         : 4;
 
 	pdu_type_and_control_information_t() : pdu_type_(0),
 										is_segmented_(0),
@@ -72,6 +75,19 @@ struct pdu_type_and_control_information_t {
 		return is_send_by_server_==true;
 	}
 
+
+	friend std::ostream& operator<<(std::ostream& os, pdu_type_and_control_information_t const& t) {
+	    std::stringstream ss;
+	    ss << std::hex << std::setw(2) << std::setfill('0')
+	       << (int)t.pdu_type_ << (int)t.is_segmented_
+	       << (int)t.has_more_segments_following_
+	       << (int)t.is_segmented_response_accepted_OR_is_normal_ack_
+	       << (int)t.is_send_by_server_;
+
+	    os << ss.str();
+	    return os;
+	  }
+
 };
 
 
@@ -97,11 +113,25 @@ struct  segmentation_t {
     return max_accepted_apdu_;
   }
 
+
+
+  friend std::ostream& operator<<(std::ostream& os, segmentation_t const& t) {
+    std::stringstream ss;
+    ss << std::hex << std::setw(2) << std::setfill('0')
+       << (int)t.unused_
+       << (int)t.max_segments_
+       << (int)t.max_accepted_apdu_;
+
+    os << ss.str();
+    return os;
+  }
+
 };
 
 
 
 }}}}
+
 
 
 

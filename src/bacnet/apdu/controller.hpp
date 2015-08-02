@@ -27,11 +27,13 @@
 #include <boost/variant.hpp>
 #include <boost/bind.hpp>
 
-
+#include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/service/services.hpp>
 #include <bacnet/apdu/detail/pdu_type.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
 #include <bacnet/apdu/frame/grammar.hpp>
+
+#include <bacnet/apdu/detail/inbound_router.hpp>
 
 
 void handler(const boost::system::error_code& error_code, const std::size_t &bytes_transfered){
@@ -52,8 +54,16 @@ struct controller {
 
   }
 
-  void service(const service::possible_service& service_) {
+  void send_unconfirmed_request_as_broadcast(const uint8_t &service_choice, const bacnet::binary_data& payload) {
+    frame::unconfirmed_request frame;
+    frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::unconfirmed_request;
+    frame.service_choice = service_choice;
+    frame.service_data = payload;
+    auto data = frame::generator::generate(frame);
+    underlying_controller_.async_send_broadcast(data, &handler);
+  }
 
+  void service(const service::possible_service& service_) {
     service::generate_frame gf;
     auto data = service_.apply_visitor(gf);
     underlying_controller_.async_send_broadcast(data, &handler);
@@ -62,15 +72,14 @@ struct controller {
   void async_received_apdu_handler(bacnet::binary_data data) {
     std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
     frame::possible_frame f = frame::parser::parse(data);
-    /* todo: add router */
-
-
+    boost::apply_visitor(inbound_router_, f);
 
   }
 
 private:
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
+  detail::inbound_router  inbound_router_;
 };
 
 }}

@@ -62,7 +62,6 @@ struct segment_ack_grammar : grammar<Iterator, segment_ack() >{
 
 
   bit_field<Iterator, pdu_type_and_control_information_t> pdu_type_and_control_information_grammar;
-  bit_field<Iterator, segmentation_t>                     segmentation_grammar;
 
   segment_ack_grammar() : segment_ack_grammar::base_type(segment_ack_rule){
 
@@ -72,7 +71,7 @@ struct segment_ack_grammar : grammar<Iterator, segment_ack() >{
                          >> actual_window_size_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
 
 
     original_invoke_id_rule   = byte_;
@@ -152,17 +151,16 @@ struct segment_ack_grammar : grammar<Iterator, segment_ack() >{
 
 
   bit_field<Iterator, pdu_type_and_control_information_t> pdu_type_and_control_information_grammar;
-  bit_field<Iterator, segmentation_t>                     segmentation_grammar;
 
   segment_ack_grammar() : segment_ack_grammar::base_type(segment_ack_rule){
 
     segment_ack_rule     = pdu_header_rule
-                         >> original_invoke_id_rule
-                         >> sequence_number_rule
-                         >> actual_window_size_rule;
+                         << original_invoke_id_rule
+                         << sequence_number_rule
+                         << actual_window_size_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
 
 
     original_invoke_id_rule   = byte_;

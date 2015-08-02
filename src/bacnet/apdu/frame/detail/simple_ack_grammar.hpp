@@ -67,7 +67,7 @@ struct simple_ack_grammar : grammar<Iterator, simple_ack() >{
                      >> service_ack_choice_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
 
     original_invoke_id_rule   = byte_;
 
@@ -145,7 +145,7 @@ struct simple_ack_grammar : grammar<Iterator, simple_ack() >{
                      << service_ack_choice_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
 
     original_invoke_id_rule   = byte_;
 
@@ -184,4 +184,4 @@ struct simple_ack_grammar : grammar<Iterator, simple_ack() >{
 }}}}}
 
 
-#endif /* SRC_BACNET_APDU_FRAME_DETAIL_CONFIRMED_REQUEST_GRAMMAR_HPP_ */
+#endif /* SRC_BACNET_APDU_FRAME_DETAIL_SIMPLE_ACK_GRAMMAR_HPP_ */

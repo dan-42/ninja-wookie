@@ -67,7 +67,7 @@ struct unconfirmed_request_grammar : grammar<Iterator, unconfirmed_request() >{
                              >> service_data_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
 
     service_choice_rule       = byte_;
 
@@ -143,7 +143,7 @@ struct unconfirmed_request_grammar : grammar<Iterator, unconfirmed_request() >{
                              << service_data_rule;
 
 
-    pdu_header_rule           = (pdu_header_rule[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
+    pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;
 
     service_choice_rule       = byte_;
 
@@ -165,12 +165,12 @@ struct unconfirmed_request_grammar : grammar<Iterator, unconfirmed_request() >{
     pdu_type_check_rule.name("pdu_type_check_rule");
 
     /*
-       debug(confirmed_request_rule);
+       debug(unconfirmed_request_rule);
        debug(pdu_header_rule);
        debug(service_choice_rule);
        debug(service_data_rule);
        debug(pdu_type_check_rule);
-     */
+     // */
   }
 
 
