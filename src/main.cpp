@@ -40,11 +40,20 @@ int main(int argc, char *argv[]) {
 
 */
 
+    std::string bvll_listening_ip = "0.0.0.0";
+    uint16_t    bvll_listening_port = 0xBAC0;
+    std::string bvll_multicast_ip = "255.255.255.255";
+
+    uint16_t npdu_network_number = 1;
+
+    uint16_t apdu_device_object_id = 1;
+
 
     boost::asio::io_service io_service;
-    bacnet::bvll::controller bvll_controller(io_service);
-    bacnet::npdu::controller<> npdu_controller(bvll_controller);
-    bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller);
+    bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
+    bacnet::npdu::controller<> npdu_controller(bvll_controller, npdu_network_number);
+    bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
+
    // bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
     //service_controller.create_service("who_is").send();

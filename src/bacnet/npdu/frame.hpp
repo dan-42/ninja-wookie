@@ -28,14 +28,14 @@
 #include <bacnet/detail/common/types.hpp>
 
 #include <bacnet/npdu/address.hpp>
-#include <bacnet/npdu/control_information.hpp>
+#include <bacnet/npdu/control_information_t.hpp>
 
 
 
 BOOST_FUSION_DEFINE_STRUCT(
   (bacnet)(npdu), frame,
   (uint8_t, protocol_version)
-  (bacnet::npdu::control_information, control_field)
+  (bacnet::npdu::control_information_t, control_field)
   (bacnet::npdu::address, destination)
   (bacnet::npdu::address, source)
   (uint8_t, hop_count)

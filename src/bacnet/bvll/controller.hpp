@@ -54,6 +54,18 @@ public:
     start();
   }
 
+  controller(boost::asio::io_service &ios, const std::string& endpoint, uint16_t port) : io_service_(ios), transporter_(ios, endpoint, port), inbound_router_(callback_manager_)  {
+      start();
+  }
+
+  controller(boost::asio::io_service &ios, const std::string& endpoint, uint16_t port, const std::string& multicast_ip) :
+                                                              io_service_(ios),
+                                                              transporter_(ios, endpoint, port, multicast_ip),
+                                                              inbound_router_(callback_manager_)  {
+      start();
+  }
+
+
   void register_async_receive_broadcast_callback(const async_receive_broadcast_callback_t &callback){
     callback_manager_.async_receive_broadcast_callback_ = callback;
   }
@@ -86,6 +98,7 @@ public:
       std::cout << std::endl;
 
       frame::possible_bvll_frame f = parser::parse(input);
+      inbound_router_.sender_endpoint(sender_endpoint_);
       boost::apply_visitor(inbound_router_, f);
 
       auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,

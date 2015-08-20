@@ -29,27 +29,42 @@
 
 namespace bacnet {   namespace  bvll {  namespace detail {
 
+static constexpr uint16_t DEFAULT_LISTENING_PORT = 0xBAC0;
+static const std::string  DEFAULT_LISTENING_ADDRESS{"0.0.0.0"};
+static const std::string  DEFAULT_MULTICAST_ADDRESS{"255.255.255.255"};
+
 
 class transporter {
 
 public:
 
-  const uint16_t DEFAULT_PORT = 0xBAC0;
-  const std::string DEFAULT_ADDRESS{"255.255.255.255"};
+
 
 
   transporter(boost::asio::io_service &io_service) : io_service_(io_service), socket_(io_service) {
     init();
   }
 
-  transporter(boost::asio::io_service &io_service, uint16_t port) : io_service_(io_service), socket_(io_service),
+  transporter(boost::asio::io_service &io_service, uint16_t port) : io_service_(io_service),
+                                                                    socket_(io_service),
                                                                     port_(port) {
     init();
   }
 
-  transporter(boost::asio::io_service &io_service, const std::string multicast_address, uint16_t port) :
-      io_service_(io_service), socket_(io_service), port_(port),
-      multicast_address_(boost::asio::ip::address::from_string(multicast_address)) {
+  transporter(boost::asio::io_service &io_service, const std::string listening_address, uint16_t port) :
+                                                                      io_service_(io_service),
+                                                                      socket_(io_service),
+                                                                      listen_address_(boost::asio::ip::address::from_string(listening_address)),
+                                                                      port_(port) {
+    init();
+  }
+
+  transporter(boost::asio::io_service &io_service, const std::string listening_address, uint16_t port, const std::string multicast_address) :
+                                                                    io_service_(io_service),
+                                                                    socket_(io_service),
+                                                                    listen_address_(boost::asio::ip::address::from_string(listening_address)),
+                                                                    port_(port),
+                                                                    multicast_address_(boost::asio::ip::address::from_string(multicast_address)) {
     init();
   }
 
@@ -75,31 +90,34 @@ public:
   }
 
 private:
-  //xxx to be setable by user for specific interface?
-  const boost::asio::ip::address listen_address_ = boost::asio::ip::address::from_string("0.0.0.0");
+
+
 
   void init() {
     std::cout << "init(): " << std::endl;
-    listen_endpoint = boost::asio::ip::udp::endpoint(listen_address_, port_);
+    listen_endpoint_ = boost::asio::ip::udp::endpoint(listen_address_, port_);
 
-    socket_.open(listen_endpoint.protocol());
+    socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.set_option(boost::asio::socket_base::broadcast(true));
-    socket_.bind(listen_endpoint);
+    socket_.bind(listen_endpoint_);
 
-    if (multicast_address_.to_string().compare(DEFAULT_ADDRESS) != 0) {
+    if (multicast_address_.to_string().compare(DEFAULT_MULTICAST_ADDRESS) != 0) {
       socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));
     }
 
 
   }
 
-  boost::asio::ip::address multicast_address_ = boost::asio::ip::address::from_string(DEFAULT_ADDRESS);
-  uint16_t port_ = DEFAULT_PORT;
+
+  uint16_t port_                              = DEFAULT_LISTENING_PORT;
+  boost::asio::ip::address listen_address_    = boost::asio::ip::address::from_string(DEFAULT_LISTENING_ADDRESS);
+  boost::asio::ip::address multicast_address_ = boost::asio::ip::address::from_string(DEFAULT_MULTICAST_ADDRESS);
 
   boost::asio::io_service &io_service_;
   boost::asio::ip::udp::socket socket_;
-  boost::asio::ip::udp::endpoint listen_endpoint;
+  boost::asio::ip::udp::endpoint listen_endpoint_;
+
 };
 
 

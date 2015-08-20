@@ -44,15 +44,24 @@ void handler(const boost::system::error_code& error_code, const std::size_t &byt
 
 namespace bacnet { namespace apdu {
 
+constexpr uint16_t DEFAULT_DEVICE_OBJECT_ID = 1;
+
 template<class UnderlyingLayerController>
 struct controller {
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
-      io_service_(io_service), underlying_controller_(underlying_controller) {
-
-	  underlying_controller.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1));
-
+                          io_service_(io_service),
+                          underlying_controller_(underlying_controller) {
+	  init();
   }
+
+  controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller, const uint16_t &device_object_id) :
+                          io_service_(io_service),
+                          underlying_controller_(underlying_controller),
+                          device_object_id_(device_object_id) {
+    init();
+  }
+
 
   void send_unconfirmed_request_as_broadcast(const uint8_t &service_choice, const bacnet::binary_data& payload) {
     frame::unconfirmed_request frame;
@@ -77,9 +86,15 @@ struct controller {
   }
 
 private:
+
+  void init() {
+    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1));
+  }
+
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
   detail::inbound_router  inbound_router_;
+  uint16_t device_object_id_ = DEFAULT_DEVICE_OBJECT_ID;
 };
 
 }}

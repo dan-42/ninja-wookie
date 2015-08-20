@@ -18,37 +18,41 @@
  * Authors: Daniel Friedrich
  */
 
+#include <bacnet/npdu/control_information_t.hpp>
 #include <string>
 #include <iomanip>
 
-#include <bacnet/npdu/control_information.hpp>
 
 namespace  bacnet { namespace npdu {
 
 
-control_information::control_information() : priority_(0), has_confirmedReq_or_ComplxAck_or_expectingReply_(0),
+control_information_t::control_information_t() : priority_(0), has_confirmedReq_or_ComplxAck_or_expectingReply_(0),
 					  has_source_specifier_(0), bit4_unused_(0), has_destination_specifier_(0),
 					  bit6_unused_(0), has_network_layer_message_(0) {
 }
 
-bool control_information::has_confirmedReq_or_ComplxAck_or_expectingReply(){
+bacnet::npdu::network_priority_t control_information_t::network_priority() const {
+  return static_cast<bacnet::npdu::network_priority_t>(priority_);
+}
+
+bool control_information_t::has_confirmed_req_OR_Complx_ack_OR_expecting_reply() const {
 	return has_confirmedReq_or_ComplxAck_or_expectingReply_==true;
 }
 
-bool control_information::has_source_specifier(){
+bool control_information_t::has_source_specifier() const {
 	return has_source_specifier_==true;
 }
 
-bool control_information::has_destination_specifier(){
+bool control_information_t::has_destination_specifier() const {
 	return has_destination_specifier_==true;
 }
 
-bool control_information::has_network_layer_message_type(){
+bool control_information_t::has_network_layer_message_type() const {
 	return has_network_layer_message_==true;
 }
 
 
-std::ostream &operator<<(std::ostream &os, const bacnet::npdu::control_information &ci) {
+std::ostream &operator<<(std::ostream &os, const bacnet::npdu::control_information_t &ci) {
   os << "\thas_network_layer_message: ";
   if(ci.has_network_layer_message_) { os << "true";  }
   else { os << "false" ;  }
