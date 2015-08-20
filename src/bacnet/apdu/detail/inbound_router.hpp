@@ -11,9 +11,11 @@
 
 
 #include <iostream>
-#include <boost/variant/static_visitor.hpp>
+#include <iomanip>
 
+#include <boost/variant/static_visitor.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
+
 
 
 namespace bacnet { namespace  apdu { namespace  detail {
@@ -31,10 +33,21 @@ public:
 
   void operator()(frame::unconfirmed_request request) {
       std::cout << "apdu::detail::inbound_router unconfirmed_request" << std::endl;
+
+      if(request.service_choice == 0x08) {
+          std::cout << "service choice: who-is" << request.service_choice;
+          for(auto& c : request.service_data){
+              std::cout << " " <<std::hex << std::setfill('0') << std::setw(2) << (int) c;
+          }
+          std::cout << std::endl;
+
+      }
+
   }
 
   void operator()(frame::simple_ack request) {
       std::cout << "apdu::detail::inbound_router simple_ack" << std::endl;
+
   }
 
   void operator()(frame::complex_ack request) {

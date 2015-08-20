@@ -27,9 +27,51 @@
 #include <bacnet/apdu/controller.hpp>
 
 
+#include <bacnet/apdu/detail/type/tag_grammar.hpp>
 
 
 int main(int argc, char *argv[]) {
+
+    //using namespace bacnet::apdu::detail::type;
+
+
+
+    std::string bin_data_to_parse{};
+    std::string bin_data_to_generate{};
+
+    bin_data_to_parse.push_back(0x11);
+
+    bool bool_;
+
+    auto start = bin_data_to_parse.begin();
+    auto end = bin_data_to_parse.end();
+    bacnet::apdu::detail::type::parser::boolean_grammar<decltype(start)> p;
+
+    bool r = boost::spirit::qi::parse(start, end, p , bool_);
+
+
+
+    if(bool_){
+        std::cout << "juhu! true" << std::endl;
+    }
+    else {
+        std::cout << "juhu! false" << std::endl;
+    }
+
+return 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
   try {
 /*
     bacnet::config::device device_config;

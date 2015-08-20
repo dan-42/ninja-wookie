@@ -1,13 +1,3 @@
-/*
- * test.cpp
- *
- *  Created on: May 14, 2015
- *      Author: schoko
- */
-
-
-
-
 /**
  * ninja-wooki, is a BACnet stack C++ library
  *
@@ -84,7 +74,6 @@ int main(int argc, char* argv[])
 	  if(bin_data_to_parse.compare(bin_data_to_generate) == 0){
 		  std::cout << "juhu!" << std::endl;
 	  }
-
 
 
 
