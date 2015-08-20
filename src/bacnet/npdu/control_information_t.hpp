@@ -18,16 +18,18 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef SRC_BACNET_NPDU_CONTROL_INFORMATION_HPP_
-#define SRC_BACNET_NPDU_CONTROL_INFORMATION_HPP_
+#ifndef SRC_BACNET_NPDU_CONTROL_INFORMATION_T_HPP_
+#define SRC_BACNET_NPDU_CONTROL_INFORMATION_T_HPP_
 
 #include <cstdint>
 #include <iostream>
 
+#include <bacnet/npdu/network_priority.hpp>
+
 namespace  bacnet { namespace npdu {
 
 
-struct  control_information {
+struct  control_information_t {
   uint8_t priority_                  : 2;
   uint8_t has_confirmedReq_or_ComplxAck_or_expectingReply_ : 1;
   uint8_t has_source_specifier_      : 1;
@@ -36,18 +38,19 @@ struct  control_information {
   uint8_t bit6_unused_               : 1;
   uint8_t has_network_layer_message_ : 1;
 
-  control_information();
+  control_information_t();
 
-  bool has_confirmedReq_or_ComplxAck_or_expectingReply();
-  bool has_source_specifier();
-  bool has_destination_specifier();
-  bool has_network_layer_message_type();
+  bacnet::npdu::network_priority_t network_priority() const;
+  bool has_confirmed_req_OR_Complx_ack_OR_expecting_reply() const;
+  bool has_source_specifier() const;
+  bool has_destination_specifier() const;
+  bool has_network_layer_message_type() const;
 };
 
-std::ostream &operator<<(std::ostream &os, const bacnet::npdu::control_information &ci);
+std::ostream &operator<<(std::ostream &os, const bacnet::npdu::control_information_t &ci);
 
 
 }}
 
 
-#endif /* SRC_BACNET_NPDU_CONTROL_INFORMATION_HPP_ */
+#endif /* SRC_BACNET_NPDU_CONTROL_INFORMATION_T_HPP_ */

@@ -39,14 +39,21 @@
 namespace bacnet { namespace npdu {
 
 
+constexpr uint8_t  NPDU_PROTOCOL_VERSION = 1;
+constexpr uint16_t DEFAULT_NETWORK_NUMBER = 1;
+constexpr uint16_t BROADCAST_NETWORK_NUMBER = 0xFFFF;
+constexpr uint8_t  BROADCAST_HOP_COUNT = 0xFF;
+
 template<class Underlying_layer = bacnet::bvll::controller>
 class controller {
 
 public:
   controller(Underlying_layer &underlying_layer) : underlying_layer_(underlying_layer), inbound_router_(callback_manager_) {
+    init();
+  }
 
-    underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1));
-
+  controller(Underlying_layer &underlying_layer, const uint16_t & network_number) : underlying_layer_(underlying_layer), inbound_router_(callback_manager_), network_number_(network_number) {
+    init();
   }
 
 
@@ -68,10 +75,10 @@ public:
   void async_send_broadcast(const bacnet::binary_data & payload, const Handler &handler){
 
     npdu::frame frame;
-    frame.protocol_version = 1;
-    frame.control_field.has_destination_specifier_ = 1;
-    frame.destination.network_number = 65535;
-    frame.hop_count = 255;
+    frame.protocol_version = NPDU_PROTOCOL_VERSION;
+    frame.control_field.has_destination_specifier_ = true;
+    frame.destination.network_number = BROADCAST_NETWORK_NUMBER;
+    frame.hop_count = BROADCAST_HOP_COUNT;
     frame.apdu_data = payload;
 
     bacnet::binary_data binary_frame = npdu::generator::generate(frame);
@@ -79,19 +86,28 @@ public:
     underlying_layer_.async_send_broadcast(binary_frame, handler);
   }
 
-  void async_receive_broadcast_handler(const bacnet::binary_data& data) {
+  void async_receive_broadcast_handler(const bacnet::binary_data& data, const boost::asio::ip::udp::endpoint& sender_endpoint) {
     std::cout << "npdu_controller " << "async_receive_broadcast_handler" << std::endl;
 
     auto frame = npdu::parser::parse(data);
     std::cout << "bacnet::npdu::parser::parse parsed "   << std::endl;
+    inbound_router_.sender_endpoint(sender_endpoint);
     inbound_router_.route(frame);
   }
 
 
 private:
+
+
+
+  void init() {
+    underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1, _2));
+  }
+
   Underlying_layer &underlying_layer_;
   detail::callback_manager callback_manager_;
   detail::inbound_router inbound_router_;
+  uint16_t network_number_ = DEFAULT_NETWORK_NUMBER;
 
 };
 

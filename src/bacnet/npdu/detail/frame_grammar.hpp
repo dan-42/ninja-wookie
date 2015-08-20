@@ -68,7 +68,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
   rule<Iterator, frame()>               frame_rule;
   rule<Iterator, uint8_t()>             protocol_version_rule;
-  rule<Iterator, control_information()> controle_information_rule;
+  rule<Iterator, control_information_t()> controle_information_rule;
   rule<Iterator, address()>             destination_rule;
   rule<Iterator, address()>             source_rule;
   rule<Iterator, uint8_t()>             hop_count_rule;
@@ -78,7 +78,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
   address_grammar<Iterator>             address_grammar_;
 
-  bit_field<Iterator, control_information> control_information_grammar;
+  bit_field<Iterator, control_information_t> control_information_grammar;
 
   npdu_grammar() : npdu_grammar::base_type(frame_rule){
 
@@ -95,19 +95,19 @@ struct npdu_grammar : grammar<Iterator, frame() >{
     protocol_version_rule = byte_(bacnet::npdu::protocol_version);
     controle_information_rule = (control_information_grammar[ref(control_field) = _1])[_val = _1];
 
-    destination_rule  = ( (eps(boost::phoenix::bind(&control_information::has_destination_specifier, ref(control_field)) == true) >>  address_grammar_ )
+    destination_rule  = ( (eps(boost::phoenix::bind(&control_information_t::has_destination_specifier, ref(control_field)) == true) >>  address_grammar_ )
                       | ( attr(empty_address)) );
 
-    source_rule       = ( (eps(boost::phoenix::bind(&control_information::has_source_specifier, ref(control_field)) == true) >> address_grammar_ )
+    source_rule       = ( (eps(boost::phoenix::bind(&control_information_t::has_source_specifier, ref(control_field)) == true) >> address_grammar_ )
                       | ( attr(empty_address)) );
 
-    hop_count_rule    = ( (eps(boost::phoenix::bind(&control_information::has_destination_specifier, ref(control_field)) == true) >> byte_            )
+    hop_count_rule    = ( (eps(boost::phoenix::bind(&control_information_t::has_destination_specifier, ref(control_field)) == true) >> byte_            )
                       | ( attr(uint8_t{0})) );
 
-    message_type_rule = ( (eps(boost::phoenix::bind(&control_information::has_network_layer_message_type, ref(control_field)) == true) >> byte_[ref(message_type) = _1]  )[_val = _1]
+    message_type_rule = ( (eps(boost::phoenix::bind(&control_information_t::has_network_layer_message_type, ref(control_field)) == true) >> byte_[ref(message_type) = _1]  )[_val = _1]
                       | ( attr(uint8_t{0})) );
 
-    vendor_id_rule    = ( (eps(boost::phoenix::bind(&control_information::has_network_layer_message_type, ref(control_field)) == true) >> eps(ref(message_type) >= vendor_specific_message_type_adr) >> big_word   )
+    vendor_id_rule    = ( (eps(boost::phoenix::bind(&control_information_t::has_network_layer_message_type, ref(control_field)) == true) >> eps(ref(message_type) >= vendor_specific_message_type_adr) >> big_word   )
                       | ( attr(uint16_t{0})) );
 
     apdu_data_rule    = repeat[byte_];
@@ -132,7 +132,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   }
 
   address empty_address;
-  control_information control_field;
+  control_information_t control_field;
   uint8_t message_type = 0;
 };
 
@@ -171,7 +171,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
   rule<Iterator, frame()>               frame_rule;
   rule<Iterator, uint8_t()>             protocol_version_rule;
-  rule<Iterator, control_information()> controle_information_rule;
+  rule<Iterator, control_information_t()> controle_information_rule;
   rule<Iterator, address()>             destination_rule;
   rule<Iterator, address()>             source_rule;
   rule<Iterator, uint8_t()>             hop_count_rule;
@@ -181,7 +181,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
   address_grammar<Iterator>             address_grammar_;
 
-  bit_field<Iterator, control_information> control_information_grammar;
+  bit_field<Iterator, control_information_t> control_information_grammar;
 
   npdu_grammar() : npdu_grammar::base_type(frame_rule){
 
@@ -198,23 +198,23 @@ struct npdu_grammar : grammar<Iterator, frame() >{
     protocol_version_rule = byte_(bacnet::npdu::protocol_version);
     controle_information_rule = (control_information_grammar[ref(control_field) = _val])[_1 = _val];
 
-    destination_rule  = ( (eps(boost::phoenix::bind(&control_information::has_destination_specifier, ref(control_field)) == true)
+    destination_rule  = ( (eps(boost::phoenix::bind(&control_information_t::has_destination_specifier, ref(control_field)) == true)
                             <<  address_grammar_ )
                       | eps );
 
-    source_rule       = ( (eps(boost::phoenix::bind(&control_information::has_source_specifier, ref(control_field)) == true)
+    source_rule       = ( (eps(boost::phoenix::bind(&control_information_t::has_source_specifier, ref(control_field)) == true)
                             << address_grammar_ )
                        | eps );
 
-    hop_count_rule    = ( (eps(boost::phoenix::bind(&control_information::has_destination_specifier, ref(control_field)) == true)
+    hop_count_rule    = ( (eps(boost::phoenix::bind(&control_information_t::has_destination_specifier, ref(control_field)) == true)
                            << byte_            )
                        | eps );
 
-    message_type_rule = ( (eps(boost::phoenix::bind(&control_information::has_network_layer_message_type, ref(control_field)) == true)
+    message_type_rule = ( (eps(boost::phoenix::bind(&control_information_t::has_network_layer_message_type, ref(control_field)) == true)
                            << byte_[ref(message_type) = _val]  )[_1 = _val]
                       | eps  );
 
-    vendor_id_rule    = ( (eps(boost::phoenix::bind(&control_information::has_network_layer_message_type, ref(control_field)) == true)
+    vendor_id_rule    = ( (eps(boost::phoenix::bind(&control_information_t::has_network_layer_message_type, ref(control_field)) == true)
                            << eps(ref(message_type) >= vendor_specific_message_type_adr) << big_word   )
                       | eps   );
 
@@ -238,7 +238,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
        debug(frame_rule);
      */
   }
-  control_information control_field;
+  control_information_t control_field;
   uint8_t message_type = 0;
 };
 
