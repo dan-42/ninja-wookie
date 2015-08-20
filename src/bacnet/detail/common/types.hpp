@@ -8,6 +8,9 @@
 #ifndef SRC_BACNET_TYPES_HPP_
 #define SRC_BACNET_TYPES_HPP_
 
+#include <vector>
+#include <cstdint>
+
 #include <boost/spirit/home/support/unused.hpp>
 namespace bacnet { namespace detail { namespace common {
 

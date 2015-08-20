@@ -293,7 +293,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
 
   bvll_grammar(const uint32_t &size) : bvll_grammar::base_type(possible_bvll_frame_rule), size_(size) {
     size_ += frame_size_offset;
-    std::cout << "size:" << size_ << std::endl;
+    std::cout << "bvll_grammar size:" << size_ << std::endl;
     possible_bvll_frame_rule =  original_broadcast_npdu_rule;
 
     original_broadcast_npdu_rule = byte_(base_type(type::bvll_bacnet_ip_v4)) <<	byte_(base_type(function::original_broadcast_npdu))		<< big_word[_1 = boost::phoenix::ref(size_)]		<< original_broadcast_npdu_grammar_;

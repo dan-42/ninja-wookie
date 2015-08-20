@@ -19,337 +19,52 @@
  */
 
 #include <iostream>
+#include <exception>
 
 #include <boost/asio.hpp>
 #include <bacnet/bvll/controller.hpp>
-
 #include <bacnet/npdu/controller.hpp>
+#include <bacnet/apdu/controller.hpp>
 
-void test_npdu_parser_1() {
 
-  std::string binary;
-  binary.push_back(0x01); //version
-  binary.push_back(0x04); //control
-
-  binary.push_back(0xDD); //apdu data
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-
-  auto start = binary.begin();
-  auto end = binary.end();
-
-
-  bacnet::npdu::frame frame_;
-  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
-  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
-
-  std::string binary_regenerated;
-  std::back_insert_iterator<std::string> sink(binary_regenerated);
-  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
-  boost::spirit::karma::generate(sink, g, frame_);
-
-  if(binary.compare(binary_regenerated) == 0) {
-    std::cout << "TEST 1: Local BACnet APDU, no addrs, reply expected: SUCCESS" << std::endl;
-  }
-  else {
-    std::cout << "TEST 1: Local BACnet APDU, no addrs, reply expected: FAILED" << std::endl;
-  }
-
-
-}
-
-void test_npdu_parser_2() {
-
-  std::string binary;
-  binary.push_back(0x01); //version
-  binary.push_back(0x24); //control
-
-  binary.push_back(0x00); //DNET
-  binary.push_back(0x01); //DNET
-  binary.push_back(0x04); //DLEN
-  binary.push_back(0x01);
-  binary.push_back(0x01);
-  binary.push_back(0x01);
-  binary.push_back(0x01);
-
-  /*no source*/
-
-  binary.push_back(0x10); //hop count
-
-  binary.push_back(0xDD); //apdu data
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-
-  auto start = binary.begin();
-  auto end = binary.end();
-
-  bacnet::npdu::frame frame_;
-  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
-  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
-
-
-
-
-  std::string binary_regenerated;
-  std::back_insert_iterator<std::string> sink(binary_regenerated);
-  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
-  boost::spirit::karma::generate(sink, g, frame_);
-
-  if(binary.compare(binary_regenerated) == 0) {
-    std::cout << "TEST 2: Remote BACnet NPDU directed to router prio normale, reply expected: SUCCESS" << std::endl;
-  }
-  else {
-    std::cout << "TEST 2: Remote BACnet NPDU directed to router prio normale, reply expected: FAILED" << std::endl;
-  }
-
-}
-
-void test_npdu_parser_3() {
-
-  std::string binary;
-  binary.push_back(0x01); //version
-  binary.push_back(0x29); //control
-
-  binary.push_back(0x00); //DNET
-  binary.push_back(0x01); //DNET
-  binary.push_back(0x01); //DLEN
-  binary.push_back(0x01);
-
-
-  binary.push_back(0x00); //SNET
-  binary.push_back(0x01); //SNET
-  binary.push_back(0x06); //SLEN
-  binary.push_back(0x0F);
-  binary.push_back(0x0F);
-  binary.push_back(0x0F);
-  binary.push_back(0x0F);
-  binary.push_back(0xBA);
-  binary.push_back(0xC0);
-
-  binary.push_back(0x10); //hop count
-
-  binary.push_back(0xDD); //apdu data
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-
-  auto start = binary.begin();
-  auto end = binary.end();
-
-  bacnet::npdu::frame frame_;
-  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
-  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
-
-
-
-  std::string binary_regenerated;
-  std::back_insert_iterator<std::string> sink(binary_regenerated);
-  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
-  boost::spirit::karma::generate(sink, g, frame_);
-
-  if(binary.compare(binary_regenerated) == 0) {
-    std::cout << "TEST 3: BACnet NPDU passwd between routers prio urgent: SUCCESS" << std::endl;
-  }
-  else {
-    std::cout << "TEST 3: BACnet NPDU passwd between routers prio urgent: FAILED" << std::endl;
-  }
-}
-
-
-void test_npdu_parser_4() {
-
-  std::string binary;
-  binary.push_back(0x01); //version
-  binary.push_back(0x0B); //control
-
-  /* no destination -> BROADCAST*/
-
-  binary.push_back(0x00); //SNET
-  binary.push_back(0x01); //SNET
-  binary.push_back(0x06); //SLEN
-  binary.push_back(0x0F);
-  binary.push_back(0x0F);
-  binary.push_back(0x0F);
-  binary.push_back(0x0F);
-  binary.push_back(0xBA);
-  binary.push_back(0xC0);
-
-  /* no HOP COUNT*/
-
-  binary.push_back(0xDD); //apdu data
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-
-  auto start = binary.begin();
-  auto end = binary.end();
-
-  bacnet::npdu::frame frame_;
-  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
-  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
-
-
-
-  std::string binary_regenerated;
-  std::back_insert_iterator<std::string> sink(binary_regenerated);
-  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
-  boost::spirit::karma::generate(sink, g, frame_);
-
-  if(binary.compare(binary_regenerated) == 0) {
-    std::cout << "TEST 4: Remote BACnet NPDU send from router to final dest prio life_safty: SUCCESS" << std::endl;
-  }
-  else {
-    std::cout << "TEST 4: Remote BACnet NPDU send from router to final dest prio life_safty: FAILED" << std::endl;
-  }
-}
-
-void test_npdu_parser_5() {
-
-  std::string binary;
-  binary.push_back(0x01); //version
-  binary.push_back(0x28); //control
-
-  binary.push_back(0xFF); //DNET
-  binary.push_back(0xFF); //DNET
-  binary.push_back(0x00); //DLEN
-
-
-  binary.push_back(0x00); //SNET
-  binary.push_back(0x01); //SNET
-  binary.push_back(0x01); //SLEN
-  binary.push_back(0x0F);
-
-  binary.push_back(0x10); //hop
-
-  binary.push_back(0xDD); //apdu data
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-  binary.push_back(0xDD);
-
-  auto start = binary.begin();
-  auto end = binary.end();
-
-  bacnet::npdu::frame frame_;
-  bacnet::npdu::parser::npdu_grammar<decltype(start)> grammar;
-  auto has_success = boost::spirit::qi::parse(start, end, grammar, frame_);
-
-
-  std::string binary_regenerated;
-  std::back_insert_iterator<std::string> sink(binary_regenerated);
-  bacnet::npdu::generator::npdu_grammar<decltype(sink)> g;
-  boost::spirit::karma::generate(sink, g, frame_);
-
-  if(binary.compare(binary_regenerated) == 0) {
-    std::cout << "TEST 5: Broadcast message by router of prio normal: SUCCESS" << std::endl;
-  }
-  else {
-    std::cout << "TEST 5: Broadcast message by router of prio normal: FAILED" << std::endl;
-  }
-}
-
-
-void handler(const boost::system::error_code& error_code, const std::size_t &bytes_transfered){
-  std::cout << "handler " <<  error_code.message() << std::endl;
-}
-
-
-
-
-
-namespace  bacnet { namespace apdu { namespace service {
-
-struct who_is {
-
-  bacnet::binary_data generate() {
-      bacnet::binary_data who_is_frame;
-      who_is_frame.push_back(0x10);
-      who_is_frame.push_back(0x08);
-      return who_is_frame;
-  }
-
-};
-
-struct i_am {
-
-  bacnet::binary_data generate() {
-    bacnet::binary_data whoi_is_frame;
-    whoi_is_frame.push_back(0x00);
-    whoi_is_frame.push_back(0x00);
-    return whoi_is_frame;
-  }
-
-};
-
-typedef boost::variant<who_is, i_am> possible_service;
-
-
-struct generate_frame : public boost::static_visitor<bacnet::binary_data> {
-  template<typename T>
-  bacnet::binary_data operator()( T op){
-    return op.generate();
-  }
-};
-
-}}}
-
-namespace bacnet { namespace apdu {
-
-template<class UnderlyingLayerController>
-struct controller {
-
-  controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
-      io_service_(io_service), underlying_controller_(underlying_controller) {
-
-  }
-
-  void service(const service::possible_service& service_) {
-
-    service::generate_frame gf;
-    auto data = service_.apply_visitor(gf);
-    underlying_controller_.async_send_broadcast(data, &handler);
-  }
-
-private:
-  boost::asio::io_service &io_service_;
-  UnderlyingLayerController underlying_controller_;
-};
-
-}}
 
 
 int main(int argc, char *argv[]) {
   try {
+/*
+    bacnet::config::device device_config;
+    device_config.apdu.device_object_id = 1;
+    device_config.apdu.support_segmentation = false;
+    device_config.apdu.max_segments_accepted= bacnet::apdu::segments::TWO_SEGMENTS;
+    device_config.npdu.network_number = 1;
 
-    test_npdu_parser_1();
-    test_npdu_parser_2();
-    test_npdu_parser_3();
-    test_npdu_parser_4();
-    test_npdu_parser_5();
+*/
 
 
     boost::asio::io_service io_service;
     bacnet::bvll::controller bvll_controller(io_service);
     bacnet::npdu::controller<> npdu_controller(bvll_controller);
-    bacnet::apdu::controller<bacnet::npdu::controller<>> apdu_controller(io_service, npdu_controller);
+    bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller);
+   // bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
-    bacnet::apdu::service::who_is who_is_;
-    apdu_controller.service(who_is_);
+    //service_controller.create_service("who_is").send();
+
+    //bacnet::apdu::service::who_is who_is_;
+
+    bacnet::binary_data who_is_frame;
+
+    apdu_controller.send_unconfirmed_request_as_broadcast(0x08, who_is_frame);
 
 
 
 
     io_service.run();
 
+
   }
   catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";
+    throw;
   }
 
   return 0;

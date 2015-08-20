@@ -109,7 +109,7 @@ struct frame_size : public boost::static_visitor<uint32_t> {
   }
 
   uint32_t operator()(const forwarded_npdu &operand) {
-    return 255;
+    return operand.npdu_data_from_origin_device.size();
   }
 
   uint32_t operator()(const register_foreign_device &operand) {
@@ -133,7 +133,7 @@ struct frame_size : public boost::static_visitor<uint32_t> {
   }
 
   uint32_t operator()(const original_unicast_npdu &operand) {
-    return 255;
+    return operand.npdu_data.size();
   }
 
   uint32_t operator()(const original_broadcast_npdu &operand) {

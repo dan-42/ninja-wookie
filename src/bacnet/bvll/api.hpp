@@ -2,8 +2,8 @@
 // Created by schoko on 6/16/15.
 //
 
-#ifndef NINJA_WOOKIE_API_HPP
-#define NINJA_WOOKIE_API_HPP
+#ifndef NINJA_WOOKIE_BVLL_API_HPP
+#define NINJA_WOOKIE_BVLL_API_HPP
 
 #include <boost/function.hpp>
 
@@ -15,4 +15,4 @@ typedef  boost::function<void (const bacnet::binary_data&)> async_receive_unicas
 
 }}
 
-#endif //NINJA_WOOKIE_API_HPP
+#endif //NINJA_WOOKIE_BVLL_API_HPP
