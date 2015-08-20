@@ -41,7 +41,8 @@ int main(int argc, char *argv[]) {
 
     bin_data_to_parse.push_back(0x11);
 
-    bool bool_;
+
+    bool bool_ = true;
 
     auto start = bin_data_to_parse.begin();
     auto end = bin_data_to_parse.end();

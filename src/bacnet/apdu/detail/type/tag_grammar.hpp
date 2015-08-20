@@ -148,11 +148,7 @@ namespace bacnet { namespace  apdu { namespace detail { namespace type { namespa
                     using boost::phoenix::bind;
 
 
-                    static constexpr uint8_t encoded_application_tagged_true  = 0x11;
-                    static constexpr uint8_t encoded_application_tagged_false = 0x10;
 
-                    static constexpr uint8_t encoded_context_tagged_true  = 0x01;
-                    static constexpr uint8_t encoded_context_tagged_false = 0x00;
 
                     template<typename Iterator>
                     struct boolean_grammar : grammar<Iterator, bool()> {
@@ -162,13 +158,21 @@ namespace bacnet { namespace  apdu { namespace detail { namespace type { namespa
                         rule<Iterator, bool()>     application_tagged_rule;
                         rule<Iterator, bool()>     application_tagged_true_rule;
                         rule<Iterator, bool()>     application_tagged_false_rule;
+
                         rule<Iterator, bool()>     context_tagged_rule;
-                        rule<Iterator, bool()>     context_tagged_value_rule;
-
-
-                        bit_field<Iterator, tag>    tag_grammar;
+                        rule<Iterator, bool()>     context_tagged_true_rule;
+                        rule<Iterator, bool()>     context_tagged_false_rule;
 
                         boolean_grammar() : boolean_grammar::base_type(bool_rule){
+
+                            constexpr uint8_t encoded_application_tagged_true  = 0x11;
+                            constexpr uint8_t encoded_application_tagged_false = 0x10;
+
+                            constexpr uint8_t encoded_context_tag_id       = 0x29;
+                            constexpr uint8_t encoded_context_tagged_true  = 0x01;
+                            constexpr uint8_t encoded_context_tagged_false = 0x00;
+
+
 
                             bool_rule  = application_tagged_rule
                                        | context_tagged_rule;
@@ -176,34 +180,15 @@ namespace bacnet { namespace  apdu { namespace detail { namespace type { namespa
                             application_tagged_rule = application_tagged_true_rule
                                                     | application_tagged_false_rule;
 
-
                             application_tagged_true_rule = byte_(encoded_application_tagged_true)[_val = true];
                             application_tagged_true_rule = byte_(encoded_application_tagged_false)[_val = false];
 
 
+                            context_tagged_rule = byte_(encoded_context_tag_id) >> (context_tagged_true_rule|context_tagged_false_rule);
 
-                            context_tagged_rule = tag_grammar[ref(tag_) = _1] >> context_tagged_value_rule;
-
-
-                            context_tagged_value_rule = eps(boost::phoenix::bind(&tag::number, ref(tag_)) == tag_number::boolean) >> attr(bool{true});
-
-                                                        /*>> (
-                                                            eps(boost::phoenix::bind(&tag::length_value_type, ref(tag_))  == encoded_context_tagged_true)
-                                                          | eps(boost::phoenix::bind(&tag::length_value_type, ref(tag_))  == encoded_context_tagged_false)
-                                                         )*/;
-
-
-
-                            bool_rule.name("bool_rule");
-                            application_tagged_rule.name("application_tagged_rule");
-                            context_tagged_rule.name("context_tagged_rule");
-                            /*
-                               debug(null_rule);
-                            */
+                            context_tagged_true_rule = byte_(encoded_context_tagged_true)[_val = true];
+                            context_tagged_false_rule = byte_(encoded_context_tagged_false)[_val = false];
                         }
-
-
-                        tag tag_;
                     };
 
                 }}}}}
