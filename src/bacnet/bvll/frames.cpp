@@ -42,11 +42,15 @@ possible_bvll_frame parse(bacnet::binary_data data) {
   bool result = false;
   try {
     result = boost::spirit::qi::parse(start, end, grammar, frame);
+    if(!result){
+      std::cerr << "error: frames.hpp parse(Container &i, possible_bvll_frame &v) " << std::endl;
+      return possible_bvll_frame{};
+    }
   }
   catch (std::exception &e) {
     std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;
   }
-  return frame;
+  return possible_bvll_frame{};
 }
 
 }}}

@@ -44,7 +44,7 @@ constexpr uint16_t DEFAULT_NETWORK_NUMBER = 1;
 constexpr uint16_t BROADCAST_NETWORK_NUMBER = 0xFFFF;
 constexpr uint8_t  BROADCAST_HOP_COUNT = 0xFF;
 
-template<class Underlying_layer = bacnet::bvll::controller>
+template<class Underlying_layer>
 class controller {
 
 public:

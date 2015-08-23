@@ -41,11 +41,12 @@ struct pdu_type_and_control_information_t {
 	uint8_t is_send_by_server_  			                        : 1;
 	uint8_t pdu_type_                                         : 4;
 
-	pdu_type_and_control_information_t() : pdu_type_(0),
+	pdu_type_and_control_information_t() :
 										is_segmented_(0),
 										has_more_segments_following_(0),
 										is_segmented_response_accepted_OR_is_normal_ack_(0),
-										is_send_by_server_(0) {
+										is_send_by_server_(0),
+										pdu_type_(0) {
 	}
 
 	uint8_t pdu_type(){

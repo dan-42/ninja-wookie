@@ -41,30 +41,41 @@ public:
 
 
 
-  transporter(boost::asio::io_service &io_service) : io_service_(io_service), socket_(io_service) {
+  transporter(boost::asio::io_service &io_service) : io_service_(io_service),
+                                                     socket_(io_service),
+                                                     port_(DEFAULT_LISTENING_PORT),
+                                                     listen_address_(boost::asio::ip::address::from_string(DEFAULT_LISTENING_ADDRESS)),
+                                                     multicast_address_(boost::asio::ip::address::from_string(DEFAULT_MULTICAST_ADDRESS)),
+                                                     listen_endpoint_(listen_address_, port_) {
     init();
   }
 
   transporter(boost::asio::io_service &io_service, uint16_t port) : io_service_(io_service),
                                                                     socket_(io_service),
-                                                                    port_(port) {
+                                                                    port_(port),
+                                                                    listen_address_(boost::asio::ip::address::from_string(DEFAULT_LISTENING_ADDRESS)),
+                                                                    multicast_address_(boost::asio::ip::address::from_string(DEFAULT_MULTICAST_ADDRESS)),
+                                                                    listen_endpoint_(listen_address_, port_) {
     init();
   }
 
   transporter(boost::asio::io_service &io_service, const std::string listening_address, uint16_t port) :
                                                                       io_service_(io_service),
                                                                       socket_(io_service),
+                                                                      port_(port),
                                                                       listen_address_(boost::asio::ip::address::from_string(listening_address)),
-                                                                      port_(port) {
+                                                                      multicast_address_(boost::asio::ip::address::from_string(DEFAULT_MULTICAST_ADDRESS)),
+                                                                      listen_endpoint_(listen_address_, port_) {
     init();
   }
 
   transporter(boost::asio::io_service &io_service, const std::string listening_address, uint16_t port, const std::string multicast_address) :
                                                                     io_service_(io_service),
                                                                     socket_(io_service),
-                                                                    listen_address_(boost::asio::ip::address::from_string(listening_address)),
                                                                     port_(port),
-                                                                    multicast_address_(boost::asio::ip::address::from_string(multicast_address)) {
+                                                                    listen_address_(boost::asio::ip::address::from_string(listening_address)),
+                                                                    multicast_address_(boost::asio::ip::address::from_string(multicast_address)),
+                                                                    listen_endpoint_(listen_address_, port_) {
     init();
   }
 
@@ -95,7 +106,7 @@ private:
 
   void init() {
     std::cout << "init(): " << std::endl;
-    listen_endpoint_ = boost::asio::ip::udp::endpoint(listen_address_, port_);
+
 
     socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
@@ -110,16 +121,15 @@ private:
   }
 
 
-  uint16_t port_                              = DEFAULT_LISTENING_PORT;
-  boost::asio::ip::address listen_address_    = boost::asio::ip::address::from_string(DEFAULT_LISTENING_ADDRESS);
-  boost::asio::ip::address multicast_address_ = boost::asio::ip::address::from_string(DEFAULT_MULTICAST_ADDRESS);
-
   boost::asio::io_service &io_service_;
   boost::asio::ip::udp::socket socket_;
+  uint16_t port_;
+  boost::asio::ip::address listen_address_;
+  boost::asio::ip::address multicast_address_;
   boost::asio::ip::udp::endpoint listen_endpoint_;
 
-};
 
+};
 
 }}}
 

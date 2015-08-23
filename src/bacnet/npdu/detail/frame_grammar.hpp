@@ -28,7 +28,7 @@
 
 #include <boost/fusion/include/define_struct.hpp>
 
-//#include <boost/phoenix/bind/bind_member_function.hpp>
+
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 #include <bacnet/detail/common/types.hpp>
@@ -44,7 +44,6 @@
 #include <bacnet/npdu/frame.hpp>
 
 #include <bacnet/npdu/detail/address_grammar.hpp>
-
 
 namespace bacnet { namespace  npdu { namespace detail { namespace parser {
 

@@ -59,14 +59,6 @@ int main(int argc, char *argv[]) {
         std::cout << "juhu! false" << std::endl;
     }
 
-return 0;
-
-
-
-
-
-
-
 
 
 
@@ -94,7 +86,7 @@ return 0;
 
     boost::asio::io_service io_service;
     bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
-    bacnet::npdu::controller<> npdu_controller(bvll_controller, npdu_network_number);
+    bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller(bvll_controller, npdu_network_number);
     bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
 
    // bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);

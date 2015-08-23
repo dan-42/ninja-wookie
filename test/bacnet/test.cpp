@@ -23,20 +23,16 @@
 
 #include <iostream>
 #include <bitset>
-#include <string>
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
 
-#include <bacnet/bacnet.hpp>
-#include <bacnet/bvll/frames.hpp>
+
+#include <bacnet/bvll/bacnet_ip_address.hpp>
 
 
 
 
 
-int main(int argc, char* argv[])
-{
+int test_npdu() {
   try
   {
 	  /**
@@ -56,18 +52,18 @@ int main(int argc, char* argv[])
 	  bin_data_to_parse.push_back(0xBA);
 	  bin_data_to_parse.push_back(0xC0);
 
-	  bacnet::bvll::bvlc::bacnet_ip_address adr{};
+	  bacnet::bvll::bacnet_ip_address adr{};
 
 	  auto start = bin_data_to_parse.begin();
 	  auto end = bin_data_to_parse.end();
-	  bacnet::bvll::bvlc::parser::bacnet_ip_address_grammar<decltype(start)> p;
+	  bacnet::bvll::parser::bacnet_ip_address_grammar<decltype(start)> p;
 
 	  bool r = boost::spirit::qi::parse(start, end, p , adr);
 
 
 
 	  std::back_insert_iterator<decltype(bin_data_to_generate)> sink(bin_data_to_generate);
-	  bacnet::bvll::bvlc::generator::bacnet_ip_address_grammar<decltype(sink)> g;
+	  bacnet::bvll::generator::bacnet_ip_address_grammar<decltype(sink)> g;
 
 	  bool r2 = boost::spirit::karma::generate(sink, g, adr);
 

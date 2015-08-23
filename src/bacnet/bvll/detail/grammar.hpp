@@ -136,7 +136,7 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
                                      |	original_unicast_npdu_rule
                                      |	original_broadcast_npdu_rule
                                      |	original_secure_bvll_rule
-                                 ))  | ( !byte_(base_type(type::bvll_bacnet_ip_v4)) > raw_rule ); //xxx first byte is missing, when do ing this!
+                                 ))  | ( (!byte_(base_type(type::bvll_bacnet_ip_v4))) > raw_rule ); //xxx first byte is missing, when do ing this!
 
 
     bvlc_result_rule = (
