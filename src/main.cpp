@@ -21,48 +21,39 @@
 #include <iostream>
 #include <exception>
 
+#include <limits>
+
 #include <boost/asio.hpp>
 #include <bacnet/bvll/controller.hpp>
 #include <bacnet/npdu/controller.hpp>
 #include <bacnet/apdu/controller.hpp>
+#include <bacnet/service/controller.hpp>
 
 
-#include <bacnet/apdu/detail/type/tag_grammar.hpp>
+
+
+/*
+
+ I-Am-Request ::= SEQUENCE {
+iAmDeviceIdentifier
+maxAPDULengthAccepted
+segmentationSupported
+vendorID
+}
+BACnetObjectIdentifier,
+Unsigned,
+BACnetSegmentation,
+Unsigned16
+
+
+ */
+
+
+
+
 
 
 int main(int argc, char *argv[]) {
-
-    //using namespace bacnet::apdu::detail::type;
-
-
-
-    std::string bin_data_to_parse{};
-    std::string bin_data_to_generate{};
-
-    bin_data_to_parse.push_back(0x11);
-
-
-    bool bool_ = true;
-
-    auto start = bin_data_to_parse.begin();
-    auto end = bin_data_to_parse.end();
-    bacnet::apdu::detail::type::parser::boolean_grammar<decltype(start)> p;
-
-    bool r = boost::spirit::qi::parse(start, end, p , bool_);
-
-
-
-    if(bool_){
-        std::cout << "juhu! true" << std::endl;
-    }
-    else {
-        std::cout << "juhu! false" << std::endl;
-    }
-
-
-
-
-
 
 
   try {
@@ -88,16 +79,22 @@ int main(int argc, char *argv[]) {
     bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
     bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller(bvll_controller, npdu_network_number);
     bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
+    bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
-   // bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
+  //    bacnet::service::who_is who_is_service0(2, 4214);
+    bacnet::service::who_is who_is_service0(1,1);
+    service_controller.send(who_is_service0);
 
-    //service_controller.create_service("who_is").send();
 
     //bacnet::apdu::service::who_is who_is_;
 
-    bacnet::binary_data who_is_frame;
+    //bacnet::binary_data who_is_frame;
 
-    apdu_controller.send_unconfirmed_request_as_broadcast(0x08, who_is_frame);
+    //apdu_controller.send_unconfirmed_request_as_broadcast(0x08, who_is_frame);
+
+    //bacnet::service::who_is who_is_service1;
+    //bacnet::service::who_is who_is_service2(42);
+    //bacnet::service::who_is who_is_service3(2, 4214);
 
 
 
