@@ -82,7 +82,6 @@ public:
   }
 
   void handle_receive_from(const boost::system::error_code &error, size_t bytes_recvd) {
-	  std::cout << "handle_receive_from()" << std::endl;
 
     if (!error) {
       std::cout << "handle_receive_from: " << sender_endpoint_.address().to_string()
@@ -100,6 +99,7 @@ public:
       frame::possible_bvll_frame f = parser::parse(input);
       inbound_router_.sender_endpoint(sender_endpoint_);
       boost::apply_visitor(inbound_router_, f);
+
 
       auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,
                                   boost::asio::placeholders::bytes_transferred);

@@ -22,29 +22,12 @@
 #define NINJA_WOOKIE_WHO_IS_GENERATOR_HPP
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/service/detail/service_choice.hpp>
 #include <bacnet/service/who_is.hpp>
 
 #include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/apdu/type/unsigned_integer.hpp>
 #include <bacnet/apdu/type/unsigned_integer_generator.hpp>
 #include <bacnet/apdu/type/detail/helper.hpp>
-#include <bacnet/service/detail/service_generator.hpp>
-#include <bacnet/service/detail/service_choice.hpp>
-
-namespace bacnet { namespace service { namespace detail {
-  using namespace bacnet::service;
-  template<>
-  struct service_choice<who_is> {
-    static constexpr uint8_t value = 0x08;
-  };
-
-  template<>
-  struct is_broadcast_service<who_is> : std::true_type {
-  };
-
-
-}}}
 
 
 
@@ -65,7 +48,6 @@ bacnet::binary_data generate<who_is>(const who_is& service) {
   constexpr uint8_t context_tag_number_0 = 0x00;
   constexpr uint8_t context_tag_number_1 = 0x01;
   constexpr bool is_conext_tag = true;
-
 
   bacnet::binary_data binary;
 
@@ -93,6 +75,19 @@ bacnet::binary_data generate<who_is>(const who_is& service) {
 
   return binary;
 }
+
+
+template<>
+bool parse<who_is>(const bacnet::binary_data& binary_data, who_is &service) {
+
+  //auto start = binary_data.begin();
+  //auto end = binary_data.end();
+  std::cout << "parse<who_is> " << std::endl;
+
+
+  return true;
+}
+
 
 }}}
 

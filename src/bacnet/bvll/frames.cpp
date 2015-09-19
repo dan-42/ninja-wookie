@@ -46,6 +46,9 @@ possible_bvll_frame parse(bacnet::binary_data data) {
       std::cerr << "error: frames.hpp parse(Container &i, possible_bvll_frame &v) " << std::endl;
       return possible_bvll_frame{};
     }
+    else {
+      return frame;
+    }
   }
   catch (std::exception &e) {
     std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;

@@ -85,6 +85,9 @@ int main(int argc, char *argv[]) {
     bacnet::service::who_is who_is_service0(1,1);
     service_controller.send(who_is_service0);
 
+    service_controller.async_receive(who_is_service0, [](){
+      std::cout << "async_receive(who_is_service): " << std::endl;
+    });
 
     //bacnet::apdu::service::who_is who_is_;
 

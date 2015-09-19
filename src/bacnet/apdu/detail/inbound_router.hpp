@@ -15,7 +15,7 @@
 
 #include <boost/variant/static_visitor.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
-
+#include <bacnet/apdu/detail/callback_manager.hpp>
 
 
 namespace bacnet { namespace  apdu { namespace  detail {
@@ -27,6 +27,9 @@ class inbound_router : public boost::static_visitor<> {
 
 public:
 
+  inbound_router(callback_manager& cbm) : callback_manager_(cbm){
+  }
+
   void operator()(frame::confirmed_request request) {
     std::cout << "apdu::detail::inbound_router confirmed_request" << std::endl;
   }
@@ -34,13 +37,10 @@ public:
   void operator()(frame::unconfirmed_request request) {
       std::cout << "apdu::detail::inbound_router unconfirmed_request" << std::endl;
 
-      if(request.service_choice == 0x08) {
-          std::cout << "service choice: who-is" << request.service_choice;
-          for(auto& c : request.service_data){
-              std::cout << " " <<std::hex << std::setfill('0') << std::setw(2) << (int) c;
-          }
-          std::cout << std::endl;
-
+      if(!callback_manager_.async_received_service_callback_.empty()){
+        meta_information_t meta_info;
+        meta_info.service_choice = request.service_choice;
+        callback_manager_.async_received_service_callback_(meta_info, request.service_data);
       }
 
   }
@@ -69,6 +69,9 @@ public:
   void operator()(frame::abort request) {
       std::cout << "apdu::detail::inbound_router abort" << std::endl;
   }
+
+private:
+  callback_manager& callback_manager_;
 
 };
 

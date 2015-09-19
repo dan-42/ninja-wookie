@@ -22,12 +22,16 @@
 #ifndef NINJA_WOOKIE_BACNET_SERVICE_CONTROLLER_HPP
 #define NINJA_WOOKIE_BACNET_SERVICE_CONTROLLER_HPP
 
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
+
 #include <bacnet/service/i_am.hpp>
 #include <bacnet/service/who_is.hpp>
 
 #include <bacnet/service/detail/service_choice.hpp>
 #include <bacnet/service/detail/who_is_generator.hpp>
 
+#include <bacnet/apdu/api.hpp>
 
 namespace bacnet { namespace service {
 
@@ -35,6 +39,17 @@ template<typename UnderlyingLayer>
 class controller {
 public:
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer) {
+
+    lower_layer_.register_async_received_service_callback([this](const bacnet::apdu::meta_information_t& mi,const bacnet::binary_data& data){
+      std::cout << "mi.service_choice " << (int)mi.service_choice << std::endl;
+      if(dispatch_item_ != nullptr && mi.service_choice == detail::service_choice<who_is>::value){
+       if(detail::parse(data, dispatch_item_->who_is_)){
+        dispatch_item_->handler_();
+       }
+
+      }
+
+    });
 
   }
 
@@ -50,13 +65,33 @@ public:
       std::cerr << "no support yet for unicast messages";
       lower_layer_.send_unconfirmed_request_as_broadcast(service_choice, data);
     }
-
   }
+
+  void async_receive(service::who_is& who_is, boost::function<void()> handler){
+
+    dispatch_item_ = boost::make_shared<dispatch_item_t>(who_is, handler);
+  }
+
+
 
 private:
     boost::asio::io_service& io_service_;
     UnderlyingLayer &lower_layer_;
 
+
+  //template<typename T>
+  struct dispatch_item_t {
+
+    dispatch_item_t(service::who_is& who_is, const boost::function<void()>& handler) : who_is_(who_is), handler_(handler){
+
+    }
+
+    service::who_is& who_is_;
+    boost::function<void()> handler_;
+
+  };
+
+  boost::shared_ptr<dispatch_item_t> dispatch_item_;
 
 };
 

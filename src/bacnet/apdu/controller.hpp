@@ -28,12 +28,12 @@
 #include <boost/bind.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/service/services.hpp>
 #include <bacnet/apdu/detail/pdu_type.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
 #include <bacnet/apdu/frame/grammar.hpp>
 
 #include <bacnet/apdu/detail/inbound_router.hpp>
+#include <bacnet/apdu/detail/callback_manager.hpp>
 
 
 void handler(const boost::system::error_code& error_code, const std::size_t &bytes_transfered){
@@ -51,15 +51,23 @@ struct controller {
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
                           io_service_(io_service),
-                          underlying_controller_(underlying_controller) {
+                          underlying_controller_(underlying_controller),
+                          inbound_router_(callback_manager_),
+                          device_object_id_(DEFAULT_DEVICE_OBJECT_ID){
 	  init();
   }
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller, const uint16_t &device_object_id) :
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
-                          device_object_id_(device_object_id) {
+                          inbound_router_(callback_manager_),
+                          device_object_id_(device_object_id)
+  {
     init();
+  }
+
+  void register_async_received_service_callback(const async_received_service_callback_t &callback){
+    callback_manager_.async_received_service_callback_ = callback;
   }
 
 
@@ -72,11 +80,6 @@ struct controller {
     underlying_controller_.async_send_broadcast(data, &handler);
   }
 
-  void service(const service::possible_service& service_) {
-    service::generate_frame gf;
-    auto data = service_.apply_visitor(gf);
-    underlying_controller_.async_send_broadcast(data, &handler);
-  }
 
   void async_received_apdu_handler(bacnet::binary_data data) {
     std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
@@ -94,7 +97,8 @@ private:
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
   detail::inbound_router  inbound_router_;
-  uint16_t device_object_id_ = DEFAULT_DEVICE_OBJECT_ID;
+  detail::callback_manager callback_manager_;
+  uint16_t device_object_id_;
 };
 
 }}

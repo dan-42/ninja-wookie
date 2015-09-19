@@ -37,6 +37,7 @@ struct is_broadcast_service : std::false_type {
 };
 
 
+
 }}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERVICE_CHOICE_HPP

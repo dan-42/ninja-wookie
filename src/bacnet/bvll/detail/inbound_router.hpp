@@ -24,20 +24,7 @@
 #include <iostream>
 #include <boost/variant/static_visitor.hpp>
 
-#include <bacnet/bvll/frame/bvlc_result.hpp>
-#include <bacnet/bvll/frame/read_broadcast_distribution_table_ack.hpp>
-#include <bacnet/bvll/frame/read_broadcast_distribution_table.hpp>
-#include <bacnet/bvll/frame/write_broadcast_distribution_table.hpp>
-#include <bacnet/bvll/frame/forwarded_npdu.hpp>
-#include <bacnet/bvll/frame/register_foreign_device.hpp>
-#include <bacnet/bvll/frame/original_broadcast_npdu.hpp>
-#include <bacnet/bvll/frame/original_unicast_npdu.hpp>
-#include <bacnet/bvll/frame/distribute_broadcast_to_network.hpp>
-#include <bacnet/bvll/frame/read_foreign_device_table_ack.hpp>
-#include <bacnet/bvll/frame/read_foreign_device_table.hpp>
-#include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
-#include <bacnet/bvll/frame/original_secure_bvll.hpp>
-#include <bacnet/bvll/frame/raw.hpp>
+#include <bacnet/bvll/frames.hpp>
 
 #include <bacnet/bvll/detail/transporter.hpp>
 #include <bacnet/bvll/detail/callback_manager.hpp>
@@ -45,6 +32,7 @@
 
 
 namespace bacnet { namespace  bvll { namespace  detail {
+
 
 class inbound_router : public boost::static_visitor<> {
 

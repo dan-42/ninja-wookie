@@ -24,6 +24,10 @@
 #include <cstdint>
 
 #include <boost/fusion/include/define_struct.hpp>
+#include <bacnet/service/detail/service_generator.hpp>
+#include <bacnet/service/detail/service_choice.hpp>
+
+
 
 BOOST_FUSION_DEFINE_STRUCT(
   (bacnet)(service), who_is,
@@ -31,6 +35,17 @@ BOOST_FUSION_DEFINE_STRUCT(
   (uint32_t, device_instance_range_high_limit)
 )
 
+namespace bacnet { namespace service { namespace detail {
+using namespace bacnet::service;
+template<>
+struct service_choice<who_is> {
+  static constexpr uint8_t value = 0x08;
+};
 
+template<>
+struct is_broadcast_service<who_is> : std::true_type {
+};
+
+}}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_WHO_IS_HPP
