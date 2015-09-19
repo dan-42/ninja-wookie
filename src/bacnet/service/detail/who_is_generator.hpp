@@ -35,11 +35,10 @@ namespace bacnet { namespace service { namespace detail {
 
 
 using namespace bacnet::service;
+namespace  apdu = bacnet::apdu::type;
 
 template<>
 bacnet::binary_data generate<who_is>(const who_is& service) {
-
-  namespace  apdu = bacnet::apdu::type;
 
 
   constexpr uint32_t device_instance_low_limit = 0;
@@ -78,12 +77,32 @@ bacnet::binary_data generate<who_is>(const who_is& service) {
 
 
 template<>
-bool parse<who_is>(const bacnet::binary_data& binary_data, who_is &service) {
+bool parse<who_is>(bacnet::binary_data& data, who_is &service) {
 
-  //auto start = binary_data.begin();
-  //auto end = binary_data.end();
-  std::cout << "parse<who_is> " << std::endl;
 
+  /*it's allowed to have now payload*/
+  if(data.empty()) {
+    service.device_instance_range_low_limit = 0;
+    service.device_instance_range_high_limit = 0;
+    return true;
+  }
+
+  apdu::unsigned_integer low_limit;
+  apdu::unsigned_integer high_limit;
+  bool has_succeeded = false;
+
+  has_succeeded= apdu::parse(data, low_limit);
+  if(!has_succeeded) {
+    return false;
+  }
+
+  has_succeeded = apdu::parse(data, high_limit);
+  if(!has_succeeded) {
+    return false;
+  }
+
+  service.device_instance_range_high_limit = high_limit.value_;
+  service.device_instance_range_low_limit  = low_limit.value_;
 
   return true;
 }

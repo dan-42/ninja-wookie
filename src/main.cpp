@@ -81,12 +81,13 @@ int main(int argc, char *argv[]) {
     bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
     bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
-  //    bacnet::service::who_is who_is_service0(2, 4214);
-    bacnet::service::who_is who_is_service0(1,1);
+      bacnet::service::who_is who_is_service0(2, 434214);
+    //bacnet::service::who_is who_is_service0(1,1);
     service_controller.send(who_is_service0);
 
-    service_controller.async_receive(who_is_service0, [](){
-      std::cout << "async_receive(who_is_service): " << std::endl;
+    service_controller.async_receive(who_is_service0, [&who_is_service0](){
+      std::cout << "async_receive(who_is_service): low " << std::dec <<(int)who_is_service0.device_instance_range_low_limit <<std::endl;
+      std::cout << "async_receive(who_is_service): hight " << std::dec <<(int)who_is_service0.device_instance_range_high_limit <<std::endl;
     });
 
     //bacnet::apdu::service::who_is who_is_;

@@ -57,24 +57,43 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
 
     rule<Iterator, unsigned_integer()>  start_rule;
     rule<Iterator, tag()>               tag_rule;
+    rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
     bit_field<Iterator, tag> tag_grammar;
 
-    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule) {
+    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), size_(0) {
 
       start_rule  = tag_rule >> value_rule ;
 
-      tag_rule = &tag_grammar[ref(tag_) = _1] >> tag_grammar;
+      tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&unsigned_integer_grammar::set_size, this, _1)] ;
 
-      value_rule  = eps(boost::phoenix::ref(tag_.length_value_type_) == 1) >> byte_
-                    | eps(boost::phoenix::ref(tag_.length_value_type_) == 2) >> big_word
-                    | eps(boost::phoenix::ref(tag_.length_value_type_) == 3) >> big_24word
-                    | eps(boost::phoenix::ref(tag_.length_value_type_) == 4) >> big_dword;
+      value_rule  = eps(boost::phoenix::ref(size_) == 1) >> byte_
+                  | eps(boost::phoenix::ref(size_) == 2) >> big_word
+                  | eps(boost::phoenix::ref(size_) == 3) >> big_24word
+                  | eps(boost::phoenix::ref(size_) == 4) >> big_dword;
 
+      tag_lower_rule = tag_grammar;
+
+      start_rule.name("start_rule");
+      tag_rule.name("tag_rule");
+      tag_lower_rule.name("tag_lower_rule");
+      value_rule.name("value_rule");
+/*
+      debug(start_rule);
+      debug(tag_rule);
+      debug(tag_lower_rule);
+      debug(value_rule);
+*/
     }
 private:
-    tag tag_;
+
+    tag& set_size(tag& t){
+      size_ = t.length_value_type();
+      return t;
+    }
+
+    uint8_t size_;
 };
 
 }}}}}

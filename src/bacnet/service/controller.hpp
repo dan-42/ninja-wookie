@@ -40,10 +40,11 @@ class controller {
 public:
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer) {
 
-    lower_layer_.register_async_received_service_callback([this](const bacnet::apdu::meta_information_t& mi,const bacnet::binary_data& data){
+    lower_layer_.register_async_received_service_callback([this](const bacnet::apdu::meta_information_t& mi, const bacnet::binary_data& data){
+      bacnet::binary_data data_ = data;
       std::cout << "mi.service_choice " << (int)mi.service_choice << std::endl;
       if(dispatch_item_ != nullptr && mi.service_choice == detail::service_choice<who_is>::value){
-       if(detail::parse(data, dispatch_item_->who_is_)){
+       if(detail::parse(data_, dispatch_item_->who_is_)){
         dispatch_item_->handler_();
        }
 

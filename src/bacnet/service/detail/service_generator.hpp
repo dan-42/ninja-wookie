@@ -38,7 +38,7 @@ namespace bacnet { namespace service { namespace detail {
 namespace bacnet { namespace service { namespace detail {
 
   template<typename Service>
-  bool parse(const bacnet::binary_data& binary_data, Service &service) {
+  bool parse(bacnet::binary_data& binary_data, Service &service) {
     return false;
   }
 

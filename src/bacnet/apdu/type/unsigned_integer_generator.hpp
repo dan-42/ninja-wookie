@@ -5,8 +5,14 @@
 #ifndef NINJA_WOOKIE_UNSIGNED_INTEGER_GENERATOR_HPP_HPP
 #define NINJA_WOOKIE_UNSIGNED_INTEGER_GENERATOR_HPP_HPP
 
+#include <boost/spirit/include/karma.hpp>
+#include <boost/spirit/include/qi.hpp>
+
+
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+
+
 
 namespace  bacnet { namespace apdu { namespace type {
 
@@ -31,12 +37,30 @@ static bacnet::binary_data generate(const unsigned_integer &v) {
 }
 
 
+static bool parse(bacnet::binary_data& data, unsigned_integer &v) {
+  using namespace bacnet::apdu;
+
+  auto start = data.begin();
+  auto end = data.end();
+
+  type::detail::parser::unsigned_integer_grammar<decltype(start)> parser;
+  bool has_succeeded = false;
+  try {
+    has_succeeded = boost::spirit::qi::parse(start, end, parser, v);
+  }
+  catch (std::exception &e) {
+    std::cerr << "exception: apdu parse unsigned_integer" << e.what() << std::endl;
+  }
+  if (has_succeeded) {
+    data.erase(data.begin(), start);
+    return true;
+  }
+
+  return false;
+}
+
+
 }}}
-
-
-
-
-
 
 
 #endif //NINJA_WOOKIE_UNSIGNED_INTEGER_GENERATOR_HPP_HPP
