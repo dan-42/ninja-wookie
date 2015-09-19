@@ -26,18 +26,16 @@
 
 namespace bacnet { namespace service { namespace detail {
 
-using namespace bacnet::service;
 
 template<typename Service>
-uint8_t service_choice(Service &service) {
-  return 0x00;
-}
+struct service_choice {
+  static constexpr uint8_t value = 0x00;
+};
 
+template<typename Service>
+struct is_broadcast_service : std::false_type {
+};
 
-template<>
-uint8_t service_choice(const who_is& service) {
-  return 0x08;
-}
 
 }}}
 

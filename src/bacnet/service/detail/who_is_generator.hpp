@@ -29,17 +29,29 @@
 #include <bacnet/apdu/type/unsigned_integer.hpp>
 #include <bacnet/apdu/type/unsigned_integer_generator.hpp>
 #include <bacnet/apdu/type/detail/helper.hpp>
+#include <bacnet/service/detail/service_generator.hpp>
+#include <bacnet/service/detail/service_choice.hpp>
+
+namespace bacnet { namespace service { namespace detail {
+  using namespace bacnet::service;
+  template<>
+  struct service_choice<who_is> {
+    static constexpr uint8_t value = 0x08;
+  };
+
+  template<>
+  struct is_broadcast_service<who_is> : std::true_type {
+  };
+
+
+}}}
+
+
 
 namespace bacnet { namespace service { namespace detail {
 
 
 using namespace bacnet::service;
-
-template<typename Service>
-bacnet::binary_data generate(const Service &service) {
-  return bacnet::binary_data{};
-}
-
 
 template<>
 bacnet::binary_data generate<who_is>(const who_is& service) {

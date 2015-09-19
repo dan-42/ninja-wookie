@@ -41,9 +41,16 @@ public:
   template<typename Service>
   void send(Service& service) {
     auto data = detail::generate(service);
-    auto service_choice = detail::service_choice(service);
+    auto service_choice = detail::service_choice<Service>::value;
 
-    lower_layer_.send_unconfirmed_request_as_broadcast(service_choice, data);
+    if(detail::is_broadcast_service<Service>::value) {
+      lower_layer_.send_unconfirmed_request_as_broadcast(service_choice, data);
+    }
+    else {
+      std::cerr << "no support yet for unicast messages";
+      lower_layer_.send_unconfirmed_request_as_broadcast(service_choice, data);
+    }
+
   }
 
 private:
