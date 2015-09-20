@@ -46,6 +46,7 @@ template<>
 struct is_broadcast_service<who_is> : std::true_type {
 };
 
+
 }}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_WHO_IS_HPP

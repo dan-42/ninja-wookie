@@ -22,6 +22,7 @@
 #ifndef NINJA_WOOKIE_BACNET_SERVICE_CONTROLLER_HPP
 #define NINJA_WOOKIE_BACNET_SERVICE_CONTROLLER_HPP
 
+#include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
@@ -41,12 +42,26 @@ public:
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer) {
 
     lower_layer_.register_async_received_service_callback([this](const bacnet::apdu::meta_information_t& mi, const bacnet::binary_data& data){
+      //xxx copy to workaround const constraints of data;
       bacnet::binary_data data_ = data;
-      std::cout << "mi.service_choice " << (int)mi.service_choice << std::endl;
-      if(dispatch_item_ != nullptr && mi.service_choice == detail::service_choice<who_is>::value){
-       if(detail::parse(data_, dispatch_item_->who_is_)){
-        dispatch_item_->handler_();
-       }
+
+      auto item = dispatch_item_map_.find(mi.service_choice);
+      if(item == dispatch_item_map_.end()){
+        return;
+      }
+
+      boost::any dispatch_item_any = item->second;
+
+      //xxx find solution for generic cast?
+      if(mi.service_choice == detail::service_choice<who_is>::value) {
+        auto dispatch_item_ptr = boost::any_cast<boost::shared_ptr<dispatch_item_t<who_is>>>(dispatch_item_any);
+        if(dispatch_item_ptr == nullptr){
+          return;
+        }
+
+        if(detail::parse(data_, dispatch_item_ptr->service_)){
+          dispatch_item_ptr->handler_();
+        }
 
       }
 
@@ -68,9 +83,13 @@ public:
     }
   }
 
-  void async_receive(service::who_is& who_is, boost::function<void()> handler){
+  template<typename Service>
+  void async_receive(Service &service, boost::function<void()> handler){
 
-    dispatch_item_ = boost::make_shared<dispatch_item_t>(who_is, handler);
+    auto dispatch_item_ = boost::make_shared<dispatch_item_t<Service>>(service, handler);
+
+    uint8_t key = detail::service_choice<Service>::value;
+    dispatch_item_map_[key] = dispatch_item_;
   }
 
 
@@ -80,19 +99,19 @@ private:
     UnderlyingLayer &lower_layer_;
 
 
-  //template<typename T>
+  template<typename Service>
   struct dispatch_item_t {
 
-    dispatch_item_t(service::who_is& who_is, const boost::function<void()>& handler) : who_is_(who_is), handler_(handler){
-
+    dispatch_item_t(Service& service, const boost::function<void()>& handler) : service_(service), handler_(handler) {
     }
 
-    service::who_is& who_is_;
+    Service& service_;
     boost::function<void()> handler_;
 
   };
 
-  boost::shared_ptr<dispatch_item_t> dispatch_item_;
+
+  std::map<uint8_t, boost::any> dispatch_item_map_;
 
 };
 
