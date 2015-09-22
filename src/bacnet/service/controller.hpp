@@ -107,12 +107,9 @@ private:
 
     Service& service_;
     boost::function<void()> handler_;
-
   };
 
-
   std::map<uint8_t, boost::any> dispatch_item_map_;
-
 };
 
 }}

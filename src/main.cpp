@@ -30,7 +30,8 @@
 #include <bacnet/service/controller.hpp>
 
 
-
+#include <bacnet/common/object_identifier.hpp>
+#include <bacnet/apdu/type/object_identifier_generator.hpp>
 
 /*
 
@@ -81,8 +82,7 @@ int main(int argc, char *argv[]) {
     bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
     bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
-      bacnet::service::who_is who_is_service0(2, 434214);
-    //bacnet::service::who_is who_is_service0(1,1);
+    bacnet::service::who_is who_is_service0(2, 434214);
     service_controller.send(who_is_service0);
 
     service_controller.async_receive(who_is_service0, [&who_is_service0](){
@@ -90,7 +90,26 @@ int main(int argc, char *argv[]) {
       std::cout << "async_receive(who_is_service): hight " << std::dec <<(int)who_is_service0.device_instance_range_high_limit <<std::endl;
     });
 
-    //bacnet::apdu::service::who_is who_is_;
+
+    bacnet::service::i_am i_am_;
+    i_am_.max_apdu_length_accepted = 1460;
+    i_am_.vendor_id = 0;
+    i_am_.segmentation_supported = 0;
+    i_am_.i_am_device_identifier = 1;
+    service_controller.send(i_am_);
+
+
+    bacnet::common::object_identifier oi;
+    oi.from_native(0x00C0000F);
+    std::cout << "oi.instance_number() " << oi.instance_number() << std::endl;
+    std::cout << "oi.object_typ() " << oi.object_typ() << std::endl;
+
+    auto generated = bacnet::apdu::type::generate(oi);
+    for(auto &c : generated){
+      std::cout << " 0x" << std::hex << (int)c ;
+    }
+    std::cout << std::endl;
+
 
     //bacnet::binary_data who_is_frame;
 
