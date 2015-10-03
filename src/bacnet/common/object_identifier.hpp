@@ -119,7 +119,7 @@ namespace bacnet { namespace common {
       object_type_      = (object_type_and_instance_number & max_object_type) >> object_type_shift_offset;
     }
 
-    inline uint32_t to_native() {
+    inline uint32_t to_native() const {
       return (object_type_ << object_type_shift_offset) | instance_number_;
     }
 

@@ -99,17 +99,40 @@ int main(int argc, char *argv[]) {
     service_controller.send(i_am_);
 
 
+
+
     bacnet::common::object_identifier oi;
     oi.from_native(0x00C0000F);
     std::cout << "oi.instance_number() " << oi.instance_number() << std::endl;
     std::cout << "oi.object_typ() " << oi.object_typ() << std::endl;
 
-    auto generated = bacnet::apdu::type::generate(oi);
+
+    bacnet::apdu::type::object_identifier aoi;
+    bacnet::apdu::type::tag t;
+    t.is_application_tag(true);
+    t.number(12);
+    t.length_value_type(4);
+
+    oi.instance_number(3);
+    oi.object_typ(bacnet::object_type::device);
+
+    aoi.object_identifier_ = oi;
+    aoi.tag_ = t;
+    auto generated = bacnet::apdu::type::generate(aoi);
     for(auto &c : generated){
       std::cout << " 0x" << std::hex << (int)c ;
     }
     std::cout << std::endl;
 
+
+    bacnet::apdu::type::object_identifier aoi_parsed;
+    bacnet::apdu::type::parse(generated, aoi_parsed);
+
+    std::cout << "oi.tag() " << aoi.tag_ << std::endl;
+    std::cout << "oi.instance_number() " << aoi_parsed.object_identifier_.instance_number() << std::endl;
+    std::cout << "oi.object_typ() " << aoi_parsed.object_identifier_.object_typ() << std::endl;
+
+    return 0;
 
     //bacnet::binary_data who_is_frame;
 
