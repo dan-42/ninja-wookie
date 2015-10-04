@@ -195,39 +195,24 @@ struct tag_grammar : grammar<Iterator, tag()> {
       static const constexpr uint8_t extended_2_bytes_length_value_indication = 0b11111110;
       static const constexpr uint8_t extended_4_bytes_length_value_indication = 0b11111111;
 
-     // start_rule = eps[boost::phoenix::bind(&tag_grammar::extract_value, this, _1)] >> tag_rule[_val = _1];
-
-     // start_rule = tag_rule;
-
       start_rule  = simple_tag_rule  >> tag_number_rule >>  is_context_tag_rule >> length_value_rule;
 
       simple_tag_rule = simple_tag_grammar[ref(simple_tag_) = _1];
 
-      tag_number_rule = attr(boost::phoenix::bind(&simple_tag::number, ref(simple_tag_)));
+      tag_number_rule = (eps(boost::phoenix::bind(&simple_tag::number, ref(simple_tag_)) == 0b1111) >> byte_ )
+                      | attr(boost::phoenix::bind(&simple_tag::number, ref(simple_tag_)));
 
       is_context_tag_rule = attr(boost::phoenix::bind(&simple_tag::is_context_tag, ref(simple_tag_)));
 
-      length_value_rule = attr(boost::phoenix::bind(&simple_tag::length_value_type, ref(simple_tag_)));
-
-      /*
-      tag_number_rule = eps( boost::phoenix::bind(&tag_grammar::is_extended_tag_number, this) == true) >> byte_
-                        | eps;
+      length_value_rule = (eps(boost::phoenix::bind(&simple_tag::length_value_type, ref(simple_tag_)) == 0b101) >> extendet_length_value_rule)
+                        |  attr(boost::phoenix::bind(&simple_tag::length_value_type, ref(simple_tag_)));
 
 
-      length_value_rule = ( eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_1_byte, this) == true) >> byte_ )
-                          | ( eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_2_byte, this) == true) >> byte_(extended_2_bytes_length_value_indication) >> big_word )
-                          | ( eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_4_byte, this) == true) >> byte_(extended_4_bytes_length_value_indication) >> big_dword )
-                          |  eps;
+      extendet_length_value_rule = (omit[byte_(254)] >> big_word)
+                                 | (omit[byte_(255)] >> big_dword)
+                                 | byte_;
 
-*/
-      /**
-       * to do
-       * [] tag grammar generator testing
-       * [] debug
-       * [] parser
-       * [] test parser
-       * [] replace by old bitfield tag_grammar
-       */
+
       start_rule.name("start_rule");
       simple_tag_rule.name("simple_tag_rule");
       tag_number_rule.name("tag_number_rule");
