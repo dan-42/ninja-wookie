@@ -36,7 +36,7 @@ namespace bacnet { namespace apdu {
     bacnet::npdu::meta_information_t npdu_meta_information;
   };
 
-  typedef  boost::function<void (const bacnet::apdu::meta_information_t&, const bacnet::binary_data&)> async_received_service_callback_t;
+  typedef  boost::function<void (bacnet::apdu::meta_information_t&&, bacnet::binary_data&&)> async_received_service_callback_t;
 
 }}
 

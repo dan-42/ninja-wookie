@@ -79,7 +79,6 @@ bacnet::binary_data generate<who_is>(const who_is& service) {
 template<>
 bool parse<who_is>(bacnet::binary_data& data, who_is &service) {
 
-
   /*it's allowed to have now payload*/
   if(data.empty()) {
     service.device_instance_range_low_limit = 0;
@@ -91,7 +90,7 @@ bool parse<who_is>(bacnet::binary_data& data, who_is &service) {
   apdu::unsigned_integer high_limit;
   bool has_succeeded = false;
 
-  has_succeeded= apdu::parse(data, low_limit);
+  has_succeeded = apdu::parse(data, low_limit);
   if(!has_succeeded) {
     return false;
   }

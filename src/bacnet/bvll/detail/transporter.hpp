@@ -81,13 +81,13 @@ public:
 
   template<typename Buffer, typename Handler>
   void async_receive_from(const Buffer &buffer, boost::asio::ip::udp::endpoint &sender, const Handler &handler) {
-    std::cout << "async_receive_from(): " << std::endl;
+   // std::cout << "async_receive_from(): " << std::endl;
     socket_.async_receive_from(buffer, sender, handler);
   }
 
   template<typename Buffer, typename Handler>
   void async_send_to(const Buffer &buffer, boost::asio::ip::udp::endpoint &receiver, const Handler &handler) {
-    std::cout << "async_send_to(): " << std::endl;
+    //std::cout << "async_send_to(): " << std::endl;
     socket_.async_send_to(buffer, receiver, handler);
   }
 
@@ -96,7 +96,7 @@ public:
   void async_send_broadcast(const Buffer &buffer, const Handler &handler) {
 
     boost::asio::ip::udp::endpoint receiver(multicast_address_, port_);
-    std::cout << "async_send_to(): " << receiver <<  std::endl;
+    //std::cout << "async_send_to(): " << receiver <<  std::endl;
     socket_.async_send_to(buffer, receiver, handler);
   }
 
@@ -105,9 +105,6 @@ private:
 
 
   void init() {
-    std::cout << "init(): " << std::endl;
-
-
     socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.set_option(boost::asio::socket_base::broadcast(true));

@@ -2,7 +2,7 @@
 // Created by dan on 10/4/15.
 //
 
-
+/*
 namespace  bacnet { namespace apdu { namespace type {
 static bacnet::binary_data generate(const bacnet::apdu::type::tag &tag_) {
   using namespace bacnet::apdu;
@@ -393,3 +393,4 @@ std::cout << " parsed successfull " << tag_parsed << std::endl;
 }
 else
 std::cout << " parsed failed " << std::endl;
+*/

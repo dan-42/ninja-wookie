@@ -10,8 +10,8 @@
 
 namespace bacnet { namespace bvll {
 
-typedef  boost::function<void (const bacnet::binary_data&, const boost::asio::ip::udp::endpoint& )> async_receive_broadcast_callback_t;
-typedef  boost::function<void (const bacnet::binary_data&, const boost::asio::ip::udp::endpoint& )> async_receive_unicast_callback_t;
+typedef  boost::function<void (bacnet::binary_data&&,  boost::asio::ip::udp::endpoint&& )> async_receive_broadcast_callback_t;
+typedef  boost::function<void ( bacnet::binary_data&&, boost::asio::ip::udp::endpoint&& )> async_receive_unicast_callback_t;
 
 }}
 

@@ -38,10 +38,10 @@ struct meta_information_t {
   uint16_t vendor_id;
 };
 
-typedef  boost::function<void (const bacnet::binary_data&)> async_receive_broadcast_callback_t;
-typedef  boost::function<void (const bacnet::binary_data&)> async_receive_unicast_callback_t;
+//typedef  boost::function<void (bacnet::binary_data&&)> async_receive_broadcast_callback_t;
+//typedef  boost::function<void (bacnet::binary_data&&)> async_receive_unicast_callback_t;
 
-typedef  boost::function<void (const bacnet::binary_data&, const bacnet::npdu::meta_information_t&)> async_received_apdu_callback_t;
+typedef  boost::function<void (bacnet::binary_data&&, bacnet::npdu::meta_information_t&&)> async_received_apdu_callback_t;
 
 }}
 

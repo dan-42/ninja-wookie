@@ -36,9 +36,7 @@
 #include <bacnet/apdu/detail/callback_manager.hpp>
 
 
-void handler(const boost::system::error_code& error_code, const std::size_t &bytes_transfered){
-  std::cout << "handler " <<  error_code.message() << std::endl;
-}
+
 
 
 
@@ -70,18 +68,25 @@ struct controller {
     callback_manager_.async_received_service_callback_ = callback;
   }
 
-
-  void send_unconfirmed_request_as_broadcast(const uint8_t &service_choice, const bacnet::binary_data& payload) {
+  template<typename Handler>
+  void async_send_unconfirmed_request_as_broadcast(const uint8_t &service_choice, const bacnet::binary_data& payload, Handler handler) {
     frame::unconfirmed_request frame;
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::unconfirmed_request;
     frame.service_choice = service_choice;
     frame.service_data = payload;
     auto data = frame::generator::generate(frame);
-    underlying_controller_.async_send_broadcast(data, &handler);
+    underlying_controller_.async_send_broadcast(data, handler);
   }
 
 
-  void async_received_apdu_handler(bacnet::binary_data data) {
+  void async_received_apdu_handler(bacnet::binary_data&& data) {
+    std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
+    frame::possible_frame f = frame::parser::parse(data);
+    boost::apply_visitor(inbound_router_, f);
+
+  }
+
+  void async_received_apdu_handler_1(bacnet::binary_data data) {
     std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
     frame::possible_frame f = frame::parser::parse(data);
     boost::apply_visitor(inbound_router_, f);
@@ -91,7 +96,7 @@ struct controller {
 private:
 
   void init() {
-    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1));
+    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler_1, this, _1));
   }
 
   boost::asio::io_service &io_service_;

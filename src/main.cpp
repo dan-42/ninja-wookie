@@ -51,7 +51,17 @@ Unsigned16
  */
 
 
+void my_handler(const boost::system::error_code& error,  std::size_t bytes_transferred ) { }
 
+class service_receiver {
+public:
+  void operator()(const bacnet::service::who_is &service) {
+    std::cout << "who_is" << std::endl;
+  }
+  void operator()(const bacnet::service::i_am &service) {
+    std::cout << "i_am" << std::endl;
+  }
+};
 
 
 int main(int argc, char *argv[]) {
@@ -82,73 +92,32 @@ int main(int argc, char *argv[]) {
     bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
     bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller(bvll_controller, npdu_network_number);
     bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
-    bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
+    bacnet::service::controller<decltype(apdu_controller), service_receiver> service_controller(io_service, apdu_controller);
 
     bacnet::service::who_is who_is_service0(2, 434214);
-    service_controller.send(who_is_service0);
+    service_controller.async_send(who_is_service0, &my_handler);
 
+
+    service_receiver sr{};
+    service_controller.async_receive_service(sr);
+
+
+
+/*
     service_controller.async_receive(who_is_service0, [&who_is_service0](){
       std::cout << "async_receive(who_is_service): low " << std::dec <<(int)who_is_service0.device_instance_range_low_limit <<std::endl;
       std::cout << "async_receive(who_is_service): hight " << std::dec <<(int)who_is_service0.device_instance_range_high_limit <<std::endl;
     });
-
+*/
 
     bacnet::service::i_am i_am_;
     i_am_.max_apdu_length_accepted = 1460;
     i_am_.vendor_id = 0;
     i_am_.segmentation_supported = 0;
     i_am_.i_am_device_identifier = 1;
-    service_controller.send(i_am_);
+    service_controller.async_send(i_am_, &my_handler);
 
-
-
-
-    bacnet::common::object_identifier oi;
-    oi.from_native(0x00C0000F);
-    std::cout << "oi.instance_number() " << oi.instance_number() << std::endl;
-    std::cout << "oi.object_typ() " << oi.object_typ() << std::endl;
-
-    bacnet::apdu::type::tag tag;
-    tag.number(12);
-    tag.is_context_tag(true);
-    tag.length_value_type(4);
-
-    bacnet::apdu::type::object_identifier aoi{tag, oi};
-
-    std::cout << std::endl;
-    std::cout << "----------------------"  << std::endl;
-    std::cout << "TAG: " << tag << std::endl;
-
-    auto generated = bacnet::apdu::type::generate(aoi);
-    for(auto &c : generated){
-      std::cout << " 0x" << std::hex << (int)c ;
-    }
-    std::cout << std::endl;
-    bacnet::apdu::type::object_identifier aoi_parsed{};
-    if( bacnet::apdu::type::parse(generated, aoi_parsed)) {
-      std::cout << " parsed successfull " << aoi_parsed << std::endl;
-    }
-    else
-      std::cout << " parsed failed " << std::endl;
-
-
-
-
-
-
-
-    //bacnet::binary_data who_is_frame;
-
-    //apdu_controller.send_unconfirmed_request_as_broadcast(0x08, who_is_frame);
-
-    //bacnet::service::who_is who_is_service1;
-    //bacnet::service::who_is who_is_service2(42);
-    //bacnet::service::who_is who_is_service3(2, 4214);
-
-
-
-
-   // io_service.run();
+    io_service.run();
 
 
   }

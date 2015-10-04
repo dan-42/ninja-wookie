@@ -65,7 +65,6 @@ bacnet::binary_data generate(const possible_bvll_frame& frame) {
 
     frame_size fs;
     uint32_t size = boost::apply_visitor( fs, frame );
-  std::cout << "size:" << size << std::endl;
     std::back_insert_iterator<bacnet::binary_data> sink(binary_frame);
     bvll_grammar<decltype(sink)> generator(size);
     bool result = false;

@@ -35,18 +35,19 @@ public:
 	inbound_router(callback_manager& cbm) : callback_manager_(cbm) {
 	}
 
-	void route(const frame& f) {
-		std::cout << "npdu::detail::inbound_router::route() "  << std::endl;
+	void route(frame&& f) {
+	//	std::cout << "npdu::detail::inbound_router::route() "  << std::endl;
 
 
 		/* 6.2.2 if control_filed has no network_layer_message, it is an APDU frame for this device*/
-		if(!f.control_field.has_network_layer_message_type()) {
+		if(!f.control_field.has_network_layer_message_type() &&  !callback_manager_.async_received_apdu_callback_.empty()) {
+
 		  meta_information_t meta_information;
 		  meta_information.endpoint = sender_endpoint_;
 		  meta_information.network_priority = f.control_field.network_priority();
 		  // is this needed?
 		  meta_information.source = f.source;
-		  callback_manager_.async_received_apdu_callback_(f.apdu_data, meta_information);
+		  callback_manager_.async_received_apdu_callback_(std::move(f.apdu_data), std::move(meta_information));
 		}
 
 		/*todo: check if not router is better name*/

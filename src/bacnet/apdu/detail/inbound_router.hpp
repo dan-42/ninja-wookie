@@ -40,7 +40,8 @@ public:
       if(!callback_manager_.async_received_service_callback_.empty()){
         meta_information_t meta_info;
         meta_info.service_choice = request.service_choice;
-        callback_manager_.async_received_service_callback_(meta_info, request.service_data);
+        auto data = request.service_data;
+        callback_manager_.async_received_service_callback_(std::move(meta_info), std::move(data));
       }
 
   }

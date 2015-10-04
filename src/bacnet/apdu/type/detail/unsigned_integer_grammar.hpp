@@ -62,7 +62,7 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
     rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
-  //  bit_field<Iterator, tag> tag_grammar;
+   tag_grammar<Iterator> tag_grammar_;
 
     unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), size_(0) {
 
@@ -75,7 +75,7 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
                   | eps(boost::phoenix::ref(size_) == 3) >> big_24word
                   | eps(boost::phoenix::ref(size_) == 4) >> big_dword;
 
-      tag_lower_rule = byte_;// tag_grammar;
+      tag_lower_rule = tag_grammar_;
 
       start_rule.name("start_rule");
       tag_rule.name("tag_rule");
