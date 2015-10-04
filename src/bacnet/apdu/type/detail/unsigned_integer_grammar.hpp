@@ -34,6 +34,8 @@
 
 #include <bacnet/apdu/type/unsigned_integer.hpp>
 
+#include <bacnet/apdu/type/detail/tag_grammar.hpp>
+
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
 using namespace boost::spirit;
@@ -60,7 +62,7 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
     rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
-    bit_field<Iterator, tag> tag_grammar;
+  //  bit_field<Iterator, tag> tag_grammar;
 
     unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), size_(0) {
 
@@ -73,7 +75,7 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
                   | eps(boost::phoenix::ref(size_) == 3) >> big_24word
                   | eps(boost::phoenix::ref(size_) == 4) >> big_dword;
 
-      tag_lower_rule = tag_grammar;
+      tag_lower_rule = byte_;// tag_grammar;
 
       start_rule.name("start_rule");
       tag_rule.name("tag_rule");
@@ -122,13 +124,13 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
     rule<Iterator, tag()>               tag_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
-    bit_field<Iterator, tag> tag_grammar;
+    tag_grammar<Iterator> tag_grammar_;
 
     unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule) {
 
       start_rule  = tag_rule << value_rule ;
 
-      tag_rule = eps[boost::phoenix::bind(&unsigned_integer_grammar::extract_size, this, _val)] << tag_grammar[_1 = _val];
+      tag_rule = eps[boost::phoenix::bind(&unsigned_integer_grammar::extract_size, this, _val)] << tag_grammar_[_1 = _val];
 
       value_rule  = eps(ref(size_) == 1) << byte_
                     | eps(ref(size_) == 2) << big_word

@@ -69,6 +69,10 @@ public:
 
   }
 
+    /*
+     * make async_send dependant on a bacnet::endpoint, as a generic way to send unidirectional services
+     */
+
   template<typename Service>
   void send(Service& service) {
     auto data = detail::generate(service);

@@ -35,6 +35,7 @@
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
 #include <bacnet/apdu/type/object_identifier.hpp>
+#include <bacnet/apdu/type/detail/tag_grammar.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -59,13 +60,13 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
   rule<Iterator, tag()>                                 tag_rule;
   rule<Iterator, bacnet::common::object_identifier()>   value_rule;
 
-  bit_field<Iterator, tag> tag_grammar;
+    tag_grammar<Iterator> tag_grammar_;
 
   object_identifier_grammar() : object_identifier_grammar::base_type(start_rule), size_(0) {
 
     start_rule  = tag_rule >> value_rule ;
 
-    tag_rule = tag_grammar;
+    tag_rule = tag_grammar_;
 
     value_rule  =  big_dword[_val = boost::phoenix::bind(&object_identifier_grammar::create_object_identifier, this, _1)] ;
 
@@ -113,13 +114,13 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
   rule<Iterator, tag()>                                 tag_rule;
   rule<Iterator, bacnet::common::object_identifier()>   value_rule;
 
-  bit_field<Iterator, tag> tag_grammar;
+    tag_grammar<Iterator> tag_grammar_;
 
   object_identifier_grammar() : object_identifier_grammar::base_type(start_rule) {
 
     start_rule  = tag_rule << value_rule ;
 
-    tag_rule = tag_grammar;
+    tag_rule = tag_grammar_;
 
     value_rule  = big_dword[_1 = boost::phoenix::bind(&object_identifier_grammar::get_native_value, this, _val)];
 
