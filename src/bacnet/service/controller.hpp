@@ -56,9 +56,11 @@ public:
 
 
     if(mi.service_choice == detail::service_choice<who_is>::value) {
-      service::who_is wi;
-      if(detail::parse(data, wi)){
-        service_receiver_(wi);
+
+
+      detail::service_choice<who_is>::type service_type;
+      if(detail::parse(data, service_type)){
+        service_receiver_(service_type);
       }
     }
   }

@@ -40,6 +40,7 @@ using namespace bacnet::service;
 template<>
 struct service_choice<who_is> {
   static constexpr uint8_t value = 0x08;
+  typedef who_is type;
 };
 
 template<>

@@ -26,10 +26,12 @@
 
 namespace bacnet { namespace service { namespace detail {
 
+struct unused{};
 
 template<typename Service>
 struct service_choice {
   static constexpr uint8_t value = 0x00;
+  typedef unused type;
 };
 
 template<typename Service>
