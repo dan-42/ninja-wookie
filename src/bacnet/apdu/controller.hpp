@@ -42,7 +42,6 @@
 
 namespace bacnet { namespace apdu {
 
-constexpr uint16_t DEFAULT_DEVICE_OBJECT_ID = 1;
 
 template<class UnderlyingLayerController>
 struct controller {
@@ -50,17 +49,14 @@ struct controller {
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
-                          inbound_router_(callback_manager_),
-                          device_object_id_(DEFAULT_DEVICE_OBJECT_ID){
+                          inbound_router_(callback_manager_) {
 	  init();
   }
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller, const uint16_t &device_object_id) :
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
-                          inbound_router_(callback_manager_),
-                          device_object_id_(device_object_id)
-  {
+                          inbound_router_(callback_manager_) {
     init();
   }
 
@@ -72,38 +68,29 @@ struct controller {
   void async_send_unconfirmed_request_as_broadcast(const uint8_t &service_choice, const bacnet::binary_data& payload, Handler handler) {
     frame::unconfirmed_request frame;
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::unconfirmed_request;
-    frame.service_choice = service_choice;
+  //  frame.service_choice = service_choice;
     frame.service_data = payload;
     auto data = frame::generator::generate(frame);
     underlying_controller_.async_send_broadcast(data, handler);
   }
 
 
-  void async_received_apdu_handler(bacnet::binary_data&& data) {
+  void async_received_apdu_handler(bacnet::binary_data data) {
     std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
-    frame::possible_frame f = frame::parser::parse(data);
+    frame::possible_frame f = frame::parser::parse(std::move(data));
     boost::apply_visitor(inbound_router_, f);
-
-  }
-
-  void async_received_apdu_handler_1(bacnet::binary_data data) {
-    std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
-    frame::possible_frame f = frame::parser::parse(data);
-    boost::apply_visitor(inbound_router_, f);
-
   }
 
 private:
 
   void init() {
-    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler_1, this, _1));
+    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1));
   }
 
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
   detail::inbound_router  inbound_router_;
   detail::callback_manager callback_manager_;
-  uint16_t device_object_id_;
 };
 
 }}

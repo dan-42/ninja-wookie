@@ -85,17 +85,39 @@ int main(int argc, char *argv[]) {
 
     uint16_t npdu_network_number = 1;
 
-    uint16_t apdu_device_object_id = 1;
-
 
     boost::asio::io_service io_service;
     bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
     bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller(bvll_controller, npdu_network_number);
-    bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller, apdu_device_object_id);
+    bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller);
     bacnet::service::controller<decltype(apdu_controller), service_receiver> service_controller(io_service, apdu_controller);
 
+
+    bacnet::application::controller<decltype(service_controller)> application_controller(io_service, service_controller);
+
+
+
     bacnet::service::who_is who_is_service0(2, 434214);
+
+
+
     service_controller.async_send(who_is_service0, &my_handler);
+
+    service_controller.async_send(who_is_service0, [](service::error_code ec){
+
+    });
+    service_controller.async_send(service::i_am{}, [](service::error_code ec){
+
+    });
+
+    service_controller.async_receive<service::i_am>([](service::error_code ec,service::i_am i_am){
+
+    });
+
+    service_controller.async_receive<service::who_is>([](service::error_code ec, service::who_is who_is) {
+
+    });
+
 
 
     service_receiver sr{};

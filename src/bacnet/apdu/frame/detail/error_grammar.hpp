@@ -65,7 +65,7 @@ struct error_grammar : grammar<Iterator, error() >{
 
     error_rule  = pdu_header_rule
                >> original_invoke_id_rule
-               >> error_choice_rule
+        //       >> error_choice_rule
                >> error_data_rule;
 
 
@@ -146,7 +146,7 @@ struct error_grammar : grammar<Iterator, error() >{
 
     error_rule  = pdu_header_rule
                << original_invoke_id_rule
-               << error_choice_rule
+      //         << error_choice_rule
                << error_data_rule;
 
 

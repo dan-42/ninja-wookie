@@ -72,7 +72,7 @@ struct complex_ack_grammar : grammar<Iterator, complex_ack() >{
                            >> invoke_id_rule
                            >> sequence_number_rule
                            >> proposed_window_size_rule
-                           >> service_ack_choice_rule
+                     //      >> service_ack_choice_rule
                            >> service_ack_data_rule;
 
 
@@ -167,7 +167,7 @@ struct complex_ack_grammar : grammar<Iterator, complex_ack() >{
                            << original_invoke_id_rule
                            << sequence_number_rule
                            << proposed_window_size_rule
-                           << service_ack_choice_rule
+            //               << service_ack_choice_rule
                            << service_ack_data_rule;
 
 

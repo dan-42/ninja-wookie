@@ -35,7 +35,7 @@ BOOST_FUSION_DEFINE_STRUCT(
         (bacnet)(apdu)(frame), error,
         (bacnet::apdu::detail::header::pdu_type_and_control_information_t, pdu_type_and_control_information)
         (uint8_t, original_invoke_id)
-        (uint8_t, error_choice)
+        //(uint8_t, error_choice)
         (bacnet::binary_data, error_data)
 )
 

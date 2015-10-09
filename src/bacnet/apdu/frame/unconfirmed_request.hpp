@@ -35,7 +35,7 @@
 BOOST_FUSION_DEFINE_STRUCT(
         (bacnet)(apdu)(frame), unconfirmed_request,
         (bacnet::apdu::detail::header::pdu_type_and_control_information_t, pdu_type_and_control_information)
-        (uint8_t, service_choice)
+       // (uint8_t, service_choice)
         (bacnet::binary_data, service_data)
 )
 

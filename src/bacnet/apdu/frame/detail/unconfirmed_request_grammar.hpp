@@ -63,7 +63,7 @@ struct unconfirmed_request_grammar : grammar<Iterator, unconfirmed_request() >{
   unconfirmed_request_grammar() : unconfirmed_request_grammar::base_type(unconfirmed_request_rule){
 
     unconfirmed_request_rule  = pdu_header_rule
-                             >> service_choice_rule
+                        //     >> service_choice_rule
                              >> service_data_rule;
 
 
@@ -139,7 +139,7 @@ struct unconfirmed_request_grammar : grammar<Iterator, unconfirmed_request() >{
   unconfirmed_request_grammar() : unconfirmed_request_grammar::base_type(unconfirmed_request_rule){
 
     unconfirmed_request_rule  = pdu_header_rule
-                             << service_choice_rule
+                       //      << service_choice_rule
                              << service_data_rule;
 
 

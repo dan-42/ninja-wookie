@@ -83,7 +83,7 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
                            >> invoke_id_rule
                            >> sequence_number_rule
                            >> proposed_window_size_rule
-                           >> service_choice_rule
+                      //     >> service_choice_rule
                            >> service_data_rule;
 
 
@@ -187,7 +187,7 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
                            << invoke_id_rule
                            << sequence_number_rule
                            << proposed_window_size_rule
-                           << service_choice_rule
+                  //         << service_choice_rule
                            << service_data_rule;
 
 

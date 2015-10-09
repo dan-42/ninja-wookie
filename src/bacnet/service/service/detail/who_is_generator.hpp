@@ -35,6 +35,7 @@ namespace bacnet { namespace service { namespace detail {
 
 
 using namespace bacnet::service;
+using namespace bacnet::service::s
 namespace  apdu = bacnet::apdu::type;
 
 template<>
