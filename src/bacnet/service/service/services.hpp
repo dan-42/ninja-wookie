@@ -22,7 +22,7 @@ BOOST_FUSION_DEFINE_STRUCT(
   (uint16_t, vendor_id)
 )
 
-namespace bacnet { namespace service { namespace detail {
+namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service::service;
 
   template<>
@@ -34,15 +34,15 @@ namespace bacnet { namespace service { namespace detail {
   template<>
   struct is_broadcast_service<i_am> : std::true_type {
   };
-}}}
+}}}}
 
 BOOST_FUSION_DEFINE_STRUCT(
-    (bacnet)(service), who_is,
+    (bacnet)(service)(service), who_is,
     (uint32_t, device_instance_range_low_limit)
     (uint32_t, device_instance_range_high_limit)
 )
 
-namespace bacnet { namespace service { namespace detail {
+namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
   template<>
   struct service_choice<who_is> {
@@ -55,19 +55,19 @@ namespace bacnet { namespace service { namespace detail {
   };
 
 
-}}}
+}}}}
 
 
 
 
 
 
-namespace bacnet { namespace service { namespace unconfirmed {
+namespace bacnet { namespace service { namespace service { namespace unconfirmed {
   typedef boost::variant<
       who_is,
       i_am
   > possible_service;
-}}}
+}}}}
 
 
 

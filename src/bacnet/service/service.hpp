@@ -18,31 +18,18 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_SERVICE_GENERATOR_HPP
-#define NINJA_WOOKIE_SERVICE_GENERATOR_HPP
-/*
+#ifndef NINJA_WOOKIE_BACNET_SERVICE_SERVICE_HPP
+#define NINJA_WOOKIE_BACNET_SERVICE_SERVICE_HPP
 
-#include <bacnet/detail/common/types.hpp>
 
-namespace bacnet { namespace service { namespace detail {
-
-  template<typename Service>
-  bacnet::binary_data generate(const Service &service) {
-    return bacnet::binary_data{};
-  }
-
-}}}
+#include <bacnet/service/service/services.hpp>
+#include <bacnet/service/error/error_code.hpp>
 
 
 
-namespace bacnet { namespace service { namespace detail {
+namespace bacnet { namespace service {
+  using namespace service;
+}}
 
-  template<typename Service>
-  bool parse(bacnet::binary_data& binary_data, Service &service) {
-    return false;
-  }
 
-}}}
-*/
-
-#endif //NINJA_WOOKIE_SERVICE_GENERATOR_HPP
+#endif //NINJA_WOOKIE_BACNET_SERVICE_SERVICE_HPP

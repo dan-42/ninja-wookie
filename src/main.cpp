@@ -30,38 +30,9 @@
 #include <bacnet/service/controller.hpp>
 
 
+
 #include <bacnet/common/object_identifier.hpp>
 #include <bacnet/apdu/type/object_identifier_generator.hpp>
-#include <bacnet/apdu/type/detail/tag_grammar.hpp>
-
-/*
-
- I-Am-Request ::= SEQUENCE {
-iAmDeviceIdentifier
-maxAPDULengthAccepted
-segmentationSupported
-vendorID
-}
-BACnetObjectIdentifier,
-Unsigned,
-BACnetSegmentation,
-Unsigned16
-
-
- */
-
-
-void my_handler(const boost::system::error_code& error,  std::size_t bytes_transferred ) { }
-
-class service_receiver {
-public:
-  void operator()(const bacnet::service::who_is &service) {
-    std::cout << "who_is" << std::endl;
-  }
-  void operator()(const bacnet::service::i_am &service) {
-    std::cout << "i_am" << std::endl;
-  }
-};
 
 
 int main(int argc, char *argv[]) {
@@ -90,54 +61,52 @@ int main(int argc, char *argv[]) {
     bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
     bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller(bvll_controller, npdu_network_number);
     bacnet::apdu::controller<decltype(npdu_controller)> apdu_controller(io_service, npdu_controller);
-    bacnet::service::controller<decltype(apdu_controller), service_receiver> service_controller(io_service, apdu_controller);
+    bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
 
-    bacnet::application::controller<decltype(service_controller)> application_controller(io_service, service_controller);
+   // bacnet::application::controller<decltype(service_controller)> application_controller(io_service, service_controller);
 
 
-
-    bacnet::service::who_is who_is_service0(2, 434214);
-
-
-
-    service_controller.async_send(who_is_service0, &my_handler);
-
-    service_controller.async_send(who_is_service0, [](service::error_code ec){
-
-    });
-    service_controller.async_send(service::i_am{}, [](service::error_code ec){
-
+    service_controller.async_send(bacnet::service::who_is{2, 434214}, [](boost::system::error_code ec) {
+        std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
     });
 
-    service_controller.async_receive<service::i_am>([](service::error_code ec,service::i_am i_am){
 
-    });
-
-    service_controller.async_receive<service::who_is>([](service::error_code ec, service::who_is who_is) {
-
+    bacnet::service::i_am i_am_{1,2,3,4};
+    service_controller.async_send(i_am_, [](boost::system::error_code ec){
+      std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
     });
 
 
 
-    service_receiver sr{};
-    service_controller.async_receive_service(sr);
 
+    bacnet::service::callback_service_i_am_t i_am_handler_ = [](boost::system::error_code ec, bacnet::service::i_am i_am) {
+      std::cout << "async_receive::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
+    };
 
+    service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 
-/*
-    service_controller.async_receive(who_is_service0, [&who_is_service0](){
-      std::cout << "async_receive(who_is_service): low " << std::dec <<(int)who_is_service0.device_instance_range_low_limit <<std::endl;
-      std::cout << "async_receive(who_is_service): hight " << std::dec <<(int)who_is_service0.device_instance_range_high_limit <<std::endl;
+    service_controller.async_receive<bacnet::service::who_is, bacnet::service::callback_service_who_is_t>([](boost::system::error_code ec, bacnet::service::who_is who_is) {
+      std::cout << "async_receive::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
+      if(!ec) {
+        std::cout << "async_receive(who_is_service): low " << std::dec << (int) who_is.device_instance_range_low_limit << std::endl;
+        std::cout << "async_receive(who_is_service): hight " << std::dec << (int) who_is.device_instance_range_high_limit << std::endl;
+      } else {
+
+      }
+
     });
-*/
 
+
+
+    /*
     bacnet::service::i_am i_am_;
     i_am_.max_apdu_length_accepted = 1460;
     i_am_.vendor_id = 0;
     i_am_.segmentation_supported = 0;
     i_am_.i_am_device_identifier = 1;
     service_controller.async_send(i_am_, &my_handler);
+     */
 
     io_service.run();
 

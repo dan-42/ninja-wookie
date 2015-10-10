@@ -26,14 +26,32 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include <bacnet/service/i_am.hpp>
-#include <bacnet/service/who_is.hpp>
+#include <bacnet/service/service.hpp>
 
-#include <bacnet/service/detail/service_choice.hpp>
-#include <bacnet/service/detail/who_is_generator.hpp>
+//#include <bacnet/service/service/detail/service_choice.hpp>
+//#include <bacnet/service/service/detail/who_is_generator.hpp>
 
-#include <bacnet/apdu/api.hpp>
+#include <bacnet/service/api.hpp>
+#include <bacnet/service/detail/callback_manager.hpp>
 
+
+namespace bacnet { namespace service { namespace service { namespace detail {
+  using namespace bacnet::service;
+  static inline unconfirmed::possible_service parse(const binary_data& data) {
+    unconfirmed::possible_service parsed_service{};
+
+    std::cout << "unconfirmed::possible_service parse(const binary_data& data) { " << std::endl;
+    return parsed_service;
+  }
+
+
+  static inline binary_data generate(const unconfirmed::possible_service& service) {
+
+    std::cout << "unconfirmed::possible_service generate(const binary_data& data) { " << std::endl;
+    return binary_data{};
+  }
+
+}}}}
 
 
 
@@ -41,7 +59,7 @@ namespace bacnet { namespace service {
 
 
 
-template<typename UnderlyingLayer, typename ServiceReceiver>
+template<typename UnderlyingLayer>
 class controller {
 public:
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer) {
@@ -53,16 +71,8 @@ public:
  void async_received_service_handler(bacnet::apdu::meta_information_t mi, bacnet::binary_data data) {
 
     std::cout << "async_received_service_handler " << std::endl;
+   auto possible_service_frame = bacnet::service::service::detail::parse(data);
 
-
-    if(mi.service_choice == detail::service_choice<who_is>::value) {
-
-
-      detail::service_choice<who_is>::type service_type;
-      if(detail::parse(data, service_type)){
-        service_receiver_(service_type);
-      }
-    }
   }
 
 
@@ -71,30 +81,36 @@ public:
      */
 
   template<typename Service, typename Handler>
-  void async_send(Service& service, Handler handler) {
-    auto data = detail::generate(service);
-    auto service_choice = detail::service_choice<Service>::value;
+  void async_send(Service&& service, Handler handler) {
+    auto data =  bacnet::service::service::detail::generate(service);
+    auto service_choice =  bacnet::service::service::detail::service_choice<Service>::value;
 
-    if(detail::is_broadcast_service<Service>::value) {
-      lower_layer_.async_send_unconfirmed_request_as_broadcast(service_choice, data, handler);
+    if( bacnet::service::service::detail::is_broadcast_service<Service>::value) {
+
+      lower_layer_.async_send_unconfirmed_request_as_broadcast(service_choice, data, [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
+        handler(ec);
+      });
     }
     else {
       std::cerr << "no support yet for unicast messages";
-      lower_layer_.async_send_unconfirmed_request_as_broadcast(service_choice, data, handler);
+      lower_layer_.async_send_unconfirmed_request_as_broadcast(service_choice, data, [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
+        handler(ec);
+      });
     }
   }
 
 
-  void async_receive_service(const ServiceReceiver &service_receiver) {
-    service_receiver_ = service_receiver;
+  template<typename ServiceType, typename FunctionHandler>
+  void async_receive(FunctionHandler function_handler) {
+    callback_manager_.set_service_callback(function_handler);
   }
 
 
 private:
     boost::asio::io_service& io_service_;
     UnderlyingLayer &lower_layer_;
+    bacnet::service::detail::callback_manager callback_manager_;
 
-  ServiceReceiver service_receiver_;
 
 };
 

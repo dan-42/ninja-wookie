@@ -25,7 +25,7 @@
 #include <cstdint>
 
 
-namespace bacnet { namespace service { namespace detail {
+namespace bacnet { namespace service { namespace service { namespace detail {
 
       namespace uncomfirmed_service {
         constexpr uint8_t i_am                          =  0;
@@ -79,10 +79,10 @@ namespace bacnet { namespace service { namespace detail {
         constexpr uint8_t removed_rev_11_authenticate   = 24;
         constexpr uint8_t removed_rev_11_request_key    = 25;
       }
-}}}
+}}}}
 
 
-namespace bacnet { namespace service { namespace detail {
+namespace bacnet { namespace service { namespace service { namespace detail {
 
 struct unused{};
 
@@ -98,6 +98,6 @@ struct is_broadcast_service : std::false_type {
 
 
 
-}}}
+}}}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERVICE_CHOICE_HPP
