@@ -70,10 +70,10 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
 
       tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&unsigned_integer_grammar::set_size, this, _1)] ;
 
-      value_rule  = eps(boost::phoenix::ref(size_) == 1) >> byte_
-                  | eps(boost::phoenix::ref(size_) == 2) >> big_word
-                  | eps(boost::phoenix::ref(size_) == 3) >> big_24word
-                  | eps(boost::phoenix::ref(size_) == 4) >> big_dword;
+      value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
+                  | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
+                  | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
+                  | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
 
       tag_lower_rule = tag_grammar_;
 
@@ -81,21 +81,22 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
       tag_rule.name("tag_rule");
       tag_lower_rule.name("tag_lower_rule");
       value_rule.name("value_rule");
+//
 /*
       debug(start_rule);
       debug(tag_rule);
       debug(tag_lower_rule);
       debug(value_rule);
-*/
+//*/
     }
 private:
 
-    tag& set_size(tag& t){
+    tag& set_size(tag& t) {
       size_ = t.length_value_type();
       return t;
     }
 
-    uint8_t size_;
+    uint32_t size_;
 };
 
 }}}}}

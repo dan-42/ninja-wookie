@@ -5,9 +5,10 @@
 #ifndef NINJA_WOOKIE_BACNET_SERVICE_ERROR_CODE_HPP
 #define NINJA_WOOKIE_BACNET_SERVICE_ERROR_CODE_HPP
 
-#include <boost/system/error_code.hpp>
 #include <string>
 #include <iostream>
+
+#include <boost/system/error_code.hpp>
 
 namespace  bacnet { namespace service { namespace  error {
 
@@ -39,12 +40,17 @@ public:
   }
 };
 
-}}}
-      /*
 const error_category& get_error_category() {
   static error_category error_category_;
   return error_category_;
 }
+
+}}}
+
+
+
+      /*
+
 
 }}}
 

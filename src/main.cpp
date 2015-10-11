@@ -30,13 +30,10 @@
 #include <bacnet/service/controller.hpp>
 
 
-
 #include <bacnet/common/object_identifier.hpp>
-#include <bacnet/apdu/type/object_identifier_generator.hpp>
 
 
 int main(int argc, char *argv[]) {
-
 
   try {
 /*
@@ -45,7 +42,6 @@ int main(int argc, char *argv[]) {
     device_config.apdu.support_segmentation = false;
     device_config.apdu.max_segments_accepted= bacnet::apdu::segments::TWO_SEGMENTS;
     device_config.npdu.network_number = 1;
-
 */
 
 
@@ -72,7 +68,7 @@ int main(int argc, char *argv[]) {
     });
 
 
-    bacnet::service::i_am i_am_{1,2,3,4};
+    bacnet::service::i_am i_am_;
     service_controller.async_send(i_am_, [](boost::system::error_code ec){
       std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
     });
@@ -80,13 +76,13 @@ int main(int argc, char *argv[]) {
 
 
 
-    bacnet::service::callback_service_i_am_t i_am_handler_ = [](boost::system::error_code ec, bacnet::service::i_am i_am) {
+    auto i_am_handler_ = [](boost::system::error_code ec, bacnet::service::i_am i_am) {
       std::cout << "async_receive::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
     };
-
     service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 
-    service_controller.async_receive<bacnet::service::who_is, bacnet::service::callback_service_who_is_t>([](boost::system::error_code ec, bacnet::service::who_is who_is) {
+
+    auto who_is_handler_ = [](boost::system::error_code ec, bacnet::service::who_is who_is) {
       std::cout << "async_receive::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
       if(!ec) {
         std::cout << "async_receive(who_is_service): low " << std::dec << (int) who_is.device_instance_range_low_limit << std::endl;
@@ -94,23 +90,12 @@ int main(int argc, char *argv[]) {
       } else {
 
       }
+    };
+    service_controller.async_receive<bacnet::service::who_is, bacnet::service::callback_service_who_is_t>(who_is_handler_);
 
-    });
 
-
-
-    /*
-    bacnet::service::i_am i_am_;
-    i_am_.max_apdu_length_accepted = 1460;
-    i_am_.vendor_id = 0;
-    i_am_.segmentation_supported = 0;
-    i_am_.i_am_device_identifier = 1;
-    service_controller.async_send(i_am_, &my_handler);
-     */
-
+    //blocking call
     io_service.run();
-
-
   }
   catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";

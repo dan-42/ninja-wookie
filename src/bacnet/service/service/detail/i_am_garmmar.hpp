@@ -22,7 +22,7 @@
 #define NINJA_WOOKIE_BACNET_SERVICE_DETAIL_I_AM_GRAMMAR_HPP
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/service/i_am.hpp>
+#include <bacnet/service/service/i_am.hpp>
 
 #include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/apdu/type/unsigned_integer.hpp>
@@ -31,11 +31,11 @@
 
 
 
-namespace bacnet { namespace service { namespace detail {
+namespace bacnet { namespace service { namespace service { namespace detail {
 
+namespace service = bacnet::service::service;
+namespace apdu    = bacnet::apdu::type;
 
-using namespace bacnet::service;
-namespace  apdu = bacnet::apdu::type;
 
 template<>
 bacnet::binary_data generate<i_am>(const i_am& service) {
@@ -52,27 +52,7 @@ bacnet::binary_data generate<i_am>(const i_am& service) {
 
   bacnet::binary_data binary;
 
-  if(service.device_instance_range_low_limit > device_instance_low_limit) {
-
-    apdu::tag tag_low_limit(context_tag_number_0, is_conext_tag, apdu::detail::length_helper(service.device_instance_range_low_limit));
-    apdu::tag tag_heigh_limit(context_tag_number_1, is_conext_tag, apdu::detail::length_helper(service.device_instance_range_high_limit));
-
-    apdu::unsigned_integer low_limit(tag_low_limit, service.device_instance_range_low_limit);
-    auto low_limit_binary = apdu::generate(low_limit);
-    binary.insert(binary.end(), low_limit_binary.begin(), low_limit_binary.end());
-
-
-    if(service.device_instance_range_high_limit > device_instance_low_limit) {
-      apdu::unsigned_integer high_limit(tag_heigh_limit, service.device_instance_range_high_limit);
-      auto high_limit_binary = apdu::generate(high_limit);
-      binary.insert(binary.end(), high_limit_binary.begin(), high_limit_binary.end());
-    }
-    else {
-      apdu::unsigned_integer high_limit(tag_heigh_limit, service.device_instance_range_low_limit);
-      auto high_limit_binary = apdu::generate(high_limit);
-      binary.insert(binary.end(), high_limit_binary.begin(), high_limit_binary.end());
-    }
-  }
+  /* todo generate */
 
   return binary;
 }
@@ -110,7 +90,7 @@ bool parse<i_am>(bacnet::binary_data& data, who_is &service) {
 }
 */
 
-}}}
+}}}}
 
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_DETAIL_I_AM_GRAMMAR_HPP

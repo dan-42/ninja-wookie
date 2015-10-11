@@ -18,31 +18,19 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_SERVICE_GENERATOR_HPP
-#define NINJA_WOOKIE_SERVICE_GENERATOR_HPP
-/*
-
-#include <bacnet/detail/common/types.hpp>
-
-namespace bacnet { namespace service { namespace detail {
-
-  template<typename Service>
-  bacnet::binary_data generate(const Service &service) {
-    return bacnet::binary_data{};
-  }
-
-}}}
+#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_ENUMERATION_HPP
+#define NINJA_WOOKIE_BACNET_APDU_TYPE_ENUMERATION_HPP
 
 
+#include <cstdint>
+#include <boost/fusion/include/define_struct.hpp>
+#include <bacnet/apdu/type/tag.hpp>
 
-namespace bacnet { namespace service { namespace detail {
+BOOST_FUSION_DEFINE_STRUCT(
+    (bacnet)(apdu)(type), enumeration,
+    (bacnet::apdu::type::tag, tag_)
+    (uint32_t, value_)
+)
 
-  template<typename Service>
-  bool parse(bacnet::binary_data& binary_data, Service &service) {
-    return false;
-  }
 
-}}}
-*/
-
-#endif //NINJA_WOOKIE_SERVICE_GENERATOR_HPP
+#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_ENUMERATION_HPP

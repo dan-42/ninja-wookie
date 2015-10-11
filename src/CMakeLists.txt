@@ -37,7 +37,7 @@ file(GLOB_RECURSE SOURCES_UTIL_CPP "util/*.cpp")
 
 add_library(wookie ${SOURCES_BACNET_CPP} ${SOURCES_UTIL_CPP} )
 
-add_executable(main  main.cpp)
+add_executable(main  main.cpp bacnet/common/segment.hpp bacnet/service/service/i_am.hpp)
 target_link_libraries(main wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread )
 
 

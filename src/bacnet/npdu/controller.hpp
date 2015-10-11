@@ -77,27 +77,9 @@ public:
     underlying_layer_.async_send_broadcast(binary_frame, handler);
   }
 
-  void async_receive_broadcast_handler(bacnet::binary_data&& data, boost::asio::ip::udp::endpoint&& sender_endpoint) {
-    std::cout << "npdu_controller " << "async_receive_broadcast_handler" << std::endl;
 
-    auto frame = npdu::parser::parse(data);
-    //std::cout << "bacnet::npdu::parser::parse parsed "   << std::endl;
-    inbound_router_.sender_endpoint(sender_endpoint);
-    inbound_router_.route(std::move(frame));
-  }
-
-  void async_receive_broadcast_handler2(bacnet::binary_data data, boost::asio::ip::udp::endpoint sender_endpoint) {
-      std::cout << "async_receive_broadcast_handler2 npdu_controller " << "async_receive_broadcast_handler" << std::endl;
-
-    auto frame = npdu::parser::parse(data);
-    //std::cout << "bacnet::npdu::parser::parse parsed "   << std::endl;
-    inbound_router_.sender_endpoint(sender_endpoint);
-    inbound_router_.route(std::move(frame));
-  }
-
-  void async_receive_broadcast_handler3(const bacnet::binary_data& data, const boost::asio::ip::udp::endpoint& sender_endpoint) {
-      std::cout << " async_receive_broadcast_handler3 npdu_controller " << "async_receive_broadcast_handler" << std::endl;
-
+  void async_receive_broadcast_handler(const bacnet::binary_data& data, const boost::asio::ip::udp::endpoint& sender_endpoint) {
+    //std::cout << " async_receive_broadcast_handler npdu_controller " << "async_receive_broadcast_handler" << std::endl;
     auto frame = npdu::parser::parse(data);
     //std::cout << "bacnet::npdu::parser::parse parsed "   << std::endl;
     inbound_router_.sender_endpoint(sender_endpoint);
@@ -108,7 +90,7 @@ public:
 private:
 
   void init() {
-    underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler3, this, _1, _2));
+    underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1, _2));
   }
 
   Underlying_layer &underlying_layer_;

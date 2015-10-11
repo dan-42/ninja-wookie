@@ -17,25 +17,36 @@
  *
  * Authors: Daniel Friedrich
  */
-
-
-#ifndef NINJA_WOOKIE_SERVICES_HPP
-#define NINJA_WOOKIE_SERVICES_HPP
+#ifndef NINJA_WOOKIE_BACNET_SERVICE_SERCICE_WHO_IS_HPP_HPP
+#define NINJA_WOOKIE_BACNET_SERVICE_SERCICE_WHO_IS_HPP_HPP
 
 
 #include <cstdint>
 
-#include <boost/variant.hpp>
 #include <boost/fusion/include/define_struct.hpp>
+#include <bacnet/service/service/detail/service_choice.hpp>
+
+BOOST_FUSION_DEFINE_STRUCT(
+  (bacnet)(service)(service), who_is,
+  (uint32_t, device_instance_range_low_limit)
+  (uint32_t, device_instance_range_high_limit)
+)
 
 
-#include <bacnet/service/service/who_is.hpp>
-#include <bacnet/service/service/i_am.hpp>
+namespace bacnet { namespace service { namespace service { namespace detail {
 
-namespace bacnet { namespace service { namespace service { namespace unconfirmed {
-  typedef boost::variant<
-      who_is,
-      i_am
-  > possible_service;
+  using namespace bacnet::service::service;
+
+  template<>
+  struct service_choice<who_is> {
+    static constexpr  uint8_t value = 8;
+    typedef who_is type;
+  };
+
+  template<>
+  struct is_broadcast_service<who_is> : std::true_type {
+  };
+
 }}}}
-#endif //NINJA_WOOKIE_SERVICES_HPP
+
+#endif //NINJA_WOOKIE_BACNET_SERVICE_SERCICE_WHO_IS_HPP_HPP

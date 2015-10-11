@@ -18,24 +18,31 @@
  * Authors: Daniel Friedrich
  */
 
-
-#ifndef NINJA_WOOKIE_SERVICES_HPP
-#define NINJA_WOOKIE_SERVICES_HPP
-
-
-#include <cstdint>
-
-#include <boost/variant.hpp>
-#include <boost/fusion/include/define_struct.hpp>
+#ifndef NINJA_WOOKIE_SERVICE_GENERATOR_HPP
+#define NINJA_WOOKIE_SERVICE_GENERATOR_HPP
 
 
-#include <bacnet/service/service/who_is.hpp>
-#include <bacnet/service/service/i_am.hpp>
+#include <bacnet/detail/common/types.hpp>
 
-namespace bacnet { namespace service { namespace service { namespace unconfirmed {
-  typedef boost::variant<
-      who_is,
-      i_am
-  > possible_service;
+namespace bacnet { namespace service { namespace service { namespace detail {
+
+  template<typename Service>
+  bacnet::binary_data generate(const Service &service) {
+    return bacnet::binary_data{};
+  }
+
 }}}}
-#endif //NINJA_WOOKIE_SERVICES_HPP
+
+
+
+namespace bacnet { namespace service { namespace service { namespace detail {
+
+  template<typename Service>
+  bool parse(bacnet::binary_data& binary_data, Service &service) {
+    std::cout << "parse<GENERIC>" << std::endl;
+    return false;
+  }
+
+}}}}
+
+#endif //NINJA_WOOKIE_SERVICE_GENERATOR_HPP

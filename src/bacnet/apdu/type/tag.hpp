@@ -62,14 +62,7 @@ struct tag {
 
 
 
-static inline std::ostream& operator<<(std::ostream& os, const tag &tag_) {
 
-  os << " number: "            << std::dec << (uint32_t) tag_.number()
-     << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
-     << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
-
-  return os;
-}
 
 namespace application_tag_number {
   uint8_t null = 0;
@@ -94,6 +87,15 @@ struct null_t;
 
 
 }}}
+
+static inline std::ostream& operator<<(std::ostream& os, const bacnet::apdu::type::tag &tag_) {
+
+  os << " number: "            << std::dec << (uint32_t) tag_.number()
+  << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
+  << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
+
+  return os;
+}
 
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::apdu::type::tag,

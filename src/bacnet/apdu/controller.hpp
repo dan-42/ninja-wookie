@@ -65,13 +65,12 @@ struct controller {
   }
 
   template<typename Handler>
-  void async_send_unconfirmed_request_as_broadcast(const uint8_t &service_choice, const bacnet::binary_data& payload, Handler handler) {
+  void async_send_unconfirmed_request_as_broadcast(const bacnet::binary_data& payload, Handler handler) {
     frame::unconfirmed_request frame;
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::unconfirmed_request;
-  //  frame.service_choice = service_choice;
     frame.service_data = payload;
     auto data = frame::generator::generate(frame);
-    underlying_controller_.async_send_broadcast(data, handler);
+    underlying_controller_.async_send_broadcast(std::move(data), handler);
   }
 
 

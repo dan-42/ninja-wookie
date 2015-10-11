@@ -19,21 +19,23 @@
  */
 
 
-#ifndef NINJA_WOOKIE_UNSIGNED_INTEGER_GENERATOR_HPP_HPP
-#define NINJA_WOOKIE_UNSIGNED_INTEGER_GENERATOR_HPP_HPP
+#ifndef NINJA_WOOKIE_ENUMARATION_GRAMMAR_HPP
+#define NINJA_WOOKIE_ENUMARATION_GRAMMAR_HPP
+
 
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/qi.hpp>
 
 
 #include <bacnet/detail/common/types.hpp>
+#include <bacnet/apdu/type/enumeration.hpp>
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
 
 
 
 namespace  bacnet { namespace apdu { namespace type {
 
-static bacnet::binary_data generate(const unsigned_integer &v) {
+static bacnet::binary_data generate(const enumeration &v) {
   using namespace bacnet::apdu;
   bacnet::binary_data binary;
 
@@ -80,4 +82,4 @@ static bool parse(bacnet::binary_data& data, unsigned_integer &v) {
 }}}
 
 
-#endif //NINJA_WOOKIE_UNSIGNED_INTEGER_GENERATOR_HPP_HPP
+#endif //NINJA_WOOKIE_ENUMARATION_GRAMMAR_HPP

@@ -18,28 +18,30 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_WHO_IS_GENERATOR_HPP
-#define NINJA_WOOKIE_WHO_IS_GENERATOR_HPP
+#ifndef NINJA_WOOKIE_BACNET_SERVICE_SERVICE_DETAIL_WHO_IS_GRAMMA_HPP
+#define NINJA_WOOKIE_BACNET_SERVICE_SERVICE_DETAIL_WHO_IS_GRAMMA_HPP
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/service/who_is.hpp>
+#include <bacnet/service/service/who_is.hpp>
 
 #include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/apdu/type/unsigned_integer.hpp>
 #include <bacnet/apdu/type/unsigned_integer_generator.hpp>
 #include <bacnet/apdu/type/detail/helper.hpp>
 
+#include <bacnet/service/service/detail/service_grammar.hpp>
 
 
-namespace bacnet { namespace service { namespace detail {
 
 
-using namespace bacnet::service;
-using namespace bacnet::service::s
-namespace  apdu = bacnet::apdu::type;
+namespace bacnet { namespace service { namespace service { namespace detail {
+
+
+namespace service = bacnet::service::service;
+namespace apdu    = bacnet::apdu::type;
 
 template<>
-bacnet::binary_data generate<who_is>(const who_is& service) {
+bacnet::binary_data generate<service::who_is>(const service::who_is& service) {
 
 
   constexpr uint32_t device_instance_low_limit = 0;
@@ -50,6 +52,9 @@ bacnet::binary_data generate<who_is>(const who_is& service) {
   constexpr bool is_conext_tag = true;
 
   bacnet::binary_data binary;
+
+  auto service_choice_command = service_choice<service::who_is>::value;
+  binary.push_back(service_choice_command);
 
   if(service.device_instance_range_low_limit > device_instance_low_limit) {
 
@@ -78,14 +83,22 @@ bacnet::binary_data generate<who_is>(const who_is& service) {
 
 
 template<>
-bool parse<who_is>(bacnet::binary_data& data, who_is &service) {
+bool parse<service::who_is>(bacnet::binary_data& data, service::who_is &service) {
+
+  std::cout << "parse<service::who_is>" << std::endl;
+
+  if(data.empty()) {
+    return false;
+  }
 
   /*it's allowed to have now payload*/
-  if(data.empty()) {
+  if(data.size() == 1 && data.front() == uncomfirmed_service::who_is) {
     service.device_instance_range_low_limit = 0;
     service.device_instance_range_high_limit = 0;
     return true;
   }
+
+  data.erase(data.begin(), data.begin()+1);
 
   apdu::unsigned_integer low_limit;
   apdu::unsigned_integer high_limit;
@@ -93,11 +106,13 @@ bool parse<who_is>(bacnet::binary_data& data, who_is &service) {
 
   has_succeeded = apdu::parse(data, low_limit);
   if(!has_succeeded) {
+    std::cout << "parse<service::who_is> fail tag 0" << std::endl;
     return false;
   }
 
   has_succeeded = apdu::parse(data, high_limit);
   if(!has_succeeded) {
+    std::cout << "parse<service::who_is> fail tag 1" << std::endl;
     return false;
   }
 
@@ -108,7 +123,7 @@ bool parse<who_is>(bacnet::binary_data& data, who_is &service) {
 }
 
 
-}}}
+}}}}
 
 
-#endif //NINJA_WOOKIE_WHO_IS_GENERATOR_HPP
+#endif //NINJA_WOOKIE_BACNET_SERVICE_SERVICE_DETAIL_WHO_IS_GRAMMA_HPP
