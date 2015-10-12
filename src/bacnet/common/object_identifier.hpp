@@ -23,6 +23,8 @@
 
 
 #include <cstdint>
+#include <boost/fusion/adapted/adt/adapt_adt.hpp>
+#include <boost/fusion/include/adapt_adt.hpp>
 
 
 namespace bacnet {
@@ -139,5 +141,14 @@ static inline std::ostream& operator<<(std::ostream& os, const object_identifier
 }
 
 }}
+
+
+BOOST_FUSION_ADAPT_ADT(
+    bacnet::common::object_identifier,
+    (obj.to_native(), obj.from_native(val))
+)
+
+
+
 
 #endif //NINJA_WOOKIE_BACNET_COMMON_OBJECT_IDENTIFIER_HPP

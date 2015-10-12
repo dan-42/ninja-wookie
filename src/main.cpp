@@ -69,6 +69,12 @@ int main(int argc, char *argv[]) {
 
 
     bacnet::service::i_am i_am_;
+    i_am_.i_am_device_identifier.object_typ(bacnet::object_type::device);
+    i_am_.i_am_device_identifier.instance_number(1);
+    i_am_.segmentation_supported.segmented(bacnet::common::segmentation::segment::both);
+    i_am_.vendor_id = 1;
+    i_am_.max_apdu_length_accepted = 1460;
+
     service_controller.async_send(i_am_, [](boost::system::error_code ec){
       std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
     });

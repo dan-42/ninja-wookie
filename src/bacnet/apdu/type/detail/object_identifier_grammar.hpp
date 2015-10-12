@@ -132,7 +132,7 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
     debug(start_rule);
     debug(value_rule);
     debug(tag_rule);
-    */
+    //*/
 
   }
 private:

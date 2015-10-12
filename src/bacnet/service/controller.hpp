@@ -31,6 +31,7 @@
 
 #include <bacnet/service/service.hpp>
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
+#include <bacnet/service/service/detail/i_am_garmmar.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;

@@ -31,8 +31,10 @@
 #include <bacnet/apdu/type/enumeration.hpp>
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
 
-
-
+/*
+ * enumarations are primitive, so the must fit in 4 bytes,
+ * also the are unsigned numbers. Conculsion, we parse them just like unsigned values
+ */
 namespace  bacnet { namespace apdu { namespace type {
 
 static bacnet::binary_data generate(const enumeration &v) {
@@ -56,7 +58,7 @@ static bacnet::binary_data generate(const enumeration &v) {
 }
 
 
-static bool parse(bacnet::binary_data& data, unsigned_integer &v) {
+static bool parse(bacnet::binary_data& data, enumeration &v) {
   using namespace bacnet::apdu;
 
   auto start = data.begin();

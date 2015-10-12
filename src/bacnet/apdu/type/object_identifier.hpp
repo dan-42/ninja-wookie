@@ -25,6 +25,7 @@
 
 #include <cstdint>
 #include <boost/fusion/include/define_struct.hpp>
+
 #include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/common/object_identifier.hpp>
 
@@ -34,10 +35,10 @@ BOOST_FUSION_DEFINE_STRUCT(
     (bacnet::apdu::type::tag, tag_)
     (bacnet::common::object_identifier, object_identifier_)
 )
-
+/*
 namespace bacnet { namespace apdu { namespace type {
 
-static inline std::ostream& operator<<(std::ostream& os, const object_identifier &oi) {
+static inline std::ostream& operator<<(std::ostream& os, const bacnet::apdu::type::object_identifier &oi) {
     os << " tag: "   << std::dec << oi.tag_
     << " object_identifier: " << std::dec << oi.object_identifier_;
     return os;
@@ -45,6 +46,6 @@ static inline std::ostream& operator<<(std::ostream& os, const object_identifier
 
 }}}
 
-
+*/
 
 #endif //NINJA_WOOKIE_BACNET_APDU_TYPE_OBJECT_IDENTIFIER_HPP
