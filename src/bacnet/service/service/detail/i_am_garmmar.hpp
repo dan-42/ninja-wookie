@@ -44,29 +44,7 @@ bacnet::binary_data generate<i_am>(const i_am& i_am_service) {
   namespace service = bacnet::service::service;
   namespace apdu    = bacnet::apdu::type;
 
-/*
 
-    (bacnet)(service)(service), i_am,
-    (bacnet::common::object_identifier, i_am_device_identifier)
-    (uint32_t, max_apdu_length_accepted)
-    (bacnet::common::segmentation, segmentation_supported)
-    (uint16_t, vendor_id)
-
-
-X'00'       Service Choice=0 (I-Am-Request)
-
-X'C4'       Application Tag 12 (Object Identifier, L=4) (I-Am Device Identifier)
-X'02000001' Device, Instance Number=1
-
-X'22'       Application Tag 2 (Unsigned Integer, L=2) (Max APDU Length Accepted)
-X'01E0'     480
-
-X'91'       Application Tag 9 (Enumerated, L=1) (Segmentation Supported)
-X'01'1      (SEGMENTED_TRANSMIT)
-
-X'21'       Application Tag 2 (Unsigned Integer, L=1) (Vendor ID)
-X'63'       99
- */
   bacnet::binary_data binary;
   auto service_choice_command = service_choice<service::i_am>::value;
   binary.push_back(service_choice_command);
@@ -102,38 +80,77 @@ X'63'       99
   return binary;
 }
 
-/*
+
 template<>
-bool parse<i_am>(bacnet::binary_data& data, who_is &service) {
+bool parse<i_am>(bacnet::binary_data& data, i_am &service) {
+/*
+
+    (bacnet)(service)(service), i_am,
+    (bacnet::common::object_identifier, i_am_device_identifier)
+    (uint32_t, max_apdu_length_accepted)
+    (bacnet::common::segmentation, segmentation_supported)
+    (uint16_t, vendor_id)
 
 
-  // it's allowed to have now payload
+X'00'       Service Choice=0 (I-Am-Request)
+
+X'C4'       Application Tag 12 (Object Identifier, L=4) (I-Am Device Identifier)
+X'02000001' Device, Instance Number=1
+
+X'22'       Application Tag 2 (Unsigned Integer, L=2) (Max APDU Length Accepted)
+X'01E0'     480
+
+X'91'       Application Tag 9 (Enumerated, L=1) (Segmentation Supported)
+X'01'1      (SEGMENTED_TRANSMIT)
+
+X'21'       Application Tag 2 (Unsigned Integer, L=1) (Vendor ID)
+X'63'       99
+ */
+
+  std::cout << "parse<service::i_am>" << std::endl;
+
   if(data.empty()) {
-    service.device_instance_range_low_limit = 0;
-    service.device_instance_range_high_limit = 0;
-    return true;
+    return false;
   }
+  data.erase(data.begin(), data.begin()+1);
 
-  apdu::unsigned_integer low_limit;
-  apdu::unsigned_integer high_limit;
+  apdu::unsigned_integer tmp_unsigned;
+  apdu::object_identifier tmp_oi;
+  apdu::enumeration tmp_enumeration;
   bool has_succeeded = false;
 
-  has_succeeded= apdu::parse(data, low_limit);
+  has_succeeded = apdu::parse(data, tmp_oi);
   if(!has_succeeded) {
+    std::cout << "parse<service::i_am> fail tag 0" << std::endl;
     return false;
   }
+  service.i_am_device_identifier = tmp_oi.object_identifier_;
 
-  has_succeeded = apdu::parse(data, high_limit);
+  has_succeeded = apdu::parse(data, tmp_unsigned);
   if(!has_succeeded) {
+    std::cout << "parse<service::i_am> fail tag 1" << std::endl;
     return false;
   }
+  service.max_apdu_length_accepted = tmp_unsigned.value_;
 
-  service.device_instance_range_high_limit = high_limit.value_;
-  service.device_instance_range_low_limit  = low_limit.value_;
+
+  has_succeeded = apdu::parse(data, tmp_enumeration);
+  if(!has_succeeded) {
+    std::cout << "parse<service::i_am> fail tag 2" << std::endl;
+    return false;
+  }
+  service.segmentation_supported.from_native(tmp_enumeration.value_);
+
+  has_succeeded = apdu::parse(data, tmp_unsigned);
+  if(!has_succeeded) {
+    std::cout << "parse<service::i_am> fail tag 3" << std::endl;
+    return false;
+  }
+  service.vendor_id = tmp_unsigned.value_;
 
   return true;
 }
-*/
+
 
 }}}}
 

@@ -80,10 +80,13 @@ int main(int argc, char *argv[]) {
     });
 
 
-
-
     auto i_am_handler_ = [](boost::system::error_code ec, bacnet::service::i_am i_am) {
       std::cout << "async_receive::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
+
+      std::cout << "i_am_device_identifier:\t" << i_am.i_am_device_identifier << std::endl;
+      std::cout << "max_apdu_length_accepted:\t" << i_am.max_apdu_length_accepted << std::endl;
+      std::cout << "segmentation_supported:\t" << i_am.segmentation_supported << std::endl;
+      std::cout << "vendor_id:\t" << (uint32_t)i_am.vendor_id << std::endl;
     };
     service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 
