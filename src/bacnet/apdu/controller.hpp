@@ -74,16 +74,17 @@ struct controller {
   }
 
 
-  void async_received_apdu_handler(bacnet::binary_data data) {
-    std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
+  void async_received_apdu_handler(bacnet::binary_data data, npdu::meta_information_t meta_info) {
     frame::possible_frame f = frame::parser::parse(std::move(data));
-    boost::apply_visitor(inbound_router_, f);
+    inbound_router_.meta_information(std::move(meta_info));
+    f.apply_visitor(inbound_router_);
+
   }
 
 private:
 
   void init() {
-    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1));
+    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1, _2));
   }
 
   boost::asio::io_service &io_service_;

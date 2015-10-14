@@ -85,7 +85,6 @@ bacnet::binary_data generate<service::who_is>(const service::who_is& service) {
 template<>
 bool parse<service::who_is>(bacnet::binary_data& data, service::who_is &service) {
 
-  std::cout << "parse<service::who_is>" << std::endl;
 
   if(data.empty()) {
     return false;

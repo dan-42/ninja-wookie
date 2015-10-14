@@ -30,15 +30,20 @@ public:
   inbound_router(callback_manager& cbm) : callback_manager_(cbm){
   }
 
+  inline void meta_information(npdu::meta_information_t meta) {
+    meta_information_ = meta;
+  }
+
+
   void operator()(frame::confirmed_request request) {
     std::cout << "apdu::detail::inbound_router confirmed_request" << std::endl;
   }
 
   void operator()(frame::unconfirmed_request request) {
-      std::cout << "apdu::detail::inbound_router unconfirmed_request" << std::endl;
 
       if(!callback_manager_.async_received_service_callback_.empty()){
         meta_information_t meta_info;
+        meta_info.npdu_meta_information = meta_information_;
        // meta_info.service_choice = request.service_choice;
         auto data = request.service_data;
         callback_manager_.async_received_service_callback_(std::move(meta_info), std::move(data));
@@ -73,6 +78,7 @@ public:
 
 private:
   callback_manager& callback_manager_;
+  npdu::meta_information_t meta_information_;
 
 };
 

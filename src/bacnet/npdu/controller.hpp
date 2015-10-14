@@ -79,9 +79,7 @@ public:
 
 
   void async_receive_broadcast_handler(const bacnet::binary_data& data, const boost::asio::ip::udp::endpoint& sender_endpoint) {
-    //std::cout << " async_receive_broadcast_handler npdu_controller " << "async_receive_broadcast_handler" << std::endl;
-    auto frame = npdu::parser::parse(data);
-    //std::cout << "bacnet::npdu::parser::parse parsed "   << std::endl;
+    auto frame = npdu::parser::parse(std::move(data));
     inbound_router_.sender_endpoint(sender_endpoint);
     inbound_router_.route(std::move(frame));
   }

@@ -36,8 +36,6 @@ public:
 	}
 
 	void route(frame&& f) {
-	//	std::cout << "npdu::detail::inbound_router::route() "  << std::endl;
-
 
 		/* 6.2.2 if control_filed has no network_layer_message, it is an APDU frame for this device*/
 		if(!f.control_field.has_network_layer_message_type() &&  !callback_manager_.async_received_apdu_callback_.empty()) {

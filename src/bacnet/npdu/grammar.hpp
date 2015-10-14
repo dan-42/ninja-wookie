@@ -34,7 +34,7 @@ bacnet::binary_data generate(const npdu::frame &f);
 
 namespace bacnet { namespace npdu { namespace parser {
 
-npdu::frame parse(const bacnet::binary_data &data);
+npdu::frame parse(bacnet::binary_data data);
 
 }}}
 

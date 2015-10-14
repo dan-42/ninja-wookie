@@ -27,7 +27,7 @@
 
 
 std::ostream &operator<<(std::ostream &os, const bacnet::npdu::address &a) {
-  os << "bacnet::npdu::address " << (int)a.network_number << ":";
+  os << "net: " << (int)a.network_number << " adr: ";
   for(auto &b : a.binary_address){
     os <<  std::setfill ('0') << std::setw(2) << std::hex << (int)b << " ";
   }

@@ -84,27 +84,19 @@ public:
   void handle_receive_from(const boost::system::error_code &error, size_t bytes_recvd) {
 
     if (!error) {
+      /*
       std::cout << "handle_receive_from: " << sender_endpoint_.address().to_string()
       << ":" << (int) sender_endpoint_.port() << " bytes: " << bytes_recvd << std::endl;
+      */
+      // copy only what is actually received
+      bacnet::binary_data input(data_.begin(), data_.begin() + bytes_recvd);
 
-      bacnet::binary_data input(data_.begin(), data_.begin()+bytes_recvd);
-
-      for(auto c : input){
-        std::bitset<8> b(c);
-        //std::cout << b.to_string();
-        std::cout << " 0x" << std::setw(2) << std::setfill('0') << std::hex << (int) c ;
-      }
-      std::cout << std::endl;
-
-      frame::possible_bvll_frame f = parser::parse(input);
+      frame::possible_bvll_frame f = parser::parse(std::move(input));
       inbound_router_.sender_endpoint(sender_endpoint_);
-      boost::apply_visitor(inbound_router_, f);
+      f.apply_visitor(inbound_router_);
 
-
-      auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,
-                                  boost::asio::placeholders::bytes_transferred);
-
-
+      //reveive next
+      auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
       transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
     }
   }

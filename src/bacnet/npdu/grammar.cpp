@@ -43,7 +43,7 @@ bacnet::binary_data bacnet::npdu::generator::generate(const npdu::frame &f){
   return binary_frame;
 }
 
-bacnet::npdu::frame bacnet::npdu::parser::parse(const bacnet::binary_data &data){
+bacnet::npdu::frame bacnet::npdu::parser::parse(bacnet::binary_data data){
 
 	bacnet::npdu::frame f;
 	auto start = data.begin();

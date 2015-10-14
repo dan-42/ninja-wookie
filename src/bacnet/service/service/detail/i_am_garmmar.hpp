@@ -107,8 +107,6 @@ X'21'       Application Tag 2 (Unsigned Integer, L=1) (Vendor ID)
 X'63'       99
  */
 
-  std::cout << "parse<service::i_am>" << std::endl;
-
   if(data.empty()) {
     return false;
   }

@@ -80,8 +80,6 @@ namespace bacnet { namespace common {
     };
 
     static inline std::ostream& operator<<(std::ostream& os, const segmentation &s) {
-
-      os << " segmentation: ";
       switch(s.segmented()) {
         case segmentation::segment::both :
           os << "both";

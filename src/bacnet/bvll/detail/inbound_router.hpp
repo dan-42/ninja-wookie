@@ -86,8 +86,7 @@ public:
 
     if(!callback_manager_.async_receive_unicast_callback_.empty()){
       auto end_point = sender_endpoint_;
-      auto data = request.npdu_data;
-      callback_manager_.async_receive_unicast_callback_(std::move(data), std::move(end_point));
+      callback_manager_.async_receive_unicast_callback_(std::move(request.npdu_data), std::move(end_point));
     }
   }
 
@@ -95,8 +94,7 @@ public:
    // std::cout << "inbound_router original_broadcast_npdu" << std::endl;
     if(!callback_manager_.async_receive_broadcast_callback_.empty()) {
       auto end_point = sender_endpoint_;
-      auto data = request.npdu_data;
-      callback_manager_.async_receive_broadcast_callback_(std::move(data), std::move(end_point));
+      callback_manager_.async_receive_broadcast_callback_(std::move(request.npdu_data), std::move(end_point));
     }
   }
 

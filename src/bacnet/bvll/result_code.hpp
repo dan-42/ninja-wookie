@@ -28,7 +28,7 @@ namespace result_code   {
 	constexpr uint16_t delete_foreign_device_table_entry_nak	= 0x0050;
 	constexpr uint16_t distribute_broadcast_to_network_nak		= 0x0060;
 
-	static std::ostream &operator<<(std::ostream &os, const uint16_t &rc);
+	//static std::ostream &operator<<(std::ostream &os, const uint16_t &rc);
 }
 
 }}

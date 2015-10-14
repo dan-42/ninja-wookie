@@ -10,7 +10,7 @@
 
 using namespace bacnet::bvll::result_code;
 
-
+/*
 std::ostream &bacnet::bvll::result_code::operator<<(std::ostream &os, const uint16_t &rc) {
   switch (rc) {
     case result_code::successful_completion :
@@ -40,6 +40,6 @@ std::ostream &bacnet::bvll::result_code::operator<<(std::ostream &os, const uint
   }
   return os;
 }
-
+*/
 
 #endif /* SRC_BACNET_BVLL_BVLC_RESULT_CODE_IMPL_ */

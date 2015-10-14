@@ -41,7 +41,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     //todo make it nice and clean with boost spirit
     if(!data.empty()) {
       if(data.front() == uncomfirmed_service::who_is) {
-        std::cout << "unconfirmed::possible_service parse who_is " << std::endl;
+        //std::cout << "unconfirmed::possible_service parse who_is " << std::endl;
         who_is service_;
         if(bacnet::service::service::detail::parse(data , service_)) {
           parsed_service = service_;
@@ -51,7 +51,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
         }
       }
       else if(data.front() == uncomfirmed_service::i_am) {
-        std::cout << "unconfirmed::possible_service parse i_am " << std::endl;
+        //std::cout << "unconfirmed::possible_service parse i_am " << std::endl;
         i_am service_;
         if(bacnet::service::service::detail::parse(data , service_)){
           parsed_service = service_;
@@ -80,28 +80,35 @@ namespace bacnet { namespace service { namespace detail {
   struct inbound_router : boost::static_visitor<> {
 
     inbound_router(callback_manager& cm) : callback_manager_(cm) {
+    }
 
+    inline void meta_information(bacnet::apdu::meta_information_t meta_information) {
+      meta_information_ = meta_information;
     }
 
     void operator()(service::who_is service) {
-      std::cout << "inbound_router service::who_is" << std::endl;
+
       if(!callback_manager_.callback_service_who_is_.empty()) {
+        bacnet::service::meta_information_t mi;
+        mi.apdu_meta_information = meta_information_;
         boost::system::error_code ec{error::errc::success, error::get_error_category()};
-        callback_manager_.callback_service_who_is_(ec, service);
+        callback_manager_.callback_service_who_is_(ec, std::move(mi), std::move(service));
       }
     }
 
     void operator()(service::i_am service) {
-      std::cout << "inbound_router service::i_am" << std::endl;
       if(!callback_manager_.callback_service_i_am_.empty()) {
+        bacnet::service::meta_information_t mi;
+        mi.apdu_meta_information = meta_information_;
         boost::system::error_code ec{error::errc::success, error::get_error_category()};
-        callback_manager_.callback_service_i_am_(ec, service);
+        callback_manager_.callback_service_i_am_(ec, std::move(mi), std::move(service));
       }
     }
 
   private:
 
     callback_manager& callback_manager_;
+    bacnet::apdu::meta_information_t meta_information_;
   };
 
 }}}
@@ -121,11 +128,9 @@ public:
   }
 
  void async_received_service_handler(bacnet::apdu::meta_information_t mi, bacnet::binary_data data) {
-   std::cout << "async_received_service_handler " << std::endl;
    auto possible_service_frame = bacnet::service::service::detail::parse(data);
-   boost::apply_visitor(inbound_router_, possible_service_frame);
-
-
+   inbound_router_.meta_information(mi);
+   possible_service_frame.apply_visitor(inbound_router_);
  }
 
 
@@ -144,7 +149,6 @@ public:
       });
     }
     else {
-      std::cerr << "no support yet for unicast messages";
       lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
         handler(ec);
       });
