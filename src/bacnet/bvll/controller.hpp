@@ -112,6 +112,7 @@ public:
     transporter_.async_send_broadcast(boost::asio::buffer(binary_frame), handler);
   }
 
+  //todo async_send(data, endpoint, handler)
 
 private:
 

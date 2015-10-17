@@ -78,6 +78,7 @@ public:
   }
 
 
+  //todo remove endpoint and replace with bacnet::endpoint
   void async_receive_broadcast_handler(const bacnet::binary_data& data, const boost::asio::ip::udp::endpoint& sender_endpoint) {
     auto frame = npdu::parser::parse(std::move(data));
     inbound_router_.sender_endpoint(sender_endpoint);
