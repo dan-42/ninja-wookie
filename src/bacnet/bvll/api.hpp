@@ -8,10 +8,11 @@
 #include <boost/function.hpp>
 #include <boost/asio/ip/udp.hpp>
 
+#include <bacnet/common/protocol/meta_information.hpp>
 namespace bacnet { namespace bvll {
 
-typedef  boost::function<void (bacnet::binary_data&&,  boost::asio::ip::udp::endpoint&& )> async_receive_broadcast_callback_t;
-typedef  boost::function<void ( bacnet::binary_data&&, boost::asio::ip::udp::endpoint&& )> async_receive_unicast_callback_t;
+typedef  boost::function<void (bacnet::binary_data&&,  bacnet::common::protocol::meta_information&& )> async_receive_broadcast_callback_t;
+typedef  boost::function<void ( bacnet::binary_data&&, bacnet::common::protocol::meta_information&& )> async_receive_unicast_callback_t;
 
 }}
 

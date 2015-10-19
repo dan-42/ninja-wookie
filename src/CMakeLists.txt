@@ -1,4 +1,6 @@
 
+#hunter_add_package(Boost COMPONENTS system)
+
 set(BOOST_ALL_DYN_LINK ON)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -11,6 +13,7 @@ if (Boost_NO_SYSTEM_PATHS)
   set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
   set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
 endif (Boost_NO_SYSTEM_PATHS)
+
 
 find_package(Boost 1.59 COMPONENTS  system REQUIRED )
 link_directories (${Boost_LIBRARY_DIRS})

@@ -41,7 +41,7 @@ public:
 		if(!f.control_field.has_network_layer_message_type() &&  !callback_manager_.async_received_apdu_callback_.empty()) {
 
 		  meta_information_t meta_information;
-		  meta_information.endpoint = sender_endpoint_;
+		  //meta_information.endpoint = sender_endpoint_;
 		  meta_information.network_priority = f.control_field.network_priority();
 		  // is this needed?
 		  meta_information.source = f.source;
@@ -55,15 +55,15 @@ public:
 
 	}
 
-	void sender_endpoint(const boost::asio::ip::udp::endpoint& sender_endpoint) {
-	  sender_endpoint_ = sender_endpoint;
+	void meta_information(const bacnet::common::protocol::meta_information& mi) {
+    meta_information_ = mi;
 	}
 
 
 
 private:
 	callback_manager& callback_manager_;
-	boost::asio::ip::udp::endpoint sender_endpoint_;
+  bacnet::common::protocol::meta_information meta_information_;
 
 };
 

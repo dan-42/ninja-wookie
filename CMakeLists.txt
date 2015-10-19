@@ -1,6 +1,13 @@
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.0)
 
-#
+### Hunter snapshot that will be used ###
+#include("cmake/HunterGate.cmake")
+#HunterGate(
+#        URL "https://github.com/ruslo/hunter/archive/v0.12.23.tar.gz"
+#        SHA1 "e1aad873adb4d0cd254c070f3e1a1c181d8daaea"
+#)
+
+
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Debug prior to calling PROJECT()
@@ -26,7 +33,6 @@ set(NINJA_WOOKIE_TEST_NAME "test-wookie")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror")
 # needed for boost library
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-unused-local-typedefs -Wno-unused-variable -Wno-deprecated-declarations")
-
 
 #-DBOOST_NO_CXX11_CONSTEXPR -DBOOST_PP_VARIADICS=0
 IF(CMAKE_BUILD_TYPE STREQUAL "Debug")

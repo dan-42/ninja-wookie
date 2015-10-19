@@ -5,27 +5,11 @@
 #ifndef NINJA_WOOKIE_BACNET_MAC_ENDPOINT_HPP
 #define NINJA_WOOKIE_BACNET_MAC_ENDPOINT_HPP
 
+#include <boost/asio.hpp>
 
-/**
-bacnet::endpoint::basic<protocol>
+#include <bacnet/detail/common/types.hpp>
 
-
- //wrapper for all variants, allows to construct from it
- bacnet::mac::address
-
- bacnet::mac::address_ipv4
- bacnet::mac::address_ipv6
- bacnet::mac::address_mstp
-
-
- bacnet::mac::endpoint
-  mebers:
-    bacnet::mac::address
-    network
-
-
- */
-namespace bacnet {  namespace mac {
+namespace bacnet {  namespace common { namespace protocol { namespace mac {
     //todo with ipv6
     typedef boost::asio::ip::address_v6 address_ipv6;
 
@@ -34,11 +18,9 @@ namespace bacnet {  namespace mac {
 
       static constexpr uint16_t default_port = 0xBAC0;
 
-      static address_ip from_string(const std::string s) {
-        //todo us asio mechanism?
-        return address_ip{};
+      static address_ip from_string(const std::string s, uint16_t port = default_port) {
+        return address_ip(boost::asio::ip::address_v4::from_string(s), port);
       }
-
 
       static address_ip from_bytes(const bacnet::binary_data bytes) {
         //static constexpr uint8_t size_expected = 6;
@@ -158,18 +140,18 @@ namespace bacnet {  namespace mac {
       endpoint() : network_(1), address_(address_ip{})  {
 
       }
-      endpoint(const bacnet::mac::address_ip& address) : network_(1), address_(address)  {
+      endpoint(const bacnet::common::protocol::mac::address_ip& address) : network_(1), address_(address)  {
       }
-      endpoint(const bacnet::mac::address_ipv6& address)  : network_(1), address_(address)  {
+      endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  : network_(1), address_(address)  {
       }
-      endpoint(const bacnet::mac::address_mstp& address)  : network_(1), address_(address)  {
+      endpoint(const bacnet::common::protocol::mac::address_mstp& address)  : network_(1), address_(address)  {
       }
 
-      endpoint(uint16_t network, const bacnet::mac::address_ip& address) : network_(network), address_(address)  {
+      endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) : network_(network), address_(address)  {
       }
-      endpoint(uint16_t network, const bacnet::mac::address_ipv6& address)  : network_(network), address_(address)  {
+      endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  : network_(network), address_(address)  {
       }
-      endpoint(uint16_t network, const bacnet::mac::address_mstp& address)  : network_(network), address_(address)  {
+      endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address)  : network_(network), address_(address)  {
       }
 
       endpoint(const endpoint& other) : network_(other.network_),
@@ -192,18 +174,18 @@ namespace bacnet {  namespace mac {
       }
 
       inline void network(uint16_t net) { network_ = net;}
-      inline void address(const bacnet::mac::address &adr) { address_ = adr;}
+      inline void address(const bacnet::common::protocol::mac::address &adr) { address_ = adr;}
 
       inline uint16_t network() const { return network_;}
-      inline bacnet::mac::address address() const { return address_;}
+      inline bacnet::common::protocol::mac::address address() const { return address_;}
 
     private:
       uint16_t network_;
-      bacnet::mac::address address_;
+      bacnet::common::protocol::mac::address address_;
     };
 
 
-}}
+}}}}
 
 
 #endif //NINJA_WOOKIE_BACNET_MAC_ENDPOINT_HPP

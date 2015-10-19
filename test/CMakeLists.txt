@@ -1,3 +1,4 @@
+#hunter_add_package(Boost COMPONENTS system unit_test_framework)
 
 set(BOOST_ALL_DYN_LINK ON)
 set(Boost_USE_STATIC_LIBS OFF)

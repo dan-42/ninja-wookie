@@ -28,7 +28,7 @@
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-
+#include <bacnet/common/protocol/meta_information.hpp>
 
 #include <bacnet/npdu/frame.hpp>
 #include <bacnet/npdu/grammar.hpp>
@@ -79,9 +79,9 @@ public:
 
 
   //todo remove endpoint and replace with bacnet::endpoint
-  void async_receive_broadcast_handler(const bacnet::binary_data& data, const boost::asio::ip::udp::endpoint& sender_endpoint) {
+  void async_receive_broadcast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
     auto frame = npdu::parser::parse(std::move(data));
-    inbound_router_.sender_endpoint(sender_endpoint);
+    inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }
 
