@@ -82,33 +82,29 @@ namespace bacnet { namespace service { namespace detail {
     inbound_router(callback_manager& cm) : callback_manager_(cm) {
     }
 
-    inline void meta_information(bacnet::apdu::meta_information_t meta_information) {
+    inline void meta_information(bacnet::common::protocol::meta_information meta_information) {
       meta_information_ = meta_information;
     }
 
     void operator()(service::who_is service) {
 
       if(!callback_manager_.callback_service_who_is_.empty()) {
-        bacnet::service::meta_information_t mi;
-        mi.apdu_meta_information = meta_information_;
         boost::system::error_code ec{error::errc::success, error::get_error_category()};
-        callback_manager_.callback_service_who_is_(ec, std::move(mi), std::move(service));
+        callback_manager_.callback_service_who_is_(ec, std::move(meta_information_), std::move(service));
       }
     }
 
     void operator()(service::i_am service) {
       if(!callback_manager_.callback_service_i_am_.empty()) {
-        bacnet::service::meta_information_t mi;
-        mi.apdu_meta_information = meta_information_;
         boost::system::error_code ec{error::errc::success, error::get_error_category()};
-        callback_manager_.callback_service_i_am_(ec, std::move(mi), std::move(service));
+        callback_manager_.callback_service_i_am_(ec, std::move(meta_information_), std::move(service));
       }
     }
 
   private:
 
     callback_manager& callback_manager_;
-    bacnet::apdu::meta_information_t meta_information_;
+      bacnet::common::protocol::meta_information meta_information_;
   };
 
 }}}
@@ -127,7 +123,7 @@ public:
 
   }
 
- void async_received_service_handler(bacnet::apdu::meta_information_t mi, bacnet::binary_data data) {
+ void async_received_service_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
    auto possible_service_frame = bacnet::service::service::detail::parse(data);
    inbound_router_.meta_information(mi);
    possible_service_frame.apply_visitor(inbound_router_);

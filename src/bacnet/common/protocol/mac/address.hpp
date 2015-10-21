@@ -58,6 +58,9 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         return *this;
       }
 
+      inline std::string to_string() {
+        return (address_.to_string() + std::to_string(port_));
+      }
 
 
     private:
@@ -124,6 +127,15 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         return *this;
       }
 
+
+        inline std::string to_string() {
+         switch(type_) {
+           case ip_:
+             return address_ip_.to_string();
+           default:
+             return "dick butt";
+         }
+        }
 
 
     private:

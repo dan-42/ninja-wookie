@@ -26,22 +26,17 @@
 #include <boost/function.hpp>
 #include <boost/asio/ip/udp.hpp>
 
+#include <bacnet/common/protocol/meta_information.hpp>
 #include <bacnet/npdu/network_priority.hpp>
 #include <bacnet/npdu/address.hpp>
 
 namespace bacnet { namespace npdu {
 
-struct meta_information_t {
-  boost::asio::ip::udp::endpoint endpoint;
-  bacnet::npdu::network_priority_t network_priority;
-  bacnet::npdu::address source;
-  uint16_t vendor_id;
-};
 
 //typedef  boost::function<void (bacnet::binary_data&&)> async_receive_broadcast_callback_t;
 //typedef  boost::function<void (bacnet::binary_data&&)> async_receive_unicast_callback_t;
 
-typedef  boost::function<void (bacnet::binary_data&&, bacnet::npdu::meta_information_t&&)> async_received_apdu_callback_t;
+typedef  boost::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&&)> async_received_apdu_callback_t;
 
 }}
 

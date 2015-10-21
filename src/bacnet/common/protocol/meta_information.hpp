@@ -24,11 +24,18 @@
 #include <cstdint>
 #include <bacnet/common/protocol/mac/address.hpp>
 
+#include <bacnet/npdu/network_priority.hpp>
+#include <bacnet/npdu/address.hpp>
+
+
 namespace bacnet { namespace common { namespace protocol {
 
 struct meta_information {
 
   bacnet::common::protocol::mac::address address;
+  bacnet::npdu::network_priority_t network_priority;
+  bacnet::npdu::address npdu_source;
+  uint16_t vendor_id;
 };
 
 }}}

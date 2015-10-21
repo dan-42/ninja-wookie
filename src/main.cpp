@@ -82,19 +82,19 @@ int main(int argc, char *argv[]) {
      // std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
     });
 
-    //auto formatter_i_am = boost::format("| %1$+7d | %2$+21d | %3$+5 | %4$_5 | %5$_5 | %6$_8 |\n");
+
     auto formatter_i_am = boost::format("| %1$+9d | %2$+21d | %3$+6d | %4$_6d | %5$_6d | %6$_8s | %7%\n");
 
-    auto i_am_handler_ = [&formatter_i_am](boost::system::error_code ec, bacnet::service::meta_information_t mi, bacnet::service::i_am i_am) {
+    auto i_am_handler_ = [&formatter_i_am](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
 
       std::stringstream ss;
-      for(auto &c : mi.apdu_meta_information.npdu_meta_information.source.binary_address) {
+      for(auto &c : mi.npdu_source.binary_address) {
         ss << std::setw(2) << std::setfill('0') << (int)c << " ";
       }
 
       std::cout << formatter_i_am % i_am.i_am_device_identifier.instance_number()
-                                  % mi.apdu_meta_information.npdu_meta_information.endpoint
-                                  % mi.apdu_meta_information.npdu_meta_information.source.network_number
+                                  % mi.address.to_string()
+                                  % mi.npdu_source.network_number
                                   % i_am.vendor_id
                                   % i_am.max_apdu_length_accepted
                                   % i_am.segmentation_supported

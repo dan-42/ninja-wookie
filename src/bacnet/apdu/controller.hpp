@@ -35,11 +35,6 @@
 #include <bacnet/apdu/detail/inbound_router.hpp>
 #include <bacnet/apdu/detail/callback_manager.hpp>
 
-
-
-
-
-
 namespace bacnet { namespace apdu {
 
 
@@ -74,7 +69,7 @@ struct controller {
   }
 
 
-  void async_received_apdu_handler(bacnet::binary_data data, npdu::meta_information_t meta_info) {
+  void async_received_apdu_handler(bacnet::binary_data data, bacnet::common::protocol::meta_information meta_info) {
     frame::possible_frame f = frame::parser::parse(std::move(data));
     inbound_router_.meta_information(std::move(meta_info));
     f.apply_visitor(inbound_router_);

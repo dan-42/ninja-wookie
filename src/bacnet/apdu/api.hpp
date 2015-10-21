@@ -24,19 +24,13 @@
 #include <cstdint>
 
 #include <boost/function.hpp>
-#include <boost/asio/ip/udp.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/npdu/api.hpp>
+#include <bacnet/common/protocol/meta_information.hpp>
 
 namespace bacnet { namespace apdu {
 
-  struct meta_information_t {
-    uint8_t service_choice;
-    bacnet::npdu::meta_information_t npdu_meta_information;
-  };
-
-  typedef  boost::function<void (bacnet::apdu::meta_information_t&&, bacnet::binary_data&&)> async_received_service_callback_t;
+  typedef  boost::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_service_callback_t;
 
 }}
 
