@@ -78,7 +78,6 @@ public:
   }
 
 
-  //todo remove endpoint and replace with bacnet::endpoint
   void async_receive_broadcast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
     auto frame = npdu::parser::parse(std::move(data));
     inbound_router_.meta_information(mi);

@@ -61,8 +61,6 @@ int main(int argc, char *argv[]) {
     bacnet::service::controller<decltype(apdu_controller)> service_controller(io_service, apdu_controller);
 
 
-   // bacnet::application::controller<decltype(service_controller)> application_controller(io_service, service_controller);
-
 
     service_controller.async_send(bacnet::service::who_is{2, 434214}, [](boost::system::error_code ec) {
        // std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;

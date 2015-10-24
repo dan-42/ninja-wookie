@@ -28,7 +28,7 @@
 
 
 namespace bacnet { namespace apdu { namespace type {
-  enum class encoding : uint8_t {
+  enum class string_encoding_type : uint8_t {
       iso_10646_utf_8     = 0,
       ibm_microsoft_dbcs  = 1,
       jis_x_0208          = 2,
@@ -42,7 +42,7 @@ namespace bacnet { namespace apdu { namespace type {
 BOOST_FUSION_DEFINE_STRUCT(
     (bacnet)(apdu)(type), character_string,
     (bacnet::apdu::type::tag, tag_)
-    (bacnet::apdu::type::encoding, encoding_)
+    (bacnet::apdu::type::string_encoding_type, encoding_)
     (std::string, value_)
 )
 
