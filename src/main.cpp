@@ -54,8 +54,6 @@ int main(int argc, char *argv[]) {
     std::string bvll_multicast_ip = "255.255.255.255";
 
 
-
-
     boost::asio::io_service io_service;
     bacnet::bvll::controller bvll_controller(io_service, bvll_listening_ip, bvll_listening_port, bvll_multicast_ip );
     bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller(bvll_controller, npdu_network_number);
@@ -99,8 +97,6 @@ int main(int argc, char *argv[]) {
                                   % i_am.max_apdu_length_accepted
                                   % i_am.segmentation_supported
                                   % ss.str();
-
-
     };
     service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 

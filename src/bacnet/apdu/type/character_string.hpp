@@ -18,26 +18,33 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_HELPER_HPP
-#define NINJA_WOOKIE_HELPER_HPP
+#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_CHARACTER_STRING_HPP
+#define NINJA_WOOKIE_BACNET_APDU_TYPE_CHARACTER_STRING_HPP
 
 #include <cstdint>
-
-namespace bacnet { namespace apdu {  namespace type { namespace detail {
-
-
-static uint8_t length_helper(uint32_t v) {
-  static constexpr uint32_t max_for_one_byte = 0x000000FF;
-  static constexpr uint32_t max_for_two_byte = 0x0000FFFF;
-  static constexpr uint32_t max_for_three_byte = 0x00FFFFFF;
-
-  if (v > max_for_three_byte) return 4;
-  else if (v > max_for_two_byte) return 3;
-  else if (v > max_for_one_byte) return 2;
-  else return 1;
-}
+#include <boost/fusion/include/define_struct.hpp>
+#include <bacnet/apdu/type/tag.hpp>
 
 
-}}}}
 
-#endif //NINJA_WOOKIE_HELPER_HPP
+namespace bacnet { namespace apdu { namespace type {
+  enum class encoding : uint8_t {
+      iso_10646_utf_8     = 0,
+      ibm_microsoft_dbcs  = 1,
+      jis_x_0208          = 2,
+      iso_10646_ucs_4     = 3,
+      iso_10646_ucs_2     = 4,
+      iso_8859_1          = 5
+  };
+
+}}}
+
+BOOST_FUSION_DEFINE_STRUCT(
+    (bacnet)(apdu)(type), character_string,
+    (bacnet::apdu::type::tag, tag_)
+    (bacnet::apdu::type::encoding, encoding_)
+    (std::string, value_)
+)
+
+
+#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_CHARACTER_STRING_HPP
