@@ -63,31 +63,34 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
 
   character_string_grammar() : character_string_grammar::base_type(start_rule), size_(0) {
 
-    start_rule  = tag_rule >> value_rule ;
+    start_rule  = tag_rule >> encoding_rule >> string_rule ;
 
-    tag_rule = tag_grammar_;
+    tag_rule = tag_grammar_[_val = boost::phoenix::bind(&character_string_grammar::set_size, this, _1)];
 
-    value_rule  =  big_dword[_val = boost::phoenix::bind(&object_identifier_grammar::create_object_identifier, this, _1)] ;
+    encoding_rule = byte_;
+
+    string_rule  =  repeate[ref(size_](byte_);
 
     start_rule.name("start_rule");
     tag_rule.name("tag_rule");
-    value_rule.name("value_rule");
+    string_encoding_type.name("string_encoding_type");
+    string_rule.name("string_rule");
 /*
 debug(start_rule);
 debug(tag_rule);
 debug(tag_lower_rule);
-debug(value_rule);
+debug(string_rule);
 */
   }
 private:
 
-  bacnet::common::object_identifier create_object_identifier(const uint32_t & native_value) {
-    bacnet::common::object_identifier oi;
-    oi.from_native(native_value);
-    return std::move(oi);
+  tag& set_size(tag& t) {
+    size_ = t.length_value_type();
+    return t;
   }
 
-  uint8_t size_;
+  uint32_t size_;
+
 };
 
 }}}}}
@@ -109,37 +112,39 @@ using bacnet::apdu::type::character_string;
 template<typename Iterator>
 struct character_string_grammar : grammar<Iterator, character_string()> {
 
-  rule<Iterator, character_string()>                   start_rule;
+  rule<Iterator, character_string()>                    start_rule;
   rule<Iterator, tag()>                                 tag_rule;
-  rule<Iterator, bacnet::common::object_identifier()>   value_rule;
+  rule<Iterator, string_encoding_type()>                encoding_rule;
+  rule<Iterator, std::string()>                         string_rule;
 
   tag_grammar<Iterator> tag_grammar_;
 
   character_string_grammar() : character_string_grammar::base_type(start_rule) {
 
-    start_rule  = tag_rule << value_rule ;
+    start_rule  = tag_rule << encoding_rule << value_rule ;
 
-    tag_rule = tag_grammar_;
+    tag_rule = eps[boost::phoenix::bind(&character_string_grammar::extract_size, this, _val)] << tag_grammar_[_1 = _val];
 
-    value_rule  = big_dword[_1 = boost::phoenix::bind(&object_identifier_grammar::get_native_value, this, _val)];
+    string_rule  = repeate[ref(size_)](byte_);
 
     start_rule.name("start_rule");
     tag_rule.name("tag_rule");
-    value_rule.name("value_rule");
+    string_rule.name("string_rule");
 
     /*
     debug(start_rule);
     debug(value_rule);
     debug(tag_rule);
-    //*/
+    */
 
   }
 private:
 
-  uint32_t get_native_value(const bacnet::common::object_identifier &oi) {
-    return oi.to_native();
+  void extract_size(const tag &tag_) {
+    size_ = tag_.length_value_type();
   }
 
+  uint8_t size_;
 };
 
 }}}}}

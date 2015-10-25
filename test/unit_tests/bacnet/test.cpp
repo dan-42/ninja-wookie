@@ -24,12 +24,7 @@
 #include <iostream>
 #include <bitset>
 
-
-
 #include <bacnet/bvll/bacnet_ip_address.hpp>
-
-
-
 
 
 int test_npdu() {
@@ -70,9 +65,6 @@ int test_npdu() {
 	  if(bin_data_to_parse.compare(bin_data_to_generate) == 0){
 		  std::cout << "juhu!" << std::endl;
 	  }
-
-
-
 
 
 

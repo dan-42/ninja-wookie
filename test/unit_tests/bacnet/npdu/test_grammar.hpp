@@ -18,8 +18,9 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_GRAMMAR_HPP
-#define NINJA_WOOKIE_GRAMMAR_HPP
+
+#ifndef NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_NPDU_GRAMMAR_HPP
+#define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_NPDU_GRAMMAR_HPP
 
 #include <iostream>
 #include <boost/test/included/unit_test.hpp>
@@ -202,4 +203,4 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif //NINJA_WOOKIE_GRAMMAR_HPP
+#endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_NPDU_GRAMMAR_HPP

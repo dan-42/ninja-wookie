@@ -166,8 +166,6 @@ using boost::spirit::qi::_1;
 using boost::phoenix::bind;
 using boost::phoenix::ref;
 
-using boost::spirit::repository::qi::big_24word;
-
 using bacnet::apdu::type::tag;
 
 
