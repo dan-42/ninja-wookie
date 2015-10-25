@@ -37,6 +37,11 @@ namespace bacnet { namespace apdu { namespace type {
       iso_8859_1          = 5
   };
 
+      static std::ostream& operator<<(std::ostream& os, const string_encoding_type& v) {
+
+        return os;
+      }
+
 }}}
 
 BOOST_FUSION_DEFINE_STRUCT(
@@ -46,5 +51,14 @@ BOOST_FUSION_DEFINE_STRUCT(
     (std::string, value_)
 )
 
+namespace bacnet { namespace apdu { namespace type {
+
+
+      static std::ostream& operator<<(std::ostream& os, const character_string& v) {
+
+        return os;
+      }
+
+    }}}
 
 #endif //NINJA_WOOKIE_BACNET_APDU_TYPE_CHARACTER_STRING_HPP

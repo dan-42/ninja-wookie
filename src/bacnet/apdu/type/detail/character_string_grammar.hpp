@@ -67,26 +67,32 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
 
     tag_rule = tag_grammar_[_val = boost::phoenix::bind(&character_string_grammar::set_size, this, _1)];
 
-    encoding_rule = byte_;
+    encoding_rule =  byte_[ _val = boost::phoenix::bind(&character_string_grammar::to_encoding_type, this, _1)];
 
-    string_rule  =  repeate[ref(size_](byte_);
+    string_rule  = repeat(ref(size_))[byte_];
 
     start_rule.name("start_rule");
     tag_rule.name("tag_rule");
-    string_encoding_type.name("string_encoding_type");
+    encoding_rule.name("encoding_rule");
     string_rule.name("string_rule");
-/*
-debug(start_rule);
-debug(tag_rule);
-debug(tag_lower_rule);
-debug(string_rule);
-*/
+    //
+    /*
+    debug(start_rule);
+    debug(tag_rule);
+    debug(encoding_rule);
+    debug(string_rule);
+    // */
   }
 private:
 
   tag& set_size(tag& t) {
-    size_ = t.length_value_type();
+    size_ = t.length_value_type() -1;
     return t;
+  }
+
+  string_encoding_type to_encoding_type(const uint8_t& underlying_value) {
+    string_encoding_type enum_value = static_cast<string_encoding_type>(underlying_value);
+    return enum_value;
   }
 
   uint32_t size_;
@@ -121,27 +127,34 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
 
   character_string_grammar() : character_string_grammar::base_type(start_rule) {
 
-    start_rule  = tag_rule << encoding_rule << value_rule ;
+    start_rule  = tag_rule << encoding_rule << string_rule ;
 
     tag_rule = eps[boost::phoenix::bind(&character_string_grammar::extract_size, this, _val)] << tag_grammar_[_1 = _val];
 
-    string_rule  = repeate[ref(size_)](byte_);
+    encoding_rule = byte_[ _1 = boost::phoenix::bind(&character_string_grammar::from_encoding_type, this, _val)];
+
+    string_rule  = repeat(ref(size_))[byte_];
 
     start_rule.name("start_rule");
     tag_rule.name("tag_rule");
+    encoding_rule.name("encoding_rule");
     string_rule.name("string_rule");
-
+    //
     /*
     debug(start_rule);
-    debug(value_rule);
     debug(tag_rule);
-    */
-
+    debug(encoding_rule);
+    debug(string_rule);
+    // */
   }
 private:
 
   void extract_size(const tag &tag_) {
-    size_ = tag_.length_value_type();
+    size_ = tag_.length_value_type() -1;
+  }
+
+  uint8_t from_encoding_type(const string_encoding_type& enum_value) {
+    return static_cast<uint8_t>(enum_value);
   }
 
   uint8_t size_;

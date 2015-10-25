@@ -22,6 +22,7 @@
 #define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TEST_HPP
 
 #include <bacnet/apdu/type/test_tag.hpp>
+#include <bacnet/apdu/type/test_character_string.hpp>
 
 
 #endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TEST_HPP

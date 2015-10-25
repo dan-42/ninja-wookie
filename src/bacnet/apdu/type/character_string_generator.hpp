@@ -46,6 +46,7 @@ static bacnet::binary_data generate(const character_string &oi) {
     std::cerr << "exception: apdu generate  character_string" << e.what() << std::endl;
   }
   if (!result) {
+    std::cerr << "failed: apdu generate  character_string" << std::endl;
     return bacnet::binary_data();
   }
 
@@ -71,7 +72,7 @@ static bool parse(bacnet::binary_data& data, character_string &oi) {
     data.erase(data.begin(), start);
     return true;
   }
-
+  std::cerr << "fail: apdu parse character_string"  << std::endl;
   return false;
 }
 

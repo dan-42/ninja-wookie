@@ -84,10 +84,7 @@ public:
   void handle_receive_from(const boost::system::error_code &error, size_t bytes_recvd) {
 
     if (!error) {
-      /*
-      std::cout << "handle_receive_from: " << sender_endpoint_.address().to_string()
-      << ":" << (int) sender_endpoint_.port() << " bytes: " << bytes_recvd << std::endl;
-      */
+
       // copy only what is actually received
       bacnet::binary_data input(data_.begin(), data_.begin() + bytes_recvd);
 
