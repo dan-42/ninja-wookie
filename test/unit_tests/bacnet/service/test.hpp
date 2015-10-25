@@ -17,12 +17,9 @@
  *
  * Authors: Daniel Friedrich
  */
-#ifndef NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_TEST_HPP
-#define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_TEST_HPP
+#ifndef NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_SERVICE_TEST_HPP
+#define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_SERVICE_TEST_HPP
 
-#include <bacnet/npdu/test.hpp>
-#include <bacnet/apdu/test.hpp>
-#include <bacnet/service/test.hpp>
+#include <bacnet/service/test_reinitialize_device.hpp>
 
-
-#endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_TEST_HPP
+#endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_SERVICE_TEST_HPP

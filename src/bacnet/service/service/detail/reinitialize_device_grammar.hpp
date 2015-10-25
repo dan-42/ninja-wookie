@@ -83,9 +83,11 @@ bacnet::binary_data generate<service::reinitialize_device>(const service::reinit
   constexpr uint8_t context_tag_number_0 = 0x00;
   constexpr uint8_t context_tag_number_1 = 0x01;
   constexpr bool is_conext_tag = true;
+  auto service_choice_command = service_choice<service::reinitialize_device>::value;
 
   bacnet::binary_data binary;
 
+  binary.push_back(service_choice_command);
 
   apdu::tag tag_reinitialized_state_of_device(context_tag_number_0, is_conext_tag, apdu::detail::length_helper(service.reinitialize_state_of_device));
   apdu::unsigned_integer reinitialized_state_of_device(tag_reinitialized_state_of_device, service.reinitialize_state_of_device);
@@ -97,7 +99,7 @@ bacnet::binary_data generate<service::reinitialize_device>(const service::reinit
 
     apdu::tag tag_password(context_tag_number_1, is_conext_tag, service.passowrd.size() + 1);
 
-    apdu::character_string password(tag_password, service.passowrd);
+    apdu::character_string password(tag_password, apdu::string_encoding_type::iso_10646_utf_8, service.passowrd);
     auto password_binary = apdu::generate(password);
     binary.insert(binary.end(), password_binary.begin(), password_binary.end());
 
@@ -114,8 +116,8 @@ bool parse<service::reinitialize_device>(bacnet::binary_data& data, service::rei
   if(data.empty()) {
     return false;
   }
+/*
 
-  /*it's allowed to have now payload*/
   if(data.size() == 1 && data.front() == uncomfirmed_service::who_is) {
     service.device_instance_range_low_limit = 0;
     service.device_instance_range_high_limit = 0;
@@ -142,7 +144,7 @@ bool parse<service::reinitialize_device>(bacnet::binary_data& data, service::rei
 
   service.device_instance_range_high_limit = high_limit.value_;
   service.device_instance_range_low_limit  = low_limit.value_;
-
+*/
   return true;
 }
 

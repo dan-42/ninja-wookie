@@ -82,22 +82,15 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag.length_value_type(string_to_generate.size()+1);
 
     character_string_to_generate.tag_ = tag;
-    character_string_to_generate.encoding_ =bacnet::apdu::type::string_encoding_type::iso_10646_utf_8;
+    character_string_to_generate.encoding_ = bacnet::apdu::type::string_encoding_type::iso_10646_utf_8;
     character_string_to_generate.value_ = string_to_generate;
 
 
     generated = bacnet::apdu::type::generate(character_string_to_generate);
-    bacnet::print(generation_expected);
-    bacnet::print(generated);
-
 
     BOOST_TEST(is_equal(generation_expected, generated), "fail tag generation failed");
     BOOST_TEST(bacnet::apdu::type::parse(generated, character_string_parsed), "fail parse simple tag");
     BOOST_TEST(is_equal(character_string_to_generate, character_string_parsed), "failed parsed is not expected");
-
-
-
-
 
   }
 
