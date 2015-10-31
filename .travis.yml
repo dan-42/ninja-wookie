@@ -8,5 +8,8 @@ addons:
     - cmake
 
 script:
-- if [ "$CXX" == "clang++" ]; then export CXX="clang++" && bii cpp:build; fi
-- if [ "$CXX" == "g++" ];     then export CXX="g++"     && bii cpp:build; fi
+  - mkdir build
+  - cd ./build
+  - cmake ..
+  - make
+  - ctest
