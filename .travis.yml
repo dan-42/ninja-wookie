@@ -10,12 +10,6 @@ apt:
     sources: ['ubuntu-toolchain-r-test']
     packages: ['g++-4.9', 'cmake']
 
-env: COMPILER=g++-4.9
-    
-before_install: 
-  - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
-  - sudo apt-get update -qq
-  - sudo apt-get install cmake
     
 
 script:
