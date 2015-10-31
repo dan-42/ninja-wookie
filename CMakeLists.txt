@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
 
 ### Hunter snapshot that will be used ###
-#include("cmake/HunterGate.cmake")
-#HunterGate(
-#        URL "https://github.com/ruslo/hunter/archive/v0.12.23.tar.gz"
-#        SHA1 "e1aad873adb4d0cd254c070f3e1a1c181d8daaea"
-#)
+include("cmake/HunterGate.cmake")
+HunterGate(
+        URL "https://github.com/dan-42/hunter/archive/v0.12.6-dan42.tar.gz"
+        SHA1 "a749367a24f25167f3b1f1712e45ad9a1f6a06e8"
+        LOCAL
+)
 
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
