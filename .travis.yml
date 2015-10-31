@@ -1,13 +1,11 @@
 language: cpp
 compiler: g++
+sudo: false
 
-before_install:
-- sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-- sudo apt-get update -qq
-
-install:
-- sudo apt-get install -qq g++-4.8
-- export CXX="g++-4.8"
+addons:
+  apt:
+    packages:
+    - cmake
 
 script:
 - if [ "$CXX" == "clang++" ]; then export CXX="clang++" && bii cpp:build; fi
