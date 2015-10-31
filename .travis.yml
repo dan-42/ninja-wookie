@@ -8,3 +8,7 @@ before_install:
 install:
 - sudo apt-get install -qq g++-4.8
 - export CXX="g++-4.8"
+
+script:
+- if [ "$CXX" == "clang++" ]; then export CXX="clang++" && bii cpp:build; fi
+- if [ "$CXX" == "g++" ];     then export CXX="g++"     && bii cpp:build; fi
