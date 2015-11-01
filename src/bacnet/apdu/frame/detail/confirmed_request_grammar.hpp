@@ -222,6 +222,7 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
     service_data_rule.name("service_data_rule");
     pdu_type_check_rule.name("pdu_type_check_rule");
 
+  //
     /*
        debug(confirmed_request_rule);
        debug(pdu_header_rule);
@@ -232,7 +233,7 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
        debug(service_choice_rule);
        debug(service_data_rule);
        debug(pdu_type_check_rule);
-     */
+  //   */
   }
 
   pdu_type_and_control_information_t pdu_header_;

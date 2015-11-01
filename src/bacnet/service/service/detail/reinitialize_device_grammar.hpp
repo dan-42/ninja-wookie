@@ -28,6 +28,7 @@
 #include <bacnet/apdu/type/unsigned_integer.hpp>
 #include <bacnet/apdu/type/unsigned_integer_generator.hpp>
 #include <bacnet/apdu/type/character_string.hpp>
+#include <bacnet/apdu/type/character_string_generator.hpp>
 #include <bacnet/apdu/type/detail/helper.hpp>
 
 #include <bacnet/service/service/detail/service_grammar.hpp>

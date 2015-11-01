@@ -31,12 +31,38 @@
 #include <bacnet/apdu/controller.hpp>
 #include <bacnet/service/controller.hpp>
 
-//#include <bacnet/mac/endpoint.hpp>
+
 #include <bacnet/common/object_identifier.hpp>
+#include <bacnet/service/service/reinitialize_device.hpp>
 
 int main(int argc, char *argv[]) {
 
 
+  /**
+   * todos
+   *
+   *  * find a nice way for setting options like:
+   *     vendor_id
+   *     apdu_size
+   *     network
+   *     segmentation
+   *
+   *  * create a managing class, for invoke id's
+   *    goal, sending a reinitialize_device and giving a handler which will return the answer, not just when it was send successful.
+   *    possible problems, depending on the answer is will be an ACK, Error PDU
+   *
+   *    So answer could be  SUCCESS, ERROR_password, errror_...
+   *    page 573:   16.4.1.3.1 Error Type
+   *
+   *    how if it is not a simple ack expected?  design for other frames should be consindered
+   *
+   *    steps:
+   *     * write c++11 interface how it should look like
+   *     * review
+   *     * try to make it work :-)
+
+   *
+   */
   try {
 /*
     bacnet::config::device device_config;
@@ -62,9 +88,9 @@ int main(int argc, char *argv[]) {
 
 
 
-    service_controller.async_send(bacnet::service::who_is{2, 434214}, [](boost::system::error_code ec) {
+//    service_controller.async_send(bacnet::service::who_is{2, 434214}, [](boost::system::error_code ec) {
        // std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
-    });
+//    });
 
 
     bacnet::service::i_am i_am_;
@@ -72,12 +98,19 @@ int main(int argc, char *argv[]) {
     i_am_.i_am_device_identifier.instance_number(1);
     i_am_.segmentation_supported.segmented(bacnet::common::segmentation::segment::both);
     i_am_.vendor_id = 1;
-    i_am_.max_apdu_length_accepted = 1460;
+    i_am_.max_apdu_length_accepted = bacnet::apdu::settings::apdu_size::ip;
 
-    service_controller.async_send(i_am_, [](boost::system::error_code ec){
+    //service_controller.async_send(i_am_, [](boost::system::error_code ec){
      // std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
-    });
+    //});
 
+    bacnet::service::service::reinitialize_device rd;
+    rd.reinitialize_state_of_device = 0;
+    rd.passowrd = "abcd";
+    std::cout << "send reinitialize_device " << std::endl;
+    service_controller.async_send(rd, [](boost::system::error_code ec){
+       std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
+    });
 
     auto formatter_i_am = boost::format("| %1$+9d | %2$+21d | %3$+6d | %4$_6d | %5$_6d | %6$_8s | %7%\n");
 

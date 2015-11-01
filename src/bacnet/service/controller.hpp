@@ -32,6 +32,7 @@
 #include <bacnet/service/service.hpp>
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
 #include <bacnet/service/service/detail/i_am_garmmar.hpp>
+#include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
@@ -62,6 +63,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
       }
       else {
         std::cout << "unconfirmed::possible_service parse undefined " << std::endl;
+        bacnet::print(data);
       }
     }
     else {
@@ -140,12 +142,16 @@ public:
 
     if( bacnet::service::service::detail::is_broadcast_service<Service>::value) {
 
+      std::cout << "send broadcast " << std::endl;
+      bacnet::print(data);
       lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
         handler(ec);
       });
     }
     else {
-      lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
+      std::cout << "send unicast " << std::endl;
+      bacnet::print(data);
+      lower_layer_.async_send_confirmed_request(std::move(data), [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
         handler(ec);
       });
     }
