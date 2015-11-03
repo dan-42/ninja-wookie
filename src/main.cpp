@@ -60,7 +60,17 @@ int main(int argc, char *argv[]) {
    *     * write c++11 interface how it should look like
    *     * review
    *     * try to make it work :-)
-
+  
+  
+        * idea: use templates for a uniqe property like
+        * uint32 pv_poperty = 80
+        * 
+        * typedef pv bacnet::property<pv_property, float, is_writable>;
+        * open questions: how to combine a whole object?
+        * how to manage read or write property? and multiple?
+        * where is the logic, like cant write pv when not out_of_service
+        * so all musst be combined in one object?
+        * how to manage reusability and seperation for object specifics but DRY!
    *
    */
   try {
