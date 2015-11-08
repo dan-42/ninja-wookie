@@ -27,6 +27,30 @@
 #include <bacnet/common/protocol/meta_information.hpp>
 namespace bacnet { namespace bvll {
 
+
+    namespace config {
+      static const constexpr char*  DEFAULT_LISTENING_ADDRESS{"0.0.0.0"};
+      static const constexpr uint16_t DEFAULT_LISTENING_PORT{0xBAC0};
+      static const constexpr char*  DEFAULT_MULTICAST_ADDRESS{"255.255.255.255"};
+    }
+
+    struct configuration {
+
+      configuration() : listening_address(config::DEFAULT_LISTENING_ADDRESS),
+                        listening_port(config::DEFAULT_LISTENING_PORT),
+                        multicast_address(config::DEFAULT_MULTICAST_ADDRESS) {
+      }
+
+      configuration(const std::string& l_addr, const uint16_t& l_port, const std::string& m_addr) : listening_address(l_addr),
+                                                                                                    listening_port(l_port),
+                                                                                                    multicast_address(m_addr) {
+      }
+
+      std::string listening_address;
+      uint16_t listening_port;
+      std::string multicast_address;
+    };
+
 typedef  boost::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&& )> async_receive_broadcast_callback_t;
 typedef  boost::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&& )> async_receive_unicast_callback_t;
 

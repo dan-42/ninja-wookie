@@ -59,7 +59,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       }
 
       inline std::string to_string() {
-        return (address_.to_string() + std::to_string(port_));
+        return (address_.to_string() + ":" + std::to_string(port_));
       }
 
 

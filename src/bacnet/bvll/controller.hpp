@@ -50,17 +50,9 @@ public:
     start();
   }
 
-  controller(boost::asio::io_service &ios, uint16_t port) : io_service_(ios), transporter_(ios, port), inbound_router_(callback_manager_)  {
-    start();
-  }
-
-  controller(boost::asio::io_service &ios, const std::string& endpoint, uint16_t port) : io_service_(ios), transporter_(ios, endpoint, port), inbound_router_(callback_manager_)  {
-      start();
-  }
-
-  controller(boost::asio::io_service &ios, const std::string& endpoint, uint16_t port, const std::string& multicast_ip) :
+  controller(boost::asio::io_service &ios, const configuration& config) :
                                                               io_service_(ios),
-                                                              transporter_(ios, endpoint, port, multicast_ip),
+                                                              transporter_(ios, config),
                                                               inbound_router_(callback_manager_)  {
       start();
   }
