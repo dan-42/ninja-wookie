@@ -1,5 +1,6 @@
 
 hunter_add_package(Boost COMPONENTS system)
+hunter_add_package(CppNetlib)
 
 set(BOOST_ALL_DYN_LINK ON)
 set(Boost_USE_STATIC_LIBS OFF)
@@ -14,11 +15,19 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 #  set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
 #endif (Boost_NO_SYSTEM_PATHS)
 
-
+# boost
 find_package(Boost 1.59 COMPONENTS  system REQUIRED )
 link_directories (${Boost_LIBRARY_DIRS})
 include_directories (${Boost_INCLUDE_DIRS})
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+
+
+# cppnetlib
+find_package(CppNetLib  REQUIRED )
+link_directories (${CppNetLib_LIBRARY_DIRS})
+include_directories (${CppNetLib_INCLUDE_DIRS})
+
+
 
 # Threads
 find_package(Threads)
@@ -41,7 +50,7 @@ file(GLOB_RECURSE SOURCES_UTIL_CPP "util/*.cpp")
 add_library(wookie ${SOURCES_BACNET_CPP} ${SOURCES_UTIL_CPP} )
 
 add_executable(main main.cpp)
-target_link_libraries(main wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread )
+target_link_libraries(main wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} ${CppNetLib_LIBRARIES} pthread )
 
 
 if(WIN32)
