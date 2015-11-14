@@ -37,5 +37,23 @@ namespace bacnet { namespace service { namespace service { namespace unconfirmed
       who_is,
       i_am
   > possible_service;
+
+//xxx todo implement possible responses
+  typedef boost::variant<
+      who_is,
+      i_am
+  > possible_service_response;
 }}}}
+
+
+namespace bacnet { namespace service {
+
+//xxx todo implement possible responses
+        typedef boost::variant<
+            service::who_is,
+            service::i_am,
+            service::reinitialize_device
+        > possible_service_response;
+}}
+
 #endif //NINJA_WOOKIE_SERVICES_HPP

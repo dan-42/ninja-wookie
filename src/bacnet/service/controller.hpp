@@ -160,7 +160,6 @@ public:
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::endpoint mac_endpoint, Service&& service, Handler handler) {
     auto data =  bacnet::service::service::detail::generate(service);
-    bacnet::print(data);
 
     lower_layer_.async_send_confirmed_request(std::move(data), [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
       handler(ec);

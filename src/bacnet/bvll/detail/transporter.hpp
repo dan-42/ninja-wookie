@@ -56,23 +56,23 @@ public:
 
   template<typename Buffer, typename Handler>
   void async_receive_from(const Buffer &buffer, boost::asio::ip::udp::endpoint &sender, const Handler &handler) {
-   // std::cout << "async_receive_from(): " << std::endl;
     socket_.async_receive_from(buffer, sender, handler);
   }
 
   template<typename Buffer, typename Handler>
   void async_send_to(const Buffer &buffer, boost::asio::ip::udp::endpoint &receiver, const Handler &handler) {
     //std::cout << "async_send_to(): " << std::endl;
-    socket_.async_send_to(buffer, receiver, handler);
+    socket_.async_send_to(buffer, receiver, [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
+      handler(ec);
+    });
   }
-
 
   template<typename Buffer, typename Handler>
   void async_send_broadcast(const Buffer &buffer, const Handler &handler) {
-
     boost::asio::ip::udp::endpoint receiver(multicast_address_, port_);
-    //std::cout << "async_send_to(): " << receiver <<  std::endl;
-    socket_.async_send_to(buffer, receiver, handler);
+    socket_.async_send_to(buffer, receiver, [this, &handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
+      handler(ec);
+    });
   }
 
 private:

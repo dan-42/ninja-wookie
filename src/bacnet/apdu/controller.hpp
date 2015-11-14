@@ -79,7 +79,7 @@ struct controller {
   }
 
   template<typename Handler>
-  void async_send_confirmed_request(const bacnet::binary_data& payload, Handler handler) {
+  void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, Handler handler) {
     frame::confirmed_request frame;
     bacnet::apdu::detail::header::segmentation_t seg;
     seg.max_accepted_apdu_ = 1;

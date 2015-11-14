@@ -123,8 +123,7 @@ struct my_bacnet_application {
       rd.passowrd = "abcd";
 
       uint32_t device_object_id = 1;
-      std::cout << "send reinitialize_device " << std::endl;
-      service_controller.async_send(device_object_id, rd, [](boost::system::error_code ec){
+      service_controller.async_send(device_object_id, rd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
         std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
       });
 

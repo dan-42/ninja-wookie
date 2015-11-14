@@ -68,8 +68,7 @@ public:
 
   void start() {
 
-    auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error,
-                                boost::asio::placeholders::bytes_transferred);
+    auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
     transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
   }
 
@@ -84,7 +83,7 @@ public:
       inbound_router_.sender_endpoint(sender_endpoint_);
       f.apply_visitor(inbound_router_);
 
-      //reveive next
+      //receive next
       auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
       transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
     }
@@ -99,6 +98,17 @@ public:
 
     bacnet::binary_data binary_frame = generator::generate(f);
     transporter_.async_send_broadcast(boost::asio::buffer(binary_frame), handler);
+  }
+
+  template<typename Handler>
+  void async_send_to(const bacnet::binary_data &payload, const bacnet::common::protocol::mac::address_ip& address, const Handler &handler){
+
+    frame::original_unicast_npdu frame;
+    frame.npdu_data = payload;
+    frame::possible_bvll_frame f(frame);
+
+    bacnet::binary_data binary_frame = generator::generate(f);
+    transporter_.async_send_to(boost::asio::buffer(binary_frame),address.to_system_endpoint(),  handler);
   }
 
   //todo async_send(data, endpoint, handler)

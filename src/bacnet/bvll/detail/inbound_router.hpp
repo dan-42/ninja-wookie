@@ -83,8 +83,6 @@ public:
   }
 
   void operator()(frame::original_unicast_npdu request) {
-    //std::cout << "inbound_router original_unicast_npdu" << std::endl;
-
     if(!callback_manager_.async_receive_unicast_callback_.empty()){
       bacnet::common::protocol::meta_information mi;
       mi.address = bacnet::common::protocol::mac::address_ip(sender_endpoint_.address().to_v4(), sender_endpoint_.port());
@@ -94,10 +92,10 @@ public:
   }
 
   void operator()(frame::original_broadcast_npdu request) {
-   // std::cout << "inbound_router original_broadcast_npdu" << std::endl;
     if(!callback_manager_.async_receive_broadcast_callback_.empty()) {
       bacnet::common::protocol::meta_information mi;
       mi.address = bacnet::common::protocol::mac::address_ip(sender_endpoint_.address().to_v4(), sender_endpoint_.port());
+
       callback_manager_.async_receive_broadcast_callback_(std::move(request.npdu_data), std::move(mi));
     }
   }
