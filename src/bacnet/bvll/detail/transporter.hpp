@@ -105,13 +105,15 @@ private:
 
 
   void init() {
+
     socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.set_option(boost::asio::socket_base::broadcast(true));
     socket_.bind(listen_endpoint_);
 
+
     if (multicast_address_.to_string().compare(DEFAULT_MULTICAST_ADDRESS) != 0) {
-      socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));
+     // socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_.to_v4(), listen_endpoint_.address().to_v4()));
     }
 
 

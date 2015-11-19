@@ -1,10 +1,5 @@
-sudo: required
-dist: trusty
-
 language: cpp
 compiler: g++
-
-
 
 script:
   - mkdir build
