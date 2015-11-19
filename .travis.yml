@@ -4,7 +4,6 @@ dist: trusty
 language: cpp
 compiler: g++
 
-compiler: gcc
 addons:
 apt:
     sources: ['ubuntu-toolchain-r-test']
