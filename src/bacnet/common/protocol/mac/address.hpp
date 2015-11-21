@@ -63,8 +63,9 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       }
 
 
-      inline boost::asio::ip::udp::endpoint to_system_endpoint() {
+      inline boost::asio::ip::udp::endpoint to_system_endpoint() const {
         //todo
+        return boost::asio::ip::udp::endpoint{};
       }
 
     private:

@@ -35,7 +35,33 @@
 #include <bacnet/apdu/detail/inbound_router.hpp>
 #include <bacnet/apdu/detail/callback_manager.hpp>
 
+namespace bacnet { namespace apdu { namespace detail {
 
+/**
+ *
+    key is   endpoint + invoke id
+    idea: for each endpoint one transmissionmanager?
+
+ *
+ */
+
+  struct transmission_identifier {
+      bacnet::common::protocol::mac::address mac;
+      uint8_t invoke_id_counter = 0;
+  };
+
+
+  struct device_transmission_manager {
+
+
+
+  private:
+      static uint8_t invoke_id_counter;
+  };
+
+
+
+}}}
 
 
 
@@ -82,9 +108,10 @@ struct controller {
   void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, Handler handler) {
     frame::confirmed_request frame;
     bacnet::apdu::detail::header::segmentation_t seg;
-    seg.max_accepted_apdu_ = 1;
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::confirmed_request;
-    frame.invoke_id = 0;
+
+    seg.max_accepted_apdu_ = 1;
+    frame.invoke_id       = 0;
     frame.segmentation = seg;
 
     frame.service_data = payload;
@@ -93,7 +120,9 @@ struct controller {
     bacnet::print(data);
     // set lambda as callback, and on success sending, store handler in a "handlerManager" with endpoint and invoke id as key
     // don't forget timeout!
-    underlying_controller_.async_send_broadcast(std::move(data), handler);
+    underlying_controller_.async_send_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec){
+          handler(ec);
+      });
   }
 
 

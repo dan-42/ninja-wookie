@@ -31,6 +31,7 @@
 
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
+#include <bacnet/service/service/reinitialize_device.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace unconfirmed {
   typedef boost::variant<

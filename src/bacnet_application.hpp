@@ -35,7 +35,7 @@
 #include <bacnet/npdu/controller.hpp>
 #include <bacnet/apdu/controller.hpp>
 #include <bacnet/service/controller.hpp>
-
+#include <bacnet/common/configuration.hpp>
 
 #include <bacnet/common/object_identifier.hpp>
 #include <bacnet/service/service/reinitialize_device.hpp>
@@ -50,12 +50,14 @@ struct my_bacnet_application {
   uint16_t    bvll_listening_port = 0xBAC0;
   std::string bvll_multicast_ip = "255.255.255.255";
 
+  typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 
 
   bacnet::bvll::controller bvll_controller;
   bacnet::npdu::controller<bacnet::bvll::controller> npdu_controller;
   bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller> > apdu_controller;
-  bacnet::service::controller<bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller> > > service_controller;
+  bacnet::service::controller<bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller>>> service_controller;
 
 
   my_bacnet_application(boost::asio::io_service& io_s) : io_service(io_s),
