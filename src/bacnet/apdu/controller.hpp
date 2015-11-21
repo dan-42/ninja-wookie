@@ -74,7 +74,7 @@ namespace bacnet { namespace apdu {
 
 
 
-template<class UnderlyingLayerController>
+template<class UnderlyingLayerController, typename ApduSize>
 struct controller {
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
@@ -110,7 +110,7 @@ struct controller {
     bacnet::apdu::detail::header::segmentation_t seg;
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::confirmed_request;
 
-    seg.max_accepted_apdu_ = 1;
+    seg.max_accepted_apdu_ = ApduSize::size_as_enum;
     frame.invoke_id       = 0;
     frame.segmentation = seg;
 

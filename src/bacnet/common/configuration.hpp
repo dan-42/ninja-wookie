@@ -50,8 +50,8 @@ enum class number_of_max_segments_accepted : uint8_t {
 };
 
 
-//20.1.2.5  max-APDU-length-accepted
-enum class max_apdu_length_accepted : uint8_t {
+//20.1.2.5  max-APDU-length-accepted, 4bit value
+enum  max_apdu_length_accepted : uint8_t {
     up_to_50_bytes = 0b0000, //minimum
     up_to_128_bytes = 0b0001,
     up_to_206_bytes = 0b0010, //(fits in a LonTalk frame)
@@ -76,8 +76,8 @@ enum class max_apdu_length_accepted : uint8_t {
 
     template<uint32_t Size, detail::max_apdu_length_accepted Enum>
     struct apdu_size_t {
-        decltype(Size) size_in_bytes;
-        decltype(Enum) size_as_enum;
+       static const constexpr decltype(Size) size_in_bytes = Size;
+       static const constexpr decltype(Enum) size_as_enum = Enum;
     };
 
     typedef apdu_size_t<50,   detail::max_apdu_length_accepted::up_to_50_bytes>     _50_bytes_minimal;

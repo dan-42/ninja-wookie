@@ -116,7 +116,7 @@ namespace bacnet { namespace service {
 
 
 
-template<typename UnderlyingLayer>
+template<typename UnderlyingLayer, typename ApduSize>
 class controller {
 public:
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer), inbound_router_(callback_manager_) {

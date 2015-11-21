@@ -51,13 +51,13 @@ struct my_bacnet_application {
   std::string bvll_multicast_ip = "255.255.255.255";
 
   typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
 
 
   bacnet::bvll::controller bvll_controller;
   bacnet::npdu::controller<bacnet::bvll::controller> npdu_controller;
-  bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller> > apdu_controller;
-  bacnet::service::controller<bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller>>> service_controller;
+  bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller>, apdu_size > apdu_controller;
+  bacnet::service::controller<bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller>, apdu_size>, apdu_size> service_controller;
 
 
   my_bacnet_application(boost::asio::io_service& io_s) : io_service(io_s),
