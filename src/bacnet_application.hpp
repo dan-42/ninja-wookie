@@ -41,6 +41,13 @@
 #include <bacnet/service/service/reinitialize_device.hpp>
 
 
+
+struct config {
+ //vendor_id
+ //
+};
+
+
 struct my_bacnet_application {
   boost::asio::io_service& io_service;
 
@@ -55,10 +62,9 @@ struct my_bacnet_application {
 
 
   bacnet::bvll::controller bvll_controller;
-  bacnet::npdu::controller<bacnet::bvll::controller> npdu_controller;
-  bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller>, apdu_size > apdu_controller;
-  bacnet::service::controller<bacnet::apdu::controller<bacnet::npdu::controller<bacnet::bvll::controller>, apdu_size>, apdu_size> service_controller;
-
+  bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller;
+  bacnet::apdu::controller<decltype(npdu_controller), apdu_size > apdu_controller;
+  bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller;
 
   my_bacnet_application(boost::asio::io_service& io_s) : io_service(io_s),
                                                                                  bvll_controller(io_service, {bvll_listening_ip, bvll_listening_port, bvll_multicast_ip} ),
@@ -76,7 +82,6 @@ struct my_bacnet_application {
      *
      *  * find a nice way for setting options like:
      *     vendor_id
-     *     apdu_size
      *     network
      *     segmentation
      *
@@ -114,7 +119,7 @@ struct my_bacnet_application {
       i_am_.i_am_device_identifier.instance_number(1);
       i_am_.segmentation_supported.segmented(bacnet::common::segmentation::segment::both);
       i_am_.vendor_id = 1;
-      //i_am_.max_apdu_length_accepted = bacnet::apdu::settings::apdu_size::ip;
+      i_am_.max_apdu_length_accepted = apdu_size::size_in_bytes;
 
       //service_controller.async_send(i_am_, [](boost::system::error_code ec){
       // std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
@@ -122,29 +127,17 @@ struct my_bacnet_application {
 
       bacnet::service::service::reinitialize_device rd;
       rd.reinitialize_state_of_device = 0;
-      rd.passowrd = "abcd";
+      rd.passowrd = "12345";
 
-      uint32_t device_object_id = 1;
+      uint32_t device_object_id = 2;
       service_controller.async_send(device_object_id, rd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
         std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
       });
 
-      auto formatter_i_am = boost::format("| %1$+9d | %2$+21d | %3$+6d | %4$_6d | %5$_6d | %6$_8s | %7%\n");
 
-      auto i_am_handler_ = [&formatter_i_am](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
 
-        std::stringstream ss;
-        for(auto &c : mi.npdu_source.binary_address) {
-          ss << std::setw(2) << std::setfill('0') << (int)c << " ";
-        }
+      auto i_am_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
 
-        std::cout << formatter_i_am % i_am.i_am_device_identifier.instance_number()
-                     % mi.address.to_string()
-                     % mi.npdu_source.network_number
-                     % i_am.vendor_id
-                     % i_am.max_apdu_length_accepted
-                     % i_am.segmentation_supported
-                     % ss.str();
       };
       service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 
@@ -162,7 +155,7 @@ struct my_bacnet_application {
       */
 
 
-      std::cout << formatter_i_am % "device_id" % "endpoint" % "net" % "vendor" % "apdu" % "seg" % "binary source" ;
+      //std::cout << formatter_i_am % "device_id" % "endpoint" % "net" % "vendor" % "apdu" % "seg" % "binary source" ;
 
 
 

@@ -28,6 +28,7 @@
 
 #include <bacnet/service/api.hpp>
 #include <bacnet/service/detail/callback_manager.hpp>
+#include <bacnet/service/detail/device_manager.hpp>
 
 #include <bacnet/service/service.hpp>
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
@@ -81,7 +82,7 @@ namespace bacnet { namespace service { namespace detail {
   using namespace bacnet::service;
   struct inbound_router : boost::static_visitor<> {
 
-    inbound_router(callback_manager& cm) : callback_manager_(cm) {
+    inbound_router(callback_manager& cm, bacnet::service::detail::device_manager& dm) : callback_manager_(cm), device_manager_(dm) {
     }
 
     inline void meta_information(bacnet::common::protocol::meta_information meta_information) {
@@ -97,16 +98,24 @@ namespace bacnet { namespace service { namespace detail {
     }
 
     void operator()(service::i_am service) {
+      device_manager_.insert_device(bacnet::common::protocol::mac::endpoint{meta_information_.npdu_source.network_number, meta_information_.address},
+                                    service.i_am_device_identifier,
+                                    service.max_apdu_length_accepted,
+                                    service.segmentation_supported,
+                                    service.vendor_id);
+      device_manager_.print_device_list();
       if(!callback_manager_.callback_service_i_am_.empty()) {
         boost::system::error_code ec{error::errc::success, error::get_error_category()};
         callback_manager_.callback_service_i_am_(ec, std::move(meta_information_), std::move(service));
+
       }
     }
 
   private:
 
     callback_manager& callback_manager_;
-      bacnet::common::protocol::meta_information meta_information_;
+    bacnet::service::detail::device_manager& device_manager_;
+    bacnet::common::protocol::meta_information meta_information_;
   };
 
 }}}
@@ -119,7 +128,7 @@ namespace bacnet { namespace service {
 template<typename UnderlyingLayer, typename ApduSize>
 class controller {
 public:
-  controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer), inbound_router_(callback_manager_) {
+  controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer), inbound_router_(callback_manager_, device_manager_) {
 
     lower_layer_.register_async_received_service_callback(boost::bind(&controller::async_received_service_handler, this, _1, _2));
 
@@ -161,7 +170,7 @@ public:
   void async_send(bacnet::common::protocol::mac::endpoint mac_endpoint, Service&& service, Handler handler) {
     auto data =  bacnet::service::service::detail::generate(std::move(service));
 
-    lower_layer_.async_send_confirmed_request(mac_endpoint.address(), std::move(data), [this, &handler]( const boost::system::error_code& ec){
+    lower_layer_.async_send_confirmed_request(mac_endpoint.address(), std::move(data), [this, handler]( const boost::system::error_code& ec){
       bacnet::service::possible_service_response res;
       handler(ec, res);
     });
@@ -171,8 +180,9 @@ public:
   template<typename Service, typename Handler>
   void async_send(uint32_t device_object_identifier, Service&& service, Handler handler) {
     /* lookup doi */
-    bacnet::common::protocol::mac::endpoint some_endpoint{};
-    async_send(some_endpoint, service, handler);
+
+    auto endpoint = device_manager_.get_endpoint(device_object_identifier);
+    async_send(endpoint, service, handler);
   }
 
   template<typename ServiceType, typename FunctionHandler>
@@ -184,8 +194,10 @@ public:
 private:
     boost::asio::io_service& io_service_;
     UnderlyingLayer &lower_layer_;
+    bacnet::service::detail::device_manager device_manager_;
     bacnet::service::detail::callback_manager callback_manager_;
     bacnet::service::detail::inbound_router inbound_router_;
+
 
 
 };

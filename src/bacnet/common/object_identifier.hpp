@@ -125,6 +125,18 @@ namespace bacnet { namespace common {
       return (object_type_ << object_type_shift_offset) | instance_number_;
     }
 
+    friend bool operator==(const object_identifier& a1, const object_identifier& a2){
+      if(a1.object_type_ == a2.object_type_ && a1.instance_number_ == a2.instance_number_) {
+        return true;
+      }
+      return false;
+    }
+    friend bool operator!=(const object_identifier& a1, const object_identifier& a2){
+      return !(a1 == a2);
+    }
+
+
+
   private:
 
     static constexpr uint32_t object_type_shift_offset = 22;
