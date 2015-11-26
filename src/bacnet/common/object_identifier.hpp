@@ -99,6 +99,16 @@ namespace bacnet { namespace common {
     static constexpr uint32_t  min_object_type      = 0x00400000;
     static constexpr uint32_t  max_object_type      = 0xFFC00000;
 
+    object_identifier() : object_type_(0), instance_number_(0) {
+
+    }
+    object_identifier(const uint32_t in) : object_type_(bacnet::object_type::device), instance_number_(in) {
+
+    }
+    object_identifier(const uint32_t type, const uint32_t in) : object_type_(type), instance_number_(in) {
+
+    }
+
     inline void object_typ(uint32_t const& ot)  {
       object_type_ = ot;
     }
@@ -125,14 +135,19 @@ namespace bacnet { namespace common {
       return (object_type_ << object_type_shift_offset) | instance_number_;
     }
 
-    friend bool operator==(const object_identifier& a1, const object_identifier& a2){
-      if(a1.object_type_ == a2.object_type_ && a1.instance_number_ == a2.instance_number_) {
-        return true;
-      }
-      return false;
+    friend constexpr bool operator==(const object_identifier& a1, const object_identifier& a2) {
+      return (a1.object_type_ == a2.object_type_ && a1.instance_number_ == a2.instance_number_) ? true : false;
     }
-    friend bool operator!=(const object_identifier& a1, const object_identifier& a2){
+
+    friend constexpr bool operator!=(const object_identifier& a1, const object_identifier& a2) {
       return !(a1 == a2);
+    }
+    friend constexpr bool operator<(const object_identifier& a1, const object_identifier& a2) {
+      return (a1.object_type_ < a2.object_type_) ? true : (
+          (a1.instance_number_ < a2.instance_number_) ? true : false );
+    }
+    friend constexpr bool operator>=(const object_identifier& a1, const object_identifier& a2){
+      return !(a1 < a2);
     }
 
 
@@ -141,8 +156,9 @@ namespace bacnet { namespace common {
 
     static constexpr uint32_t object_type_shift_offset = 22;
 
-    uint32_t instance_number_;
     uint32_t object_type_;
+    uint32_t instance_number_;
+
 
   };
 

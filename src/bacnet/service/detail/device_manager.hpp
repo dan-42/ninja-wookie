@@ -45,27 +45,25 @@ public:
                             const bacnet::common::segmentation& max_segmentaions,
                             const uint16_t& vendor_id) {
 
-    if(has_device(endpoint, object_identifier)) {
+    if(has_device(object_identifier)) {
       update(endpoint, object_identifier, max_apdu_size, max_segmentaions, vendor_id);
     }
     else {
-      devices.push_back({endpoint, object_identifier, max_apdu_size, max_segmentaions, vendor_id, std::chrono::steady_clock::now()});
+      device_manager::device d{endpoint, object_identifier, max_apdu_size, max_segmentaions, vendor_id, std::chrono::steady_clock::now()};
+      devices.emplace(std::make_pair(object_identifier, std::move(d)));
     }
   }
 
-  bacnet::common::protocol::mac::endpoint get_endpoint( const bacnet::common::object_identifier& object_identifier) {
-    bacnet::common::protocol::mac::endpoint endpoint;
-    uint32_t  matches{0};
+  std::vector<bacnet::common::protocol::mac::endpoint> get_endpoint( const bacnet::common::object_identifier& object_identifier) {
+
+    print_device_list();
+    std::vector<bacnet::common::protocol::mac::endpoint> endpoints;
     for(auto& device: devices) {
-      if(device.device_object_identifier == object_identifier) {
-        endpoint = device.endpoint;
-        matches++;
+      if(device.first == object_identifier) {
+        endpoints.push_back(device.second.endpoint);
       }
     }
-    if(matches > 1) {
-      std::cerr << "device_manager: " << "more then one endpoint with that doi";
-    }
-    return endpoint;
+    return endpoints;
   }
   void print_device_list() {
     auto formatter_device = boost::format("| %1$+9d | %2$+21d | %3$+6d | %4$_6d | %5$_6d | %6$_8s | %7%\n");
@@ -75,12 +73,12 @@ public:
     os << "device_manager: device_list" << std::endl;
     for(auto& device: devices) {
 
-      os << formatter_device % device.device_object_identifier.instance_number()
-                   % device.endpoint.address().to_string()
-                   % device.endpoint.network()
-                   % device.vendor_id
-                   % device.max_apdu_size
-                   % device.max_segemnations
+      os << formatter_device % device.second.device_object_identifier.instance_number()
+                   % device.second.endpoint.address().to_string()
+                   % device.second.endpoint.network()
+                   % device.second.vendor_id
+                   % device.second.max_apdu_size
+                   % device.second.max_segemnations
                    % " ";
     }
     os << std::endl;
@@ -97,12 +95,19 @@ private:
     std::chrono::steady_clock::time_point last_update;
   };
 
-  bool has_device(const bacnet::common::protocol::mac::endpoint& endpoint,
-                  const bacnet::common::object_identifier& object_identifier) {
-    for(auto &device : devices) {
-      if(device.endpoint == endpoint && device.device_object_identifier == object_identifier) {
+
+  bool has_device( const bacnet::common::protocol::mac::endpoint& endpoint) {
+    for( auto &device : devices) {
+      if(device.second.endpoint == endpoint) {
         return true;
       }
+    }
+    return false;
+  }
+
+  bool has_device(const bacnet::common::object_identifier& object_identifier) {
+    if(devices.count(object_identifier) > 0) {
+      return true;
     }
     return false;
   }
@@ -113,17 +118,18 @@ private:
               const bacnet::common::segmentation& max_segemnations,
               const uint16_t& vendor_id) {
     for(auto &device : devices) {
-      if(device.endpoint == endpoint && device.device_object_identifier == object_identifier) {
-        device.max_apdu_size = max_apdu_size;
-        device.max_segemnations = max_segemnations;
-        device.vendor_id = vendor_id;
-        device.last_update =  std::chrono::steady_clock::now();
+      if(device.second.endpoint == endpoint && device.second.device_object_identifier == object_identifier) {
+        device.second.max_apdu_size = max_apdu_size;
+        device.second.max_segemnations = max_segemnations;
+        device.second.vendor_id = vendor_id;
+        device.second.last_update =  std::chrono::steady_clock::now();
       }
     }
     return false;
   }
 
-  std::list<device> devices;
+ // std::list<device> devices;
+    std::multimap<bacnet::common::object_identifier, device> devices;
 
 };
 

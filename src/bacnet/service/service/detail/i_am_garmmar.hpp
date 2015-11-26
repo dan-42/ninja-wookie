@@ -123,6 +123,7 @@ X'63'       99
     return false;
   }
   service.i_am_device_identifier = tmp_oi.object_identifier_;
+  service.i_am_device_identifier.object_typ(bacnet::object_type::device);
 
   has_succeeded = apdu::parse(data, tmp_unsigned);
   if(!has_succeeded) {

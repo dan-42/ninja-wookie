@@ -114,26 +114,16 @@ struct my_bacnet_application {
     try {
 
 
-      bacnet::service::i_am i_am_;
-      i_am_.i_am_device_identifier.object_typ(bacnet::object_type::device);
-      i_am_.i_am_device_identifier.instance_number(1);
-      i_am_.segmentation_supported.segmented(bacnet::common::segmentation::segment::both);
-      i_am_.vendor_id = 1;
-      i_am_.max_apdu_length_accepted = apdu_size::size_in_bytes;
 
-      //service_controller.async_send(i_am_, [](boost::system::error_code ec){
-      // std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
-      //});
 
+      bacnet::common::object_identifier device_object_id(bacnet::object_type::device, 2);
       bacnet::service::service::reinitialize_device rd;
       rd.reinitialize_state_of_device = 0;
       rd.passowrd = "12345";
 
-      uint32_t device_object_id = 2;
       service_controller.async_send(device_object_id, rd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
         std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
       });
-
 
 
       auto i_am_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
@@ -141,18 +131,29 @@ struct my_bacnet_application {
       };
       service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 
-  /*
-      auto who_is_handler_ = [](boost::system::error_code ec, bacnet::service::meta_information_t mi, bacnet::service::who_is who_is) {
+
+      auto who_is_handler_ = [this](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::who_is who_is) {
         std::cout << "async_receive::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
         if(!ec) {
-          std::cout << "async_receive(who_is_service): low " << std::dec << (int) who_is.device_instance_range_low_limit << std::endl;
-          std::cout << "async_receive(who_is_service): hight " << std::dec << (int) who_is.device_instance_range_high_limit << std::endl;
+
+          bacnet::service::i_am i_am_;
+          i_am_.i_am_device_identifier.object_typ(bacnet::object_type::device);
+          i_am_.i_am_device_identifier.instance_number(2);
+          i_am_.segmentation_supported.segmented(bacnet::common::segmentation::segment::both);
+          i_am_.vendor_id = 1;
+          i_am_.max_apdu_length_accepted = apdu_size::size_in_bytes;
+
+
+          service_controller.async_send(i_am_, [this](boost::system::error_code ec){
+            std::cout << "async_send::i_am " << ec.category().name() << " " << ec.message() <<  std::endl;
+          });
+
         } else {
 
         }
       };
       service_controller.async_receive<bacnet::service::who_is, bacnet::service::callback_service_who_is_t>(who_is_handler_);
-      */
+
 
 
       //std::cout << formatter_i_am % "device_id" % "endpoint" % "net" % "vendor" % "apdu" % "seg" % "binary source" ;
