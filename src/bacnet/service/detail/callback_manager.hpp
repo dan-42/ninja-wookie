@@ -10,19 +10,34 @@
 
 namespace bacnet { namespace service { namespace detail {
 
+
+
       using namespace bacnet::service;
       struct callback_manager {
 
-        void set_service_callback(const callback_service_who_is_t &service_callback) {
-          callback_service_who_is_ = service_callback;
+        void set_service_callback(callback_service_who_is_t service_callback) {
+          callbacks_service_who_is_.push_back(std::move(service_callback));
         }
 
-        void set_service_callback(const callback_service_i_am_t &service_callback) {
-          callback_service_i_am_ = service_callback;
+        void set_service_callback(callback_service_i_am_t service_callback) {
+          callback_service_i_am_ = std::move(service_callback);
         }
 
-        callback_service_who_is_t callback_service_who_is_;
+
+        void invoke(const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi, const bacnet::service::who_is &service) {
+          for(auto &callback_service_who_is_ : callbacks_service_who_is_) {
+            if(!callback_service_who_is_.empty()) {
+              callback_service_who_is_(ec, mi, service);
+            }
+          }
+        }
+
+
+
         callback_service_i_am_t callback_service_i_am_;
+
+      private:
+        std::list<callback_service_who_is_t> callbacks_service_who_is_;
       };
     }}}
 

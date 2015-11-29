@@ -37,17 +37,6 @@ namespace bacnet { namespace configuration {
 namespace detail {
 
 
-//   20.1.2.4   max-segments-accepted
-enum class number_of_max_segments_accepted : uint8_t {
-    unspecified = 0b000,
-    segments_2 = 0b001,
-    segments_4 = 0b010,
-    segments_8 = 0b011,
-    segments_16 = 0b100,
-    segments_32 = 0b101,
-    segments_64 = 0b110,
-    segments_more_then_64 = 0b111
-};
 
 
 //20.1.2.5  max-APDU-length-accepted, 4bit value
@@ -69,6 +58,13 @@ enum  max_apdu_length_accepted : uint8_t {
     reserved_value_15 = 0b1111
 };
 
+
+
+
+
+
+
+
 }
 
 
@@ -89,7 +85,37 @@ enum  max_apdu_length_accepted : uint8_t {
 
   }
 
-}}
+
+//   20.1.2.4   max-segments-accepted
+    enum class max_segments_accepted : uint8_t {
+      unspecified = 0b000,
+      segments_2  = 0b001,
+      segments_4  = 0b010,
+      segments_8  = 0b011,
+      segments_16 = 0b100,
+      segments_32 = 0b101,
+      segments_64 = 0b110,
+      segments_more_then_64 = 0b111
+    };
+
+
+}
+
+
+ struct config {
+   bacnet::common::segmentation segmentation;
+   bacnet::configuration::max_segments_accepted max_segments_accepted = bacnet::configuration::max_segments_accepted::segments_more_then_64;
+   uint16_t  vendor_id = 1337;
+   uint16_t device_object_id = 1;
+
+   /**
+    * if only a BACnet browser, we can disable this.
+    * wer das liesst ist doof.(my gf)
+    */
+   bool send_i_am_frames = true;
+ };
+
+}
 
 
 

@@ -102,12 +102,32 @@ namespace bacnet { namespace common {
     object_identifier() : object_type_(0), instance_number_(0) {
 
     }
-    object_identifier(const uint32_t in) : object_type_(bacnet::object_type::device), instance_number_(in) {
+    object_identifier(const uint32_t &in) : object_type_(bacnet::object_type::device), instance_number_(in) {
 
     }
-    object_identifier(const uint32_t type, const uint32_t in) : object_type_(type), instance_number_(in) {
+    object_identifier(const uint32_t &type, const uint32_t &in) : object_type_(type), instance_number_(in) {
 
     }
+
+    object_identifier(const object_identifier& other) : object_type_(other.object_type_),
+                                                        instance_number_(other.instance_number_)   {
+
+    }
+    object_identifier(object_identifier&& other)  : object_type_(other.object_type_),
+                                                    instance_number_(other.instance_number_)   {
+    }
+
+    object_identifier& operator=(object_identifier&& other) {
+      object_type_ = other.object_type_;
+      instance_number_ = other.instance_number_;
+      return *this;
+    }
+    object_identifier& operator=(const object_identifier& other) {
+      object_type_ = other.object_type_;
+      instance_number_ = other.instance_number_;
+      return *this;
+    }
+
 
     inline void object_typ(uint32_t const& ot)  {
       object_type_ = ot;

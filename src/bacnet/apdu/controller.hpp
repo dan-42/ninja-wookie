@@ -116,11 +116,11 @@ struct controller {
 
     frame.service_data = payload;
     auto data = frame::generator::generate(frame);
-    std::cout << "send async_send_confirmed_request " << std::endl;
-    bacnet::print(data);
+    //std::cout << "send async_send_confirmed_request " << std::endl;
+    //bacnet::print(data);
     // set lambda as callback, and on success sending, store handler in a "handlerManager" with endpoint and invoke id as key
     // don't forget timeout!
-    underlying_controller_.async_send_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec){
+    underlying_controller_.async_send_broadcast(std::move(data), [this, handler]( const boost::system::error_code& ec){
           handler(ec);
       });
   }

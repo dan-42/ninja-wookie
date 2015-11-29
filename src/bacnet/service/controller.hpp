@@ -36,6 +36,7 @@
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
 #include <bacnet/service/service/detail/i_am_garmmar.hpp>
 #include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
+#include <bacnet/common/configuration.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
@@ -92,11 +93,8 @@ namespace bacnet { namespace service { namespace detail {
     }
 
     void operator()(service::who_is service) {
-
-      if(!callback_manager_.callback_service_who_is_.empty()) {
-        boost::system::error_code ec{error::errc::success, error::get_error_category()};
-        callback_manager_.callback_service_who_is_(ec, std::move(meta_information_), std::move(service));
-      }
+      boost::system::error_code ec{error::errc::success, error::get_error_category()};
+      callback_manager_.invoke(ec, std::move(meta_information_), std::move(service));
     }
 
     void operator()(service::i_am service) {
@@ -130,7 +128,13 @@ namespace bacnet { namespace service {
 template<typename UnderlyingLayer, typename ApduSize>
 class controller {
 public:
-  controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer): io_service_(io_service), lower_layer_(lower_layer), timeout_timer_(io_service_), inbound_router_(callback_manager_, device_manager_) {
+  controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer, bacnet::config config):
+                io_service_(io_service),
+                lower_layer_(lower_layer),
+                timeout_timer_(io_service_),
+                inbound_router_(callback_manager_, device_manager_),
+                device_object_identifier_(bacnet::object_type::device, config.device_object_id),
+                config_(config){
 
     lower_layer_.register_async_received_service_callback(boost::bind(&controller::async_received_service_handler, this, _1, _2));
 
@@ -177,7 +181,6 @@ public:
   template<typename Service, typename Handler>
   void async_send(bacnet::common::object_identifier device_object_identifier, Service&& service, Handler handler) {
     /* lookup doi */
-
     auto endpoints = device_manager_.get_endpoint(device_object_identifier);
     if(endpoints.size() == 1) {
       std::cout << "async_send no such endpoint, try who is" << std::endl;
@@ -197,7 +200,7 @@ public:
 
 
       timeout_timer_.expires_from_now(std::chrono::milliseconds(500));
-      timeout_timer_.async_wait([&service, &device_object_identifier, &handler, this](boost::system::error_code ec) {
+      timeout_timer_.async_wait([service, device_object_identifier, &handler, this](boost::system::error_code ec) {
         std::cout << "async_send timeout_timer_  "<< ec << std::endl;
         if(!ec) {
           auto endpoints = device_manager_.get_endpoint(device_object_identifier);
@@ -235,6 +238,8 @@ private:
     bacnet::service::detail::device_manager device_manager_;
     bacnet::service::detail::callback_manager callback_manager_;
     bacnet::service::detail::inbound_router inbound_router_;
+    bacnet::common::object_identifier device_object_identifier_;
+    bacnet::config config_;
 
 
 

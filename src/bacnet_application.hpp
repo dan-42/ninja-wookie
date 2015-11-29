@@ -60,6 +60,7 @@ struct my_bacnet_application {
   typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
 
 
+  bacnet::config config{};
 
   bacnet::bvll::controller bvll_controller;
   bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller;
@@ -70,7 +71,7 @@ struct my_bacnet_application {
                                                                                  bvll_controller(io_service, {bvll_listening_ip, bvll_listening_port, bvll_multicast_ip} ),
                                                                                  npdu_controller(bvll_controller, npdu_network_number),
                                                                                  apdu_controller(io_service, npdu_controller),
-                                                                                 service_controller(io_service, apdu_controller) {
+                                                                                 service_controller(io_service, apdu_controller, config) {
 
   }
 
@@ -120,14 +121,12 @@ struct my_bacnet_application {
       bacnet::service::service::reinitialize_device rd;
       rd.reinitialize_state_of_device = 0;
       rd.passowrd = "12345";
-
       service_controller.async_send(device_object_id, rd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
         std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
       });
 
 
       auto i_am_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
-
       };
       service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
 
@@ -138,9 +137,9 @@ struct my_bacnet_application {
 
           bacnet::service::i_am i_am_;
           i_am_.i_am_device_identifier.object_typ(bacnet::object_type::device);
-          i_am_.i_am_device_identifier.instance_number(2);
-          i_am_.segmentation_supported.segmented(bacnet::common::segmentation::segment::both);
-          i_am_.vendor_id = 1;
+          i_am_.i_am_device_identifier.instance_number(config.device_object_id);
+          i_am_.segmentation_supported = config.segmentation;
+          i_am_.vendor_id              = config.vendor_id;
           i_am_.max_apdu_length_accepted = apdu_size::size_in_bytes;
 
 

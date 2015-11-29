@@ -55,10 +55,10 @@ public:
   }
 
   std::vector<bacnet::common::protocol::mac::endpoint> get_endpoint( const bacnet::common::object_identifier& object_identifier) {
-
-    print_device_list();
+    //print_device_list();
     std::vector<bacnet::common::protocol::mac::endpoint> endpoints;
     for(auto& device: devices) {
+      std::cout << "get_endpoint " << device.first << std::endl;
       if(device.first == object_identifier) {
         endpoints.push_back(device.second.endpoint);
       }
