@@ -75,7 +75,7 @@ namespace bacnet { namespace common {
 
     private:
 
-      segment segmented_;
+      segment segmented_ = segment::both ;
 
     };
 

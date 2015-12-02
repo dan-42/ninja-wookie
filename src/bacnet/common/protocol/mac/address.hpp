@@ -58,10 +58,26 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         return *this;
       }
 
-      inline std::string to_string() {
-        return (address_.to_string() + std::to_string(port_));
+      friend inline bool operator==(const address_ip& a1, const address_ip& a2) {
+        if(a1.address_ == a2.address_ && a1.port_ == a2.port_) {
+          return true;
+        }
+        return false;
       }
 
+      friend bool operator!=(const address_ip& a1, const address_ip& a2) {
+        return !(a1 == a2);
+      }
+
+      inline std::string to_string() {
+        return (address_.to_string() + ":" + std::to_string(port_));
+      }
+
+
+      inline boost::asio::ip::udp::endpoint to_system_endpoint() const {
+        //todo
+        return boost::asio::ip::udp::endpoint{};
+      }
 
     private:
       boost::asio::ip::address_v4 address_;
@@ -127,15 +143,34 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         return *this;
       }
 
-
-        inline std::string to_string() {
-         switch(type_) {
-           case ip_:
-             return address_ip_.to_string();
-           default:
-             return "dick butt";
-         }
+      friend bool operator==(const address& a1, const address& a2) {
+        if ( a1.type_ != a2.type_) {
+          return false;
         }
+        switch (a1.type_) {
+          case ip_:
+            return a1.address_ip_ == a2.address_ip_;
+          case ipv6_:
+            return a1.address_ipv6_ == a2.address_ipv6_;
+          case mstp_:
+            /*to do*/
+            return false;
+        }
+        return false;
+      }
+
+      friend bool operator!=(const address& a1, const address& a2) {
+        return !(a1 == a2);
+      }
+
+      inline std::string to_string() {
+       switch(type_) {
+         case ip_:
+           return address_ip_.to_string();
+         default:
+           return "dick butt";
+       }
+      }
 
 
     private:
@@ -159,6 +194,8 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       endpoint(const bacnet::common::protocol::mac::address_mstp& address)  : network_(1), address_(address)  {
       }
 
+      endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address) : network_(network), address_(address)  {
+      }
       endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) : network_(network), address_(address)  {
       }
       endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  : network_(network), address_(address)  {
@@ -183,6 +220,17 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         network_ = other.network_;
         address_ = other.address_;
         return *this;
+      }
+
+      friend bool operator==(const endpoint& a1, const endpoint& a2) {
+        if(a1.network_ == a2.network_ && a1.address_ == a2.address_) {
+          return true;
+        }
+        return false;
+      }
+
+      friend bool operator!=(const endpoint& a1, const endpoint& a2) {
+        return !(a1 == a2);
       }
 
       inline void network(uint16_t net) { network_ = net;}

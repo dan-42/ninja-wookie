@@ -33,6 +33,18 @@
 namespace bacnet { namespace npdu {
 
 
+    namespace config {
+      static const bacnet::common::protocol::mac::address DEFAULT_MAC_ADDRESS{bacnet::common::protocol::mac::address_ip{"0.0.0.0", 0}};
+      static const constexpr uint16_t  DEFAULT_VENDOR_ID{4242};
+    }
+
+
+    struct configuration {
+      uint16_t  vendor_id{config::DEFAULT_VENDOR_ID};
+      bacnet::common::protocol::mac::address mac_address{config::DEFAULT_MAC_ADDRESS};
+
+    };
+
 //typedef  boost::function<void (bacnet::binary_data&&)> async_receive_broadcast_callback_t;
 //typedef  boost::function<void (bacnet::binary_data&&)> async_receive_unicast_callback_t;
 

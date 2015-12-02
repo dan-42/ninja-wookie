@@ -119,9 +119,9 @@ struct  segmentation_t {
   friend std::ostream& operator<<(std::ostream& os, segmentation_t const& t) {
     std::stringstream ss;
     ss << std::hex << std::setw(2) << std::setfill('0')
-       << (int)t.unused_
-       << (int)t.max_segments_
-       << (int)t.max_accepted_apdu_;
+       << " " << (int)t.unused_
+			 << " " << (int)t.max_segments_
+			 << " " << (int)t.max_accepted_apdu_;
 
     os << ss.str();
     return os;

@@ -31,11 +31,30 @@
 
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
+#include <bacnet/service/service/reinitialize_device.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace unconfirmed {
   typedef boost::variant<
       who_is,
       i_am
   > possible_service;
+
+//xxx todo implement possible responses
+  typedef boost::variant<
+      who_is,
+      i_am
+  > possible_service_response;
 }}}}
+
+
+namespace bacnet { namespace service {
+
+//xxx todo implement possible responses
+        typedef boost::variant<
+            service::who_is,
+            service::i_am,
+            service::reinitialize_device
+        > possible_service_response;
+}}
+
 #endif //NINJA_WOOKIE_SERVICES_HPP

@@ -35,58 +35,33 @@
 #include <bacnet/apdu/detail/inbound_router.hpp>
 #include <bacnet/apdu/detail/callback_manager.hpp>
 
-namespace bacnet { namespace apdu {
+namespace bacnet { namespace apdu { namespace detail {
+
+/**
+ *
+    key is   endpoint + invoke id
+    idea: for each endpoint one transmissionmanager?
+
+ *
+ */
+
+  struct transmission_identifier {
+      bacnet::common::protocol::mac::address mac;
+      uint8_t invoke_id_counter = 0;
+  };
 
 
-    namespace detail {
-
-      //   20.1.2.4   max-segments-accepted
-      enum class number_of_max_segments_accepted : uint8_t {
-        unspecified = 0b000,
-        segments_2 = 0b001,
-        segments_4 = 0b010,
-        segments_8 = 0b011,
-        segments_16 = 0b100,
-        segments_32 = 0b101,
-        segments_64 = 0b110,
-        segments_more_then_64 = 0b111
-      };
+  struct device_transmission_manager {
 
 
-      //20.1.2.5  max-APDU-length-accepted
-      enum class max_apdu_length_accepted : uint8_t {
-        up_to_50_bytes = 0b0000, //minimum
-        up_to_128_bytes = 0b0001,
-        up_to_206_bytes = 0b0010, //(fits in a LonTalk frame)
-        up_to_480_bytes = 0b0011, //(fits in an ARCNET frame)
-        up_to_1024_bytes = 0b0100,
-        up_to_1476_bytes = 0b0101, //(fits in an ISO 8802-3 frame)
-        reserved_value_07 = 0b0110,
-        reserved_value_08 = 0b0111,
-        reserved_value_09 = 0b1001,
-        reserved_value_10 = 0b1010,
-        reserved_value_11 = 0b1011,
-        reserved_value_12 = 0b1100,
-        reserved_value_13 = 0b1101,
-        reserved_value_14 = 0b1110,
-        reserved_value_15 = 0b1111
-      };
 
-    }
+  private:
+      static uint8_t invoke_id_counter;
+  };
 
 
-    namespace settings {
 
-      namespace apdu_size {
-        static const constexpr auto minimal = static_cast<typename std::underlying_type<decltype(detail::max_apdu_length_accepted::up_to_50_bytes)>::type>(
-                                                                                                            detail::max_apdu_length_accepted::up_to_50_bytes);
-        static const constexpr auto ip = static_cast<typename std::underlying_type<decltype(detail::max_apdu_length_accepted::up_to_1476_bytes)>::type>(
-                                                                                                            detail::max_apdu_length_accepted::up_to_1476_bytes);
-      }
-
-    }
-
-}}
+}}}
 
 
 
@@ -99,7 +74,7 @@ namespace bacnet { namespace apdu {
 
 
 
-template<class UnderlyingLayerController>
+template<class UnderlyingLayerController, typename ApduSize>
 struct controller {
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
@@ -130,19 +105,24 @@ struct controller {
   }
 
   template<typename Handler>
-  void async_send_confirmed_request(const bacnet::binary_data& payload, Handler handler) {
+  void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, Handler handler) {
     frame::confirmed_request frame;
     bacnet::apdu::detail::header::segmentation_t seg;
-    seg.max_accepted_apdu_ = 1;
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::confirmed_request;
-    frame.invoke_id = 0;
+
+    seg.max_accepted_apdu_ = ApduSize::size_as_enum;
+    frame.invoke_id       = 0;
     frame.segmentation = seg;
 
     frame.service_data = payload;
     auto data = frame::generator::generate(frame);
-    std::cout << "send async_send_confirmed_request " << std::endl;
-    bacnet::print(data);
-    underlying_controller_.async_send_broadcast(std::move(data), handler);
+    //std::cout << "send async_send_confirmed_request " << std::endl;
+    //bacnet::print(data);
+    // set lambda as callback, and on success sending, store handler in a "handlerManager" with endpoint and invoke id as key
+    // don't forget timeout!
+    underlying_controller_.async_send_broadcast(std::move(data), [this, handler]( const boost::system::error_code& ec){
+          handler(ec);
+      });
   }
 
 
