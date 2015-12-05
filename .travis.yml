@@ -1,5 +1,16 @@
+sudo: required
+dist: trusty
+
 language: cpp
 compiler: g++
+
+compiler: gcc
+addons:
+apt:
+    sources: ['ubuntu-toolchain-r-test']
+    packages: ['g++-4.9', 'cmake']
+
+    
 
 script:
   - mkdir build
