@@ -28,6 +28,13 @@
 
 namespace  bacnet { namespace npdu {
 
+enum priority : uint8_t  {
+    normal_message             = 0,
+    urgent_message             = 1,
+    critical_equipment_message = 2,
+    life_safety_message        = 3
+
+};
 
 struct  control_information_t {
   uint8_t priority_                  : 2;

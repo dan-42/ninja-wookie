@@ -115,8 +115,6 @@ struct my_bacnet_application {
     try {
 
 
-
-
       bacnet::common::object_identifier device_object_id(bacnet::object_type::device, 2);
       bacnet::service::service::reinitialize_device rd;
       rd.reinitialize_state_of_device = 0;
@@ -126,6 +124,8 @@ struct my_bacnet_application {
       });
 
 
+
+      /*
       auto i_am_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
       };
       service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
@@ -153,7 +153,7 @@ struct my_bacnet_application {
       };
       service_controller.async_receive<bacnet::service::who_is, bacnet::service::callback_service_who_is_t>(who_is_handler_);
 
-
+      */
 
       //std::cout << formatter_i_am % "device_id" % "endpoint" % "net" % "vendor" % "apdu" % "seg" % "binary source" ;
 

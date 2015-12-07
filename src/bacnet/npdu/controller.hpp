@@ -77,6 +77,21 @@ public:
     underlying_layer_.async_send_broadcast(binary_frame, handler);
   }
 
+  template<typename Handler>
+  void async_send_unicast(bacnet::common::protocol::mac::endpoint endpoint, const bacnet::binary_data & payload, Handler handler){
+
+    npdu::frame frame;
+    frame.protocol_version = NPDU_PROTOCOL_VERSION;
+    frame.control_field.has_network_layer_message_ = false;
+    frame.control_field.priority_ = npdu::priority::normal_message;
+    frame.hop_count = 0;
+    frame.apdu_data = payload;
+
+    bacnet::binary_data binary_frame = npdu::generator::generate(frame);
+
+    underlying_layer_.async_send_to(binary_frame,endpoint.address(), handler);
+  }
+
 
   void async_receive_broadcast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
     auto frame = npdu::parser::parse(std::move(data));

@@ -128,6 +128,9 @@ namespace bacnet { namespace service {
 template<typename UnderlyingLayer, typename ApduSize>
 class controller {
 public:
+
+  static const constexpr auto time_wait_for_i_am_answer = boost::chrono::milliseconds(500);
+
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer, bacnet::config config):
                 io_service_(io_service),
                 lower_layer_(lower_layer),
@@ -183,33 +186,42 @@ public:
     /* lookup doi */
     auto endpoints = device_manager_.get_endpoint(device_object_identifier);
     if(endpoints.size() == 1) {
-      std::cout << "async_send no such endpoint, try who is" << std::endl;
       async_send(endpoints.front(), service, handler);
     }
+
     else {
       /**
        * send who is, and if more then one answers, send error up to calling layer
        */
+      bool service_has_been_send = false;
+      auto i_am_callback = [&service_has_been_send, &device_object_identifier](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am){
+        if(i_am.i_am_device_identifier == device_object_identifier) {
+          async_send(endpoints.front(), service, handler);
+          service_has_been_send = true;
+        }
+      };
+
+      callback_manager_.set_service_callback(i_am_callback);
       bacnet::service::service::who_is wi(device_object_identifier.instance_number(), device_object_identifier.instance_number());
-      async_send(wi, [&handler](boost::system::error_code ec) {
-        std::cout << "async_send send who is" << std::endl;
-        //todo set special error_code on error
-        //bacnet::service::possible_service_response res;
-        //handler(ec, res);
+      async_send(wi, [handler](boost::system::error_code ec) {
+        if(ec) {
+          //todo set special error_code on error
+          bacnet::service::possible_service_response res;
+          handler(ec, res);
+        }
       });
 
 
-      timeout_timer_.expires_from_now(std::chrono::milliseconds(500));
+      timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
       timeout_timer_.async_wait([service, device_object_identifier, &handler, this](boost::system::error_code ec) {
-        std::cout << "async_send timeout_timer_  "<< ec << std::endl;
         if(!ec) {
-          auto endpoints = device_manager_.get_endpoint(device_object_identifier);
-          if(endpoints.size() == 1) {
-            std::cout << "async_send found send rd "<< ec << std::endl;
-            async_send(endpoints.front(), service, handler);
+          if(service_has_been_send) {
+            //todo set special error_code on error
+            bacnet::service::possible_service_response res;
+            handler(ec, res);
           }
           else {
-            std::cout << "async_send still no device  "<< ec << std::endl;
+            std::cout << "no device with doi found  " << std::endl;
             //todo set special error_code on error
             bacnet::service::possible_service_response res;
             handler(ec, res);
