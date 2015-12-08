@@ -5,6 +5,7 @@
 #ifndef NINJA_WOOKIE_BACNET_SERVICE_DETAIL_CALLBACK_MANAGER_HPP
 #define NINJA_WOOKIE_BACNET_SERVICE_DETAIL_CALLBACK_MANAGER_HPP
 
+#include <stdexcept>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/service/api.hpp>
 
@@ -13,6 +14,7 @@ namespace bacnet { namespace service { namespace detail {
 
 
       using namespace bacnet::service;
+      using namespace bacnet::service::service;
       struct callback_manager {
 
         void set_service_callback(callback_service_who_is_t service_callback) {
@@ -31,8 +33,6 @@ namespace bacnet { namespace service { namespace detail {
             }
           }
         }
-
-
 
         callback_service_i_am_t callback_service_i_am_;
 

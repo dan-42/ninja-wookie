@@ -107,7 +107,7 @@ enum  max_apdu_length_accepted : uint8_t {
    bacnet::configuration::max_segments_accepted max_segments_accepted = bacnet::configuration::max_segments_accepted::segments_more_then_64;
    uint16_t  vendor_id = 1337;
    uint16_t device_object_id = 1;
-
+   uint16_t network_number = 1;
    /**
     * if only a BACnet browser, we can disable this.
     * wer das liesst ist doof.(my gf)

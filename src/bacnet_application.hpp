@@ -31,6 +31,9 @@
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
 
+#include <bacnet/transport/api.hpp>
+#include <bacnet/transport/ip_v4.hpp>
+
 #include <bacnet/bvll/controller.hpp>
 #include <bacnet/npdu/controller.hpp>
 #include <bacnet/apdu/controller.hpp>
@@ -42,34 +45,30 @@
 
 
 
-struct config {
- //vendor_id
- //
-};
-
 
 struct my_bacnet_application {
   boost::asio::io_service& io_service;
 
-  uint16_t npdu_network_number = 1;
+
 
   std::string bvll_listening_ip = "0.0.0.0";
   uint16_t    bvll_listening_port = 0xBAC0;
-  std::string bvll_multicast_ip = "255.255.255.255";
 
   typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
 
 
-  bacnet::config config{};
+  bacnet::config config{}; //default config
 
-  bacnet::bvll::controller bvll_controller;
-  bacnet::npdu::controller<decltype(bvll_controller)> npdu_controller;
-  bacnet::apdu::controller<decltype(npdu_controller), apdu_size > apdu_controller;
+  bacnet::transport::ip_v4                                          transporter;
+  bacnet::bvll::controller<decltype(transporter)>                   bvll_controller;
+  bacnet::npdu::controller<decltype(bvll_controller)>               npdu_controller;
+  bacnet::apdu::controller<decltype(npdu_controller),    apdu_size> apdu_controller;
   bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller;
 
   my_bacnet_application(boost::asio::io_service& io_s) : io_service(io_s),
-                                                                                 bvll_controller(io_service, {bvll_listening_ip, bvll_listening_port, bvll_multicast_ip} ),
-                                                                                 npdu_controller(bvll_controller, npdu_network_number),
+                                                         transporter(io_service, {bvll_listening_ip, bvll_listening_port} ),
+                                                                                 bvll_controller(io_service, transporter),
+                                                                                 npdu_controller(bvll_controller),
                                                                                  apdu_controller(io_service, npdu_controller),
                                                                                  service_controller(io_service, apdu_controller, config) {
 
@@ -81,10 +80,6 @@ struct my_bacnet_application {
     /**
      * todos
      *
-     *  * find a nice way for setting options like:
-     *     vendor_id
-     *     network
-     *     segmentation
      *
      *  * create a managing class, for invoke id's
      *    goal, sending a reinitialize_device and giving a handler which will return the answer, not just when it was send successful.
@@ -114,15 +109,14 @@ struct my_bacnet_application {
      */
     try {
 
-
-      bacnet::common::object_identifier device_object_id(bacnet::object_type::device, 2);
-      bacnet::service::service::reinitialize_device rd;
-      rd.reinitialize_state_of_device = 0;
-      rd.passowrd = "12345";
-      service_controller.async_send(device_object_id, rd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
+      /**
+       * sending a reinitialize device to device with DOI 2
+       */
+      bacnet::common::object_identifier doi(bacnet::object_type::device, 2);
+      bacnet::service::service::reinitialize_device reinitd{0, "12345"};
+      service_controller.async_send(doi, reinitd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
         std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
       });
-
 
 
       /*

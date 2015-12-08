@@ -22,15 +22,13 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         return address_ip(boost::asio::ip::address_v4::from_string(s), port);
       }
 
-      static address_ip from_bytes(const bacnet::binary_data bytes) {
-        //static constexpr uint8_t size_expected = 6;
-        //if(bytes.size() != size_expected) {
-        //  return address_ip{};
-        //}
-        //boost::asio::ip::address::f
-        return address_ip{};
+      static address_ip from_native(const boost::asio::ip::udp::endpoint &ep)  {
+        return address_ip{ep.address().to_v4(), ep.port() };
       }
 
+      static address_ip broadcast(uint16_t port = default_port)  {
+        return address_ip{"255.255.255.255", port };
+      }
 
       address_ip() : port_(default_port) {
       }
@@ -172,6 +170,17 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
        }
       }
 
+      inline bool is_ip() {
+        return type_ == ip_;
+      }
+
+      inline bool is_ipv6() {
+        return type_ == ipv6_;
+      }
+
+      inline bool is_mstp() {
+        return type_ == mstp_;
+      }
 
     private:
       enum { ip_, ipv6_,  mstp_ } type_;

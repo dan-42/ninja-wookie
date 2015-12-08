@@ -23,6 +23,7 @@
 #define NINJA_WOOKIE_BACNET_SERVICE_CONTROLLER_HPP
 
 #include <type_traits>
+#include <chrono>
 #include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -123,13 +124,13 @@ namespace bacnet { namespace service { namespace detail {
 
 namespace bacnet { namespace service {
 
-
+    static const std::chrono::milliseconds time_wait_for_i_am_answer{500};
 
 template<typename UnderlyingLayer, typename ApduSize>
 class controller {
 public:
 
-  static const constexpr auto time_wait_for_i_am_answer = boost::chrono::milliseconds(500);
+
 
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer, bacnet::config config):
                 io_service_(io_service),
@@ -194,7 +195,7 @@ public:
        * send who is, and if more then one answers, send error up to calling layer
        */
       bool service_has_been_send = false;
-      auto i_am_callback = [&service_has_been_send, &device_object_identifier](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am){
+      bacnet::service::callback_service_i_am_t i_am_callback = [handler, service, endpoints, &service_has_been_send, &device_object_identifier, this](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am){
         if(i_am.i_am_device_identifier == device_object_identifier) {
           async_send(endpoints.front(), service, handler);
           service_has_been_send = true;
@@ -213,7 +214,7 @@ public:
 
 
       timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
-      timeout_timer_.async_wait([service, device_object_identifier, &handler, this](boost::system::error_code ec) {
+      timeout_timer_.async_wait([handler, service, endpoints, &service_has_been_send, &device_object_identifier, this](boost::system::error_code ec) {
         if(!ec) {
           if(service_has_been_send) {
             //todo set special error_code on error

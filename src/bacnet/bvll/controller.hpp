@@ -29,32 +29,33 @@
 #include <bitset>
 
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
+
+#include <bacnet/transport/api.hpp>
 
 #include <bacnet/bvll/frames.hpp>
 #include <bacnet/bvll/api.hpp>
 
 #include <bacnet/bvll/detail/inbound_router.hpp>
-#include <bacnet/bvll/detail/transporter.hpp>
 #include <bacnet/bvll/detail/callback_manager.hpp>
 
 
 namespace bacnet { namespace  bvll {
 
-
+template<typename Transporter>
 class controller {
 
 public:
 
-  controller(boost::asio::io_service &ios) : io_service_(ios), transporter_(ios), inbound_router_(callback_manager_) {
-    start();
-  }
+  controller(boost::asio::io_service &ios, Transporter &transporter) :
+                                          io_service_(ios),
+                                          transporter_(transporter),
+                                          inbound_router_(callback_manager_) {
 
-  controller(boost::asio::io_service &ios, const configuration& config) :
-                                                              io_service_(ios),
-                                                              transporter_(ios, config),
-                                                              inbound_router_(callback_manager_)  {
-      start();
+
+
+
+
+    start();
   }
 
 
@@ -67,65 +68,53 @@ public:
   }
 
   void start() {
-
-    auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-    transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
+    //transporter.set_async_receive_callback([](boost::system::error_code aa, bacnet::common::protocol::mac::address bb, bacnet::binary_data cc){});
+    transporter_.set_async_receive_callback(boost::bind(&controller::handle_async_receive, this, boost::asio::placeholders::error, _1, _2));
+    transporter_.start();
   }
 
-  void handle_receive_from(const boost::system::error_code &error, size_t bytes_recvd) {
+  void handle_async_receive(boost::system::error_code error, bacnet::common::protocol::mac::address sender, bacnet::binary_data data) {
 
     if (!error) {
-
-      // copy only what is actually received
-      bacnet::binary_data input(data_.begin(), data_.begin() + bytes_recvd);
-
-      frame::possible_bvll_frame f = parser::parse(std::move(input));
-      inbound_router_.sender_endpoint(sender_endpoint_);
+      frame::possible_bvll_frame f = parser::parse(std::move(data));
+      inbound_router_.sender_endpoint(sender);
       f.apply_visitor(inbound_router_);
 
-      //receive next
-      auto callback = boost::bind(&controller::handle_receive_from, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-      transporter_.async_receive_from(boost::asio::buffer(data_, std::numeric_limits<uint16_t>::max()), sender_endpoint_, callback);
     }
   }
 
-  template<typename Handler>
-  void async_send_broadcast(const bacnet::binary_data &payload, const Handler &handler){
-
-    frame::original_broadcast_npdu frame;
-    frame.npdu_data = payload;
-    frame::possible_bvll_frame f(frame);
-
-    bacnet::binary_data binary_frame = generator::generate(f);
-    transporter_.async_send_broadcast(boost::asio::buffer(binary_frame), handler);
-  }
 
   template<typename Handler>
-  void async_send_to(const bacnet::binary_data &payload, const bacnet::common::protocol::mac::address_ip& address, const Handler &handler){
+  void async_send(const bacnet::binary_data &payload, const bacnet::common::protocol::mac::address_ip& address, const Handler &handler){
 
     frame::original_unicast_npdu frame;
     frame.npdu_data = payload;
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
-    transporter_.async_send_to(boost::asio::buffer(binary_frame),address.to_system_endpoint(),  handler);
+    transporter_.async_send(binary_frame, address,  handler);
   }
+  template<typename Handler>
+  void async_send_broadcast(const bacnet::binary_data &payload, const Handler &handler){
+    //todo here we need a broadcast address or access to the global config? or get a broadcast address from underlying type?
+    auto address = bacnet::common::protocol::mac::address(bacnet::common::protocol::mac::address_ip::broadcast());
+    frame::original_broadcast_npdu frame;
+    frame.npdu_data = payload;
+    frame::possible_bvll_frame f(frame);
 
-  //todo async_send(data, endpoint, handler)
+    bacnet::binary_data binary_frame = generator::generate(f);
+    transporter_.async_send(binary_frame, address,  [](const boost::system::error_code &error){});
+  }
 
 private:
 
   boost::asio::io_service &io_service_;
-  boost::asio::ip::udp::endpoint sender_endpoint_;
+  Transporter &transporter_;
 
-  std::array<uint8_t, std::numeric_limits<uint16_t>::max()> data_;
-
-  bacnet::bvll::detail::transporter transporter_;
   bacnet::bvll::detail::inbound_router inbound_router_;
   bacnet::bvll::detail::callback_manager callback_manager_;
 
 };
-
 
 }}
 

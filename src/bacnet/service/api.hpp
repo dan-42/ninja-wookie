@@ -2,8 +2,8 @@
 // Created by dan on 10.10.15.
 //
 
-#ifndef NINJA_WOOKIE_API_HPP
-#define NINJA_WOOKIE_API_HPP
+#ifndef NINJA_WOOKIE_SERVICE_API_HPP
+#define NINJA_WOOKIE_SERVICE_API_HPP
 
 #include <boost/system/error_code.hpp>
 #include <boost/function.hpp>
@@ -18,4 +18,4 @@ namespace bacnet { namespace service {
   typedef boost::function<void(boost::system::error_code, bacnet::common::protocol::meta_information, bacnet::service::i_am)>    callback_service_i_am_t;
 }}
 
-#endif //NINJA_WOOKIE_API_HPP
+#endif //NINJA_WOOKIE_SERVICE_API_HPP
