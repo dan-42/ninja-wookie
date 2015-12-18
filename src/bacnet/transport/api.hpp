@@ -2,8 +2,8 @@
 // Created by dan on 07.12.15.
 //
 
-#ifndef NINJA_WOOKIE_API_HPP
-#define NINJA_WOOKIE_API_HPP
+#ifndef NINJA_WOOKIE_BACNET_TRANSPORT_API_HPP
+#define NINJA_WOOKIE_BACNET_TRANSPORT_API_HPP
 
 
 #include <boost/system/error_code.hpp>
@@ -41,4 +41,4 @@ namespace bacnet { namespace transport {
 
 }}
 
-#endif //NINJA_WOOKIE_API_HPP
+#endif //NINJA_WOOKIE_BACNET_TRANSPORT_API_HPP

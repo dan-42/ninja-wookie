@@ -1,4 +1,5 @@
-#hunter_add_package(Boost COMPONENTS system unit_test_framework)
+hunter_add_package(Boost COMPONENTS system)
+
 
 set(BOOST_ALL_DYN_LINK ON)
 set(Boost_USE_STATIC_LIBS OFF)
@@ -6,18 +7,8 @@ set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
 
-#set(Boost_NO_SYSTEM_PATHS TRUE)
-#if (Boost_NO_SYSTEM_PATHS)
-#    set(BOOST_ROOT "/opt/boost_1_59_0")
-#    set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
-#    set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
-#endif (Boost_NO_SYSTEM_PATHS)
 
-find_package(Boost 1.59 COMPONENTS  system   REQUIRED )
-add_definitions (-DBOOST_TEST_DYN_LINK)
-link_directories (${Boost_LIBRARY_DIRS})
-include_directories (${Boost_INCLUDE_DIRS})
-
+# boost
 
 find_package(Boost 1.59 COMPONENTS  system  REQUIRED )
 link_directories (${Boost_LIBRARY_DIRS})

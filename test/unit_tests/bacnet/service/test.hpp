@@ -21,5 +21,6 @@
 #define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_SERVICE_TEST_HPP
 
 #include <bacnet/service/test_reinitialize_device.hpp>
+#include <bacnet/service/who_is_i_am.hpp>
 
 #endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_SERVICE_TEST_HPP
