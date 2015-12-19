@@ -104,7 +104,7 @@ public:
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
-    transporter_.async_send(binary_frame, address,  [](const boost::system::error_code &error){});
+    transporter_.async_send(binary_frame, address,  [handler](const boost::system::error_code &error){});
   }
 
 private:

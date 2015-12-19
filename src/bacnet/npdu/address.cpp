@@ -25,12 +25,13 @@
 #include <bacnet/npdu/address.hpp>
 
 
-
 std::ostream &operator<<(std::ostream &os, const bacnet::npdu::address &a) {
-  os << "net: " << (int)a.network_number << " adr: ";
-  for(auto &b : a.binary_address){
-    os <<  std::setfill ('0') << std::setw(2) << std::hex << (int)b << " ";
+  os << "net: " << (int) a.network_number << " adr: ";
+  for(auto &b : a.binary_address) {
+    os << std::setfill('0') << std::setw(2) << std::hex << (int) b << " ";
   }
   return os;
 }
+
+
 

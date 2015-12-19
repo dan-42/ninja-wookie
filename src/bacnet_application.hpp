@@ -114,7 +114,7 @@ struct my_bacnet_application {
        */
       bacnet::common::object_identifier doi(bacnet::object_type::device, 2);
       bacnet::service::service::reinitialize_device reinitd{0, "12345"};
-      service_controller.async_send(doi, reinitd, [](boost::system::error_code ec, bacnet::service::possible_service_response response){
+      service_controller.async_send(doi, reinitd, [](const boost::system::error_code &ec, bacnet::service::possible_service_response response){
         std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
       });
 

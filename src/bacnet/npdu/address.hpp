@@ -298,7 +298,6 @@ BOOST_FUSION_DEFINE_STRUCT(
     (bacnet::binary_data, binary_address)
 )
 
-
 std::ostream &operator<<(std::ostream &os, const bacnet::npdu::address &a);
 
 #endif /* SRC_BACNET_NPDU_ADDRESS_HPP_ */

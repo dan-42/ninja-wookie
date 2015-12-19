@@ -46,7 +46,7 @@
 
 
 
-
+/*
 struct test_who_is_i_am_service {
     boost::asio::io_service& io_service;
 
@@ -127,7 +127,7 @@ BOOST_ASSERT_MSG( 1 == 1, "OK");
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
+*/
 
 
 #endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_SERVICE_WHO_IS_I_AM_HPP

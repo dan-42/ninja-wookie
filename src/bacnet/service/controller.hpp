@@ -24,6 +24,8 @@
 
 #include <type_traits>
 #include <chrono>
+#include <iostream>
+#include <boost/system/error_code.hpp>
 #include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -160,14 +162,17 @@ public:
     auto data =  bacnet::service::service::detail::generate(service);
 
     if( bacnet::service::service::detail::is_broadcast_service<typename std::decay<Service>::type>::value) {
-      std::cout << "send broadcast " << std::endl;
-      bacnet::print(data);
+      //std::cout << "send broadcast " << std::endl;
+      //bacnet::print(data);
       lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec){
         handler(ec);
       });
     }
     else {
       std::cout << "not a broadcast service  " << std::endl;
+      auto ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
+      //bacnet::service::possible_service_response res;
+      handler(ec);
     }
   }
 
@@ -183,13 +188,14 @@ public:
 
 
   template<typename Service, typename Handler>
-  void async_send(bacnet::common::object_identifier device_object_identifier, Service&& service, Handler handler) {
+  void async_send(bacnet::common::object_identifier device_object_identifier, Service service, Handler handler) {
+
     /* lookup doi */
     auto endpoints = device_manager_.get_endpoint(device_object_identifier);
     if(endpoints.size() == 1) {
       async_send(endpoints.front(), service, handler);
+      return;
     }
-
     else {
       /**
        * send who is, and if more then one answers, send error up to calling layer
@@ -215,6 +221,7 @@ public:
 
       timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
       timeout_timer_.async_wait([handler, service, endpoints, &service_has_been_send, &device_object_identifier, this](boost::system::error_code ec) {
+
         if(!ec) {
           if(service_has_been_send) {
             //todo set special error_code on error
