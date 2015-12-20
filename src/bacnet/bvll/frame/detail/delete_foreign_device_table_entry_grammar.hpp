@@ -29,12 +29,17 @@
 #include <bacnet/detail/common/types.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 
+extern template struct bacnet::bvll::detail::generator::bacnet_ip_address_grammar<bacnet::generate_iterator>;
+extern template struct bacnet::bvll::detail::parser::bacnet_ip_address_grammar<bacnet::parse_iterator>;
+
 namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace bacnet::bvll;
 using namespace bacnet::bvll::generator;
+
+
 
 template<typename Iterator>
 struct delete_foreign_device_table_entry_grammar : grammar<Iterator, delete_foreign_device_table_entry()> {
@@ -67,6 +72,7 @@ using namespace ::boost::spirit;
 using namespace ::boost::spirit::qi;
 using namespace bacnet::bvll;
 using namespace bacnet::bvll::parser;
+
 
 
 template<typename Iterator>

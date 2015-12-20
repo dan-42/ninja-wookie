@@ -11,8 +11,8 @@
 
 #include <utility>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/detail/common/types.hpp>
 #include <util/boost/spirit/unused_type.hpp>
+#include <bacnet/detail/common/types.hpp>
 #include <bacnet/bvll/foreign_device_table.hpp>
 
 namespace bacnet { namespace bvll { namespace frame {

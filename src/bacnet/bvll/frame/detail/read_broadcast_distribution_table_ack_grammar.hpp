@@ -27,6 +27,7 @@
 #include <boost/spirit/include/karma.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/bvll/frame/read_broadcast_distribution_table_ack.hpp>
+#include <bacnet/bvll/detail/broadcast_distribution_table_grammar.hpp>
 
 namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
@@ -34,6 +35,8 @@ using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::generator;
+
+using namespace bacnet::bvll::detail::generator;
 
 template<typename Iterator>
 struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_broadcast_distribution_table_ack()> {
@@ -65,6 +68,8 @@ using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::parser;
+
+using namespace bacnet::bvll::detail::parser;
 
 template<typename Iterator>
 struct read_broadcast_distribution_table_ack_grammar : grammar<Iterator, read_broadcast_distribution_table_ack()> {

@@ -25,9 +25,13 @@
 #include <bitset>
 
 #include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/detail/bacnet_ip_address_grammar.hpp>
+
 
 
 int test_npdu() {
+
+
   try
   {
 	  /**
@@ -51,14 +55,14 @@ int test_npdu() {
 
 	  auto start = bin_data_to_parse.begin();
 	  auto end = bin_data_to_parse.end();
-	  bacnet::bvll::parser::bacnet_ip_address_grammar<decltype(start)> p;
+	  bacnet::bvll::detail::parser::bacnet_ip_address_grammar<decltype(start)> p;
 
 	  bool r = boost::spirit::qi::parse(start, end, p , adr);
 
 
 
 	  std::back_insert_iterator<decltype(bin_data_to_generate)> sink(bin_data_to_generate);
-	  bacnet::bvll::generator::bacnet_ip_address_grammar<decltype(sink)> g;
+	  bacnet::bvll::detail::generator::bacnet_ip_address_grammar<decltype(sink)> g;
 
 	  bool r2 = boost::spirit::karma::generate(sink, g, adr);
 

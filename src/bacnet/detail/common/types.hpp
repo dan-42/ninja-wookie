@@ -21,7 +21,9 @@ namespace bacnet { namespace detail { namespace common {
  */
 typedef std::vector<uint8_t> binary_data;
 
+typedef std::back_insert_iterator<binary_data> generate_iterator;
 
+typedef binary_data::iterator parse_iterator;
 
 
 }}}
@@ -31,6 +33,8 @@ namespace bacnet {
 
 /* make it accessable via bacnet namespace */
 using detail::common::binary_data;
+using detail::common::generate_iterator;
+using detail::common::parse_iterator;
 
   static void print(const binary_data &data) {
     for(auto &c : data)

@@ -24,11 +24,8 @@
 
 
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
 
 #include <bacnet/bvll/bacnet_ip_address.hpp>
-
 
 
 BOOST_FUSION_DEFINE_STRUCT(
@@ -40,83 +37,15 @@ BOOST_FUSION_DEFINE_STRUCT(
 
 namespace bacnet { namespace bvll { namespace generator {
 
-using namespace boost::spirit;
-using namespace boost::spirit::karma;
-using namespace bacnet::bvll;
-
-template<typename Iterator>
-struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_distribution_table_entry()> {
-
-
-	rule<Iterator, broadcast_distribution_table_entry()> broadcast_distribution_table_entry_rule;
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, uint32_t()> broadcast_distribution_mask_rule;
-
-	bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
-
-	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(broadcast_distribution_table_entry_rule) {
-
-		broadcast_distribution_table_entry_rule = bacnet_ip_address_rule << broadcast_distribution_mask_rule;
-
-		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
-		broadcast_distribution_mask_rule = big_word;
-
-		broadcast_distribution_table_entry_rule.name("broadcast_distribution_table_entry_rule");
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-		broadcast_distribution_mask_rule.name("broadcast_distribution_mask_rule");
-	}
-};
-
-
-template<typename Container>
-bool generate(Container &c, broadcast_distribution_table_entry &v) {
-	std::back_insert_iterator<Container> sink(c);
-	bacnet::bvll::generator::broadcast_distribution_table_entry_grammar<decltype(sink)> g;
-	return boost::spirit::karma::generate(sink, g, v);
-}
+  bool generate(bacnet::binary_data &c, broadcast_distribution_table_entry &v) ;
 
 }}}
 
 
 namespace bacnet { namespace bvll { namespace parser {
 
-using namespace boost::spirit;
-using namespace boost::spirit::qi;
-using namespace bacnet::bvll;
-
-template<typename Iterator>
-struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_distribution_table_entry()> {
-
-
-	rule<Iterator, broadcast_distribution_table_entry()> broadcast_distribution_table_entry_rule;
-	rule<Iterator, bacnet_ip_address()> bacnet_ip_address_rule;
-	rule<Iterator, uint32_t()> broadcast_distribution_mask_rule;
-
-	bacnet_ip_address_grammar<Iterator> bacnet_ip_address_grammar_;
-
-	broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(broadcast_distribution_table_entry_rule) {
-
-
-		broadcast_distribution_table_entry_rule = bacnet_ip_address_rule > broadcast_distribution_mask_rule;
-
-		bacnet_ip_address_rule = bacnet_ip_address_grammar_;
-		broadcast_distribution_mask_rule = big_word;
-
-		broadcast_distribution_table_entry_rule.name("broadcast_distribution_table_entry_rule");
-		bacnet_ip_address_rule.name("bacnet_ip_address_rule");
-		broadcast_distribution_mask_rule.name("broadcast_distribution_mask_rule");
-	}
-};
-
-template<typename Container>
-bool parse(Container &i, broadcast_distribution_table_entry &v){
-	auto start = i.begin(); auto end = i.end();
-	broadcast_distribution_table_entry_grammar<decltype(start)> grammar;
-	return boost::spirit::qi::parse(start, end, grammar, v);
-}
+  bool parse(bacnet::binary_data &i, broadcast_distribution_table_entry &v);
 
 }}}
-
-
 
 #endif /* SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_ENTRY_HPP_ */

@@ -21,6 +21,7 @@
 
 #ifndef SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_
 #define SRC_BACNET_BVLL_FRAME_READ_BROADCAST_DISTRIBUTION_TABLE_ACK_HPP_
+
 #include <utility>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/detail/common/types.hpp>

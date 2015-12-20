@@ -25,9 +25,13 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
+#include <bacnet/detail/common/types.hpp>
 #include <bacnet/bvll/frame/forwarded_npdu.hpp>
 #include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/detail/bacnet_ip_address_grammar.hpp>
 
+extern template struct bacnet::bvll::detail::generator::bacnet_ip_address_grammar<bacnet::generate_iterator>;
+extern template struct bacnet::bvll::detail::parser::bacnet_ip_address_grammar<bacnet::parse_iterator>;
 
 namespace bacnet { namespace bvll { namespace frame { namespace detail { namespace generator {
 
@@ -35,6 +39,8 @@ using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::generator;
+
+//extern template struct bacnet::bvll::detail::bacnet_ip_address_grammar<bacnet::generate_iterator>;
 
 template<typename Iterator>
 struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {
@@ -66,6 +72,8 @@ using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace bacnet::bvll::frame;
 using namespace bacnet::bvll::parser;
+
+//extern template struct bacnet::bvll::detail::bacnet_ip_address_grammar<bacnet::parse_iterator>;
 
 template<typename Iterator>
 struct forwarded_npdu_grammar : grammar<Iterator, forwarded_npdu()> {

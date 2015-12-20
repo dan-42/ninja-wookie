@@ -25,9 +25,6 @@
 #include <string>
 
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
-
 #include <bacnet/bvll/bacnet_ip_address.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(

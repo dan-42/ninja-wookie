@@ -39,6 +39,9 @@
 #include <bacnet/bvll/detail/callback_manager.hpp>
 
 
+
+
+
 namespace bacnet { namespace  bvll {
 
 template<typename Transporter>
@@ -50,11 +53,6 @@ public:
                                           io_service_(ios),
                                           transporter_(transporter),
                                           inbound_router_(callback_manager_) {
-
-
-
-
-
     start();
   }
 
@@ -68,9 +66,7 @@ public:
   }
 
   void start() {
-    //transporter.set_async_receive_callback([](boost::system::error_code aa, bacnet::common::protocol::mac::address bb, bacnet::binary_data cc){});
     transporter_.set_async_receive_callback(boost::bind(&controller::handle_async_receive, this, boost::asio::placeholders::error, _2, _3));
-    //transporter_.set_async_receive_callback(boost::bind(&controller::handle_async_receive, this, _1, _2, _3));
     transporter_.start();
   }
 

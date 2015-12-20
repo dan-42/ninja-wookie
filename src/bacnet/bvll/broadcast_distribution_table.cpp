@@ -18,26 +18,30 @@
  * Authors: Daniel Friedrich
  */
 
+#include <bacnet/bvll/broadcast_distribution_table.hpp>
+#include <bacnet/bvll/detail/broadcast_distribution_table_grammar.hpp>
 
-#ifndef SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_
-#define SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_
-
-
-#include <vector>
-#include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/broadcast_distribution_table_entry.hpp>
-
-namespace bacnet { namespace bvll {
-	typedef std::vector<bacnet::bvll::broadcast_distribution_table_entry> broadcast_distribution_table;
-}}
 
 namespace bacnet { namespace bvll { namespace generator {
-  bool generate(bacnet::binary_data &c, broadcast_distribution_table &v);
+
+  bool generate(bacnet::binary_data &c, broadcast_distribution_table &v) {
+    std::back_insert_iterator<std::decay<decltype(c)>::type> sink(c);
+    bacnet::bvll::detail::generator::broadcast_distribution_table_grammar<decltype(sink)> g;
+    return boost::spirit::karma::generate(sink, g, v);
+  }
+
 }}}
 
 
 namespace bacnet { namespace bvll { namespace parser {
-  bool parse(bacnet::binary_data &i, broadcast_distribution_table &v);
+
+
+  bool parse(bacnet::binary_data &i, broadcast_distribution_table &v){
+    auto start = i.begin(); auto end = i.end();
+    bacnet::bvll::detail::parser::broadcast_distribution_table_grammar<decltype(start)> grammar;
+    return boost::spirit::qi::parse(start, end, grammar, v);
+  }
+
 }}}
 
-#endif /* SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_ */
+
