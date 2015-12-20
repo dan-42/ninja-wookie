@@ -25,6 +25,7 @@ ENDIF()
 
 
 project(ninja-wookie)
+enable_testing ()
 
 set(NINJA_WOOKIE_LIBRARY_NAME "wookie")
 set(NINJA_WOOKIE_EXEC_NAME "ninja-wookie")
@@ -47,5 +48,4 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 add_subdirectory(src)
 add_subdirectory(test)
-enable_testing ()
-add_test (NAME ${NINJA_WOOKIE_TEST_NAME} COMMAND ${NINJA_WOOKIE_TEST_NAME})
+
