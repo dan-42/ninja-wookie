@@ -18,10 +18,8 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TYPE_CHARACTER_STRING_HPP
-#define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TYPE_CHARACTER_STRING_HPP
 
-#include <iostream>
+#define BOOST_TEST_MODULE test ninja wookie bacnet apdu types character string
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
@@ -48,7 +46,17 @@ bool is_equal(const bacnet::apdu::type::character_string& a, const bacnet::apdu:
   }
   return true;
 }
-
+bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {
+  if(a.size() != b.size()) {
+    return false;
+  }
+  for(std::size_t idx = 0; idx < a.size(); ++idx) {
+    if(a.at(idx) != b.at(idx)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 BOOST_AUTO_TEST_SUITE( apdu_type_character_string )
 
@@ -96,4 +104,3 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif /*NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TYPE_CHARACTER_STRING_HPP*/

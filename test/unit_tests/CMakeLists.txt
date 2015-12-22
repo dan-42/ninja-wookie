@@ -26,12 +26,14 @@ include_directories(${CMAKE_CURRENT_LIST_DIR} )
 
 
 function(add_new_test test_name file_path)
-    set(executable_name "${NINJA_WOOKIE_TEST_NAME}_${test_name}")
+    set(executable_name "${NINJA_WOOKIE_TEST_NAME}-${test_name}")
 
-    file(GLOB NINJA_WOOKIE_TEST_SOURCE_CPP "${file_path}/*.cpp")
+    file(GLOB NINJA_WOOKIE_TEST_SOURCE_CPP "${CMAKE_CURRENT_SOURCE_DIR}/${file_path}")
 
-    message(INFO "TEST ${NINJA_WOOKIE_TEST_SOURCE_CPP}")
-    message(INFO "TEST ${file_path}")
+
+    message(INFO "TEST SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}")
+    message(INFO "TEST SOURCE_DIR_TEST ${CMAKE_CURRENT_SOURCE_DIR}/${file_path}")
+    message(INFO "TEST SOURCE FILES ${NINJA_WOOKIE_TEST_SOURCE_CPP}")
 
     add_executable ("${executable_name}"  "${NINJA_WOOKIE_TEST_SOURCE_CPP}")
     target_link_libraries (${executable_name}
@@ -48,8 +50,12 @@ function(add_new_test test_name file_path)
     add_test (NAME ${executable_name} COMMAND ${executable_name})
 
 endfunction(add_new_test)
-# todo make path absolut 
-add_new_test("bacnet_ip_address" "./bacnet/bvll/types")
 
+
+
+
+add_subdirectory(bacnet/bvll)
+add_subdirectory(bacnet/npdu)
+add_subdirectory(bacnet/apdu)
 
 

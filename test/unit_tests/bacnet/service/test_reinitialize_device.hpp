@@ -30,7 +30,7 @@
 
 
 /*
-bool is_equal(const bacnet::apdu::type::character_string& a, const bacnet::apdu::type::character_string& b) {
+bool is_equal(const bacnet::apdu::types::character_string& a, const bacnet::apdu::types::character_string& b) {
   if(a.encoding_ != b.encoding_) {
     return false;
   }
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_SUITE( service_reninialize_device)
     bacnet::print(generated);
 
     //BOOST_TEST(is_equal(generation_expected, generated), "fail tag generation failed");
-    //BOOST_TEST(bacnet::apdu::type::parse(generated, character_string_parsed), "fail parse simple tag");
+    //BOOST_TEST(bacnet::apdu::types::parse(generated, character_string_parsed), "fail parse simple tag");
     //BOOST_TEST(is_equal(character_string_to_generate, character_string_parsed), "failed parsed is not expected");
 
   }

@@ -183,7 +183,7 @@ namespace bacnet { namespace common {
   };
 
 static inline std::ostream& operator<<(std::ostream& os, const object_identifier &oi) {
-  os << " type: "     << std::dec << oi.object_typ()
+  os << " types: "     << std::dec << oi.object_typ()
      << " instance: " << std::dec << oi.instance_number();
   return os;
 }

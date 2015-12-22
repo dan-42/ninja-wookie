@@ -36,9 +36,9 @@ BOOST_FUSION_DEFINE_STRUCT(
     (bacnet::common::object_identifier, object_identifier_)
 )
 /*
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace apdu { namespace types {
 
-static inline std::ostream& operator<<(std::ostream& os, const bacnet::apdu::type::object_identifier &oi) {
+static inline std::ostream& operator<<(std::ostream& os, const bacnet::apdu::types::object_identifier &oi) {
     os << " tag: "   << std::dec << oi.tag_
     << " object_identifier: " << std::dec << oi.object_identifier_;
     return os;

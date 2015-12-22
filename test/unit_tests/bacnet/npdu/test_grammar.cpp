@@ -19,13 +19,12 @@
  */
 
 
-#ifndef NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_NPDU_GRAMMAR_HPP
-#define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_NPDU_GRAMMAR_HPP
-
-#include <iostream>
+#define BOOST_TEST_MODULE test ninja wookie bacnet npdu grammar
 #include <boost/test/included/unit_test.hpp>
 
+#include <iostream>
 #include <bacnet/npdu/controller.hpp>
+
 
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {
 
@@ -203,4 +202,4 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif //NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_NPDU_GRAMMAR_HPP
+

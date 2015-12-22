@@ -42,7 +42,7 @@ std::ostream &bacnet::bvll::operator<<(std::ostream &os, const type &t) {
       os << "bvll_bacnet_ip_v6(0x82)";
       break;
     default:
-      os << "unknown bvlc type (0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(t) << ")";
+      os << "unknown bvlc types (0x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(t) << ")";
   }
   return os;
 }

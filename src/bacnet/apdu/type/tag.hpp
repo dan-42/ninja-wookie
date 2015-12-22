@@ -23,6 +23,9 @@
 #define NINJA_WOOKIE_TAG_HPP
 
 #include <cstdint>
+#include <boost/fusion/include/adapt_struct.hpp>
+
+
 
 namespace bacnet { namespace apdu {  namespace type {
 

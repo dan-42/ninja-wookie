@@ -14,11 +14,11 @@ HunterGate(
 # to Debug prior to calling PROJECT()
 # source: http://www.cmake.org/pipermail/cmake/2008-September/023808.html
 IF(DEFINED CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are:
+    SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the types of build, options are:
                                                            None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release."
        )
 ELSE()
-    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are:
+    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the types of build, options are:
                                              None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release"
     )
 ENDIF()

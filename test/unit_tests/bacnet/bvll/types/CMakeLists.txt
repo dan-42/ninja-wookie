@@ -1,0 +1,1 @@
+add_new_test("bacnet-ip-address" "./test_bacnet_ip_address.cpp")

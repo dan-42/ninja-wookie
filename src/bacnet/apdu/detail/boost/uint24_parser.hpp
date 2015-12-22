@@ -53,7 +53,7 @@ namespace boost { namespace spirit { namespace repository { namespace qi {
 struct big_24word_parser
     : boost::spirit::qi::primitive_parser<big_24word_parser>
 {
-    // Define the attribute type exposed by this parser component
+    // Define the attribute types exposed by this parser component
     template <typename Context, typename Iterator>
     struct attribute
     {

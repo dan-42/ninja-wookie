@@ -93,7 +93,7 @@ public:
   }
   template<typename Handler>
   void async_send_broadcast(const bacnet::binary_data &payload, const Handler &handler){
-    //todo here we need a broadcast address or access to the global config? or get a broadcast address from underlying type?
+    //todo here we need a broadcast address or access to the global config? or get a broadcast address from underlying types?
     auto address = bacnet::common::protocol::mac::address(bacnet::common::protocol::mac::address_ip::broadcast());
     frame::original_broadcast_npdu frame;
     frame.npdu_data = payload;

@@ -18,11 +18,9 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TYPE_TAG_HPP
-#define NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TYPE_TAG_HPP
-
-#include <iostream>
+#define BOOST_TEST_MODULE test ninja wookie bacnet apdu types tag
 #include <boost/test/included/unit_test.hpp>
+
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/tag.hpp>
@@ -43,7 +41,17 @@ bool is_equal(const bacnet::apdu::type::tag& a, const bacnet::apdu::type::tag& b
   }
   return true;
 }
-
+bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {
+    if(a.size() != b.size()) {
+        return false;
+    }
+    for(std::size_t idx = 0; idx < a.size(); ++idx) {
+        if(a.at(idx) != b.at(idx)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 namespace  bacnet { namespace apdu { namespace type {
 static bacnet::binary_data generate(const bacnet::apdu::type::tag &tag_) {
@@ -486,4 +494,3 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif /*NINJA_WOOKIE_TEST_UNIT_TEST_BACNET_APDU_TYPE_TAG_HPP*/
