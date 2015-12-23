@@ -287,29 +287,38 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
   rule<Iterator, possible_bvll_frame()> possible_bvll_frame_rule;
 
   rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
+  rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
 
   original_broadcast_npdu_grammar<Iterator> original_broadcast_npdu_grammar_;
+  original_unicast_npdu_grammar<Iterator> original_unicast_npdu_grammar_;
 
 
   bvll_grammar(const uint32_t &size) : bvll_grammar::base_type(possible_bvll_frame_rule), size_(size) {
     size_ += frame_size_offset;
-    possible_bvll_frame_rule =  original_broadcast_npdu_rule;
+    possible_bvll_frame_rule =  original_broadcast_npdu_rule | original_unicast_npdu_rule;
 
-    original_broadcast_npdu_rule = byte_(base_type(type::bvll_bacnet_ip_v4)) <<	byte_(base_type(function::original_broadcast_npdu))		<< big_word[_1 = boost::phoenix::ref(size_)]		<< original_broadcast_npdu_grammar_;
+    original_broadcast_npdu_rule    = byte_(base_type(type::bvll_bacnet_ip_v4))
+                                   <<	byte_(base_type(function::original_broadcast_npdu))
+                                   << big_word[_1 = boost::phoenix::ref(size_)]
+                                   << original_broadcast_npdu_grammar_;
 
+    original_unicast_npdu_rule    = byte_(base_type(type::bvll_bacnet_ip_v4))
+                                    <<	byte_(base_type(function::original_unicast_npdu))
+                                    << big_word[_1 = boost::phoenix::ref(size_)]
+                                    << original_unicast_npdu_grammar_;
+
+    possible_bvll_frame_rule.name("possible_bvll_frame_rule");
     original_broadcast_npdu_rule.name("original_broadcast_npdu_rule");
+    original_unicast_npdu_rule.name("original_unicast_npdu_rule");
+
 
 
 //
-/*
-		debug(bvlc_result_rule);
-		debug(write_broadcast_distribution_table_rule);
-		debug(read_broadcast_distribution_table_ack_rule);
-		debug(forwarded_npdu_rule);
-		debug(register_foreign_device_rule);
-		debug(distribute_broadcast_to_network_rule);
-		debug(original_unicast_npdu_rule);
+ /*
+		debug(possible_bvll_frame_rule);
 		debug(original_broadcast_npdu_rule);
+		debug(original_unicast_npdu_rule);
+
 // */
 
 

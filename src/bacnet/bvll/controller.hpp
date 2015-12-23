@@ -70,17 +70,6 @@ public:
     transporter_.start();
   }
 
-  void handle_async_receive(boost::system::error_code error, bacnet::common::protocol::mac::address sender, bacnet::binary_data data) {
-
-    if (!error) {
-      frame::possible_bvll_frame f = parser::parse(std::move(data));
-      inbound_router_.sender_endpoint(sender);
-      f.apply_visitor(inbound_router_);
-
-    }
-  }
-
-
   template<typename Handler>
   void async_send(const bacnet::binary_data &payload, const bacnet::common::protocol::mac::address_ip& address, const Handler &handler){
 
@@ -89,11 +78,12 @@ public:
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
-    transporter_.async_send(binary_frame, address,  handler);
+    transporter_.async_send(binary_frame, bacnet::common::protocol::mac::address(address),  handler);
   }
+
   template<typename Handler>
   void async_send_broadcast(const bacnet::binary_data &payload, const Handler &handler){
-    //todo here we need a broadcast address or access to the global config? or get a broadcast address from underlying types?
+    //todo here we need a broadcast address AND PORT or access to the global config? or get a broadcast address from underlying types?
     auto address = bacnet::common::protocol::mac::address(bacnet::common::protocol::mac::address_ip::broadcast());
     frame::original_broadcast_npdu frame;
     frame.npdu_data = payload;
@@ -104,6 +94,14 @@ public:
   }
 
 private:
+
+  void handle_async_receive(boost::system::error_code error, bacnet::common::protocol::mac::address sender, bacnet::binary_data data) {
+    if (!error) {
+      frame::possible_bvll_frame f = parser::parse(std::move(data));
+      inbound_router_.sender_endpoint(sender);
+      f.apply_visitor(inbound_router_);
+    }
+  }
 
   boost::asio::io_service &io_service_;
   Transporter &transporter_;

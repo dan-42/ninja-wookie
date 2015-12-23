@@ -57,5 +57,6 @@ endfunction(add_new_test)
 add_subdirectory(bacnet/bvll)
 add_subdirectory(bacnet/npdu)
 add_subdirectory(bacnet/apdu)
+add_subdirectory(bacnet/transport)
 
 

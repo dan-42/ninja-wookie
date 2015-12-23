@@ -91,13 +91,13 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
 
     class address {
     public:
-      address_ip ip() {
+      address_ip ip() const {
         return address_ip_;
       }
-      address_ipv6 ipv6() {
+      address_ipv6 ipv6() const {
         return address_ipv6_;
       }
-      address_mstp mstp() {
+      address_mstp mstp() const {
         return address_mstp_;
       }
 
@@ -170,15 +170,15 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
        }
       }
 
-      inline bool is_ip() {
+      inline bool is_ip() const {
         return type_ == ip_;
       }
 
-      inline bool is_ipv6() {
+      inline bool is_ipv6() const {
         return type_ == ipv6_;
       }
 
-      inline bool is_mstp() {
+      inline bool is_mstp() const {
         return type_ == mstp_;
       }
 

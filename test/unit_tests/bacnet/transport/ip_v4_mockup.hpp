@@ -21,7 +21,11 @@ namespace bacnet { namespace transport {
 
 typedef boost::function<boost::system::error_code (boost::asio::ip::udp::endpoint,  ::bacnet::binary_data) > async_send_from_stack_callback;
 
-
+/**
+ * simple mockup for testing the stack without the need of a real IP-connection
+ * calling async_send  -> calls async_send_from_stack_callback
+ * calling async_send_to_stack  -> calls async_receive_callback
+ */
 struct ip_v4_mockup {
 
 public:
@@ -42,13 +46,16 @@ public:
 
 
     template<typename Handler>
-    void async_send(const ::bacnet::binary_data &data, ::bacnet::common::protocol::mac::address &receiver, const Handler &handler) {
-      if(!receiver.is_ip()) {
-        throw new std::runtime_error("transport::ip_v4 : its not a ip endpoint");
-      }
-      auto ip_receiver = receiver.ip().to_system_endpoint();
-      boost::system::error_code ec = async_send_from_stack_callback_(ip_receiver, data);
-      handler(ec);
+    void async_send(const ::bacnet::binary_data &data, const ::bacnet::common::protocol::mac::address &receiver, const Handler &handler) {
+      bacnet::print(data);
+      io_service_.post([this, data, receiver, handler](){
+        if(!receiver.is_ip()) {
+          throw new std::runtime_error("transport::ip_v4 : its not a ip endpoint");
+        }
+        auto ip_receiver = receiver.ip().to_system_endpoint();
+        boost::system::error_code ec = async_send_from_stack_callback_(ip_receiver, data);
+        handler(ec);
+      });
     }
 
     void start() {
@@ -60,7 +67,9 @@ public:
     }
 
     void async_send_to_stack(boost::system::error_code ec, ::bacnet::common::protocol::mac::address ep ,::bacnet::binary_data data) {
-      async_receive_callback_(ec, ep, data);
+      io_service_.post([=]() {
+        async_receive_callback_(ec, ep, data);
+      });
     }
 
 private:

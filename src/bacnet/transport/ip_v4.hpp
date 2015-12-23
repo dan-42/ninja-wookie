@@ -44,7 +44,7 @@ public:
   }
 
   template<typename Handler>
-  void async_send(const bacnet::binary_data &data, bacnet::common::protocol::mac::address &receiver, const Handler &handler) {
+  void async_send(const bacnet::binary_data &data, const bacnet::common::protocol::mac::address &receiver, const Handler &handler) {
     if(!receiver.is_ip()) {
       throw new std::runtime_error("transport::ip_v4 : its not a ip endpoint");
     }
