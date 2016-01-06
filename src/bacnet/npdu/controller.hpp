@@ -39,10 +39,10 @@
 namespace bacnet { namespace npdu {
 
 
-constexpr uint8_t  NPDU_PROTOCOL_VERSION = 1;
-constexpr uint16_t DEFAULT_NETWORK_NUMBER = 1;
+constexpr uint8_t  NPDU_PROTOCOL_VERSION    = 1;
+constexpr uint16_t DEFAULT_NETWORK_NUMBER   = 1;
 constexpr uint16_t BROADCAST_NETWORK_NUMBER = 0xFFFF;
-constexpr uint8_t  BROADCAST_HOP_COUNT = 0xFF;
+constexpr uint8_t  BROADCAST_HOP_COUNT      = 0xFF;
 
 template<class Underlying_layer>
 class controller {
@@ -89,18 +89,17 @@ public:
 
     bacnet::binary_data binary_frame = npdu::generator::generate(frame);
 
-    underlying_layer_.async_send_to(binary_frame,endpoint.address(), handler);
+    underlying_layer_.async_send(binary_frame, endpoint.address(), handler);
   }
 
+
+private:
 
   void async_receive_broadcast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
     auto frame = npdu::parser::parse(std::move(data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }
-
-
-private:
 
   void init() {
     underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1, _2));

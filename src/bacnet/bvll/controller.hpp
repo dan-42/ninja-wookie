@@ -39,9 +39,6 @@
 #include <bacnet/bvll/detail/callback_manager.hpp>
 
 
-
-
-
 namespace bacnet { namespace  bvll {
 
 template<typename Transporter>
@@ -71,14 +68,14 @@ public:
   }
 
   template<typename Handler>
-  void async_send(const bacnet::binary_data &payload, const bacnet::common::protocol::mac::address_ip& address, const Handler &handler){
+  void async_send(const bacnet::binary_data &payload, const bacnet::common::protocol::mac::address& address, const Handler &handler){
 
     frame::original_unicast_npdu frame;
     frame.npdu_data = payload;
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
-    transporter_.async_send(binary_frame, bacnet::common::protocol::mac::address(address),  handler);
+    transporter_.async_send(binary_frame, address,  handler);
   }
 
   template<typename Handler>
