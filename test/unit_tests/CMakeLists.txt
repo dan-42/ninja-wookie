@@ -30,11 +30,6 @@ function(add_new_test test_name file_path)
 
     file(GLOB NINJA_WOOKIE_TEST_SOURCE_CPP "${CMAKE_CURRENT_SOURCE_DIR}/${file_path}")
 
-
-    message(INFO "TEST SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}")
-    message(INFO "TEST SOURCE_DIR_TEST ${CMAKE_CURRENT_SOURCE_DIR}/${file_path}")
-    message(INFO "TEST SOURCE FILES ${NINJA_WOOKIE_TEST_SOURCE_CPP}")
-
     add_executable ("${executable_name}"  "${NINJA_WOOKIE_TEST_SOURCE_CPP}")
     target_link_libraries (${executable_name}
             ${NINJA_WOOKIE_LIBRARY_NAME}
@@ -56,6 +51,7 @@ add_subdirectory(bacnet/transport)
 add_subdirectory(bacnet/bvll)
 add_subdirectory(bacnet/npdu)
 add_subdirectory(bacnet/apdu)
+add_subdirectory(bacnet/service)
 
 
 

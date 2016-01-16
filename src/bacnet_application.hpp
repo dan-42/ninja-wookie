@@ -70,7 +70,7 @@ struct my_bacnet_application {
                                                                                  bvll_controller(io_service, transporter),
                                                                                  npdu_controller(bvll_controller),
                                                                                  apdu_controller(io_service, npdu_controller),
-                                                                                   service_controller(io_service, apdu_controller, config) {
+                                                                                 service_controller(io_service, apdu_controller, config) {
 
   }
 

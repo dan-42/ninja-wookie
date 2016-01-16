@@ -30,8 +30,7 @@
 #include <bacnet/apdu/controller.hpp>
 
 
-
-BOOST_AUTO_TEST_SUITE( test_services_who-is-i-am )
+BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
   BOOST_AUTO_TEST_CASE( test_send_who_is ) {
 
