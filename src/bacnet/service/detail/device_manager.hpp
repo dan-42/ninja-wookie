@@ -23,6 +23,7 @@
 #define NINJA_WOOKIE_DEVICE_MANAGER_HPP
 
 #include <chrono>
+#include <boost/format.hpp>
 #include <bacnet/common/protocol/mac/address.hpp>
 #include <bacnet/common/object_identifier.hpp>
 #include <bacnet/common/segment.hpp>
