@@ -7,14 +7,14 @@
 
 
 #include <boost/system/error_code.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/mac/address.hpp>
 
 namespace bacnet { namespace transport {
 
-    typedef boost::function<void(boost::system::error_code, bacnet::common::protocol::mac::address, bacnet::binary_data)> async_receive_callback;
+    typedef std::function<void(boost::system::error_code, bacnet::common::protocol::mac::address, bacnet::binary_data)> async_receive_callback;
 
 
 

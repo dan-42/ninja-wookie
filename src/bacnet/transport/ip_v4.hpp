@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include <boost/asio.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include <boost/bind.hpp>
 #include <bacnet/transport/api.hpp>
 
@@ -56,7 +56,7 @@ public:
 
   void start() {
 
-    if(async_receive_callback_.empty()) {
+    if(!async_receive_callback_) {
       throw new std::runtime_error("transport::ip_v4 : no callback set, cant work without it");
     }
 

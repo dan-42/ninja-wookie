@@ -107,11 +107,9 @@ namespace bacnet { namespace service { namespace detail {
                                     service.segmentation_supported,
                                     service.vendor_id);
       device_manager_.print_device_list();
-      if(!callback_manager_.callback_service_i_am_.empty()) {
-        boost::system::error_code ec{error::errc::success, error::get_error_category()};
-        callback_manager_.callback_service_i_am_(ec, std::move(meta_information_), std::move(service));
 
-      }
+      boost::system::error_code ec{error::errc::success, error::get_error_category()};
+      callback_manager_.invoke(ec, std::move(meta_information_), std::move(service));
     }
 
   private:
@@ -208,7 +206,7 @@ public:
         }
       };
 
-      callback_manager_.set_service_callback(i_am_callback);
+    //  callback_manager_.set_service_callback(i_am_callback);
       bacnet::service::service::who_is wi(device_object_identifier.instance_number(), device_object_identifier.instance_number());
       async_send(wi, [handler](boost::system::error_code ec) {
         if(ec) {
@@ -245,9 +243,9 @@ public:
     }
   }
 
-  template<typename ServiceType, typename FunctionHandler>
-  void async_receive(FunctionHandler function_handler) {
-    callback_manager_.set_service_callback(function_handler);
+  template<typename ...Callbacks>
+  void async_receive(Callbacks... callbacks) {
+    callback_manager_.set_service_callbacks(callbacks...);
   }
 
 

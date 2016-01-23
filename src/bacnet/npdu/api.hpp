@@ -23,7 +23,7 @@
 
 #include <cstdint>
 
-#include <boost/function.hpp>
+#include <functional>
 #include <boost/asio/ip/udp.hpp>
 
 #include <bacnet/common/protocol/meta_information.hpp>
@@ -45,10 +45,10 @@ namespace bacnet { namespace npdu {
 
     };
 
-//typedef  boost::function<void (bacnet::binary_data&&)> async_receive_broadcast_callback_t;
-//typedef  boost::function<void (bacnet::binary_data&&)> async_receive_unicast_callback_t;
+//typedef  std::function<void (bacnet::binary_data&&)> async_receive_broadcast_callback_t;
+//typedef  std::function<void (bacnet::binary_data&&)> async_receive_unicast_callback_t;
 
-typedef  boost::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&&)> async_received_apdu_callback_t;
+typedef  std::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&&)> async_received_apdu_callback_t;
 
 }}
 

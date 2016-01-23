@@ -32,7 +32,7 @@ set(NINJA_WOOKIE_EXEC_NAME "ninja-wookie")
 set(NINJA_WOOKIE_TEST_NAME "test-wookie")
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Werror")
 # needed for boost library
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-unused-local-typedefs -Wno-unused-variable -Wno-deprecated-declarations")
 

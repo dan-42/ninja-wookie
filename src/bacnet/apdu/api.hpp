@@ -23,14 +23,14 @@
 
 #include <cstdint>
 
-#include <boost/function.hpp>
+#include <functional>
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
 
 namespace bacnet { namespace apdu {
 
-  typedef  boost::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_service_callback_t;
+  typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_service_callback_t;
 
 }}
 

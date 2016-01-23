@@ -41,8 +41,7 @@ public:
 
   void operator()(frame::unconfirmed_request request) {
 
-      if(!callback_manager_.async_received_service_callback_.empty()){
-
+      if(callback_manager_.async_received_service_callback_) {
        // meta_info.service_choice = request.service_choice;
         auto data = request.service_data;
         callback_manager_.async_received_service_callback_(std::move(meta_information_), std::move(data));

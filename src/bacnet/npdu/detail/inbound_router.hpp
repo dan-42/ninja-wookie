@@ -38,7 +38,7 @@ public:
 	void route(frame&& f) {
 
 		/* 6.2.2 if control_filed has no network_layer_message, it is an APDU frame for this device*/
-		if(!f.control_field.has_network_layer_message_type() &&  !callback_manager_.async_received_apdu_callback_.empty()) {
+		if(!f.control_field.has_network_layer_message_type() &&  callback_manager_.async_received_apdu_callback_) {
 
 			meta_information_.network_priority = f.control_field.network_priority();
 			meta_information_.npdu_source = f.source;

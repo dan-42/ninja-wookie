@@ -6,16 +6,14 @@
 #define NINJA_WOOKIE_SERVICE_API_HPP
 
 #include <boost/system/error_code.hpp>
-#include <boost/function.hpp>
+#include <functional>
 
 #include <bacnet/service/service.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
 
 namespace bacnet { namespace service {
-
-
-  typedef boost::function<void(boost::system::error_code, bacnet::common::protocol::meta_information, bacnet::service::who_is)>  callback_service_who_is_t;
-  typedef boost::function<void(boost::system::error_code, bacnet::common::protocol::meta_information, bacnet::service::i_am)>    callback_service_i_am_t;
+  typedef std::function<void(boost::system::error_code, bacnet::common::protocol::meta_information, bacnet::service::who_is)>  callback_service_who_is_t;
+  typedef std::function<void(boost::system::error_code, bacnet::common::protocol::meta_information, bacnet::service::i_am)>    callback_service_i_am_t;
 }}
 
 #endif //NINJA_WOOKIE_SERVICE_API_HPP

@@ -37,7 +37,7 @@ public:
   void operator()(frame::unconfirmed_request request) {
       std::cout << "apdu::detail::inbound_router unconfirmed_request" << std::endl;
 
-      if(!callback_manager_.async_received_service_callback_.empty()){
+      if(callback_manager_.async_received_service_callback_){
         meta_information_t meta_info;
        // meta_info.service_choice = request.service_choice;
         auto data = request.service_data;

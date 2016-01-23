@@ -82,7 +82,7 @@ public:
   }
 
   void operator()(frame::original_unicast_npdu request) {
-    if(!callback_manager_.async_receive_unicast_callback_.empty()){
+    if(callback_manager_.async_receive_unicast_callback_){
       bacnet::common::protocol::meta_information mi;
       mi.address = sender_endpoint_;
 
@@ -91,7 +91,7 @@ public:
   }
 
   void operator()(frame::original_broadcast_npdu request) {
-    if(!callback_manager_.async_receive_broadcast_callback_.empty()) {
+    if(callback_manager_.async_receive_broadcast_callback_) {
       bacnet::common::protocol::meta_information mi;
       mi.address = sender_endpoint_;
 
