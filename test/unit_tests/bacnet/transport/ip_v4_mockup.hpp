@@ -68,7 +68,7 @@ public:
 
 
     /**
-     * mockup calback, is called when something is send from application_layer to the network
+     * mockup callback, is called when something is send from application_layer to the network
      */
     void set_async_send_from_stack_callback(const async_send_from_stack_callback &callback) {
       async_send_from_stack_callback_ = callback;

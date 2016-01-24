@@ -119,10 +119,17 @@ struct my_bacnet_application {
       });
 
 
-      /*
-      auto i_am_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
+      auto i_am_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am service) {
+
       };
-      service_controller.async_receive<bacnet::service::i_am, bacnet::service::callback_service_i_am_t>(i_am_handler_);
+      auto who_is_handler_ = [](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::who_is service) {
+
+      };
+
+      service_controller.async_receive(i_am_handler_, who_is_handler_);
+
+      /*
+
 
 
       auto who_is_handler_ = [this](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::who_is who_is) {

@@ -28,7 +28,7 @@
 int main(int argc, char *argv[]) {
 
 
-  try {
+  //try {
 
     boost::asio::io_service io_service;
     my_bacnet_application my_app(io_service);
@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
 
     //blocking call
     io_service.run();
-  }
-  catch (std::exception &e) {
-    std::cerr << "Exception: " << e.what() << "\n";
-    throw;
-  }
+  //}
+ // catch (const std::exception &e) {
+ //   std::cerr << "Exception: " << e.what() << "\n";
+ //   throw;
+  //}
 
   return 0;
 }
