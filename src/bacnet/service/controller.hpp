@@ -205,16 +205,12 @@ public:
        * send who is, and if more then one answers, send error up to calling layer
        */
      auto callback_idx =  callback_manager_.set_i_am_service_callback(
-         //[handler, service, endpoints, device_object_identifier, this]
          [handler, service, endpoints, device_object_identifier, this]
            (boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
-           std::cerr << "bacnet::service::controller lambda callback: i_am  " << i_am.i_am_device_identifier << std::endl;
-           std::cerr << "bacnet::service::controller lambda callback: exp " << device_object_identifier << std::endl;
                if(i_am.i_am_device_identifier == device_object_identifier) {
-                 std::cerr << "bacnet::service::controller correct doi " << std::endl;
                  async_send(mi.address, service, handler);
                }
-             });
+            });
 
      bacnet::service::service::who_is wi(device_object_identifier.instance_number(), device_object_identifier.instance_number());
      async_send(wi, [handler](boost::system::error_code ec) {  });

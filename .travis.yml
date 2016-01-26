@@ -1,16 +1,21 @@
-sudo: required
-dist: trusty
+#sudo: required
+#dist: trusty
+sudo: false
 
 language: cpp
-compiler: g++
 
-compiler: gcc
 addons:
-apt:
-    sources: ['ubuntu-toolchain-r-test']
-    packages: ['g++-4.9', 'cmake']
-
+    apt:
+        sources:
+#            - llvm-toolchain-precise
+            - ubuntu-toolchain-r-test
+        packages:
+#            - clang-3.7
+            - g++-5
+#            - gcc-5
     
+install:
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
 
 script:
   - mkdir build

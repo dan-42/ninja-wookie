@@ -198,6 +198,8 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       endpoint() : network_(1), address_(address_ip{})  {
 
       }
+      endpoint(const bacnet::common::protocol::mac::address& address)    : network_(1), address_(address)  {
+      }
       endpoint(const bacnet::common::protocol::mac::address_ip& address) : network_(1), address_(address)  {
       }
       endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  : network_(1), address_(address)  {

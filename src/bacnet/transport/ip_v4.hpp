@@ -49,9 +49,6 @@ public:
       throw std::runtime_error("transport::ip_v4 : its not a ip endpoint");
     }
     auto ip_receiver = receiver.ip().to_system_endpoint();
-    std::cout << " ipv4: " << std::endl;
-    bacnet::print(data);
-    std::cout << " ------" << std::endl;
     socket_.async_send_to(boost::asio::buffer(data, data.size()), ip_receiver, [this, handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
       handler(ec);
     });

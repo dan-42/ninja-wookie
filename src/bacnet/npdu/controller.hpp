@@ -74,8 +74,6 @@ public:
 
     bacnet::binary_data binary_frame = npdu::generator::generate(frame);
 
-    std::cout << " npdu: " << std::endl;
-    bacnet::print(binary_frame);
     underlying_layer_.async_send_broadcast(binary_frame, handler);
   }
 

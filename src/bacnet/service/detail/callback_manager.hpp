@@ -84,14 +84,12 @@ typedef boost::fusion::map<
         }
 
         std::size_t set_i_am_service_callback(callback_service_i_am_t callback) {
-          std::cerr << "bacnet::service::callback_manager set_i_am_service_callback: " << std::endl;
           callbacks_service_i_am_idx_last++;
           callbacks_service_i_am[callbacks_service_i_am_idx_last] = callback;
           return callbacks_service_i_am_idx_last;
         }
 
         void clear_i_am_service_callback(std::size_t idx) {
-          std::cerr << "bacnet::service::callback_manager clear_i_am_service_callback: " << std::endl;
           if(idx <= callbacks_service_i_am_idx_last) {
             callbacks_service_i_am.erase(idx);
             callbacks_service_i_am_idx_last--;
@@ -110,10 +108,8 @@ typedef boost::fusion::map<
 
       template<>
       void callback_manager::invoke<service::i_am>(const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi, const service::i_am &service) {
-        std::cerr << "bacnet::service::callback_manager invoke: " << std::endl;
         for(auto &callback :  callbacks_service_i_am) {
           if(callback.second) {
-            std::cerr << "bacnet::service::callback_manager invoke: i_am " << std::endl;
             callback.second(ec, mi, service);
           }
         }
