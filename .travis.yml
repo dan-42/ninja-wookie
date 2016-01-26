@@ -8,7 +8,6 @@ addons:
 apt:
     sources: ['ubuntu-toolchain-r-test']
     packages: ['g++-5.3', 'cmake']
-    
 
 script:
   - mkdir build
