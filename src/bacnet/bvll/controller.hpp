@@ -75,11 +75,13 @@ public:
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
+    std::cout << " bvll async_send: " << std::endl;
+    bacnet::print(binary_frame);
     transporter_.async_send(binary_frame, address,  handler);
   }
 
   template<typename Handler>
-  void async_send_broadcast(const bacnet::binary_data &payload, const Handler &handler){
+  void async_send_broadcast(const bacnet::binary_data &payload, Handler handler){
     //todo here we need a broadcast address AND PORT or access to the global config? or get a broadcast address from underlying types?
     auto address = bacnet::common::protocol::mac::address(bacnet::common::protocol::mac::address_ip::broadcast());
     frame::original_broadcast_npdu frame;
@@ -87,7 +89,9 @@ public:
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
-    transporter_.async_send(binary_frame, address,  [handler](const boost::system::error_code &error){});
+    std::cout << " bvll async_send_broadcast: " << std::endl;
+    bacnet::print(binary_frame);
+    transporter_.async_send(binary_frame, address, handler);
   }
 
 private:

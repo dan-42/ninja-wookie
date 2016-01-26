@@ -44,11 +44,14 @@ public:
   }
 
   template<typename Handler>
-  void async_send(const bacnet::binary_data &data, const bacnet::common::protocol::mac::address &receiver, const Handler &handler) {
+  void async_send(bacnet::binary_data data, bacnet::common::protocol::mac::address receiver, const Handler &handler) {
     if(!receiver.is_ip()) {
-      throw new std::runtime_error("transport::ip_v4 : its not a ip endpoint");
+      throw std::runtime_error("transport::ip_v4 : its not a ip endpoint");
     }
     auto ip_receiver = receiver.ip().to_system_endpoint();
+    std::cout << " ipv4: " << std::endl;
+    bacnet::print(data);
+    std::cout << " ------" << std::endl;
     socket_.async_send_to(boost::asio::buffer(data, data.size()), ip_receiver, [this, handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred){
       handler(ec);
     });
@@ -57,7 +60,7 @@ public:
   void start() {
 
     if(!async_receive_callback_) {
-      throw new std::runtime_error("transport::ip_v4 : no callback set, cant work without it");
+      throw std::runtime_error("transport::ip_v4 : no callback set, cant work without it");
     }
 
     socket_.open(listen_endpoint_.protocol());

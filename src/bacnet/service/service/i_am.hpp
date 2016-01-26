@@ -24,6 +24,7 @@
 
 
 #include <cstdint>
+#include <iostream>
 
 #include <boost/fusion/include/define_struct.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
@@ -33,7 +34,35 @@
 #include <bacnet/common/segment.hpp>
 
 
+namespace bacnet { namespace service { namespace service {
 
+struct i_am {
+    bacnet::common::object_identifier i_am_device_identifier;
+    uint32_t                        max_apdu_length_accepted;
+    bacnet::common::segmentation    segmentation_supported;
+    uint16_t                        vendor_id;
+};
+
+static inline std::ostream& operator<<(std::ostream& os, const i_am& s) {
+  os << "i_am_device_identifier: " << s.i_am_device_identifier
+  << "  max_apdu_length_accepted: " << s.max_apdu_length_accepted
+  << "  segmentation_supported: " << s.segmentation_supported
+  << "  vendor_id: " << s.vendor_id;
+  return os;
+}
+
+
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+    bacnet::service::service::i_am,
+    i_am_device_identifier,
+    max_apdu_length_accepted,
+    segmentation_supported,
+    vendor_id
+)
+
+/*
 BOOST_FUSION_DEFINE_STRUCT(
     (bacnet)(service)(service), i_am,
     (bacnet::common::object_identifier, i_am_device_identifier)
@@ -41,7 +70,7 @@ BOOST_FUSION_DEFINE_STRUCT(
     (bacnet::common::segmentation, segmentation_supported)
     (uint16_t, vendor_id)
 )
-
+*/
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service::service;
 

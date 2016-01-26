@@ -178,14 +178,18 @@ public:
 
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::endpoint mac_endpoint, Service&& service, Handler handler) {
+    async_send(mac_endpoint.address(), std::move(service), handler);
+  }
+
+  template<typename Service, typename Handler>
+  void async_send(bacnet::common::protocol::mac::address address, Service&& service, Handler handler) {
     auto data =  bacnet::service::service::detail::generate(std::move(service));
 
-    lower_layer_.async_send_confirmed_request(mac_endpoint.address(), std::move(data), [this, handler]( const boost::system::error_code& ec){
+    lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]( const boost::system::error_code& ec){
       bacnet::service::possible_service_response res;
       handler(ec, res);
     });
   }
-
 
   template<typename Service, typename Handler>
   void async_send(bacnet::common::object_identifier device_object_identifier, Service service, Handler handler) {
@@ -201,10 +205,14 @@ public:
        * send who is, and if more then one answers, send error up to calling layer
        */
      auto callback_idx =  callback_manager_.set_i_am_service_callback(
-         [handler, service, endpoints, &device_object_identifier, this]
+         //[handler, service, endpoints, device_object_identifier, this]
+         [handler, service, endpoints, device_object_identifier, this]
            (boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
+           std::cerr << "bacnet::service::controller lambda callback: i_am  " << i_am.i_am_device_identifier << std::endl;
+           std::cerr << "bacnet::service::controller lambda callback: exp " << device_object_identifier << std::endl;
                if(i_am.i_am_device_identifier == device_object_identifier) {
-                 async_send(endpoints.front(), service, handler);
+                 std::cerr << "bacnet::service::controller correct doi " << std::endl;
+                 async_send(mi.address, service, handler);
                }
              });
 
