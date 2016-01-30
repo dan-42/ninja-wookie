@@ -75,8 +75,6 @@ public:
     frame::possible_bvll_frame f(frame);
 
     bacnet::binary_data binary_frame = generator::generate(f);
-    std::cout << " bvll async_send: " << std::endl;
-    bacnet::print(binary_frame);
     transporter_.async_send(binary_frame, address,  handler);
   }
 
