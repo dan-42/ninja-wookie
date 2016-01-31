@@ -10,11 +10,16 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 
 # boost
-find_package(Boost 1.59 COMPONENTS  system REQUIRED )
+find_package(Boost 1.60 COMPONENTS system REQUIRED )
 link_directories (${Boost_LIBRARY_DIRS})
 include_directories (${Boost_INCLUDE_DIRS})
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+#ADD_DEFINITIONS(-DBOOST_ERROR_CODE_HEADER_ONLY)
 
+# pre
+#hunter_add_package(lib-cpp-pre)
+#find_package(lib-cpp-pre 1.3.2 REQUIRED)
+#include_directories(AFTER ${LIB_CPP_PRE_INCLUDE_DIRS})
 
 # Threads
 find_package(Threads)

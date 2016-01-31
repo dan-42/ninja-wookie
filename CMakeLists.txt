@@ -3,11 +3,12 @@ cmake_minimum_required(VERSION 3.0)
 ### Hunter snapshot that will be used ###
 include("cmake/HunterGate.cmake")
 HunterGate(
-        URL "https://github.com/dan-42/hunter/archive/v0.12.6-dan42.tar.gz"
-        SHA1 "a749367a24f25167f3b1f1712e45ad9a1f6a06e8"
-        LOCAL
+       # URL "https://github.com/dan-42/hunter/archive/v0.12.6-dan42.tar.gz"
+       # SHA1 "a749367a24f25167f3b1f1712e45ad9a1f6a06e8"
+       # LOCAL
+        URL "https://github.com/dan-42/hunter/archive/v0.12.42-dan.tar.gz"
+        SHA1 "e20106adbd1dfe0f437515d0bd4152ecd755b0a7"
 )
-
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
@@ -34,13 +35,23 @@ set(NINJA_WOOKIE_TEST_NAME "test-wookie")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Werror")
 # needed for boost library
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-unused-local-typedefs -Wno-unused-variable -Wno-deprecated-declarations")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function -Wno-unused-local-typedefs -Wno-unused-variable -Wno-unused-value -Wno-deprecated-declarations")
 
 #-DBOOST_NO_CXX11_CONSTEXPR -DBOOST_PP_VARIADICS=0
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -gdwarf-2 ")
 ELSE()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --visibility=hidden -os")
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections")
+
+        add_definitions(
+                -fvisibility=hidden
+                -Os
+                -ffunction-sections
+                -fdata-sections)
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
     set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 ENDIF()
 
