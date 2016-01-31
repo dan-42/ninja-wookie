@@ -101,8 +101,6 @@ namespace bacnet { namespace service { namespace detail {
       callback_manager_.invoke(ec, std::move(meta_information_), std::move(service));
     }
 
-
-
   private:
 
     callback_manager& callback_manager_;
@@ -145,14 +143,25 @@ public:
                 config_(config){
 
     lower_layer_.register_async_received_service_callback(boost::bind(&controller::async_received_service_handler, this, _1, _2));
+    lower_layer_.register_async_received_error_callback(boost::bind(&controller::async_received_error_handler, this, _1, _2));
 
   }
 
- void async_received_service_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
+  void async_received_service_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
+   std::cout << "service async_receive_handler : " << std::endl;
+   bacnet::print(data);
    auto possible_service_frame = bacnet::service::service::detail::parse(data);
    inbound_router_.meta_information(mi);
    possible_service_frame.apply_visitor(inbound_router_);
- }
+  }
+
+  void async_received_error_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
+    std::cout << "service async_received_error_handler : " << std::endl;
+    bacnet::print(data);
+   // auto possible_service_frame = bacnet::service::service::detail::parse(data);
+   // inbound_router_.meta_information(mi);
+   // possible_service_frame.apply_visitor(inbound_router_);
+  }
 
 
     /*

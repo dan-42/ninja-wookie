@@ -23,7 +23,7 @@ public:
 
   ip_v4(boost::asio::io_service &io_service) :
                                                 io_service_(io_service),
-                                                socket_(io_service),
+                                                socket_(io_service_),
                                                 port_(bacnet::transport::config::DEFAULT_LISTENING_PORT),
                                                 listen_address_(boost::asio::ip::address::from_string(bacnet::transport::config::DEFAULT_LISTENING_ADDRESS)),
                                                 listen_endpoint_(listen_address_, port_) {
@@ -32,7 +32,7 @@ public:
 
   ip_v4(boost::asio::io_service &io_service, const bacnet::transport::configuration& config) :
                                                 io_service_(io_service),
-                                                socket_(io_service),
+                                                socket_(io_service_),
                                                 port_(config.listening_port),
                                                 listen_address_(boost::asio::ip::address::from_string(config.listening_address)),
                                                 listen_endpoint_(listen_address_, port_) {
@@ -78,6 +78,8 @@ private:
 
     if(!ec) {
       bacnet::binary_data input(data_.begin(), data_.begin() + bytes_transferred);
+      std::cout << "ip_received: " ;
+      bacnet::print(input);
       async_receive_callback_(ec, sender, std::move(input));
     }
     else {

@@ -31,6 +31,8 @@
 namespace bacnet { namespace apdu {
 
   typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_service_callback_t;
+  typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_error_callback_t;
+
 
 }}
 

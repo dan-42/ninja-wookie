@@ -16,6 +16,7 @@ namespace bacnet { namespace  apdu { namespace detail {
       struct callback_manager {
 
         async_received_service_callback_t async_received_service_callback_;
+        async_received_error_callback_t   async_received_error_callback_;
       };
 
     }}}

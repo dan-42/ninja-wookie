@@ -64,6 +64,10 @@ public:
 
   void operator()(frame::error request) {
       std::cout << "apdu::detail::inbound_router error" << std::endl;
+    if(callback_manager_.async_received_service_callback_) {
+      auto data = request.error_data;
+      callback_manager_.async_received_error_callback_(std::move(meta_information_), std::move(data));
+    }
   }
 
   void operator()(frame::reject request) {

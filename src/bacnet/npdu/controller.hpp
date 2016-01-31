@@ -101,8 +101,17 @@ private:
     inbound_router_.route(std::move(frame));
   }
 
+  void async_receive_unicast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
+    std::cout << "async_receive_unicast_handler: " ;
+    bacnet::print(data);
+    auto frame = npdu::parser::parse(std::move(data));
+    inbound_router_.meta_information(mi);
+    inbound_router_.route(std::move(frame));
+  }
+
   void init() {
     underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1, _2));
+    underlying_layer_.register_async_receive_unicast_callback(boost::bind(&controller::async_receive_unicast_handler, this, _1, _2));
   }
 
   Underlying_layer &underlying_layer_;

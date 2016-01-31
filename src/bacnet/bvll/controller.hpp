@@ -94,7 +94,6 @@ private:
 
   void handle_async_receive(boost::system::error_code error, bacnet::common::protocol::mac::address sender, bacnet::binary_data data) {
     if (!error) {
-      bacnet::print(data);
       frame::possible_bvll_frame f = parser::parse(std::move(data));
       inbound_router_.sender_endpoint(sender);
       f.apply_visitor(inbound_router_);

@@ -86,6 +86,7 @@ struct my_bacnet_application {
       throw;
     }
 
+
     return 0;
   }
 

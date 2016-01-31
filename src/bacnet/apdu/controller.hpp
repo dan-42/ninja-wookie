@@ -95,6 +95,10 @@ struct controller {
     callback_manager_.async_received_service_callback_ = callback;
   }
 
+  void register_async_received_error_callback(const async_received_error_callback_t &callback){
+    callback_manager_.async_received_error_callback_ = callback;
+  }
+
   template<typename Handler>
   void async_send_unconfirmed_request_as_broadcast(const bacnet::binary_data& payload, Handler handler) {
     frame::unconfirmed_request frame;
