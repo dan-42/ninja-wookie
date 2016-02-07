@@ -29,26 +29,6 @@
 #include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
 
 
-/*
-bool is_equal(const bacnet::apdu::types::character_string& a, const bacnet::apdu::types::character_string& b) {
-  if(a.encoding_ != b.encoding_) {
-    return false;
-  }
-  if(a.value_.compare(b.value_) != 0) {
-    return false;
-  }
-  if(a.tag_.number() != b.tag_.number()) {
-    return false;
-  }
-  if(a.tag_.is_context_tag() != b.tag_.is_context_tag()) {
-    return false;
-  }
-  if(a.tag_.length_value_type() != b.tag_.length_value_type()) {
-    return false;
-  }
-  return true;
-}
-*/
 
 BOOST_AUTO_TEST_SUITE( service_reninialize_device)
 
