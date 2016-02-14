@@ -78,7 +78,7 @@ namespace apdu    = bacnet::apdu::type;
 template<>
 bacnet::binary_data generate<service::reinitialize_device>(const service::reinitialize_device& service) {
 
-
+  std::cout << "generate password " << service.passowrd << std::endl;
   constexpr decltype(service.passowrd)::size_type password_string_max_length = 20;
 
   constexpr uint8_t context_tag_number_0 = 0x00;
