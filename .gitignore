@@ -32,3 +32,6 @@
 
 #builds
 /build*
+
+.directory
+
