@@ -40,6 +40,8 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     using namespace bacnet;
     using namespace bacnet::transport;
 
+
+
     /**
      * expected data
      */
@@ -68,6 +70,9 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      * actual test function
      */
     auto async_send_from_stack_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+
+
+
       bacnet::print(data);
       bacnet::print(expected_data);
       BOOST_ASSERT_MSG(test::utils::compare_binary_data(expected_data, data), "SEND DATA IS NOT THE SAME ");
