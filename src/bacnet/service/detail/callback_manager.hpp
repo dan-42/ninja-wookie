@@ -70,7 +70,7 @@ typedef boost::fusion::map<
           pre::for_each_args([this](auto callback ) {
             typedef pre::function_traits<decltype(callback)> callback_traits;
             typedef typename callback_traits::template arg<2> arg_2_t;
-            boost::fusion::at_key<arg_2_t>(callback_map) = callback;
+            boost::fusion::at_key<typename std::decay<arg_2_t>::type>(callback_map) = callback;
           }, callbacks...);
         }
 

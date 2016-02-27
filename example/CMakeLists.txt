@@ -27,3 +27,10 @@ set_target_properties(reinitialize_device PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS reinitialize_device DESTINATION bin)
 
 
+
+add_executable(who_is who_is.cpp)
+target_link_libraries(who_is wookie::wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+set_target_properties(who_is PROPERTIES DEBUG_POSTFIX "d")
+install(TARGETS who_is DESTINATION bin)
+
+
