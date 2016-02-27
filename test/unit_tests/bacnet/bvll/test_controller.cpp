@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   data_to_send.push_back(0x02);
   data_to_send.push_back(0x03);
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
 
     bacnet::binary_data expected_data;
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
 
   boost::asio::io_service ios;
   ip_v4_mockup transport(ios);
-  transport.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport.set_from_application_callback(from_application_callback_);
 
 
   bacnet::common::protocol::mac::address_ip address  = bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1", 0xBAC0);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   data_to_send.push_back(0x02);
   data_to_send.push_back(0x03);
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
 
     bacnet::binary_data expected_data;
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
 
   boost::asio::io_service ios;
   ip_v4_mockup transport(ios);
-  transport.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport.set_from_application_callback(from_application_callback_);
 
   controller<decltype(transport)> controller_(ios, transport);
   controller_.async_send_broadcast(data_to_send, [](const boost::system::error_code &ec) {
@@ -149,14 +149,14 @@ BOOST_AUTO_TEST_CASE( test_receive_unicast ) {
   using namespace bacnet::transport;
   using namespace bacnet::bvll;
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
     return ec;
   };
 
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
 
   controller<decltype(transport_)> controller_(ios, transport_);
   controller_.register_async_receive_unicast_callback([](bacnet::binary_data&& data, bacnet::common::protocol::meta_information&& mi){
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( test_receive_unicast ) {
   data.push_back(0x02);
   data.push_back(0x03);
 
-  transport_.async_send_to_stack(ec, address, data) ;
+  transport_.send_to_stack(ec, address, data) ;
 
   ios.run();
 }
@@ -208,14 +208,14 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   using namespace bacnet::transport;
   using namespace bacnet::bvll;
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
     return ec;
   };
 
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
 
   controller<decltype(transport_)> controller_(ios, transport_);
   controller_.register_async_receive_broadcast_callback([](bacnet::binary_data&& data, bacnet::common::protocol::meta_information&& mi){
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   data.push_back(0x02);
   data.push_back(0x03);
 
-  transport_.async_send_to_stack(ec, address, data) ;
+  transport_.send_to_stack(ec, address, data) ;
 
   ios.run();
 }

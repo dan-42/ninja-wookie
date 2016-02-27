@@ -40,27 +40,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     using namespace bacnet;
     using namespace bacnet::transport;
 
-
-
-    /**
-     * expected data
-     */
-    bacnet::binary_data expected_data;
-    //bvll
-    expected_data.push_back(0x81); //bacnet ipv4
-    expected_data.push_back(0x0b); //original broadcast
-    expected_data.push_back(0x00); //
-    expected_data.push_back(0xc); // 2byte length
-    //npdu
-    expected_data.push_back(0x01); //version
-    expected_data.push_back(0x20); //control info
-    expected_data.push_back(0xff); //network number
-    expected_data.push_back(0xff);
-    expected_data.push_back(0x00); //MAX
-    expected_data.push_back(0xff); //hop count
-    //apdu
-    expected_data.push_back(0x10); //unconfirmed service
-    expected_data.push_back(0x08); //who is
+    auto expected_data = bacnet::make_binary<bacnet::hex_string>("81 0b 00 0c 01 20 ff ff 00 ff 10 08");
 
     boost::asio::ip::udp::endpoint expected_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
 
@@ -70,8 +50,6 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      * actual test function
      */
     auto async_send_from_stack_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
-
-
 
       bacnet::print(data);
       bacnet::print(expected_data);
@@ -84,7 +62,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
-    transport_mockup.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+    transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
     transport_mockup.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
@@ -93,7 +71,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      * test mockup
      */
     bvll::controller<decltype(transport_mockup)> bvll_controller_(ios, transport_mockup);
-    transport_mockup.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+    transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
 
 
     /**
@@ -130,33 +108,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     using namespace bacnet;
     using namespace bacnet::transport;
 
-    /**
-     * expected data
-     */
-    bacnet::binary_data expected_data;
-    //bvll
-    expected_data.push_back(0x81); //bacnet ipv4
-    expected_data.push_back(0x0b); //original broadcast
-    expected_data.push_back(0x00); //
-    expected_data.push_back(0x10); // 2byte length
-    //npdu
-    expected_data.push_back(0x01); //version
-    expected_data.push_back(0x20); //control info
-    expected_data.push_back(0xff); //network number
-    expected_data.push_back(0xff);
-    expected_data.push_back(0x00); //MAX
-    expected_data.push_back(0xff); //hop count
-    //apdu
-    expected_data.push_back(0x10); //unconfirmed service
-    expected_data.push_back(0x08); //who is
-
-    //TAG 0
-    expected_data.push_back(0x09);
-    expected_data.push_back(0x01);
-    //TAG 1
-    expected_data.push_back(0x19);
-    expected_data.push_back(0x01);
-
+    auto expected_data = bacnet::make_binary<bacnet::hex_string>("810b0010  0120ffff00ff  1008  0901 1901");
 
     boost::asio::ip::udp::endpoint expected_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
 
@@ -178,7 +130,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
-    transport_mockup.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+    transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
     transport_mockup.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
@@ -187,7 +139,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      * test mockup
      */
     bvll::controller<decltype(transport_mockup)> bvll_controller_(ios, transport_mockup);
-    transport_mockup.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+    transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
 
 
     /**
@@ -224,25 +176,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     using namespace bacnet;
     using namespace bacnet::transport;
 
-    /**
-     * expected data
-     */
-    bacnet::binary_data send_data;
-    //bvll
-    send_data.push_back(0x81); //bacnet ipv4
-    send_data.push_back(0x0b); //original broadcast
-    send_data.push_back(0x00); //
-    send_data.push_back(0x0c); // 2byte length
-    //npdu
-    send_data.push_back(0x01); //version
-    send_data.push_back(0x20); //control info
-    send_data.push_back(0xff); //network number
-    send_data.push_back(0xff);
-    send_data.push_back(0x00); //MAX
-    send_data.push_back(0xff); //hop count
-    //apdu
-    send_data.push_back(0x10); //unconfirmed service
-    send_data.push_back(0x08); //who is
+    auto send_data = bacnet::make_binary<bacnet::hex_string>("810b000c  0120ffff00ff  1008");
 
     boost::asio::ip::udp::endpoint send_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
     ::bacnet::common::protocol::mac::address send_adr(::bacnet::common::protocol::mac::address_ip::from_native(send_ep));
@@ -256,7 +190,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      */
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
-    transport_mockup.set_async_send_from_stack_callback([](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+    transport_mockup.set_from_application_callback([](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
      return boost::system::errc::make_error_code(boost::system::errc::success);
     });
 
@@ -288,7 +222,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
     });
 
-    transport_mockup.async_send_to_stack(send_ec, send_adr, send_data);
+    transport_mockup.send_to_stack(send_ec, send_adr, send_data);
 
 
 
@@ -305,33 +239,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     using namespace bacnet;
     using namespace bacnet::transport;
 
-    /**
-     * expected data
-     */
-    bacnet::binary_data expected_data;
-    //bvll
-    expected_data.push_back(0x81); //bacnet ipv4
-    expected_data.push_back(0x0b); //original broadcast
-    expected_data.push_back(0x00); //
-    expected_data.push_back(0x10); // 2byte length
-    //npdu
-    expected_data.push_back(0x01); //version
-    expected_data.push_back(0x20); //control info
-    expected_data.push_back(0xff); //network number
-    expected_data.push_back(0xff);
-    expected_data.push_back(0x00); //MAX
-    expected_data.push_back(0xff); //hop count
-    //apdu
-    expected_data.push_back(0x10); //unconfirmed service
-    expected_data.push_back(0x08); //who is
-
-    //TAG 0
-    expected_data.push_back(0x09);
-    expected_data.push_back(0x01);
-    //TAG 1
-    expected_data.push_back(0x19);
-    expected_data.push_back(0x01);
-
+    auto expected_data = bacnet::make_binary<bacnet::hex_string>("810b0010  0120ffff00ff  1008 0901 1901");
 
     boost::asio::ip::udp::endpoint expected_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
 
@@ -340,7 +248,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /*
      * actual test function
      */
-    auto async_send_from_stack_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+    auto from_application_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
 
       bacnet::print(data);
       bacnet::print(expected_data);
@@ -353,7 +261,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
-    transport_mockup.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+    transport_mockup.set_from_application_callback(from_application_callback_);
     transport_mockup.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
@@ -362,7 +270,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      * test mockup
      */
     bvll::controller<decltype(transport_mockup)> bvll_controller_(ios, transport_mockup);
-    transport_mockup.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+    transport_mockup.set_from_application_callback(from_application_callback_);
 
 
     /**

@@ -19,7 +19,7 @@
 namespace bacnet { namespace transport {
 
 
-typedef std::function<boost::system::error_code (boost::asio::ip::udp::endpoint,  ::bacnet::binary_data) > async_send_from_stack_callback;
+typedef std::function<boost::system::error_code (boost::asio::ip::udp::endpoint,  ::bacnet::binary_data) > from_application_callback;
 
 /**
  * simple mockup for testing the stack without the need of a real IP-connection
@@ -46,7 +46,7 @@ public:
      * needed by api
      */
     void start() {
-      if(!async_receive_callback_ || !async_send_from_stack_callback_) {
+      if(!async_receive_callback_ || !from_application_callback_) {
         throw std::runtime_error("transport::ip_v4_mockup : no callback set, cant work without it");
       }
     }
@@ -61,7 +61,7 @@ public:
           throw std::runtime_error("transport::ip_v4_mockup : its not a ip endpoint");
         }
         auto ip_receiver = receiver.ip().to_system_endpoint();
-        boost::system::error_code ec = async_send_from_stack_callback_(ip_receiver, data);
+        boost::system::error_code ec = from_application_callback_(ip_receiver, data);
         handler(ec);
       });
     }
@@ -70,14 +70,14 @@ public:
     /**
      * mockup callback, is called when something is send from application_layer to the network
      */
-    void set_async_send_from_stack_callback(const async_send_from_stack_callback &callback) {
-      async_send_from_stack_callback_ = callback;
+    void set_from_application_callback(const from_application_callback &callback) {
+      from_application_callback_ = callback;
     }
 
     /**
      * mockup used to send somthing to the application_layer
      */
-    void async_send_to_stack(boost::system::error_code ec, ::bacnet::common::protocol::mac::address ep ,::bacnet::binary_data data) {
+    void send_to_stack(boost::system::error_code ec, ::bacnet::common::protocol::mac::address ep ,::bacnet::binary_data data) {
       io_service_.post([=]() {
         async_receive_callback_(ec, ep, data);
       });
@@ -87,7 +87,7 @@ private:
 
     boost::asio::io_service &io_service_;
     ::bacnet::transport::async_receive_callback async_receive_callback_;
-    async_send_from_stack_callback async_send_from_stack_callback_;
+    from_application_callback from_application_callback_;
 
 };
 

@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
     }
 
   };
-  async_send_from_stack_callback async_send_from_stack_callback_ = [&data_to_send](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback async_send_from_stack_callback_ = [&data_to_send](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
 
     BOOST_ASSERT_MSG(data_to_send.size() == data.size(), "SEND DATA IS NOT THE SAME length");
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
   boost::asio::io_service ios;
   ip_v4_mockup transport(ios);
   transport.set_async_receive_callback(async_receive_callback_);
-  transport.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport.set_from_application_callback(async_send_from_stack_callback_);
 
   transport.async_send(data_to_send, receiver, [](const boost::system::error_code& ec){
     BOOST_ASSERT_MSG(ec == boost::system::errc::success, "SEND WAS NOT SUCCESSFULL");
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
 
   auto ec = boost::system::errc::make_error_code(boost::system::errc::argument_list_too_long);
   ::bacnet::common::protocol::mac::address ep(::bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1"));
-  transport.async_send_to_stack(ec, ep ,data_to_send);
+  transport.send_to_stack(ec, ep ,data_to_send);
 
   transport.start();
   ios.run();

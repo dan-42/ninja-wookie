@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   using namespace bacnet::transport;
 
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
 
 
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
 
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
   transport_.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
 
   });
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   bvll::controller<decltype(transport_)> bvll_controller_(ios, transport_);
   npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
 
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
 
   bacnet::binary_data data_to_send;
   data_to_send.push_back(0x10); //unconfirmed service
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   using namespace bacnet::transport;
 
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
 
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
 
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
   transport_.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
 
   });
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   bvll::controller<decltype(transport_)> bvll_controller_(ios, transport_);
   npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
 
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
 
   bacnet::common::protocol::mac::endpoint endpoint;
   endpoint.network(1);
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   using namespace bacnet::transport;
 
 
-  async_send_from_stack_callback async_send_from_stack_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
     auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
     return ec;
   };
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
 
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
-  transport_.set_async_send_from_stack_callback(async_send_from_stack_callback_);
+  transport_.set_from_application_callback(from_application_callback_);
   transport_.set_async_receive_callback(async_receive_callback_);
 
   bvll::controller<decltype(transport_)> bvll_controller_(ios, transport_);
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   data_send_to_stack.push_back(0x10); //unconfirmed service
   data_send_to_stack.push_back(0x08); //who is
 
-  transport_.async_send_to_stack(ec, adr, data_send_to_stack);
+  transport_.send_to_stack(ec, adr, data_send_to_stack);
 
   ios.run();
 }
