@@ -71,9 +71,9 @@ include_directories (${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
 # pre
-#hunter_add_package(lib-cpp-pre)
-#find_package(lib-cpp-pre 1.3.2 REQUIRED)
-#include_directories(AFTER ${LIB_CPP_PRE_INCLUDE_DIRS})
+hunter_add_package(lib-cpp-pre)
+find_package(lib-cpp-pre 1.3.3 REQUIRED)
+include_directories(AFTER ${LIB_CPP_PRE_INCLUDE_DIRS})
 
 # Threads
 find_package(Threads)
