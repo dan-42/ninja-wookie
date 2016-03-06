@@ -72,7 +72,7 @@ add_definitions(-DBOOST_LOG_DYN_LINK)
 
 # pre
 hunter_add_package(lib-cpp-pre)
-find_package(lib-cpp-pre 1.3.3 REQUIRED)
+find_package(lib-cpp-pre REQUIRED)
 include_directories(AFTER ${LIB_CPP_PRE_INCLUDE_DIRS})
 
 # Threads

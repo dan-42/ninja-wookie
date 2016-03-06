@@ -24,11 +24,15 @@
 #include <bitset>
 
 #include <boost/fusion/include/define_struct.hpp>
-
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
+
+#include <bacnet/bvll/api.hpp>
+
+
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
+
 
 #include <bacnet/npdu/frame.hpp>
 #include <bacnet/npdu/grammar.hpp>
@@ -49,11 +53,11 @@ class controller {
 
 public:
   controller(Underlying_layer &underlying_layer) : underlying_layer_(underlying_layer), inbound_router_(callback_manager_) {
-    init();
+
   }
 
   controller(Underlying_layer &underlying_layer, const uint16_t & network_number) : underlying_layer_(underlying_layer), inbound_router_(callback_manager_), network_number_(network_number) {
-    init();
+
   }
 
   /** callback to upper layer*/
@@ -92,27 +96,33 @@ public:
     underlying_layer_.async_send(binary_frame, endpoint.address(), handler);
   }
 
+  void start() {
+    underlying_layer_.register_callbacks([this](bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
+                                                async_receive_broadcast_handler(std::move(data), mi);
+                                         },
+                                         [this](bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
+                                            async_receive_unicast_handler(std::move(data), mi);
+                                         });
+    underlying_layer_.start();
+  }
 
 private:
 
-  void async_receive_broadcast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
-    auto frame = npdu::parser::parse(std::move(data));
+  void async_receive_broadcast_handler(bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
+    auto frame = npdu::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }
 
-  void async_receive_unicast_handler(const bacnet::binary_data& data, const bacnet::common::protocol::meta_information& mi) {
+  void async_receive_unicast_handler(bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
     std::cout << "async_receive_unicast_handler: " ;
-    bacnet::print(data);
-    auto frame = npdu::parser::parse(std::move(data));
+    bacnet::print(data.npdu_data);
+    auto frame = npdu::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }
 
-  void init() {
-    underlying_layer_.register_async_receive_broadcast_callback(boost::bind(&controller::async_receive_broadcast_handler, this, _1, _2));
-    underlying_layer_.register_async_receive_unicast_callback(boost::bind(&controller::async_receive_unicast_handler, this, _1, _2));
-  }
+
 
   Underlying_layer &underlying_layer_;
   detail::callback_manager callback_manager_;

@@ -22,17 +22,83 @@
 #define NINJA_WOOKIE_BVLL_API_HPP
 
 #include <functional>
-#include <boost/asio/ip/udp.hpp>
-
+#include <bacnet/bvll/frames.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
+
+
 namespace bacnet { namespace bvll {
-
-
-
-
-typedef  std::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&& )> async_receive_broadcast_callback_t;
-typedef  std::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&& )> async_receive_unicast_callback_t;
-
+typedef  std::function<void (frame::bvlc_result,                            bacnet::common::protocol::meta_information )> receive_bvlc_result_callback_t;
+typedef  std::function<void (frame::write_broadcast_distribution_table,     bacnet::common::protocol::meta_information )> receive_write_broadcast_distribution_table_callback_t;
+typedef  std::function<void (frame::read_broadcast_distribution_table,      bacnet::common::protocol::meta_information )> receive_read_broadcast_distribution_table_callback_t;
+typedef  std::function<void (frame::read_broadcast_distribution_table_ack,  bacnet::common::protocol::meta_information )> receive_read_broadcast_distribution_table_ack_callback_t;
+typedef  std::function<void (frame::forwarded_npdu,                         bacnet::common::protocol::meta_information )> receive_forwarded_npdu_callback_t;
+typedef  std::function<void (frame::register_foreign_device,                bacnet::common::protocol::meta_information )> receive_register_foreign_device_callback_t;
+typedef  std::function<void (frame::read_foreign_device_table,              bacnet::common::protocol::meta_information )> receive_read_foreign_device_table_callback_t;
+typedef  std::function<void (frame::read_foreign_device_table_ack,          bacnet::common::protocol::meta_information )> receive_read_foreign_device_table_ack_callback_t;
+typedef  std::function<void (frame::delete_foreign_device_table_entry,      bacnet::common::protocol::meta_information )> receive_delete_foreign_device_table_entry_callback_t;
+typedef  std::function<void (frame::distribute_broadcast_to_network,        bacnet::common::protocol::meta_information )> receive_distribute_broadcast_to_network_callback_t;
+typedef  std::function<void (frame::original_unicast_npdu,                  bacnet::common::protocol::meta_information )> receive_original_unicast_npdu_callback_t;
+typedef  std::function<void (frame::original_broadcast_npdu,                bacnet::common::protocol::meta_information )> receive_original_broadcast_npdu_callback_t;
+typedef  std::function<void (frame::original_secure_bvll,                   bacnet::common::protocol::meta_information )> receive_original_secure_bvll_callback_t;
+typedef  std::function<void (frame::raw,                                    bacnet::common::protocol::meta_information )> receive_raw_callback_t;
 }}
+
+
+
+/*
+
+ namespace bacnet { namespace bvll {
+typedef  std::function<void (frame::bvlc_result&&,                            bacnet::common::protocol::meta_information&& )> receive_bvlc_result_callback_t;
+typedef  std::function<void (frame::write_broadcast_distribution_table&&,     bacnet::common::protocol::meta_information&& )> receive_write_broadcast_distribution_table_callback_t;
+typedef  std::function<void (frame::read_broadcast_distribution_table&&,      bacnet::common::protocol::meta_information&& )> receive_read_broadcast_distribution_table_callback_t;
+typedef  std::function<void (frame::read_broadcast_distribution_table_ack&&,  bacnet::common::protocol::meta_information&& )> receive_read_broadcast_distribution_table_ack_callback_t;
+typedef  std::function<void (frame::forwarded_npdu&&,                         bacnet::common::protocol::meta_information&& )> receive_forwarded_npdu_callback_t;
+typedef  std::function<void (frame::register_foreign_device&&,                bacnet::common::protocol::meta_information&& )> receive_register_foreign_device_callback_t;
+typedef  std::function<void (frame::read_foreign_device_table&&,              bacnet::common::protocol::meta_information&& )> receive_read_foreign_device_table_callback_t;
+typedef  std::function<void (frame::read_foreign_device_table_ack&&,          bacnet::common::protocol::meta_information&& )> receive_read_foreign_device_table_ack_callback_t;
+typedef  std::function<void (frame::delete_foreign_device_table_entry&&,      bacnet::common::protocol::meta_information&& )> receive_delete_foreign_device_table_entry_callback_t;
+typedef  std::function<void (frame::distribute_broadcast_to_network&&,        bacnet::common::protocol::meta_information&& )> receive_distribute_broadcast_to_network_callback_t;
+typedef  std::function<void (frame::original_unicast_npdu&&,                  bacnet::common::protocol::meta_information&& )> receive_original_unicast_npdu_callback_t;
+typedef  std::function<void (frame::original_broadcast_npdu&&,                bacnet::common::protocol::meta_information&& )> receive_original_broadcast_npdu_callback_t;
+typedef  std::function<void (frame::original_secure_bvll&&,                   bacnet::common::protocol::meta_information&& )> receive_original_secure_bvll_callback_t;
+typedef  std::function<void (frame::raw&&,                                    bacnet::common::protocol::meta_information&& )> receive_raw_callback_t;
+}}
+
+
+namespace bacnet { namespace bvll {
+typedef  std::function<void (frame::bvlc_result&,                            bacnet::common::protocol::meta_information& )> receive_bvlc_result_callback_t;
+typedef  std::function<void (frame::write_broadcast_distribution_table&,     bacnet::common::protocol::meta_information& )> receive_write_broadcast_distribution_table_callback_t;
+typedef  std::function<void (frame::read_broadcast_distribution_table&,      bacnet::common::protocol::meta_information& )> receive_read_broadcast_distribution_table_callback_t;
+typedef  std::function<void (frame::read_broadcast_distribution_table_ack&,  bacnet::common::protocol::meta_information& )> receive_read_broadcast_distribution_table_ack_callback_t;
+typedef  std::function<void (frame::forwarded_npdu&,                         bacnet::common::protocol::meta_information& )> receive_forwarded_npdu_callback_t;
+typedef  std::function<void (frame::register_foreign_device&,                bacnet::common::protocol::meta_information& )> receive_register_foreign_device_callback_t;
+typedef  std::function<void (frame::read_foreign_device_table&,              bacnet::common::protocol::meta_information& )> receive_read_foreign_device_table_callback_t;
+typedef  std::function<void (frame::read_foreign_device_table_ack&,          bacnet::common::protocol::meta_information& )> receive_read_foreign_device_table_ack_callback_t;
+typedef  std::function<void (frame::delete_foreign_device_table_entry&,      bacnet::common::protocol::meta_information& )> receive_delete_foreign_device_table_entry_callback_t;
+typedef  std::function<void (frame::distribute_broadcast_to_network&,        bacnet::common::protocol::meta_information& )> receive_distribute_broadcast_to_network_callback_t;
+typedef  std::function<void (frame::original_unicast_npdu&,                  bacnet::common::protocol::meta_information& )> receive_original_unicast_npdu_callback_t;
+typedef  std::function<void (frame::original_broadcast_npdu&,                bacnet::common::protocol::meta_information& )> receive_original_broadcast_npdu_callback_t;
+typedef  std::function<void (frame::original_secure_bvll&,                   bacnet::common::protocol::meta_information& )> receive_original_secure_bvll_callback_t;
+typedef  std::function<void (frame::raw&,                                    bacnet::common::protocol::meta_information& )> receive_raw_callback_t;
+
+
+ namespace bacnet { namespace bvll {
+typedef  std::function<void (const frame::bvlc_result&,                            const bacnet::common::protocol::meta_information& )> receive_bvlc_result_callback_t;
+typedef  std::function<void (const frame::write_broadcast_distribution_table&,     const bacnet::common::protocol::meta_information& )> receive_write_broadcast_distribution_table_callback_t;
+typedef  std::function<void (const frame::read_broadcast_distribution_table&,      const bacnet::common::protocol::meta_information& )> receive_read_broadcast_distribution_table_callback_t;
+typedef  std::function<void (const frame::read_broadcast_distribution_table_ack&,  const bacnet::common::protocol::meta_information& )> receive_read_broadcast_distribution_table_ack_callback_t;
+typedef  std::function<void (const frame::forwarded_npdu&,                         const bacnet::common::protocol::meta_information& )> receive_forwarded_npdu_callback_t;
+typedef  std::function<void (const frame::register_foreign_device&,                const bacnet::common::protocol::meta_information& )> receive_register_foreign_device_callback_t;
+typedef  std::function<void (const frame::read_foreign_device_table&,              const bacnet::common::protocol::meta_information& )> receive_read_foreign_device_table_callback_t;
+typedef  std::function<void (const frame::read_foreign_device_table_ack&,          const bacnet::common::protocol::meta_information& )> receive_read_foreign_device_table_ack_callback_t;
+typedef  std::function<void (const frame::delete_foreign_device_table_entry&,      const bacnet::common::protocol::meta_information& )> receive_delete_foreign_device_table_entry_callback_t;
+typedef  std::function<void (const frame::distribute_broadcast_to_network&,        const bacnet::common::protocol::meta_information& )> receive_distribute_broadcast_to_network_callback_t;
+typedef  std::function<void (const frame::original_unicast_npdu&,                  const bacnet::common::protocol::meta_information& )> receive_original_unicast_npdu_callback_t;
+typedef  std::function<void (const frame::original_broadcast_npdu&,                const bacnet::common::protocol::meta_information& )> receive_original_broadcast_npdu_callback_t;
+typedef  std::function<void (const frame::original_secure_bvll&,                   const bacnet::common::protocol::meta_information& )> receive_original_secure_bvll_callback_t;
+typedef  std::function<void (const frame::raw&,                                    const bacnet::common::protocol::meta_information& )> receive_raw_callback_t;
+}}
+
+ */
 
 #endif //NINJA_WOOKIE_BVLL_API_HPP

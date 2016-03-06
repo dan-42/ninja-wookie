@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
     transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
-    transport_mockup.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
     transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
-    transport_mockup.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
 
@@ -204,11 +204,11 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
     bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
 
-
+    service_controller.start();
     /**
      * receiving who_is
      */
-    service_controller.async_receive([&](boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::who_is service) {
+    service_controller.async_receive([&](bacnet::service::who_is service, boost::system::error_code ec, bacnet::common::protocol::meta_information mi) {
 
       boost::system::error_code expected_ec{bacnet::service::error::errc::success, bacnet::service::error::get_error_category()};
       BOOST_ASSERT_MSG(ec == expected_ec, " Error code is wrong ");
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
     });
 
-    transport_mockup.send_to_stack(send_ec, send_adr, send_data);
+    transport_mockup.send_to_application(send_ec, send_adr, send_data);
 
 
 
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
     transport_mockup.set_from_application_callback(from_application_callback_);
-    transport_mockup.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
 

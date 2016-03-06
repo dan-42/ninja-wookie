@@ -39,8 +39,8 @@ struct raw {
 
 BOOST_FUSION_ADAPT_STRUCT(
 		bacnet::bvll::frame::raw,
-		(bacnet::binary_data, data)
-		(unused_t, unused)
+		data,
+		unused
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_FORWARDED_NPDU_HPP_ */

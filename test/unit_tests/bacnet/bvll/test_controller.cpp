@@ -159,16 +159,16 @@ BOOST_AUTO_TEST_CASE( test_receive_unicast ) {
   transport_.set_from_application_callback(from_application_callback_);
 
   controller<decltype(transport_)> controller_(ios, transport_);
-  controller_.register_async_receive_unicast_callback([](bacnet::binary_data&& data, bacnet::common::protocol::meta_information&& mi){
+  controller_.register_callbacks([](bacnet::bvll::frame::original_broadcast_npdu&& frame, bacnet::common::protocol::meta_information&& mi){
     bacnet::binary_data expected_data;
     expected_data.push_back(0x00); //payload
     expected_data.push_back(0x01);
     expected_data.push_back(0x02);
     expected_data.push_back(0x03);
 
-    BOOST_ASSERT_MSG(expected_data.size() == data.size(), "RECEIVED DATA IS NOT THE SAME length");
-    for(std::size_t idx = 0; idx < data.size(); ++idx) {
-      BOOST_ASSERT_MSG(expected_data[idx] == data[idx], "RECEIVED DATA IS NOT SAME");
+    BOOST_ASSERT_MSG(expected_data.size() == frame.npdu_data.size(), "RECEIVED DATA IS NOT THE SAME length");
+    for(std::size_t idx = 0; idx < frame.npdu_data.size(); ++idx) {
+      BOOST_ASSERT_MSG(expected_data[idx] == frame.npdu_data[idx], "RECEIVED DATA IS NOT SAME");
     }
 
     bacnet::common::protocol::mac::address_ip expected_address_ip  = bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1", 0xBAC0);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( test_receive_unicast ) {
   data.push_back(0x02);
   data.push_back(0x03);
 
-  transport_.send_to_stack(ec, address, data) ;
+  transport_.send_to_application(ec, address, data) ;
 
   ios.run();
 }
@@ -218,16 +218,16 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   transport_.set_from_application_callback(from_application_callback_);
 
   controller<decltype(transport_)> controller_(ios, transport_);
-  controller_.register_async_receive_broadcast_callback([](bacnet::binary_data&& data, bacnet::common::protocol::meta_information&& mi){
+  controller_.register_callbacks([](bacnet::bvll::frame::original_broadcast_npdu&& frame, bacnet::common::protocol::meta_information&& mi){
     bacnet::binary_data expected_data;
     expected_data.push_back(0x00); //payload
     expected_data.push_back(0x01);
     expected_data.push_back(0x02);
     expected_data.push_back(0x03);
 
-    BOOST_ASSERT_MSG(expected_data.size() == data.size(), "RECEIVED DATA IS NOT THE SAME length");
-    for(std::size_t idx = 0; idx < data.size(); ++idx) {
-      BOOST_ASSERT_MSG(expected_data[idx] == data[idx], "RECEIVED DATA IS NOT SAME");
+    BOOST_ASSERT_MSG(expected_data.size() == frame.npdu_data.size(), "RECEIVED DATA IS NOT THE SAME length");
+    for(std::size_t idx = 0; idx < frame.npdu_data.size(); ++idx) {
+      BOOST_ASSERT_MSG(expected_data[idx] == frame.npdu_data[idx], "RECEIVED DATA IS NOT SAME");
     }
 
     bacnet::common::protocol::mac::address_ip expected_address_ip  = bacnet::common::protocol::mac::address_ip::from_string("255.255.255.255", 0xBAC0);
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   data.push_back(0x02);
   data.push_back(0x03);
 
-  transport_.send_to_stack(ec, address, data) ;
+  transport_.send_to_application(ec, address, data) ;
 
   ios.run();
 }

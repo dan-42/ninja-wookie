@@ -6,10 +6,11 @@
 #define NINJA_WOOKIE_BACNET_TRANSPORT_IP_V4_HPP
 
 #include <iostream>
+#include <functional>
 
 #include <boost/asio.hpp>
-#include <functional>
 #include <boost/bind.hpp>
+#include <util/callback_manager.hpp>
 #include <bacnet/transport/api.hpp>
 
 
@@ -39,8 +40,8 @@ public:
 
   }
 
-  void set_async_receive_callback(const async_receive_callback &callback) {
-    async_receive_callback_ = callback;
+  void register_receive_callback(const receive_callback &callback) {
+    receive_callback_ = callback;
   }
 
   template<typename Handler>
@@ -56,10 +57,9 @@ public:
 
   void start() {
 
-    if(!async_receive_callback_) {
+    if(!receive_callback_) {
       throw std::runtime_error("transport::ip_v4 : no callback set, cant work without it");
     }
-
     socket_.open(listen_endpoint_.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.set_option(boost::asio::socket_base::broadcast(true));
@@ -70,20 +70,20 @@ public:
   }
 
 private:
-
-
   void handle_receive_from(const boost::system::error_code& ec,  std::size_t bytes_transferred) {
 
     bacnet::common::protocol::mac::address sender(bacnet::common::protocol::mac::address_ip::from_native(sender_endpoint_));
-
+    auto send_ec = ec;
     if(!ec) {
+      /* copy from input buffer to binary_data
+       * this should be the only copy
+       */
       bacnet::binary_data input(data_.begin(), data_.begin() + bytes_transferred);
-      std::cout << "ip_received: " ;
-      bacnet::print(input);
-      async_receive_callback_(ec, sender, std::move(input));
+
+      receive_callback_(std::move(send_ec), std::move(sender), std::move(input));
     }
     else {
-      async_receive_callback_(ec, sender, bacnet::binary_data{});
+      receive_callback_(std::move(send_ec), std::move(sender), bacnet::binary_data{});
     }
 
     auto callback = boost::bind(&ip_v4::handle_receive_from, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
@@ -92,14 +92,13 @@ private:
 
 
   boost::asio::io_service &io_service_;
-  async_receive_callback async_receive_callback_;
+  receive_callback receive_callback_;
   boost::asio::ip::udp::socket socket_;
   uint16_t port_;
   boost::asio::ip::address listen_address_;
   boost::asio::ip::udp::endpoint listen_endpoint_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
   std::array<uint8_t, std::numeric_limits<uint16_t>::max()> data_;
-
 };
 
 

@@ -98,7 +98,7 @@ namespace bacnet { namespace service { namespace detail {
     template<typename Service>
     inline void operator()(Service service) {
       boost::system::error_code ec{error::errc::success, error::get_error_category()};
-      callback_manager_.invoke(ec, std::move(meta_information_), std::move(service));
+      callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
     }
 
   private:
@@ -118,7 +118,7 @@ inline void inbound_router::operator()<service::i_am>(service::i_am service) {
   device_manager_.print_device_list();
 
   boost::system::error_code ec{error::errc::success, error::get_error_category()};
-  callback_manager_.invoke(ec, std::move(meta_information_), std::move(service));
+  callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
 }
 
 }}}
@@ -145,6 +145,10 @@ public:
     lower_layer_.register_async_received_service_callback(boost::bind(&controller::async_received_service_handler, this, _1, _2));
     lower_layer_.register_async_received_error_callback(boost::bind(&controller::async_received_error_handler, this, _1, _2));
 
+  }
+
+  void start() {
+    lower_layer_.start();
   }
 
   void async_received_service_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
@@ -215,7 +219,7 @@ public:
        */
      auto callback_idx =  callback_manager_.set_i_am_service_callback(
          [handler, service, endpoints, device_object_identifier, this]
-           (boost::system::error_code ec, bacnet::common::protocol::meta_information mi, bacnet::service::i_am i_am) {
+           (bacnet::service::i_am i_am, boost::system::error_code ec, bacnet::common::protocol::meta_information mi) {
                if(i_am.i_am_device_identifier == device_object_identifier) {
                  async_send(mi.address, service, handler);
                }

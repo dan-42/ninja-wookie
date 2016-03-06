@@ -81,7 +81,7 @@ using detail::common::parse_iterator;
   }
 
 
-  static inline void print(const binary_data &data) {
+  static inline void print(binary_data &data) {
     for(auto &c : data)
       std::cout << " 0x" << std::setfill('0') << std::setw(2) << std::hex << (int)c;
     std::cout << std::endl;

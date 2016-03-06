@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
   transport_.set_from_application_callback(from_application_callback_);
-  transport_.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
+  transport_.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
 
   });
 
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
   transport_.set_from_application_callback(from_application_callback_);
-  transport_.set_async_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
+  transport_.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
 
   });
 
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
   transport_.set_from_application_callback(from_application_callback_);
-  transport_.set_async_receive_callback(async_receive_callback_);
+  transport_.register_receive_callback(async_receive_callback_);
 
   bvll::controller<decltype(transport_)> bvll_controller_(ios, transport_);
   npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   data_send_to_stack.push_back(0x10); //unconfirmed service
   data_send_to_stack.push_back(0x08); //who is
 
-  transport_.send_to_stack(ec, adr, data_send_to_stack);
+  transport_.send_to_application(ec, adr, data_send_to_stack);
 
   ios.run();
 }

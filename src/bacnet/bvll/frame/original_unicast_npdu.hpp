@@ -39,8 +39,8 @@ struct original_unicast_npdu {
 
 BOOST_FUSION_ADAPT_STRUCT(
 		bacnet::bvll::frame::original_unicast_npdu,
-		(bacnet::binary_data, npdu_data)
-		(unused_t, unused)
+		npdu_data,
+		unused
 )
 
 #endif /* SRC_BACNET_BVLL_FRAME_ORIGINAL_UNICAST_NPDU_HPP_ */

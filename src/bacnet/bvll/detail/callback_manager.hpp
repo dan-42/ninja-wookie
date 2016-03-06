@@ -10,11 +10,7 @@
 namespace bacnet { namespace  bvll { namespace detail {
 
 
-struct callback_manager {
 
-  bacnet::bvll::async_receive_broadcast_callback_t async_receive_broadcast_callback_;
-  bacnet::bvll::async_receive_unicast_callback_t async_receive_unicast_callback_;
-};
 
 }}}
 

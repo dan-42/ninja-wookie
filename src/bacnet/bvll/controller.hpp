@@ -30,6 +30,8 @@
 
 #include <boost/bind.hpp>
 
+#include <util/callback_manager.hpp>
+
 #include <bacnet/transport/api.hpp>
 
 #include <bacnet/bvll/frames.hpp>
@@ -38,8 +40,26 @@
 #include <bacnet/bvll/detail/inbound_router.hpp>
 #include <bacnet/bvll/detail/callback_manager.hpp>
 
-
 namespace bacnet { namespace  bvll {
+
+    namespace  detail {
+      typedef boost::fusion::map<
+          boost::fusion::pair<frame::bvlc_result, receive_bvlc_result_callback_t>,
+          boost::fusion::pair<frame::write_broadcast_distribution_table, receive_write_broadcast_distribution_table_callback_t>,
+          boost::fusion::pair<frame::read_broadcast_distribution_table, receive_read_broadcast_distribution_table_callback_t>,
+          boost::fusion::pair<frame::read_broadcast_distribution_table_ack, receive_read_broadcast_distribution_table_ack_callback_t>,
+          boost::fusion::pair<frame::forwarded_npdu, receive_forwarded_npdu_callback_t>,
+          boost::fusion::pair<frame::register_foreign_device, receive_register_foreign_device_callback_t>,
+          boost::fusion::pair<frame::read_foreign_device_table, receive_read_foreign_device_table_callback_t>,
+          boost::fusion::pair<frame::read_foreign_device_table_ack, receive_read_foreign_device_table_ack_callback_t>,
+          boost::fusion::pair<frame::delete_foreign_device_table_entry, receive_delete_foreign_device_table_entry_callback_t>,
+          boost::fusion::pair<frame::distribute_broadcast_to_network, receive_distribute_broadcast_to_network_callback_t>,
+          boost::fusion::pair<frame::original_unicast_npdu, receive_original_unicast_npdu_callback_t>,
+          boost::fusion::pair<frame::original_broadcast_npdu, receive_original_broadcast_npdu_callback_t>,
+          boost::fusion::pair<frame::original_secure_bvll, receive_original_secure_bvll_callback_t>,
+          boost::fusion::pair<frame::raw, receive_raw_callback_t>
+      > callback_map_type;
+    }
 
 template<typename Transporter>
 class controller {
@@ -50,20 +70,21 @@ public:
                                           io_service_(ios),
                                           transporter_(transporter),
                                           inbound_router_(callback_manager_) {
-    start();
   }
 
 
-  void register_async_receive_broadcast_callback(const async_receive_broadcast_callback_t &callback){
-    callback_manager_.async_receive_broadcast_callback_ = callback;
+
+  template<typename... Callbacks>
+  void register_callbacks(Callbacks... callbacks) {
+    callback_manager_.set_callbacks(callbacks...);
   }
 
-  void register_async_receive_unicast_callback(const async_receive_unicast_callback_t &callback){
-    callback_manager_.async_receive_unicast_callback_ = callback;
-  }
 
   void start() {
-    transporter_.set_async_receive_callback(boost::bind(&controller::handle_async_receive, this, boost::asio::placeholders::error, _2, _3));
+    //transporter_.register_receive_callback(boost::bind(&controller::handle_async_receive, this, boost::asio::placeholders::error, _2, _3));
+    transporter_.register_receive_callback([this](boost::system::error_code &&error, bacnet::common::protocol::mac::address &&sender, bacnet::binary_data&& data) {
+      handle_async_receive(std::move(error), std::move(sender), std::move(data));
+    });
     transporter_.start();
   }
 
@@ -92,19 +113,18 @@ public:
 
 private:
 
-  void handle_async_receive(boost::system::error_code error, bacnet::common::protocol::mac::address sender, bacnet::binary_data data) {
+  void handle_async_receive(boost::system::error_code &&error, bacnet::common::protocol::mac::address &&sender, bacnet::binary_data&& data) {
     if (!error) {
       frame::possible_bvll_frame f = parser::parse(std::move(data));
       inbound_router_.sender_endpoint(sender);
-      f.apply_visitor(inbound_router_);
+      boost::apply_visitor(inbound_router_, f);
     }
   }
 
   boost::asio::io_service &io_service_;
   Transporter &transporter_;
-
-  bacnet::bvll::detail::inbound_router inbound_router_;
-  bacnet::bvll::detail::callback_manager callback_manager_;
+  util::callback::callback_manager<detail::callback_map_type> callback_manager_;
+  bacnet::bvll::detail::inbound_router<decltype(callback_manager_)> inbound_router_;
 
 };
 

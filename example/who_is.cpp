@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
     bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port};
     auto &service_controller = factory.controller();
 
-    service_controller.async_receive([](const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi,  const bacnet::service::i_am &service){
-    	std::cout << service << std::endl;
+    service_controller.async_receive([](const bacnet::service::i_am &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi){
+    	//std::cout << service << std::endl;
     });
 
 

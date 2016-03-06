@@ -38,15 +38,15 @@ public:
     /**
      * needed api for upper layer
      */
-    void set_async_receive_callback(const ::bacnet::transport::async_receive_callback &callback) {
-      async_receive_callback_ = callback;
+    void register_receive_callback(const ::bacnet::transport::receive_callback &callback) {
+      receive_callback_ = callback;
     }
 
     /**
      * needed by api
      */
     void start() {
-      if(!async_receive_callback_ || !from_application_callback_) {
+      if(!receive_callback_ || !from_application_callback_) {
         throw std::runtime_error("transport::ip_v4_mockup : no callback set, cant work without it");
       }
     }
@@ -77,16 +77,33 @@ public:
     /**
      * mockup used to send somthing to the application_layer
      */
-    void send_to_stack(boost::system::error_code ec, ::bacnet::common::protocol::mac::address ep ,::bacnet::binary_data data) {
+    void send_to_application(const boost::system::error_code &ec, const boost::asio::ip::udp::endpoint &ep ,const ::bacnet::binary_data& data) {
+      auto ip_ep = ::bacnet::common::protocol::mac::address_ip::from_native(ep);
+      ::bacnet::common::protocol::mac::address bacnet_ep(ip_ep);
+
       io_service_.post([=]() {
-        async_receive_callback_(ec, ep, data);
+        auto send_ec = ec;
+        auto send_ep = bacnet_ep;
+        auto send_data = data;
+        receive_callback_(std::move(send_ec), std::move(send_ep), std::move(send_data));
+      });
+    }
+    /**
+     * mockup used to send somthing to the application_layer
+     */
+    void send_to_application(const boost::system::error_code &ec, const ::bacnet::common::protocol::mac::address &ep, const ::bacnet::binary_data& data) {
+      io_service_.post([=]() {
+        auto send_ec = ec;
+        auto send_ep = ep;
+        auto send_data = data;
+        receive_callback_(std::move(send_ec), std::move(send_ep), std::move(send_data));
       });
     }
 
 private:
 
     boost::asio::io_service &io_service_;
-    ::bacnet::transport::async_receive_callback async_receive_callback_;
+    ::bacnet::transport::receive_callback receive_callback_;
     from_application_callback from_application_callback_;
 
 };

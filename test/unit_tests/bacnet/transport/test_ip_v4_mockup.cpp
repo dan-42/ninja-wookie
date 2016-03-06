@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
 
 
 
-  async_receive_callback async_receive_callback_= [&data_to_send](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
+  receive_callback receive_callback_= [&data_to_send](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data &&data){
     BOOST_ASSERT_MSG(ec == boost::system::errc::argument_list_too_long, "ERROR_CODE WRONG");
     ::bacnet::common::protocol::mac::address expected_adr(::bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1"));
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
 
   boost::asio::io_service ios;
   ip_v4_mockup transport(ios);
-  transport.set_async_receive_callback(async_receive_callback_);
+  transport.register_receive_callback(receive_callback_);
   transport.set_from_application_callback(async_send_from_stack_callback_);
 
   transport.async_send(data_to_send, receiver, [](const boost::system::error_code& ec){
@@ -82,7 +82,9 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
 
   auto ec = boost::system::errc::make_error_code(boost::system::errc::argument_list_too_long);
   ::bacnet::common::protocol::mac::address ep(::bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1"));
-  transport.send_to_stack(ec, ep ,data_to_send);
+    auto d = data_to_send;
+  //transport.send_to_application(ec, ep , std::move(d));
+    transport.send_to_application(ec, ep , d);
 
   transport.start();
   ios.run();

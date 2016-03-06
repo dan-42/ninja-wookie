@@ -33,15 +33,23 @@
 
 namespace bacnet { namespace  bvll { namespace  detail {
 
-
+template<typename CallbackManager>
 class inbound_router : public boost::static_visitor<> {
 
 public:
 
-  inbound_router(bacnet::bvll::detail::callback_manager& cm) : callback_manager_(cm) {
-
+  inbound_router(CallbackManager& cm) : callback_manager_(cm) {
   }
 
+  template<typename T>
+  void operator()(T& t) {
+    T copy = t;
+      bacnet::common::protocol::meta_information mi;
+      mi.address = sender_endpoint_;
+      callback_manager_.invoke_callback(copy, mi);
+  }
+
+  /*
   void operator()(frame::bvlc_result request) {
     std::cout << "inbound_router bvlc_result" << std::endl;
   }
@@ -106,12 +114,13 @@ public:
     std::cout << "inbound_router raw data" << std::endl;
   }
 
+*/
   void sender_endpoint(const bacnet::common::protocol::mac::address& sender_endpoint) {
     sender_endpoint_ = sender_endpoint;
   }
 
 private:
-  bacnet::bvll::detail::callback_manager&  callback_manager_;
+  CallbackManager&  callback_manager_;
   bacnet::common::protocol::mac::address sender_endpoint_;
 };
 

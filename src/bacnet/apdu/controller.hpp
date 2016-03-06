@@ -81,14 +81,19 @@ struct controller {
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
                           inbound_router_(callback_manager_) {
-	  init();
+
   }
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller, const uint16_t &device_object_id) :
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
                           inbound_router_(callback_manager_) {
-    init();
+
+  }
+
+  void start() {
+    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1, _2));
+    underlying_controller_.start();
   }
 
   void register_async_received_service_callback(const async_received_service_callback_t &callback){
@@ -140,9 +145,7 @@ struct controller {
 
 private:
 
-  void init() {
-    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1, _2));
-  }
+
 
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
