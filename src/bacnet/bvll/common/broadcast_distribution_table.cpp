@@ -18,7 +18,7 @@
  * Authors: Daniel Friedrich
  */
 
-#include <bacnet/bvll/broadcast_distribution_table.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table.hpp>
 #include <bacnet/bvll/detail/broadcast_distribution_table_grammar.hpp>
 
 

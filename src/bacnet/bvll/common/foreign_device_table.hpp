@@ -19,32 +19,27 @@
  */
 
 
-#ifndef SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
-#define SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
+#ifndef SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_
+#define SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_
 
-#include <bacnet/detail/common/types.hpp>
-#include <boost/fusion/include/define_struct.hpp>
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/foreign_device_table_entry.hpp>
 
+// xxx put it into a Fusion struct as well?
+namespace bacnet { namespace bvll {
+typedef std::vector<bacnet::bvll::foreign_device_table_entry> foreign_device_table;
+}}
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll), foreign_device_table_entry,
-	(bacnet::bvll::bacnet_ip_address, address)
-	(uint16_t, time_to_live_in_sec)
-	(uint16_t, time_to_purge_in_sec)
-)
+namespace bacnet { namespace bvll { namespace generator {
 
-
-namespace bacnet  { namespace bvll { namespace generator {
-
-bool generate(bacnet::binary_data &c, foreign_device_table_entry &v);
+bool generate(bacnet::binary_data &c, foreign_device_table &v);
 
 }}}
 
 namespace bacnet { namespace bvll { namespace parser {
 
-bool parse(bacnet::binary_data &i, foreign_device_table_entry &v);
+bool parse(bacnet::binary_data &i, foreign_device_table &v);
 
 }}}
 
-#endif /* SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_ENTRY_HPP_ */
+
+#endif /* SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_ */

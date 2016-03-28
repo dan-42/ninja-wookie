@@ -21,32 +21,36 @@
 #ifndef NINJA_WOOKIE_NPDU_CONTROLLER_HPP
 #define NINJA_WOOKIE_NPDU_CONTROLLER_HPP
 
-#include <bitset>
-
 #include <boost/fusion/include/define_struct.hpp>
+
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 #include <bacnet/bvll/api.hpp>
 
-
-
 #include <bacnet/detail/common/types.hpp>
+#include <util/callback_manager.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
 
-
 #include <bacnet/npdu/frame.hpp>
-#include <bacnet/npdu/grammar.hpp>
+#include <bacnet/npdu/detail/grammar.hpp>
 #include <bacnet/npdu/api.hpp>
-#include <bacnet/npdu/detail/callback_manager.hpp>
 #include <bacnet/npdu/detail/inbound_router.hpp>
 
 namespace bacnet { namespace npdu {
 
 
-constexpr uint8_t  NPDU_PROTOCOL_VERSION    = 1;
-constexpr uint16_t DEFAULT_NETWORK_NUMBER   = 1;
+constexpr uint8_t  NPDU_PROTOCOL_VERSION    = 0x01;
+constexpr uint16_t DEFAULT_NETWORK_NUMBER   = 0x0001;
 constexpr uint16_t BROADCAST_NETWORK_NUMBER = 0xFFFF;
 constexpr uint8_t  BROADCAST_HOP_COUNT      = 0xFF;
+
+
+    namespace  detail {
+      typedef boost::fusion::map<
+          boost::fusion::pair<frame::apdu, receive_apdu_callback_t>,
+          boost::fusion::pair<frame::raw, receive_raw_callback_t>,
+      > callback_map_type;
+    }
 
 template<class Underlying_layer>
 class controller {
@@ -56,13 +60,16 @@ public:
 
   }
 
-  controller(Underlying_layer &underlying_layer, const uint16_t & network_number) : underlying_layer_(underlying_layer), inbound_router_(callback_manager_), network_number_(network_number) {
+  controller(Underlying_layer &underlying_layer, const uint16_t & network_number) :
+                                                        underlying_layer_(underlying_layer),
+                                                        inbound_router_(callback_manager_),
+                                                        network_number_(network_number) {
 
   }
 
   /** callback to upper layer*/
   void register_async_received_apdu_callback(const async_received_apdu_callback_t &callback){
-    callback_manager_.async_received_apdu_callback_ = callback;
+    callback_manager_.set_callbacks(callback);
   }
 
 
@@ -74,7 +81,7 @@ public:
     frame.control_field.has_destination_specifier_ = true;
     frame.destination.network_number = BROADCAST_NETWORK_NUMBER;
     frame.hop_count = BROADCAST_HOP_COUNT;
-    frame.apdu_data = payload;
+    frame.body = frame::apdu(payload);
 
     bacnet::binary_data binary_frame = npdu::generator::generate(frame);
 
@@ -89,7 +96,7 @@ public:
     frame.control_field.has_network_layer_message_ = false;
     frame.control_field.priority_ = npdu::priority::normal_message;
     frame.hop_count = 0;
-    frame.apdu_data = payload;
+    frame.body = frame::apdu(payload);
 
     bacnet::binary_data binary_frame = npdu::generator::generate(frame);
 
@@ -125,7 +132,7 @@ private:
 
 
   Underlying_layer &underlying_layer_;
-  detail::callback_manager callback_manager_;
+  util::callback::callback_manager<callback_map_type> callback_manager_;
   detail::inbound_router inbound_router_;
   uint16_t network_number_ = DEFAULT_NETWORK_NUMBER;
 

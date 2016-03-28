@@ -43,6 +43,7 @@
 
 #include <bacnet/npdu/frame.hpp>
 
+
 #include <bacnet/npdu/detail/address_grammar.hpp>
 
 namespace bacnet { namespace  npdu { namespace detail { namespace parser {
@@ -73,7 +74,15 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   rule<Iterator, uint8_t()>             hop_count_rule;
   rule<Iterator, uint8_t()>             message_type_rule;
   rule<Iterator, uint16_t()>            vendor_id_rule;
-  rule<Iterator, bacnet::binary_data()> apdu_data_rule;
+  rule<Iterator, frame_body_t()>        body_rule;
+
+  //todo but in separate grammar
+  rule<Iterator, frame_body::apdu()>         frame_apdu_rule;
+  rule<Iterator, bacnet::binary_data()> frame_apdu_data_rule;
+
+  rule<Iterator, frame()>               frame_raw_rule;
+  rule<Iterator, frame_body::raw()>          frame_raw_type_rule;
+  rule<Iterator, bacnet::binary_data()> frame_raw_data_rule;
 
   address_grammar<Iterator>             address_grammar_;
 
@@ -81,14 +90,15 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
   npdu_grammar() : npdu_grammar::base_type(frame_rule){
 
-    frame_rule = protocol_version_rule
+    frame_rule = (protocol_version_rule
                  >> controle_information_rule
-                 >>  destination_rule
+                 >> destination_rule
                  >> source_rule
                  >> hop_count_rule
                  >> message_type_rule
                  >> vendor_id_rule
-                 >> apdu_data_rule;
+                 >> body_rule)
+               | frame_raw_rule;
 
 
     protocol_version_rule = byte_(bacnet::npdu::protocol_version);
@@ -109,7 +119,18 @@ struct npdu_grammar : grammar<Iterator, frame() >{
     vendor_id_rule    = ( (eps(boost::phoenix::bind(&control_information_t::has_network_layer_message_type, ref(control_field)) == true) >> eps(ref(message_type) >= vendor_specific_message_type_adr) >> big_word   )
                       | ( attr(uint16_t{0})) );
 
-    apdu_data_rule    = repeat[byte_];
+
+    /** creating an empty control information field and parsing all data inside thye payload
+     */
+    frame_raw_rule      = attr(empty_address) >> attr(empty_address) >> attr(uint8_t{0}) >> attr(uint8_t{0}) >> attr(uint16_t{0})  >> frame_raw_type_rule;
+    frame_raw_type_rule = frame_raw_data_rule;
+    frame_raw_data_rule = repeat[byte_];
+
+    //if we want to support more frames, we have to add them here with an or (|)
+    body_rule         = frame_apdu_rule;
+
+    frame_apdu_rule         = frame_apdu_data_rule;
+    frame_apdu_data_rule    = repeat[byte_];
 
 
     frame_rule.name("frame_rule");
@@ -134,6 +155,8 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   control_information_t control_field;
   uint8_t message_type = 0;
 };
+
+static const npdu_grammar<bacnet::parse_iterator> npdu_grammar_instance{};
 
 }}}}
 
@@ -176,7 +199,13 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   rule<Iterator, uint8_t()>             hop_count_rule;
   rule<Iterator, uint8_t()>             message_type_rule;
   rule<Iterator, uint16_t()>            vendor_id_rule;
-  rule<Iterator, bacnet::binary_data()> apdu_data_rule;
+  rule<Iterator, frame_body_t()>        body_rule;
+
+  //todo add support for raw frame, maybe with flag in struct
+
+  //todo but in separate grammar
+  rule<Iterator, frame_body::apdu()>         frame_apdu_rule;
+  rule<Iterator, bacnet::binary_data()> frame_apdu_data_rule;
 
   address_grammar<Iterator>             address_grammar_;
 
@@ -191,7 +220,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
                  << hop_count_rule
                  << message_type_rule
                  << vendor_id_rule
-                 << apdu_data_rule;
+                 << body_rule;
 
 
     protocol_version_rule = byte_(bacnet::npdu::protocol_version);
@@ -217,7 +246,12 @@ struct npdu_grammar : grammar<Iterator, frame() >{
                            << eps(ref(message_type) >= vendor_specific_message_type_adr) << big_word   )
                       | eps   );
 
-    apdu_data_rule    = repeat[byte_];
+
+    // if we want to support more frames, we have to add them here
+    body_rule         = frame_apdu_rule << eps;
+
+    frame_apdu_rule         = frame_apdu_data_rule;
+    frame_apdu_data_rule    = repeat[byte_];
 
 
     frame_rule.name("frame_rule");
@@ -240,6 +274,8 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   control_information_t control_field;
   uint8_t message_type = 0;
 };
+
+static const bacnet::npdu::detail::generator::npdu_grammar<bacnet::generate_iterator> npdu_grammar_instance{};
 
 }}}}
 

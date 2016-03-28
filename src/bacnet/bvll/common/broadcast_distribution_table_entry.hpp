@@ -19,25 +19,33 @@
  */
 
 
-#ifndef SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_
-#define SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_
+#ifndef SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_ENTRY_HPP_
+#define SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_ENTRY_HPP_
 
 
-#include <vector>
-#include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/broadcast_distribution_table_entry.hpp>
+#include <boost/fusion/include/define_struct.hpp>
 
-namespace bacnet { namespace bvll {
-	typedef std::vector<bacnet::bvll::broadcast_distribution_table_entry> broadcast_distribution_table;
-}}
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
+
+
+BOOST_FUSION_DEFINE_STRUCT(
+	(bacnet)(bvll), broadcast_distribution_table_entry,
+	(bacnet::bvll::bacnet_ip_address, address)
+	(uint32_t, broadcast_distribution_mask)
+)
+
 
 namespace bacnet { namespace bvll { namespace generator {
-  bool generate(bacnet::binary_data &c, broadcast_distribution_table &v);
+
+  bool generate(bacnet::binary_data &c, broadcast_distribution_table_entry &v) ;
+
 }}}
 
 
 namespace bacnet { namespace bvll { namespace parser {
-  bool parse(bacnet::binary_data &i, broadcast_distribution_table &v);
+
+  bool parse(bacnet::binary_data &i, broadcast_distribution_table_entry &v);
+
 }}}
 
-#endif /* SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_ */
+#endif /* SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_ENTRY_HPP_ */

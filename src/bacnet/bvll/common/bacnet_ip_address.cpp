@@ -1,6 +1,6 @@
 
 
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
 #include <bacnet/bvll/detail/bacnet_ip_address_grammar.hpp>
 
 namespace bacnet { namespace bvll { namespace generator {

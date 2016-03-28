@@ -18,28 +18,25 @@
  * Authors: Daniel Friedrich
  */
 
-
-#ifndef SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_
-#define SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_
-
-#include <bacnet/bvll/foreign_device_table_entry.hpp>
-
-// xxx put it into a Fusion struct as well?
-namespace bacnet { namespace bvll {
-typedef std::vector<bacnet::bvll::foreign_device_table_entry> foreign_device_table;
-}}
+#include <bacnet/bvll/common/foreign_device_table.hpp>
+#include <bacnet/bvll/detail/foreign_device_table_grammar.hpp>
 
 namespace bacnet { namespace bvll { namespace generator {
 
-bool generate(bacnet::binary_data &c, foreign_device_table &v);
+bool generate(bacnet::binary_data &c, foreign_device_table &v) {
+  std::back_insert_iterator<std::decay<decltype(c)>::type> sink(c);
+  bacnet::bvll::detail::generator::foreign_device_table_grammar<decltype(sink)> g;
+  return boost::spirit::karma::generate(sink, g, v);
+}
 
 }}}
 
 namespace bacnet { namespace bvll { namespace parser {
 
-bool parse(bacnet::binary_data &i, foreign_device_table &v);
+bool parse(bacnet::binary_data &i, foreign_device_table &v){
+  auto start = i.begin(); auto end = i.end();
+  bacnet::bvll::detail::parser::foreign_device_table_grammar<decltype(start)> grammar;
+  return boost::spirit::qi::parse(start, end, grammar, v);
+}
 
 }}}
-
-
-#endif /* SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_HPP_ */

@@ -19,30 +19,32 @@
  */
 
 
-#include <bacnet/bvll/foreign_device_table_entry.hpp>
-#include <bacnet/bvll/detail/foreign_device_table_entry_grammar.hpp>
+#ifndef SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
+#define SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_ENTRY_HPP_
+
+#include <bacnet/detail/common/types.hpp>
+#include <boost/fusion/include/define_struct.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
+
+
+BOOST_FUSION_DEFINE_STRUCT(
+	(bacnet)(bvll), foreign_device_table_entry,
+	(bacnet::bvll::bacnet_ip_address, address)
+	(uint16_t, time_to_live_in_sec)
+	(uint16_t, time_to_purge_in_sec)
+)
 
 
 namespace bacnet  { namespace bvll { namespace generator {
 
-bool generate(bacnet::binary_data &c, foreign_device_table_entry &v) {
-  std::back_insert_iterator<std::decay<decltype(c)>::type> sink(c);
-  bacnet::bvll::detail::generator::foreign_device_table_entry_grammar<decltype(sink)> g;
-  return boost::spirit::karma::generate(sink, g, v);
-}
+bool generate(bacnet::binary_data &c, foreign_device_table_entry &v);
 
 }}}
-
 
 namespace bacnet { namespace bvll { namespace parser {
 
-bool parse(bacnet::binary_data &i, foreign_device_table_entry &v){
-  auto start = i.begin(); auto end = i.end();
-  bacnet::bvll::detail::parser::foreign_device_table_entry_grammar<decltype(start)> grammar;
-  return boost::spirit::qi::parse(start, end, grammar, v);
-}
+bool parse(bacnet::binary_data &i, foreign_device_table_entry &v);
 
 }}}
 
-
-
+#endif /* SRC_BACNET_BVLL_FOREIGN_DEVICE_TABLE_ENTRY_HPP_ */

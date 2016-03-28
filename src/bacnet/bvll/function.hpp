@@ -24,8 +24,7 @@
 
 #include <iostream>
 
-namespace bacnet {
-namespace bvll {
+namespace bacnet { namespace bvll {
 
 
 enum class function : uint8_t {
@@ -48,8 +47,7 @@ static uint8_t base_type(const function &f);
 
 static std::ostream &operator<<(std::ostream &os, const function &f);
 
-}
-}
+}}
 
 #include <bacnet/bvll/impl/function.ipp>
 

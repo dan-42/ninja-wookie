@@ -29,7 +29,7 @@
 #include <boost/spirit/include/karma.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/foreign_device_table_entry.hpp>
+#include <bacnet/bvll/common/foreign_device_table_entry.hpp>
 #include <bacnet/bvll/detail/bacnet_ip_address_grammar.hpp>
 
 extern template struct bacnet::bvll::detail::generator::bacnet_ip_address_grammar<bacnet::generate_iterator>;

@@ -38,7 +38,6 @@
 #include <bacnet/bvll/api.hpp>
 
 #include <bacnet/bvll/detail/inbound_router.hpp>
-#include <bacnet/bvll/detail/callback_manager.hpp>
 
 namespace bacnet { namespace  bvll {
 

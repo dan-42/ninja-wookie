@@ -25,7 +25,7 @@
 #include <iostream>
 #include <bitset>
 
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
 #include <bacnet/bvll/detail/bacnet_ip_address_grammar.hpp>
 
 

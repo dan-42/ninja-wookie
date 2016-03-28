@@ -25,7 +25,7 @@
 #include <boost/spirit/include/karma.hpp>
 
 #include <bacnet/bvll/frame/delete_foreign_device_table_entry.hpp>
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 

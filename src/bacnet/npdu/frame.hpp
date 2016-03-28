@@ -24,14 +24,22 @@
 #include <iostream>
 
 #include <boost/fusion/include/define_struct.hpp>
+#include <boost/variant.hpp>
 
 #include <bacnet/detail/common/types.hpp>
 
 #include <bacnet/npdu/address.hpp>
 #include <bacnet/npdu/control_information_t.hpp>
 
+#include <bacnet/npdu/frame/apdu.hpp>
+#include <bacnet/npdu/frame/raw.hpp>
 
-
+namespace bacnet { namespace npdu {
+    typedef boost::variant<
+        bacnet::npdu::frame_body::apdu,
+        bacnet::npdu::frame_body::raw
+    > frame_body_t;
+  }}
 BOOST_FUSION_DEFINE_STRUCT(
   (bacnet)(npdu), frame,
   (uint8_t, protocol_version)
@@ -41,7 +49,7 @@ BOOST_FUSION_DEFINE_STRUCT(
   (uint8_t, hop_count)
   (uint8_t, message_type)
   (uint16_t, vendor_id)
-  (bacnet::binary_data, apdu_data)
+  (bacnet::npdu::frame_body_t, body)
 )
 
 

@@ -31,11 +31,11 @@
 #include <boost/variant.hpp>
 
 
-#include <bacnet/bvll/bacnet_ip_address.hpp>
-#include <bacnet/bvll/foreign_device_table_entry.hpp>
-#include <bacnet/bvll/foreign_device_table.hpp>
-#include <bacnet/bvll/broadcast_distribution_table_entry.hpp>
-#include <bacnet/bvll/broadcast_distribution_table.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/foreign_device_table_entry.hpp>
+#include <bacnet/bvll/common/foreign_device_table.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table_entry.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table.hpp>
 
 #include <bacnet/bvll/frame/bvlc_result.hpp>
 #include <bacnet/bvll/frame/read_broadcast_distribution_table_ack.hpp>

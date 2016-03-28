@@ -18,20 +18,26 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_NPDU_CALLBACK_MANAGER_HPP
-#define NINJA_WOOKIE_NPDU_CALLBACK_MANAGER_HPP
 
-#include <bacnet/npdu/api.hpp>
+#ifndef SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_
+#define SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_
 
-namespace bacnet { namespace  npdu { namespace detail {
 
-using namespace bacnet::npdu;
+#include <vector>
+#include <bacnet/detail/common/types.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table_entry.hpp>
 
-struct callback_manager {
-  async_received_apdu_callback_t async_received_apdu_callback_;
-};
+namespace bacnet { namespace bvll {
+	typedef std::vector<bacnet::bvll::broadcast_distribution_table_entry> broadcast_distribution_table;
+}}
 
+namespace bacnet { namespace bvll { namespace generator {
+  bool generate(bacnet::binary_data &c, broadcast_distribution_table &v);
 }}}
 
 
-#endif //NINJA_WOOKIE_NPDU_CALLBACK_MANAGER_HPP
+namespace bacnet { namespace bvll { namespace parser {
+  bool parse(bacnet::binary_data &i, broadcast_distribution_table &v);
+}}}
+
+#endif /* SRC_BACNET_BVLL_BROADCAST_DISTRIBUTION_TABLE_HPP_ */

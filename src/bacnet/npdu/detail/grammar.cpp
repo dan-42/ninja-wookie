@@ -18,21 +18,22 @@
  * Authors: Daniel Friedrich
  */
 
-#include <bacnet/npdu/grammar.hpp>
+#include <bacnet/npdu/detail/grammar.hpp>
 
 #include <bacnet/npdu/detail/frame_grammar.hpp>
 
 
+using namespace bacnet::npdu;
+using namespace bacnet::npdu::detail;
 
-bacnet::binary_data bacnet::npdu::generator::generate(const npdu::frame &f){
+bacnet::binary_data generator::generate(frame &&f){
 
   bacnet::binary_data binary_frame;
+  bacnet::generate_iterator sink(binary_frame);
 
-  std::back_insert_iterator<bacnet::binary_data> sink(binary_frame);
-  bacnet::npdu::detail::generator::npdu_grammar<decltype(sink)> generator;
   bool result = false;
   try{
-    result = boost::spirit::karma::generate(sink, generator, f);
+    result = boost::spirit::karma::generate(sink, detail::generator::npdu_grammar_instance, f);
   }
   catch (std::exception &e) {
     std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;
@@ -43,14 +44,12 @@ bacnet::binary_data bacnet::npdu::generator::generate(const npdu::frame &f){
   return binary_frame;
 }
 
-bacnet::npdu::frame bacnet::npdu::parser::parse(bacnet::binary_data data){
+frame parser::parse(bacnet::binary_data &&data){
 
-	bacnet::npdu::frame f;
+	frame f;
 	auto start = data.begin();
 	auto end = data.end();
-
-	bacnet::npdu::detail::parser::npdu_grammar<decltype(start)> grammar;
-	auto has_success = boost::spirit::qi::parse(start, end, grammar, f);
+	auto has_success = boost::spirit::qi::parse(start, end, detail::parser::npdu_grammar_instance, f);
 
 	if(!has_success){
 	  std::cerr << "bacnet::npdu::parser::parse failed to parse"   << std::endl;

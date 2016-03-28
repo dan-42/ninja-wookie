@@ -23,16 +23,17 @@
 
 
 #include <bacnet/npdu/frame.hpp>
-#include <bacnet/npdu/detail/callback_manager.hpp>
+
 
 namespace bacnet { namespace  npdu { namespace  detail {
 
 using namespace bacnet::npdu;
 
+template<typename CallbackManager>
 class inbound_router {
 
 public:
-	inbound_router(callback_manager& cbm) : callback_manager_(cbm) {
+	inbound_router(CallbackManager& cbm) : callback_manager_(cbm) {
 	}
 
 	void route(frame&& f) {
@@ -59,7 +60,7 @@ public:
 
 
 private:
-	callback_manager& callback_manager_;
+  CallbackManager& callback_manager_;
   bacnet::common::protocol::meta_information meta_information_;
 
 };

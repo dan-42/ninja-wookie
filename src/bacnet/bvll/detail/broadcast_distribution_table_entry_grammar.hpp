@@ -26,7 +26,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
 #include <bacnet/bvll/detail/bacnet_ip_address_grammar.hpp>
 
 extern template struct bacnet::bvll::detail::generator::bacnet_ip_address_grammar<bacnet::generate_iterator>;

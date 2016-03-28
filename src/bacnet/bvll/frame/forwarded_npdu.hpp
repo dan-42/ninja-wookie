@@ -25,7 +25,7 @@
 #include <string>
 
 #include <boost/fusion/include/define_struct.hpp>
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
 	(bacnet)(bvll)(frame),forwarded_npdu,

@@ -18,25 +18,27 @@
  * Authors: Daniel Friedrich
  */
 
-#include <bacnet/bvll/foreign_device_table.hpp>
-#include <bacnet/bvll/detail/foreign_device_table_grammar.hpp>
+#ifndef SRC_BACNET_NPDU_DETAIL_GRAMMAR_HPP_
+#define SRC_BACNET_NPDU_DETAIL_GRAMMAR_HPP_
 
-namespace bacnet { namespace bvll { namespace generator {
 
-bool generate(bacnet::binary_data &c, foreign_device_table &v) {
-  std::back_insert_iterator<std::decay<decltype(c)>::type> sink(c);
-  bacnet::bvll::detail::generator::foreign_device_table_grammar<decltype(sink)> g;
-  return boost::spirit::karma::generate(sink, g, v);
-}
+#include <bacnet/detail/common/types.hpp>
+#include <bacnet/npdu/frame.hpp>
 
-}}}
+namespace bacnet { namespace npdu { namespace detail { namespace generator {
 
-namespace bacnet { namespace bvll { namespace parser {
+bacnet::binary_data generate(bacnet::npdu::frame &&f);
 
-bool parse(bacnet::binary_data &i, foreign_device_table &v){
-  auto start = i.begin(); auto end = i.end();
-  bacnet::bvll::detail::parser::foreign_device_table_grammar<decltype(start)> grammar;
-  return boost::spirit::qi::parse(start, end, grammar, v);
-}
+}}}}
 
-}}}
+
+namespace bacnet { namespace npdu { namespace detail { namespace parser {
+
+bacnet::npdu::frame parse(bacnet::binary_data &&data);
+
+}}}}
+
+
+
+
+#endif /* SRC_BACNET_NPDU_DETAIL_GRAMMAR_HPP_ */

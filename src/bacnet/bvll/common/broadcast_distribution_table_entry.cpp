@@ -21,7 +21,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 
-#include <bacnet/bvll/broadcast_distribution_table_entry.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table_entry.hpp>
 #include <bacnet/bvll/detail/broadcast_distribution_table_entry_grammar.hpp>
 
 

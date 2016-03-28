@@ -26,7 +26,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <util/boost/spirit/unused_type.hpp>
-#include <bacnet/bvll/broadcast_distribution_table.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table.hpp>
 
 namespace bacnet { namespace bvll { namespace frame {
 struct read_broadcast_distribution_table_ack {

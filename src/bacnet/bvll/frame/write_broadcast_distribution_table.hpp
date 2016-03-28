@@ -22,7 +22,7 @@
 #define SRC_BACNET_BVLL_FRAME_WRITE_BROADCAST_DISTRIBUTION_TABLE_HPP_
 
 #include <boost/fusion/include/define_struct.hpp>
-#include <bacnet/bvll/broadcast_distribution_table.hpp>
+#include <bacnet/bvll/common/broadcast_distribution_table.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 
 namespace bacnet { namespace bvll { namespace frame {

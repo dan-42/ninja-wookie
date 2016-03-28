@@ -13,7 +13,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/foreign_device_table.hpp>
+#include <bacnet/bvll/common/foreign_device_table.hpp>
 
 namespace bacnet { namespace bvll { namespace frame {
 struct read_foreign_device_table_ack {

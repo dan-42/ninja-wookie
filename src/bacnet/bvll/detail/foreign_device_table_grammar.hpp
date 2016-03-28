@@ -25,7 +25,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
-#include <bacnet/bvll/foreign_device_table.hpp>
+#include <bacnet/bvll/common/foreign_device_table.hpp>
 #include <bacnet/bvll/detail/foreign_device_table_entry_grammar.hpp>
 
 

@@ -7,7 +7,7 @@
 #include <boost/spirit/include/karma.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/bvll/bacnet_ip_address.hpp>
+#include <bacnet/bvll/common/bacnet_ip_address.hpp>
 
 namespace bacnet { namespace bvll { namespace detail { namespace generator {
 

@@ -45,10 +45,8 @@ namespace bacnet { namespace npdu {
 
     };
 
-//typedef  std::function<void (bacnet::binary_data&&)> async_receive_broadcast_callback_t;
-//typedef  std::function<void (bacnet::binary_data&&)> async_receive_unicast_callback_t;
-
-typedef  std::function<void (bacnet::binary_data&&, bacnet::common::protocol::meta_information&&)> async_received_apdu_callback_t;
+typedef  std::function<void (frame::apdu&&, bacnet::common::protocol::meta_information&&)> receive_apdu_callback_t;
+typedef  std::function<void (frame::raw&&,  bacnet::common::protocol::meta_information&&)> receive_raw_callback_t;
 
 }}
 
