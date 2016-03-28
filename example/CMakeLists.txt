@@ -4,11 +4,10 @@ cmake_minimum_required(VERSION 3.2)
 project(example-wookie)
 
 if(TARGET wookie)
-  add_library(wookie::wookie ALIAS wookie)
+ # add_library(wookie::wookie ALIAS wookie)
 else()  
   find_package(wookie CONFIG REQUIRED)
 endif()
-
 
 hunter_add_package(Boost COMPONENTS system)
 set(BOOST_ALL_DYN_LINK         ON)

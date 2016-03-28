@@ -75,7 +75,7 @@ namespace bacnet { namespace bvll { namespace frame {
 			original_unicast_npdu,
 			original_broadcast_npdu,
 			original_secure_bvll,
-      raw
+			raw
 		 > possible_bvll_frame;
 }}}
 

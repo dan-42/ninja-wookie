@@ -149,17 +149,16 @@ BOOST_AUTO_TEST_CASE( test_receive_unicast ) {
   using namespace bacnet::transport;
   using namespace bacnet::bvll;
 
-  from_application_callback from_application_callback_ = [](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
-    auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
-    return ec;
-  };
 
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
-  transport_.set_from_application_callback(from_application_callback_);
+  transport_.set_from_application_callback([](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
+	    auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
+	    return ec;
+	  });
 
   controller<decltype(transport_)> controller_(ios, transport_);
-  controller_.register_callbacks([](bacnet::bvll::frame::original_broadcast_npdu&& frame, bacnet::common::protocol::meta_information&& mi){
+  controller_.register_callbacks([](bacnet::bvll::frame::original_broadcast_npdu frame, bacnet::common::protocol::meta_information&& mi){
     bacnet::binary_data expected_data;
     expected_data.push_back(0x00); //payload
     expected_data.push_back(0x01);
@@ -177,6 +176,8 @@ BOOST_AUTO_TEST_CASE( test_receive_unicast ) {
     BOOST_ASSERT_MSG(mi.address == expected_address, "RECEIVED DATA IS NOT SAME");
 
   });
+
+  controller_.start();
 
   auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
   bacnet::common::protocol::mac::address_ip address_ip  = bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1", 0xBAC0);
@@ -236,6 +237,8 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
     BOOST_ASSERT_MSG(mi.address == expected_address, "RECEIVED DATA IS NOT SAME");
 
   });
+  controller_.start();
+
 
   auto ec = boost::system::errc::make_error_code(boost::system::errc::success);
   bacnet::common::protocol::mac::address_ip address_ip  = bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1", 0xBAC0);
