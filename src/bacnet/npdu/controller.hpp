@@ -67,7 +67,12 @@ public:
 
   }
 
-  /** callback to upper layer*/
+  template<typename... Callbacks>
+  void register_callbacks(Callbacks... callbacks) {
+    callback_manager_.set_callbacks(callbacks...);
+  }
+
+  //Deprecated!
   void register_async_received_apdu_callback(const receive_apdu_callback_t &callback){
     callback_manager_.set_callbacks(callback);
   }
@@ -77,11 +82,13 @@ public:
   void async_send_broadcast(const bacnet::binary_data & payload, const Handler &handler){
 
     npdu::frame frame;
+    frame_body::apdu body;
+    body.data = payload;
     frame.protocol_version = NPDU_PROTOCOL_VERSION;
     frame.control_field.has_destination_specifier_ = true;
     frame.destination.network_number = BROADCAST_NETWORK_NUMBER;
     frame.hop_count = BROADCAST_HOP_COUNT;
-    frame.body = frame_body::apdu(payload);
+    frame.body = body;
 
     bacnet::binary_data binary_frame = npdu::detail::generator::generate(std::move(frame));
 
@@ -96,7 +103,9 @@ public:
     frame.control_field.has_network_layer_message_ = false;
     frame.control_field.priority_ = npdu::priority::normal_message;
     frame.hop_count = 0;
-    frame.body = frame_body::apdu(payload);
+    frame_body::apdu body;
+    body.data = payload;
+    frame.body = body;
 
     bacnet::binary_data binary_frame = npdu::detail::generator::generate(std::move(frame));
 
@@ -116,7 +125,7 @@ public:
 private:
 
   void async_receive_broadcast_handler(bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
-    auto frame = npdu::parser::parse(std::move(data.npdu_data));
+    auto frame = npdu::detail::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }
@@ -124,7 +133,7 @@ private:
   void async_receive_unicast_handler(bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
     std::cout << "async_receive_unicast_handler: " ;
     bacnet::print(data.npdu_data);
-    auto frame = npdu::parser::parse(std::move(data.npdu_data));
+    auto frame = npdu::detail::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }

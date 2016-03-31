@@ -30,20 +30,20 @@ namespace bacnet { namespace  npdu { namespace  detail {
 using namespace bacnet::npdu;
 
 template<typename CallbackManager>
-class inbound_router {
+class inbound_router : public boost::static_visitor<> {
 
 public:
 	inbound_router(CallbackManager& cbm) : callback_manager_(cbm) {
 	}
 
-	void route(frame&& f) {
+	void route(frame f) {
 
 		/* 6.2.2 if control_filed has no network_layer_message, it is an APDU frame for this device*/
-		if(!f.control_field.has_network_layer_message_type() &&  callback_manager_.async_received_apdu_callback_) {
+		if(!f.control_field.has_network_layer_message_type()) {
 
-			meta_information_.network_priority = f.control_field.network_priority();
-			meta_information_.npdu_source = f.source;
-		 // callback_manager_.async_received_apdu_callback_(std::move(f.apdu_data), std::move(meta_information_));
+      meta_information_.network_priority = f.control_field.network_priority();
+      meta_information_.npdu_source = f.source;
+      boost::apply_visitor( *this, f.body );
 		}
 
 		/*todo: check if not router is better name*/
@@ -52,6 +52,13 @@ public:
 
 
 	}
+
+
+
+	template<typename T>
+  void operator()(T npdu_frame_body) const  {
+	  callback_manager_.invoke_callback(npdu_frame_body, meta_information_);
+  }
 
 	void meta_information(const bacnet::common::protocol::meta_information& mi) {
     meta_information_ = mi;

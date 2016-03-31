@@ -189,7 +189,8 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
   bvll::controller<decltype(transport_)> bvll_controller_(ios, transport_);
   npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
 
-  npdu_controller_.register_async_received_apdu_callback([](bacnet::binary_data&& data, bacnet::common::protocol::meta_information&& mi){
+  npdu_controller_.register_async_received_apdu_callback([](npdu::frame_body::apdu&& frame, bacnet::common::protocol::meta_information&& mi){
+    auto &data = frame.data;
 
     bacnet::binary_data expected_data;
     //apdu

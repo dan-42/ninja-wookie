@@ -57,8 +57,8 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
 
 
 
-    auto frame_parsed = bacnet::npdu::parser::parse(binary);
-    bacnet::binary_data frame_generated =  bacnet::npdu::generator::generate(frame_parsed);
+    auto frame_parsed = bacnet::npdu::detail::parser::parse(bacnet::binary_data{binary});
+    bacnet::binary_data frame_generated =  bacnet::npdu::detail::generator::generate(std::move(frame_parsed));
 
     BOOST_TEST(is_equal(binary, frame_generated), "Local BACnet APDU, no addrs, reply expected");
 
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
     binary.push_back(0xDD);
 
 
-    auto frame_parsed = bacnet::npdu::parser::parse(binary);
-    bacnet::binary_data frame_generated =  bacnet::npdu::generator::generate(frame_parsed);
+    auto frame_parsed = bacnet::npdu::detail::parser::parse(bacnet::binary_data{binary});
+    bacnet::binary_data frame_generated =  bacnet::npdu::detail::generator::generate(std::move(frame_parsed));
 
     BOOST_TEST(is_equal(binary, frame_generated),  "Remote BACnet NPDU directed to router prio normale, reply expected");
 
@@ -127,8 +127,9 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
     binary.push_back(0xDD);
     binary.push_back(0xDD);
 
-    auto frame_parsed = bacnet::npdu::parser::parse(binary);
-    bacnet::binary_data frame_generated =  bacnet::npdu::generator::generate(frame_parsed);
+
+    auto frame_parsed = bacnet::npdu::detail::parser::parse(bacnet::binary_data{binary});
+    bacnet::binary_data frame_generated =  bacnet::npdu::detail::generator::generate(std::move(frame_parsed));
 
     BOOST_TEST(is_equal(binary, frame_generated),  "BACnet NPDU passwd between routers prio urgent");
   }
@@ -161,8 +162,10 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
     binary.push_back(0xDD);
 
 
-    auto frame_parsed = bacnet::npdu::parser::parse(binary);
-    bacnet::binary_data frame_generated =  bacnet::npdu::generator::generate(frame_parsed);
+
+    auto frame_parsed = bacnet::npdu::detail::parser::parse(bacnet::binary_data{binary});
+    bacnet::binary_data frame_generated =  bacnet::npdu::detail::generator::generate(std::move(frame_parsed));
+
 
     BOOST_TEST(is_equal(binary, frame_generated), "Remote BACnet NPDU send from router to final dest prio life_safty");
 
@@ -193,8 +196,10 @@ BOOST_AUTO_TEST_SUITE( npdu_grammar )
     binary.push_back(0xDD);
 
 
-    auto frame_parsed = bacnet::npdu::parser::parse(binary);
-    bacnet::binary_data frame_generated =  bacnet::npdu::generator::generate(frame_parsed);
+
+    auto frame_parsed = bacnet::npdu::detail::parser::parse(bacnet::binary_data{binary});
+    bacnet::binary_data frame_generated =  bacnet::npdu::detail::generator::generate(std::move(frame_parsed));
+
 
     BOOST_TEST(is_equal(binary, frame_generated),  "Broadcast message by router of prio normal");
   }
