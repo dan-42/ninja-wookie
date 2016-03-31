@@ -28,8 +28,8 @@
 
 #include <boost/fusion/include/define_struct.hpp>
 
-
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 
 #include <bacnet/detail/common/types.hpp>
 
@@ -75,6 +75,8 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   rule<Iterator, uint8_t()>             message_type_rule;
   rule<Iterator, uint16_t()>            vendor_id_rule;
   rule<Iterator, frame_body_t()>        body_rule;
+
+  unused_grammar<Iterator>				unused_grammar_;
 
   //todo but in separate grammar
   rule<Iterator, frame_body::apdu()>         frame_apdu_rule;
@@ -122,14 +124,22 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
     /** creating an empty control information field and parsing all data inside thye payload
      */
-    frame_raw_rule      = attr(empty_address) >> attr(empty_address) >> attr(uint8_t{0}) >> attr(uint8_t{0}) >> attr(uint16_t{0})  >> frame_raw_type_rule;
-    frame_raw_type_rule = frame_raw_data_rule;
+    frame_raw_rule      =  attr(uint8_t{0})  	//version
+						>> attr(control_information_t{})  	//ci
+						>> attr(empty_address)  //dts
+						>> attr(empty_address)  //src
+						>> attr(uint8_t{0}) 	//hop
+						>> attr(uint8_t{0}) 	//type
+						>> attr(uint16_t{0}) 	//vendor
+						>> frame_raw_type_rule; //all data
+
+    frame_raw_type_rule = frame_raw_data_rule >> unused_grammar_;
     frame_raw_data_rule = repeat[byte_];
 
     //if we want to support more frames, we have to add them here with an or (|)
-    body_rule         = frame_apdu_rule;
+    body_rule         = frame_apdu_rule >> unused_grammar_;
 
-    frame_apdu_rule         = frame_apdu_data_rule;
+    frame_apdu_rule         = frame_apdu_data_rule >> unused_grammar_;
     frame_apdu_data_rule    = repeat[byte_];
 
 
@@ -201,11 +211,16 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   rule<Iterator, uint16_t()>            vendor_id_rule;
   rule<Iterator, frame_body_t()>        body_rule;
 
+  unused_grammar<Iterator>				unused_grammar_;
+
   //todo add support for raw frame, maybe with flag in struct
 
   //todo but in separate grammar
-  rule<Iterator, frame_body::apdu()>         frame_apdu_rule;
-  rule<Iterator, bacnet::binary_data()> frame_apdu_data_rule;
+  rule<Iterator, frame_body::apdu()>      frame_apdu_rule;
+  rule<Iterator, bacnet::binary_data()>   frame_apdu_data_rule;
+
+  rule<Iterator, frame_body::raw()>       frame_raw_rule;
+  rule<Iterator, bacnet::binary_data()>   frame_raw_data_rule;
 
   address_grammar<Iterator>             address_grammar_;
 
@@ -248,10 +263,13 @@ struct npdu_grammar : grammar<Iterator, frame() >{
 
 
     // if we want to support more frames, we have to add them here
-    body_rule         = frame_apdu_rule << eps;
+    body_rule         = frame_apdu_rule  | frame_raw_rule;
 
-    frame_apdu_rule         = frame_apdu_data_rule;
+    frame_apdu_rule         = frame_apdu_data_rule << unused_grammar_;
     frame_apdu_data_rule    = repeat[byte_];
+
+    frame_raw_rule         = frame_raw_data_rule << unused_grammar_;
+	frame_apdu_data_rule   = repeat[byte_];
 
 
     frame_rule.name("frame_rule");
@@ -274,7 +292,7 @@ struct npdu_grammar : grammar<Iterator, frame() >{
   control_information_t control_field;
   uint8_t message_type = 0;
 };
-
+//todo uee thread local storage
 static const bacnet::npdu::detail::generator::npdu_grammar<bacnet::generate_iterator> npdu_grammar_instance{};
 
 }}}}

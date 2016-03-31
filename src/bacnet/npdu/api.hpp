@@ -45,8 +45,8 @@ namespace bacnet { namespace npdu {
 
     };
 
-typedef  std::function<void (frame::apdu&&, bacnet::common::protocol::meta_information&&)> receive_apdu_callback_t;
-typedef  std::function<void (frame::raw&&,  bacnet::common::protocol::meta_information&&)> receive_raw_callback_t;
+typedef  std::function<void (frame_body::apdu&&, bacnet::common::protocol::meta_information&&)> receive_apdu_callback_t;
+typedef  std::function<void (frame_body::raw&&,  bacnet::common::protocol::meta_information&&)> receive_raw_callback_t;
 
 }}
 

@@ -6,6 +6,7 @@
 #define WOOKIE_BACNET_NPDU_FRAME_RAW_HPP
 
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/detail/common/types.hpp>
 
 
@@ -13,13 +14,15 @@ namespace bacnet { namespace npdu {  namespace frame_body {
 
 struct raw {
   bacnet::binary_data data;
+  unused_t unused_t_;
 };
 
 }}}
 
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::npdu::frame_body::raw,
-    data
+    data,
+	unused_t_
 )
 
 #endif //WOOKIE_BACNET_NPDU_FRAME_RAW_HPP

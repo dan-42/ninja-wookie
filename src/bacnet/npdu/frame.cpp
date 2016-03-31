@@ -33,9 +33,9 @@ std::ostream &operator<<(std::ostream &os, const bacnet::npdu::frame &f) {
   os << "\t vendor_id: " <<  std::setfill ('0') << std::setw(2) << std::hex << (int)f.vendor_id << "\n";
   os << "\t apdu_data: ";
 
-  for(auto &b : f.apdu_data){
-    os <<  std::setfill ('0') << std::setw(2) << std::hex << (int)b << " ";
-  }
+//  for(auto &b : f.body){
+//    os <<  std::setfill ('0') << std::setw(2) << std::hex << (int)b << " ";
+//  }
   os << "\n";
 
   return os;

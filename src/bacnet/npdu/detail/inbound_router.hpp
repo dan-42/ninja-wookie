@@ -43,7 +43,7 @@ public:
 
 			meta_information_.network_priority = f.control_field.network_priority();
 			meta_information_.npdu_source = f.source;
-		  callback_manager_.async_received_apdu_callback_(std::move(f.apdu_data), std::move(meta_information_));
+		 // callback_manager_.async_received_apdu_callback_(std::move(f.apdu_data), std::move(meta_information_));
 		}
 
 		/*todo: check if not router is better name*/

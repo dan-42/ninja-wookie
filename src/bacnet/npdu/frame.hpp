@@ -39,7 +39,9 @@ namespace bacnet { namespace npdu {
         bacnet::npdu::frame_body::apdu,
         bacnet::npdu::frame_body::raw
     > frame_body_t;
-  }}
+}}
+
+
 BOOST_FUSION_DEFINE_STRUCT(
   (bacnet)(npdu), frame,
   (uint8_t, protocol_version)
@@ -52,7 +54,7 @@ BOOST_FUSION_DEFINE_STRUCT(
   (bacnet::npdu::frame_body_t, body)
 )
 
-
+//todo use fusion operator
 std::ostream &operator<<(std::ostream &os, const bacnet::npdu::frame &f) ;
 
 

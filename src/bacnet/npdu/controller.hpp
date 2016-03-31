@@ -47,8 +47,8 @@ constexpr uint8_t  BROADCAST_HOP_COUNT      = 0xFF;
 
     namespace  detail {
       typedef boost::fusion::map<
-          boost::fusion::pair<frame::apdu, receive_apdu_callback_t>,
-          boost::fusion::pair<frame::raw, receive_raw_callback_t>,
+          boost::fusion::pair<frame_body::apdu, receive_apdu_callback_t>,
+          boost::fusion::pair<frame_body::raw, receive_raw_callback_t>
       > callback_map_type;
     }
 
@@ -68,7 +68,7 @@ public:
   }
 
   /** callback to upper layer*/
-  void register_async_received_apdu_callback(const async_received_apdu_callback_t &callback){
+  void register_async_received_apdu_callback(const receive_apdu_callback_t &callback){
     callback_manager_.set_callbacks(callback);
   }
 
@@ -81,9 +81,9 @@ public:
     frame.control_field.has_destination_specifier_ = true;
     frame.destination.network_number = BROADCAST_NETWORK_NUMBER;
     frame.hop_count = BROADCAST_HOP_COUNT;
-    frame.body = frame::apdu(payload);
+    frame.body = frame_body::apdu(payload);
 
-    bacnet::binary_data binary_frame = npdu::generator::generate(frame);
+    bacnet::binary_data binary_frame = npdu::detail::generator::generate(std::move(frame));
 
     underlying_layer_.async_send_broadcast(binary_frame, handler);
   }
@@ -96,9 +96,9 @@ public:
     frame.control_field.has_network_layer_message_ = false;
     frame.control_field.priority_ = npdu::priority::normal_message;
     frame.hop_count = 0;
-    frame.body = frame::apdu(payload);
+    frame.body = frame_body::apdu(payload);
 
-    bacnet::binary_data binary_frame = npdu::generator::generate(frame);
+    bacnet::binary_data binary_frame = npdu::detail::generator::generate(std::move(frame));
 
     underlying_layer_.async_send(binary_frame, endpoint.address(), handler);
   }
@@ -132,8 +132,8 @@ private:
 
 
   Underlying_layer &underlying_layer_;
-  util::callback::callback_manager<callback_map_type> callback_manager_;
-  detail::inbound_router inbound_router_;
+  util::callback::callback_manager<detail::callback_map_type> callback_manager_;
+  detail::inbound_router<decltype(callback_manager_)> inbound_router_;
   uint16_t network_number_ = DEFAULT_NETWORK_NUMBER;
 
 };
