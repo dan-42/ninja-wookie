@@ -67,6 +67,13 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         return !(a1 == a2);
       }
 
+      friend inline bool operator<(const address_ip& a1, const address_ip& a2) {
+        if(a1.address_ < a2.address_ && a1.port_ < a2.port_) {
+          return true;
+        }
+        return false;
+      }
+
       inline std::string to_string() {
         return (address_.to_string() + ":" + std::to_string(port_));
       }
@@ -160,6 +167,23 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       friend bool operator!=(const address& a1, const address& a2) {
         return !(a1 == a2);
       }
+
+
+      friend bool operator<(const address& a1, const address& a2) {
+         if ( a1.type_ >= a2.type_) {
+           return false;
+         }
+         switch (a1.type_) {
+           case ip_:
+             return a1.address_ip_ < a2.address_ip_;
+           case ipv6_:
+             return a1.address_ipv6_ < a2.address_ipv6_;
+           case mstp_:
+             /*to do*/
+             return false;
+         }
+         return false;
+       }
 
       inline std::string to_string() {
        switch(type_) {

@@ -17,7 +17,8 @@ HunterGate(
 #   * PROJECT_NAME
 #   * PROJECT_VERSION
 project(wookie VERSION 0.0.1)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -gdwarf-2 ")
 add_subdirectory(src)
 add_subdirectory(example)
 add_subdirectory(test)

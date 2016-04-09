@@ -62,6 +62,14 @@ struct factory<ip_v4> {
              service_controller(ios, apdu_controller, bacnet::config{}) {
   }
 
+  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port, bacnet::config c) :
+               transporter(ios, {ip, port} ),
+               bvll_controller(ios, transporter),
+               npdu_controller(bvll_controller),
+               apdu_controller(ios, npdu_controller),
+               service_controller(ios, apdu_controller, c) {
+    }
+
   detail::ip_v4::service_controller_t &controller() {
     return service_controller;
   }
@@ -74,6 +82,8 @@ private:
     detail::ip_v4::service_controller_t  service_controller;
 
 };
+
+
 
 }}
 

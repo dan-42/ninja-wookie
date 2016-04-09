@@ -27,11 +27,16 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
+#include <bacnet/apdu/frame/frames.hpp>
+
 
 namespace bacnet { namespace apdu {
 
   typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_service_callback_t;
   typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_error_callback_t;
+
+  typedef std::function< void (const boost::system::error_code&, frame::possible_frame, bacnet::common::protocol::meta_information)> confirmed_request_handler_type;
+  typedef std::function< void (const boost::system::error_code&)>                                                                     unconfirmed_request_handler_type;
 
 
 }}

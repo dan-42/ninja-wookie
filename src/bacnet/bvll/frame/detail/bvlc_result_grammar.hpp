@@ -42,11 +42,11 @@ struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
   rule<Iterator, bvlc_result()> bvlc_result_rule;
   rule<Iterator, uint16_t()> result_code_rule;
 
-  unused_grammar<Iterator> unused_grammar_;
+ // unused_grammar<Iterator> unused_grammar_;
 
   bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
 
-    bvlc_result_rule = result_code_rule << unused_grammar_;
+    bvlc_result_rule = result_code_rule;// << unused_grammar_;
     result_code_rule = big_word;
 
     bvlc_result_rule.name("bvlc_result_rule");
@@ -70,11 +70,11 @@ struct bvlc_result_grammar : grammar<Iterator, bvlc_result()> {
   rule<Iterator, bvlc_result()> bvlc_result_rule;
   rule<Iterator, uint16_t()> result_code_rule;
 
-  unused_grammar<Iterator> unused_grammar_;
+  //unused_grammar<Iterator> unused_grammar_;
 
   bvlc_result_grammar() : bvlc_result_grammar::base_type(bvlc_result_rule) {
 
-    bvlc_result_rule = result_code_rule >> unused_grammar_;
+    bvlc_result_rule = result_code_rule;// >> unused_grammar_;
     result_code_rule = big_word;
 
     bvlc_result_rule.name("bvlc_result_rule");

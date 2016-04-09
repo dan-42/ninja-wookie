@@ -14,68 +14,60 @@
 #include <iomanip>
 
 #include <boost/variant/static_visitor.hpp>
-#include <bacnet/service/service/services.hpp
+#include <bacnet/service/service/services.hpp>
 #include <bacnet/service/detail/callback_manager.hpp>
+#include <bacnet/service/detail/device_manager.hpp>
 
 
-namespace bacnet { namespace  service { namespace  detail {
 
 
-using namespace bacnet::apdu;
+namespace bacnet { namespace service { namespace detail {
 
-class inbound_router : public boost::static_visitor<> {
+  using namespace bacnet::apdu;
+  using namespace bacnet::service;
 
-public:
+  struct inbound_router : boost::static_visitor<> {
 
-  inbound_router(callback_manager& cbm) : callback_manager_(cbm){
-  }
+    inbound_router(callback_manager& cm, bacnet::service::detail::device_manager& dm) : callback_manager_(cm), device_manager_(dm) {
+    }
 
-  void operator()(frame::confirmed_request request) {
-    std::cout << "apdu::detail::inbound_router confirmed_request" << std::endl;
-  }
+    inline void meta_information(bacnet::common::protocol::meta_information meta_information) {
+      meta_information_ = meta_information;
+    }
 
-  void operator()(frame::unconfirmed_request request) {
-      std::cout << "apdu::detail::inbound_router unconfirmed_request" << std::endl;
+    template<typename Service>
+    inline void operator()(Service service) {
+      boost::system::error_code ec{error::errc::success, error::get_error_category()};
+      callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
+    }
 
-      if(callback_manager_.async_received_service_callback_){
-        meta_information_t meta_info;
-       // meta_info.service_choice = request.service_choice;
-        auto data = request.service_data;
-        callback_manager_.async_received_service_callback_(std::move(meta_info), std::move(data));
-      }
+  private:
 
-  }
+    callback_manager& callback_manager_;
+    bacnet::service::detail::device_manager& device_manager_;
+    bacnet::common::protocol::meta_information meta_information_;
+  };
 
-  void operator()(frame::simple_ack request) {
-      std::cout << "apdu::detail::inbound_router simple_ack" << std::endl;
 
-  }
+  /**
+   * specialisation used to update internal DOI-Mapping list
+   */
+template<>
+inline void inbound_router::operator()<service::i_am>(service::i_am service) {
+  device_manager_.insert_device(bacnet::common::protocol::mac::endpoint{meta_information_.npdu_source.network_number, meta_information_.address},
+                                service.i_am_device_identifier,
+                                service.max_apdu_length_accepted,
+                                service.segmentation_supported,
+                                service.vendor_id);
+  device_manager_.print_device_list();
 
-  void operator()(frame::complex_ack request) {
-      std::cout << "apdu::detail::inbound_router complex_ack" << std::endl;
-  }
+  boost::system::error_code ec{error::errc::success, error::get_error_category()};
+  callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
+}
 
-  void operator()(frame::segment_ack request) {
-      std::cout << "apdu::detail::inbound_router segment_ack" << std::endl;
-  }
-
-  void operator()(frame::error request) {
-      std::cout << "apdu::detail::inbound_router error" << std::endl;
-  }
-
-  void operator()(frame::reject request) {
-      std::cout << "apdu::detail::inbound_router reject" << std::endl;
-  }
-
-  void operator()(frame::abort request) {
-      std::cout << "apdu::detail::inbound_router abort" << std::endl;
-  }
-
-private:
-  callback_manager& callback_manager_;
-
-};
 
 }}}
+
+
 
 #endif /* SRC_BACNET_SERVICE_DETAIL_INBOUND_ROUTER_HPP */

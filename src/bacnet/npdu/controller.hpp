@@ -72,12 +72,12 @@ public:
     callback_manager_.set_callbacks(callbacks...);
   }
 
-  //Deprecated!
-  void register_async_received_apdu_callback(const receive_apdu_callback_t &callback){
-    callback_manager_.set_callbacks(callback);
-  }
 
-
+  /**
+   * handler is called when
+   *  * Successfully send message
+   *  * error while sending
+   */
   template<typename Handler>
   void async_send_broadcast(const bacnet::binary_data & payload, const Handler &handler){
 
@@ -95,44 +95,61 @@ public:
     underlying_layer_.async_send_broadcast(binary_frame, handler);
   }
 
+  /**
+   * handler is called when
+   *  * Successfully send message
+   *  * error while sending
+   * It will not be waited for an answer, thats job of a upper layer
+   */
   template<typename Handler>
   void async_send_unicast(bacnet::common::protocol::mac::endpoint endpoint, const bacnet::binary_data & payload, Handler handler){
 
+    endpoint.network(network_number_);
+    /**
+     * simple BACnet messages have a simple NPDU-Header without any src or dst information
+     * xxx use kind of a router if we want to send to a different BACnet network
+     *     then we need a more complex NPDU-header
+     */
     npdu::frame frame;
-    frame.protocol_version = NPDU_PROTOCOL_VERSION;
-    frame.control_field.has_network_layer_message_ = false;
-    frame.control_field.priority_ = npdu::priority::normal_message;
-    frame.hop_count = 0;
-    frame_body::apdu body;
-    body.data = payload;
-    frame.body = body;
+    frame.protocol_version                          = NPDU_PROTOCOL_VERSION;
+    frame.control_field.has_network_layer_message_  = false;
+    frame.control_field.priority_                   = npdu::priority::normal_message;
+    frame.hop_count                                 = 0;
+
+    /*because of single-element-fusion-sequence*/
+    frame_body::apdu  body;
+    body.data       = payload;
+    frame.body      = body;
 
     bacnet::binary_data binary_frame = npdu::detail::generator::generate(std::move(frame));
-
     underlying_layer_.async_send(binary_frame, endpoint.address(), handler);
   }
 
   void start() {
     underlying_layer_.register_callbacks([this](bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
-                                                async_receive_broadcast_handler(std::move(data), mi);
+                                            received_broadcast(std::move(data), mi);
                                          },
                                          [this](bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
-                                            async_receive_unicast_handler(std::move(data), mi);
+                                            received_unicast(std::move(data), mi);
                                          });
     underlying_layer_.start();
   }
 
 private:
 
-  void async_receive_broadcast_handler(bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
+  /**
+   * called when a underlying layer received a broadcast message
+   */
+  void received_broadcast(bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
     auto frame = npdu::detail::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
   }
 
-  void async_receive_unicast_handler(bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
-    std::cout << "async_receive_unicast_handler: " ;
-    bacnet::print(data.npdu_data);
+  /**
+   * called when a underlying layer received a unicast message
+   */
+  void received_unicast(bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
     auto frame = npdu::detail::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));

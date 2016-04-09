@@ -22,6 +22,8 @@
 #define NINJA_WOOKIE_APDU_CONTROLLER_HPP
 
 #include <iostream>
+#include <limits>
+#include <functional>
 
 #include <boost/asio.hpp>
 #include <boost/variant.hpp>
@@ -34,45 +36,29 @@
 
 #include <bacnet/apdu/detail/inbound_router.hpp>
 #include <bacnet/apdu/detail/callback_manager.hpp>
+#include <bacnet/apdu/detail/request_manager.hpp>
 
-namespace bacnet { namespace apdu { namespace detail {
-
-/**
- *
-    key is   endpoint + invoke id
-    idea: for each endpoint one transmissionmanager?
-
- *
- */
-
-  struct transmission_identifier {
-      bacnet::common::protocol::mac::address mac;
-      uint8_t invoke_id_counter = 0;
-  };
-
-
-  struct device_transmission_manager {
-
-
-
-  private:
-      static uint8_t invoke_id_counter;
-  };
-
-
-
-}}}
-
-
-
-
-
+#include <bacnet/npdu/api.hpp>
 
 
 
 namespace bacnet { namespace apdu {
 
 
+/**
+ * SCOPE OF THIS LAYER
+ *  * layer decodes static part of apdu messages(apdu-types...)
+ *  * fully decodes simple_ack, reject and abort frame as the payload is only a uint8_t simple enums
+ *  * [NOT YET] Concatenates segmented messages into one, before sending to upperLayer
+ *  * [NOT YET] slices message into segments and sends to lowerLayer
+ *  * manage confirmed requests
+ *    * manages invoke_ids
+ *    * stores callbacks for each request, calles them on receiving answer
+ *    * [NOT YET] takes care of timeouts
+ *  * unconfirmed messages, are more or less just passed trough
+ *
+ *
+ */
 
 template<class UnderlyingLayerController, typename ApduSize>
 struct controller {
@@ -80,19 +66,21 @@ struct controller {
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
-                          inbound_router_(callback_manager_) {
+                          inbound_router_(callback_manager_, request_manager_) {
 
   }
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller, const uint16_t &device_object_id) :
                           io_service_(io_service),
                           underlying_controller_(underlying_controller),
-                          inbound_router_(callback_manager_) {
+                          inbound_router_(callback_manager_, request_manager_) {
 
   }
 
   void start() {
-    underlying_controller_.register_async_received_apdu_callback(boost::bind(&controller::async_received_apdu_handler, this, _1, _2));
+    underlying_controller_.register_callbacks([this](bacnet::npdu::frame_body::apdu apdu, bacnet::common::protocol::meta_information meta_info) {
+                                                        this->async_received_apdu_handler(apdu, meta_info);
+                                                      });
     underlying_controller_.start();
   }
 
@@ -104,6 +92,12 @@ struct controller {
     callback_manager_.async_received_error_callback_ = callback;
   }
 
+
+
+  /**
+   * handler is called when sending was successful/failed, as this is a unconfirmed message,
+   * so no response can be expected
+   */
   template<typename Handler>
   void async_send_unconfirmed_request_as_broadcast(const bacnet::binary_data& payload, Handler handler) {
     frame::unconfirmed_request frame;
@@ -113,25 +107,37 @@ struct controller {
     underlying_controller_.async_send_broadcast(std::move(data), handler);
   }
 
-  template<typename Handler>
-  void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, Handler handler) {
+  /*
+   * handler is called if:
+   *  * the message could not be send(internal error)
+   *  * answer received  for the confirmed message, including answer payload
+   */
+  void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, confirmed_request_handler_type handler) {
+    bacnet::common::protocol::mac::endpoint ep{adr};
+
+
     frame::confirmed_request frame;
     bacnet::apdu::detail::header::segmentation_t seg;
+    auto invoke_id = request_manager_.get_next_invoke_id(adr);
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::confirmed_request;
 
     seg.max_accepted_apdu_ = ApduSize::size_as_enum;
-    frame.invoke_id       = 0;
-    frame.segmentation = seg;
+    frame.invoke_id        = invoke_id;
+    frame.segmentation     = seg;
 
-    frame.service_data = payload;
+    frame.service_data     = payload;
     auto data = frame::generator::generate(frame);
-    //std::cout << "send async_send_confirmed_request " << std::endl;
-    //bacnet::print(data);
-    // set lambda as callback, and on success sending, store handler in a "handlerManager" with endpoint and invoke id as key
+
+
     // don't forget timeout!
-    bacnet::common::protocol::mac::endpoint ep{adr};
-    underlying_controller_.async_send_unicast(ep, std::move(data), [this, handler]( const boost::system::error_code& ec){
-          handler(ec);
+    underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const boost::system::error_code& ec) {
+            if(ec) {
+              this->request_manager_.purge_invoke_id(adr, invoke_id);
+              handler(ec, frame::possible_frame(), bacnet::common::protocol::meta_information());
+            }
+            else {
+              this->request_manager_.store_handler(adr, invoke_id, handler);
+            }
       });
   }
 
@@ -152,6 +158,7 @@ private:
   UnderlyingLayerController& underlying_controller_;
   detail::inbound_router  inbound_router_;
   detail::callback_manager callback_manager_;
+  detail::request_manager request_manager_;
 };
 
 }}

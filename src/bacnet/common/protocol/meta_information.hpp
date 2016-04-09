@@ -36,6 +36,7 @@ struct meta_information {
   bacnet::npdu::network_priority_t network_priority;
   bacnet::npdu::address npdu_source;
   uint16_t vendor_id;
+  uint8_t invoke_id;
 };
 
 }}}

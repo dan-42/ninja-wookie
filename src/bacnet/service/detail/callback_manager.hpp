@@ -17,8 +17,8 @@ namespace bacnet { namespace service { namespace detail {
 
 typedef boost::fusion::map<
     boost::fusion::pair<service::who_is, callback_service_who_is_t>,
-    boost::fusion::pair<service::i_am,   callback_service_i_am_t  >
-    //boost::fusion::pair<service::reinit, callback_service_i_am_t >
+    boost::fusion::pair<service::i_am,   callback_service_i_am_t  >,
+    boost::fusion::pair<service::reinitialize_device, callback_service_reinitialize_device_t >
 > callback_map_type;
 
       using namespace bacnet::service;
@@ -33,6 +33,11 @@ typedef boost::fusion::map<
         template<typename Service>
         void invoke(const Service &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
           callback_manager_.invoke_callback(service, ec, mi);
+        }
+
+
+        void add_who_is_service_callback(callback_service_who_is_t callback) {
+          callbacks_service_who_is.push_back(std::move(callback));
         }
 
         std::size_t set_i_am_service_callback(callback_service_i_am_t callback) {
@@ -51,6 +56,7 @@ typedef boost::fusion::map<
       private:
           util::callback::callback_manager<callback_map_type>  callback_manager_;
           std::map<std::size_t, callback_service_i_am_t> callbacks_service_i_am;
+          std::list<callback_service_who_is_t> callbacks_service_who_is;
           std::size_t  callbacks_service_i_am_idx_last;
       };
 
@@ -64,7 +70,18 @@ typedef boost::fusion::map<
             callback.second(service, ec, mi );
           }
         }
-        callback_manager_.invoke_callback(service, ec, mi);      }
+        callback_manager_.invoke_callback(service, ec, mi);
+      }
+
+      template<>
+        void callback_manager::invoke<service::who_is>(const service::who_is &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
+          for(auto &callback :  callbacks_service_who_is) {
+            if(callback) {
+              callback(service, ec, mi );
+            }
+          }
+          callback_manager_.invoke_callback(service, ec, mi);
+        }
     }}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_DETAIL_CALLBACK_MANAGER_HPP

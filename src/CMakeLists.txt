@@ -26,10 +26,24 @@ ELSE()
     SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the types of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release" )
 ENDIF()
 
+list (INSERT WOOKIE_COMPILE_FLAGS 0
+                    -std=c++14 
+                    -Wall 
+                    -Werror
+                    # needed for boost library
+                    -Wno-unused-function 
+                    -Wno-unused-local-typedefs 
+                    -Wno-unused-variable 
+                    -Wno-unused-value 
+                    -Wno-deprecated-declarations)
+
 
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-    add_compile_options(-g 
-                        -gdwarf-2 )
+
+    list (APPEND WOOKIE_COMPILE_FLAGS  
+                    -g
+                    -gdwarf-2)
+    
 ELSE()
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections")
@@ -43,18 +57,6 @@ ELSE()
     endif()    
 ENDIF()
 
-#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-
-list (INSERT WOOKIE_COMPILE_FLAGS 0
-                    -std=c++14 
-                    -Wall 
-                    -Werror
-                    # needed for boost library
-                    -Wno-unused-function 
-                    -Wno-unused-local-typedefs 
-                    -Wno-unused-variable 
-                    -Wno-unused-value 
-                    -Wno-deprecated-declarations)
 
 add_compile_options(${WOOKIE_COMPILE_FLAGS})
 

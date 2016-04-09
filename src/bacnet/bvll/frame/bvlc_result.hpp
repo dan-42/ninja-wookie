@@ -21,14 +21,46 @@
 #ifndef SRC_BACNET_BVLL_BVLC_RESULT_HPP_
 #define SRC_BACNET_BVLL_BVLC_RESULT_HPP_
 
-#include <boost/fusion/include/define_struct.hpp>
 
-#include <util/boost/spirit/unused_type.hpp>
+#include <cstdint>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/spirit/home/qi/detail/assign_to.hpp>
+#include <boost/spirit/home/support/attributes.hpp>
+#include <boost/spirit/include/karma_domain.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-	(bacnet)(bvll)(frame), bvlc_result,
-	(uint16_t, result_code)
-	(unused_t, unused)
+namespace bacnet { namespace bvll { namespace frame {
+
+struct bvlc_result{
+  uint16_t result_code;
+};
+
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+  bacnet::bvll::frame::bvlc_result,
+  result_code
 )
+
+
+
+namespace boost { namespace spirit { namespace traits {
+    template <>
+    struct transform_attribute<uint16_t const, bacnet::bvll::frame::bvlc_result, boost::spirit::karma::domain>  {
+        typedef bacnet::bvll::frame::bvlc_result type;
+        static bacnet::bvll::frame::bvlc_result pre(uint16_t const& attr) {
+          bacnet::bvll::frame::bvlc_result val;
+          val.result_code = attr;
+          return val;
+        }
+    };
+
+    template <>
+    struct assign_to_attribute_from_value<uint16_t, bacnet::bvll::frame::bvlc_result, void> {
+        static void call(bacnet::bvll::frame::bvlc_result const& val, uint16_t& attr) {
+             attr = val.result_code;
+        }
+    };
+}}}
+
 
 #endif /* SRC_BACNET_BVLL_BVLC_RESULT_HPP_ */

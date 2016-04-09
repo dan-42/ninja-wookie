@@ -27,8 +27,6 @@
 int main(int argc, char *argv[]) {
   try {
     uint16_t    doi{1};
-    uint16_t    state{0};
-    std::string password{};
     uint16_t    port{0xBAC0};
     std::string ip{"0.0.0.0"};
 
@@ -73,10 +71,8 @@ int main(int argc, char *argv[]) {
 */
 
     std::cout
-    << "sending reinitialize_device to "
+    << "sending who is to "
     << " doi: "     << doi
-    << " state: "   << state
-    << " with password: "   << password
     << " on " << ip << ":"  << port
     << std::endl;
 
@@ -99,7 +95,7 @@ int main(int argc, char *argv[]) {
     );
 
 
-
+    service_controller.start();
 
     io_service.run();
   }

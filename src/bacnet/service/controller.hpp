@@ -34,12 +34,29 @@
 #include <bacnet/service/api.hpp>
 #include <bacnet/service/detail/callback_manager.hpp>
 #include <bacnet/service/detail/device_manager.hpp>
+#include <bacnet/service/detail/inbound_router.hpp>
 
 #include <bacnet/service/service.hpp>
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
 #include <bacnet/service/service/detail/i_am_garmmar.hpp>
 #include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
 #include <bacnet/common/configuration.hpp>
+
+#include <bacnet/apdu/api.hpp>
+
+
+/**
+ * SCOPE OF THIS LAYER
+ * * decodes variable part of apdu
+ * * offer height level api to send services
+ * * holds list of known clients (DOI<--> Address mapping)
+ * * sends who_is if DOI is not known
+ *
+ */
+
+
+
+
 
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
@@ -83,46 +100,6 @@ namespace bacnet { namespace service { namespace service { namespace detail {
 }}}}
 
 
-namespace bacnet { namespace service { namespace detail {
-
-  using namespace bacnet::service;
-  struct inbound_router : boost::static_visitor<> {
-
-    inbound_router(callback_manager& cm, bacnet::service::detail::device_manager& dm) : callback_manager_(cm), device_manager_(dm) {
-    }
-
-    inline void meta_information(bacnet::common::protocol::meta_information meta_information) {
-      meta_information_ = meta_information;
-    }
-
-    template<typename Service>
-    inline void operator()(Service service) {
-      boost::system::error_code ec{error::errc::success, error::get_error_category()};
-      callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
-    }
-
-  private:
-
-    callback_manager& callback_manager_;
-    bacnet::service::detail::device_manager& device_manager_;
-    bacnet::common::protocol::meta_information meta_information_;
-  };
-
-template<>
-inline void inbound_router::operator()<service::i_am>(service::i_am service) {
-  device_manager_.insert_device(bacnet::common::protocol::mac::endpoint{meta_information_.npdu_source.network_number, meta_information_.address},
-                                service.i_am_device_identifier,
-                                service.max_apdu_length_accepted,
-                                service.segmentation_supported,
-                                service.vendor_id);
-  device_manager_.print_device_list();
-
-  boost::system::error_code ec{error::errc::success, error::get_error_category()};
-  callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
-}
-
-}}}
-
 
 namespace bacnet { namespace service {
 
@@ -149,6 +126,25 @@ public:
 
   void start() {
     lower_layer_.start();
+    /*
+     * dependant on the config, a callback for who_is request is registered, and requests are automaticly answered
+     */
+    if(config_.send_i_am_frames) {
+      i_am_message_ = service::i_am{device_object_identifier_, ApduSize::size_in_bytes, bacnet::common::segmentation(bacnet::common::segmentation::segment::both), ApduSize::size_in_bytes};
+      callback_manager_.add_who_is_service_callback([this](bacnet::service::who_is service, boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
+        if(!ec)
+          if(  (     service.device_instance_range_low_limit  == 0
+                  && service.device_instance_range_high_limit == 0
+               )
+                ||
+               (     this->config_.device_object_id >= service.device_instance_range_low_limit
+                  && this->config_.device_object_id <= service.device_instance_range_high_limit
+               )) {
+            this->async_send(this->i_am_message_, [](const boost::system::error_code& ec){});
+        }
+      });
+      async_send(i_am_message_, [](const boost::system::error_code& ec){});
+    }
   }
 
   void async_received_service_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
@@ -182,9 +178,7 @@ public:
       });
     }
     else {
-      std::cout << "not a broadcast service  " << std::endl;
       auto ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
-      //bacnet::service::possible_service_response res;
       handler(ec);
     }
   }
@@ -194,13 +188,32 @@ public:
     async_send(mac_endpoint.address(), std::move(service), handler);
   }
 
+
+
+  /*
+   * handler accepts only possible service responses
+   */
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::address address, Service&& service, Handler handler) {
     auto data =  bacnet::service::service::detail::generate(std::move(service));
 
-    lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]( const boost::system::error_code& ec){
-      bacnet::service::possible_service_response res;
-      handler(ec, res);
+    lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
+                                                                       ( const boost::system::error_code& ec,
+                                                                               bacnet::apdu::frame::possible_frame frame,
+                                                                               bacnet::common::protocol::meta_information mi) {
+
+      /*
+       *
+       */
+      if(ec) {
+        handler(ec, bacnet::service::possible_service_response());
+      }
+      else {
+        inbound_router_.meta_information(std::move(mi));
+        //xxx frame must be service
+        //frame.apply_visitor(inbound_router_);
+      }
+
     });
   }
 
@@ -263,6 +276,7 @@ private:
     bacnet::service::detail::inbound_router inbound_router_;
     bacnet::common::object_identifier device_object_identifier_;
     bacnet::config config_;
+    service::i_am i_am_message_;
 
 
 

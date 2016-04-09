@@ -41,6 +41,11 @@ namespace bacnet { namespace common {
       };
 
 
+      segmentation() = default;
+      segmentation(segment s) : segmented_(std::move(s)) {
+
+      }
+
       inline segment segmented() const {
         return segmented_;
       }
