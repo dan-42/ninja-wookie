@@ -74,14 +74,14 @@ typedef boost::fusion::map<
       }
 
       template<>
-        void callback_manager::invoke<service::who_is>(const service::who_is &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
-          for(auto &callback :  callbacks_service_who_is) {
-            if(callback) {
-              callback(service, ec, mi );
-            }
+      void callback_manager::invoke<service::who_is>(const service::who_is &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
+        for(auto &callback :  callbacks_service_who_is) {
+          if(callback) {
+            callback(service, ec, mi );
           }
-          callback_manager_.invoke_callback(service, ec, mi);
         }
+        callback_manager_.invoke_callback(service, ec, mi);
+      }
     }}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_DETAIL_CALLBACK_MANAGER_HPP

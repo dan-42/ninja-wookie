@@ -35,7 +35,6 @@
 #include <bacnet/apdu/frame/grammar.hpp>
 
 #include <bacnet/apdu/detail/inbound_router.hpp>
-#include <bacnet/apdu/detail/callback_manager.hpp>
 #include <bacnet/apdu/detail/request_manager.hpp>
 
 #include <bacnet/npdu/api.hpp>
@@ -59,6 +58,16 @@ namespace bacnet { namespace apdu {
  *
  *
  */
+namespace detail {
+
+using namespace bacnet::apdu;
+
+typedef boost::fusion::map<
+    boost::fusion::pair<frame::unconfirmed_request, received_unconfirmed_callback_t>,
+    boost::fusion::pair<frame::confirmed_request,   received_confirmed_callback_t  >
+> callback_map_type;
+
+}
 
 template<class UnderlyingLayerController, typename ApduSize>
 struct controller {
@@ -84,14 +93,10 @@ struct controller {
     underlying_controller_.start();
   }
 
-  void register_async_received_service_callback(const async_received_service_callback_t &callback){
-    callback_manager_.async_received_service_callback_ = callback;
+  template<typename ...Callbacks>
+  void register_callbacks(Callbacks... callbacks) {
+    callback_manager_.set_callbacks(callbacks...);
   }
-
-  void register_async_received_error_callback(const async_received_error_callback_t &callback){
-    callback_manager_.async_received_error_callback_ = callback;
-  }
-
 
 
   /**
@@ -133,7 +138,7 @@ struct controller {
     underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const boost::system::error_code& ec) {
             if(ec) {
               this->request_manager_.purge_invoke_id(adr, invoke_id);
-              handler(ec, frame::possible_frame(), bacnet::common::protocol::meta_information());
+              handler(ec, frame::possible_confirmed_respons(), bacnet::common::protocol::meta_information());
             }
             else {
               this->request_manager_.store_handler(adr, invoke_id, handler);
@@ -156,8 +161,9 @@ private:
 
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
-  detail::inbound_router  inbound_router_;
-  detail::callback_manager callback_manager_;
+  util::callback::callback_manager<detail::callback_map_type>  callback_manager_;
+  detail::inbound_router<decltype(callback_manager_)>  inbound_router_;
+
   detail::request_manager request_manager_;
 };
 

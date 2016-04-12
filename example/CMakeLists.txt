@@ -20,6 +20,13 @@ link_directories (${Boost_LIBRARY_DIRS})
 include_directories (${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
+
+add_executable(playground playground.cpp)
+target_link_libraries(playground wookie::wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+set_target_properties(playground PROPERTIES DEBUG_POSTFIX "d")
+install(TARGETS playground DESTINATION bin)
+
+
 add_executable(reinitialize_device reinitialize_device.cpp)
 target_link_libraries(reinitialize_device wookie::wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 set_target_properties(reinitialize_device PROPERTIES DEBUG_POSTFIX "d")

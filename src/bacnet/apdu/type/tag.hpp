@@ -68,22 +68,22 @@ struct tag {
 
 
 namespace application_tag_number {
-  uint8_t null = 0;
-  uint8_t boolean = 1;
-  uint8_t unsigned_interger = 2;
-  uint8_t signed_integer = 3; // (2's complement notation)
-  uint8_t real = 4; //Real (ANSI/IEEE-754 floating point)
-  uint8_t double_presision = 5; //Double (ANSI/IEEE-754 double precision floating point)
-  uint8_t octet_string = 6;
-  uint8_t character_string = 7;
-  uint8_t bit_string = 8;
-  uint8_t enumerated = 9;
-  uint8_t date = 10;
-  uint8_t time = 11;
+  uint8_t null                     =  0;
+  uint8_t boolean                  =  1;
+  uint8_t unsigned_interger        =  2;
+  uint8_t signed_integer           =  3; // (2's complement notation)
+  uint8_t real                     =  4; //Real (ANSI/IEEE-754 floating point)
+  uint8_t double_presision         =  5; //Double (ANSI/IEEE-754 double precision floating point)
+  uint8_t octet_string             =  6;
+  uint8_t character_string         =  7;
+  uint8_t bit_string               =  8;
+  uint8_t enumerated               =  9;
+  uint8_t date                     = 10;
+  uint8_t time                     = 11;
   uint8_t bacnet_object_identifier = 12;
-  uint8_t reserved_13 = 13;
-  uint8_t reserved_14 = 14;
-  uint8_t reserved_15 = 15;
+  uint8_t reserved_13              = 13;
+  uint8_t reserved_14              = 14;
+  uint8_t reserved_15              = 15;
 };
 
 struct null_t;

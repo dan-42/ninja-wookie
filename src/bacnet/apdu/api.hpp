@@ -31,12 +31,16 @@
 
 
 namespace bacnet { namespace apdu {
+   /* called when new requests are incomming    */
+  typedef  std::function<void (frame::unconfirmed_request, boost::system::error_code, bacnet::common::protocol::meta_information)> received_unconfirmed_callback_t;
+  typedef  std::function<void (frame::confirmed_request  , boost::system::error_code, bacnet::common::protocol::meta_information)> received_confirmed_callback_t;
 
-  typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_service_callback_t;
-  typedef  std::function<void (bacnet::common::protocol::meta_information&&, bacnet::binary_data&&)> async_received_error_callback_t;
 
-  typedef std::function< void (const boost::system::error_code&, frame::possible_frame, bacnet::common::protocol::meta_information)> confirmed_request_handler_type;
-  typedef std::function< void (const boost::system::error_code&)>                                                                     unconfirmed_request_handler_type;
+  /* called after sending a request to somewhere */
+  typedef std::function< void (const  boost::system::error_code&,
+                                      frame::possible_confirmed_respons,
+                                      bacnet::common::protocol::meta_information )> confirmed_request_handler_type;
+  typedef std::function< void (const boost::system::error_code&)>                   unconfirmed_request_handler_type;
 
 
 }}
