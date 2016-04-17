@@ -1,6 +1,7 @@
 
 
 cmake_minimum_required(VERSION 3.2)
+
 project(example-wookie)
 
 if(TARGET wookie)
@@ -25,7 +26,6 @@ add_executable(playground playground.cpp)
 target_link_libraries(playground wookie::wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 set_target_properties(playground PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS playground DESTINATION bin)
-
 
 add_executable(reinitialize_device reinitialize_device.cpp)
 target_link_libraries(reinitialize_device wookie::wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)

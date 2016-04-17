@@ -11,14 +11,21 @@ HunterGate(
         SHA1 "db065c2f01e15d27207f9a3f37799b5b435f4c11"
 )
 
-
 ####
 # Set variables:
 #   * PROJECT_NAME
 #   * PROJECT_VERSION
 project(wookie VERSION 0.0.1)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -gdwarf-2 ")
+
+
+#SET (CMAKE_C_COMPILER       "/usr/bin/clang")    
+#SET (CMAKE_CXX_COMPILER     "/usr/bin/clang++")
+#SET (CMAKE_LINKER  "/home/dan/bin/ld")
+#SET (CMAKE_OBJDUMP "/usr/bin/llvm-objdump")
+#SET (CMAKE_AR      "/home/dan/bin/ar")
+#SET (CMAKE_NM      "/home/dan/bin/nm")
+#SET (CMAKE_RANLIB  "/home/dan/bin/ranlib")
+
 add_subdirectory(src)
 add_subdirectory(example)
 add_subdirectory(test)

@@ -55,7 +55,7 @@ namespace type {
 
 namespace property {
 
-  template<uint32_t object_type, uint16_t property_type, typename Type >
+  template<uint32_t object_type, uint16_t property_t, typename Type >
   struct property_type {
     typedef Type type;
   };
@@ -78,19 +78,104 @@ namespace property {
 
 }
 
-namespace object {
-
-  struct analog_input {
-    namespace prop_type = bacnet::type::property;
 
 
-    ai::object_name::type object_name;
-    ai::object_identifier::type object_identifier;
-    ai::present_value::type present_value;
+
+namespace detail {
+
+  class object_base {
+  public:
+    virtual ~object_base(){};
+    virtual bacnet::binary_data read_prop(uint16_t property_id, boost::optional<uint16_t> index) = 0;
+    virtual void write_prop(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) = 0;
+
   };
+  typedef std::shared_ptr<object_base> object_base_ptr_t;
+}//detail
+
+typedef std::vector<detail::object_base_ptr_t> object_ptr_list_t;
 
 
-}}
+namespace traits {
+
+  template<typename T> struct has_read_property : std::false_type { };
+
+}
+
+
+template<typename Derived>
+class object : public detail::object_base {
+public:
+
+  object() {
+    object_types_supported_.set(traits::supported_index<Derived>::value);
+
+  }
+
+  virtual ~object(){}
+
+  Derived& self() { return static_cast<Derived&>(*this); }
+
+  inline bacnet::binary_data read_prop(uint16_t property_id, boost::optional<uint16_t> index) {
+
+    if(traits::has_read_property<Derived>::value) {
+      std::cout << "object:: read_prop" << std::endl;
+      return self().read_prop_impl(property_id, index);
+    }
+    std::cout << "object:: read_prop not supported" << std::endl;
+    return bacnet::binary_data{};
+  }
+  inline void write_prop(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) {
+    std::cout << "object:: write_prop" << std::endl;
+    self().write_prop_impl(property_id, index, data);
+  }
+
+
+private:
+
+  static std::bitset<54> object_types_supported_;
+
+};
+
+
+
+
+
+  struct analog_input final : public object<analog_input> {
+
+    inline bacnet::binary_data read_prop_impl(uint16_t property_id, boost::optional<uint16_t> index) {
+      std::cout << "analog_input:: read_prop_impl" << std::endl;
+        return bacnet::binary_data{};
+    }
+
+    inline void write_prop_impl(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) {
+        std::cout << "analog_input:: write_prop_impl" << std::endl;
+    }
+
+
+  };
+  namespace traits {
+    template<>  struct has_read_property<analog_input> : std::true_type { };
+  }
+
+
+
+  struct analog_output final : public object<analog_output> {
+
+      inline bacnet::binary_data read_prop_impl(uint16_t property_id, boost::optional<uint16_t> index) {
+        std::cout << "analog_output:: read_prop_impl" << std::endl;
+          return bacnet::binary_data{};
+      }
+
+      inline void write_prop_impl(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) {
+          std::cout << "analog_output:: write_prop_impl" << std::endl;
+      }
+
+
+    };
+
+
+}
 
 
 
@@ -99,56 +184,22 @@ namespace object {
 int main(int argc, char *argv[]) {
 
 
-  bacnet::type::analog_input::present_value::type value;
 
 
+  bacnet::object_ptr_list_t object_list;
 
+  auto ai_ptr = std::make_shared<bacnet::analog_input>();
+  auto ao_ptr = std::make_shared<bacnet::analog_output>();
+  object_list.push_back(ai_ptr);
+  object_list.push_back(ao_ptr);
 
+  uint16_t property_id{0};
+  boost::optional<uint16_t> index;
+  bacnet::binary_data data{};
 
-
-
-
-
-
-  try {
-    uint16_t    doi{1};
-    uint16_t    port{0xBAC0};
-    std::string ip{"0.0.0.0"};
-
-
-    std::cout
-    << "sending who is to "
-    << " doi: "     << doi
-    << " on " << ip << ":"  << port
-    << std::endl;
-
-    boost::asio::io_service io_service;
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port};
-    auto &service_controller = factory.controller();
-
-    service_controller.async_receive([](const bacnet::service::i_am &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi){
-    	//std::cout << service << std::endl;
-    });
-
-
-    //bacnet::common::object_identifier device_id{bacnet::object_type::device, 2};
-    bacnet::service::service::who_is wi;
-
-    service_controller.async_send(wi, []
-                 (const boost::system::error_code &ec){
-                    std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
-                 }
-    );
-
-
-    service_controller.start();
-
-    io_service.run();
-  }
-  catch (const std::exception &e) {
-    std::cerr << "Exception: " << e.what() << "\n";
-    throw;
+  for(auto& o : object_list) {
+    o->write_prop(property_id, index, data);
+    o->read_prop(property_id, index);
   }
 
-  return 0;
 }

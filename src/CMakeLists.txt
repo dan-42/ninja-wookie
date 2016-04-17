@@ -15,7 +15,6 @@
 # Set minimum version of CMake. Since command 'project' use
 cmake_minimum_required(VERSION 3.2)
 
-
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Debug prior to calling PROJECT()
@@ -30,6 +29,7 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -std=c++14 
                     -Wall 
                     -Werror
+                  #  -Wpedantic
                     # needed for boost library
                     -Wno-unused-function 
                     -Wno-unused-local-typedefs 
@@ -46,19 +46,27 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
     
 ELSE()
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections")
+        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections -flto")
 
-        add_definitions(
-                -fvisibility=hidden
-                -Os
+        list(APPEND WOOKIE_COMPILE_FLAGS
+                -fvisibility=hidden                
                 -ffunction-sections
                 -fdata-sections
-                -s)
-    endif()    
+                -flto 
+                -fuse-linker-plugin                        
+        )
+
+        
+        
+    endif()
+    list(APPEND WOOKIE_COMPILE_FLAGS        
+                -Os         
+                -s                       
+        )    
 ENDIF()
 
 
-add_compile_options(${WOOKIE_COMPILE_FLAGS})
+
 
 
 hunter_add_package(Boost COMPONENTS system)
@@ -89,6 +97,7 @@ file(GLOB_RECURSE SOURCES_UTIL_CPP "util/*.cpp")
 add_library(wookie ${SOURCES_BACNET_CPP} ${SOURCES_UTIL_CPP} )
 
 
+
 ####
 # Properties of targets
 
@@ -98,7 +107,7 @@ add_library(wookie ${SOURCES_BACNET_CPP} ${SOURCES_UTIL_CPP} )
 #   * Release: -DWOOKIE_DEBUG=0
 #   * other:   -DWOOKIE_DEBUG=0
 target_compile_definitions(wookie PUBLIC "WOOKIE_DEBUG=$<CONFIG:Debug>")
-
+add_definitions(${WOOKIE_COMPILE_FLAGS})
 
 # Generate:
 #   * ${CMAKE_CURRENT_BINARY_DIR}/wookie_export.h with WOOKIE_EXPORT
