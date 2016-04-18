@@ -116,7 +116,7 @@ public:
 
   Derived& self() { return static_cast<Derived&>(*this); }
 
-  inline bacnet::binary_data read_prop(uint16_t property_id, boost::optional<uint16_t> index) {
+  inline bacnet::binary_data read_prop(uint16_t property_id, boost::optional<uint16_t> index) final {
 
     if(traits::has_read_property<Derived>::value) {
       std::cout << "object:: read_prop" << std::endl;
@@ -125,7 +125,7 @@ public:
     std::cout << "object:: read_prop not supported" << std::endl;
     return bacnet::binary_data{};
   }
-  inline void write_prop(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) {
+  inline void write_prop(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) final {
     std::cout << "object:: write_prop" << std::endl;
     self().write_prop_impl(property_id, index, data);
   }
