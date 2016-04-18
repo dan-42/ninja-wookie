@@ -60,43 +60,91 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
     rule<Iterator, unsigned_integer()>  start_rule;
     rule<Iterator, tag()>               tag_rule;
     rule<Iterator, tag()>               tag_lower_rule;
+    rule<Iterator >                     tag_validation_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
    tag_grammar<Iterator> tag_grammar_;
 
     unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), size_(0) {
-
-      start_rule  = tag_rule >> value_rule ;
-
-      tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&unsigned_integer_grammar::set_size, this, _1)] ;
-
-      value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
-                  | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
-                  | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
-                  | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
-
-      tag_lower_rule = tag_grammar_;
-
-      start_rule.name("start_rule");
-      tag_rule.name("tag_rule");
-      tag_lower_rule.name("tag_lower_rule");
-      value_rule.name("value_rule");
-//
-/*
-      debug(start_rule);
-      debug(tag_rule);
-      debug(tag_lower_rule);
-      debug(value_rule);
-//*/
+      setup();
     }
+
+    unsigned_integer_grammar(application_tag tag) :  unsigned_integer_grammar::base_type(start_rule),has_context_(true),
+                                                                  size_(0),
+                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(tag)),
+                                                                  is_expecting_context_tag_(false),
+                                                                  has_context_(true) {
+      setup();
+    }
+
+    unsigned_integer_grammar(uint8_t tag) : unsigned_integer_grammar::base_type(start_rule),
+                                                                  size_(0),
+                                                                  tag_number_expected_(tag),
+                                                                  is_expecting_context_tag_(true),
+                                                                  has_context_(true) {
+      setup();
+    }
+
 private:
 
+    inline void setup() {
+      start_rule  = tag_rule >> tag_validation_rule >> value_rule ;
+
+           tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&unsigned_integer_grammar::set_size, this, _1)] ;
+
+
+           tag_validation_rule = eps( boost::phoenix::bind(&unsigned_integer_grammar::is_as_expected, this) == true );
+
+           value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
+                       | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
+                       | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
+                       | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
+
+           tag_lower_rule = tag_grammar_;
+
+           start_rule.name("start_rule");
+           tag_rule.name("tag_rule");
+           tag_lower_rule.name("tag_lower_rule");
+           value_rule.name("value_rule");
+
+     /*
+           debug(start_rule);
+           debug(tag_rule);
+           debug(tag_lower_rule);
+           debug(value_rule);
+     //*/
+    }
+
+    /**
+     * using separate size value, as  accessing complex type
+     * does somehow not work here with spirit
+     */
     tag& set_size(tag& t) {
+      tag_ = t;
       size_ = t.length_value_type();
       return t;
     }
 
-    uint32_t size_;
+    bool is_as_expected() {
+      if(has_context_) {
+        if(   tag_.is_context_tag_ == is_expecting_context_tag_
+           && tag_.number()  == tag_number_expected_ ) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        return true;
+      }
+    }
+
+    tag tag_;
+    uint32_t size_{0};
+    uint8_t tag_number_expected_{0};
+    bool is_expecting_context_tag_{false};
+    bool has_context_{false};
 };
 
 }}}}}

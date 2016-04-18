@@ -40,10 +40,6 @@
 
 
 
-
-
-
-
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -55,7 +51,7 @@
 #include <bacnet/apdu/type/unsigned_integer.hpp>
 
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
-
+/*
 namespace bacnet { namespace  service { namespace service { namespace detail { namespace parser {
 
 using namespace boost::spirit;
@@ -66,14 +62,14 @@ using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
 using boost::phoenix::bind;
-/**
+/ **
 
  bacnet::common::object_identifier i_am_device_identifier;
     uint32_t                        max_apdu_length_accepted;
     bacnet::common::segmentation    segmentation_supported;
     uint16_t                        vendor_id;
 
- */
+ // * /
 
 using bacnet::service::service::i_am;
 
@@ -114,13 +110,13 @@ struct i_am_grammar : grammar<Iterator, i_am()> {
       segmentation_supported_rule.name("segmentation_supported_rule");
       vendor_id_rule.name("vendor_id_rule");
 
-/*
+/ *
       debug(start_rule);
       debug(i_am_device_identifier_rule);
       debug(max_apdu_length_accepted_rule);
       debug(segmentation_supported_rule);
       debug(vendor_id_rule);
-//*/
+// * /
     }
 private:
 
@@ -175,11 +171,11 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
       tag_rule.name("tag_rule");
       value_rule.name("value_rule");
 
-      /*
+     // / *
       debug(start_rule);
       debug(value_rule);
       debug(tag_rule);
-      */
+     // * /
 
     }
 private:
@@ -194,7 +190,7 @@ private:
 }}}}}
 
 
-
+*/
 
 
 
@@ -222,11 +218,11 @@ bacnet::binary_data generate<i_am>(const i_am& i_am_service) {
 
   auto max_apdu_length_accepted = i_am_service.max_apdu_length_accepted;
 
-  constexpr bool is_application_tag = false;
-  apdu::tag tag_object_identifier(apdu::application_tag_number::bacnet_object_identifier, is_application_tag, 4);
-  apdu::tag tag_max_apdu_accepted(apdu::application_tag_number::unsigned_interger, is_application_tag, apdu::detail::length_helper(max_apdu_length_accepted));
-  apdu::tag tag_segmentation_supported(apdu::application_tag_number::enumerated, is_application_tag, apdu::detail::length_helper(i_am_service.segmentation_supported.to_native()));
-  apdu::tag tag_vendor_id(apdu::application_tag_number::unsigned_interger, is_application_tag, apdu::detail::length_helper(i_am_service.vendor_id));
+
+  apdu::tag tag_object_identifier(apdu::application_tag::bacnet_object_identifier, 4);
+  apdu::tag tag_max_apdu_accepted(apdu::application_tag::unsigned_interger, apdu::detail::length_helper(max_apdu_length_accepted));
+  apdu::tag tag_segmentation_supported(apdu::application_tag::enumerated, apdu::detail::length_helper(i_am_service.segmentation_supported.to_native()));
+  apdu::tag tag_vendor_id(apdu::application_tag::unsigned_interger, apdu::detail::length_helper(i_am_service.vendor_id));
 
 
   apdu::object_identifier oi(tag_object_identifier, i_am_service.i_am_device_identifier);
