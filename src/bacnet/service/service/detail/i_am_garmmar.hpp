@@ -49,9 +49,10 @@
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
 #include <bacnet/apdu/type/unsigned_integer.hpp>
+#include <bacnet/apdu/type/tag.hpp>
 
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
-/*
+
 namespace bacnet { namespace  service { namespace service { namespace detail { namespace parser {
 
 using namespace boost::spirit;
@@ -62,14 +63,17 @@ using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
 using boost::phoenix::bind;
-/ **
+
+using bacnet::apdu::type::application_tag;
+
+/**
 
  bacnet::common::object_identifier i_am_device_identifier;
     uint32_t                        max_apdu_length_accepted;
     bacnet::common::segmentation    segmentation_supported;
     uint16_t                        vendor_id;
 
- // * /
+ // */
 
 using bacnet::service::service::i_am;
 
@@ -77,11 +81,11 @@ template<typename Iterator>
 struct i_am_grammar : grammar<Iterator, i_am()> {
 
 
-    rule<Iterator, i_am()>                      start_rule;
-    rule<Iterator, i_am_device_identifier()>    i_am_device_identifier_rule;
-    rule<Iterator, max_apdu_length_accepted()>  max_apdu_length_accepted_rule;
-    rule<Iterator, segmentation_supported()>    segmentation_supported_rule;
-    rule<Iterator, vendor_id()>                 vendor_id_rule;
+    rule<Iterator, i_am()>                     start_rule;
+    object_identifier_grammar<Iterator>        i_am_device_identifier_rule;
+    unsigned_integer_grammar<Iterator>         max_apdu_length_accepted_rule(application_tag::unsigned_interger);
+    rule<Iterator, segmentation_supported()>   segmentation_supported_rule;
+    unsigned_integer_grammar<Iterator>         vendor_id_rule(application_tag::unsigned_interger);
 
     unsigned_integer_grammar<Iterator> unsigned_integer_grammar_;
     object_identifier_grammar<Iterator> object_identifier_grammar_;
@@ -95,13 +99,10 @@ struct i_am_grammar : grammar<Iterator, i_am()> {
                   ;
 
 
-      i_am_device_identifier_rule = object_identifier_grammar_;
-
-      max_apdu_length_accepted_rule = unsigned_integer_grammar_;
 
       segmentation_supported_rule = unsigned_integer_grammar_;
 
-      vendor_id_rule = unsigned_integer_grammar_;
+
 
 
       start_rule.name("start_rule");
@@ -110,13 +111,13 @@ struct i_am_grammar : grammar<Iterator, i_am()> {
       segmentation_supported_rule.name("segmentation_supported_rule");
       vendor_id_rule.name("vendor_id_rule");
 
-/ *
+/*
       debug(start_rule);
       debug(i_am_device_identifier_rule);
       debug(max_apdu_length_accepted_rule);
       debug(segmentation_supported_rule);
       debug(vendor_id_rule);
-// * /
+// */
     }
 private:
 
@@ -171,11 +172,11 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
       tag_rule.name("tag_rule");
       value_rule.name("value_rule");
 
-     // / *
+     // /*
       debug(start_rule);
       debug(value_rule);
       debug(tag_rule);
-     // * /
+     // */
 
     }
 private:
@@ -189,8 +190,6 @@ private:
 
 }}}}}
 
-
-*/
 
 
 

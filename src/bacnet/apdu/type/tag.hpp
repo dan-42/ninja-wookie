@@ -52,6 +52,8 @@ enum class  application_tag : uint8_t {
 
 struct tag {
 
+    using application_tag;
+
     uint32_t length_value_type_;
     bool is_context_tag_;
     uint8_t number_;

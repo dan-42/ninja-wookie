@@ -32,7 +32,7 @@
 #include <bacnet/apdu/detail/boost/uint24_parser.hpp>
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
-#include <bacnet/apdu/type/unsigned_integer.hpp>
+
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
 
@@ -50,14 +50,14 @@ using boost::phoenix::bind;
 using boost::spirit::repository::qi::big_24word;
 
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::unsigned_integer;
+
 
 
 template<typename Iterator>
-struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
+struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
 
 
-    rule<Iterator, unsigned_integer()>  start_rule;
+    rule<Iterator, uint32_t()>  start_rule;
     rule<Iterator, tag()>               tag_rule;
     rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator >                     tag_validation_rule;
@@ -65,35 +65,29 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
 
    tag_grammar<Iterator> tag_grammar_;
 
-    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), size_(0) {
-      setup();
-    }
-
-    unsigned_integer_grammar(application_tag tag) :  unsigned_integer_grammar::base_type(start_rule),has_context_(true),
+    unsigned_integer_grammar() :  unsigned_integer_grammar::base_type(start_rule),
                                                                   size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(tag)),
-                                                                  is_expecting_context_tag_(false),
-                                                                  has_context_(true) {
+                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::unsigned_interger)),
+                                                                  is_expecting_context_tag_(false) {
       setup();
     }
 
     unsigned_integer_grammar(uint8_t tag) : unsigned_integer_grammar::base_type(start_rule),
                                                                   size_(0),
                                                                   tag_number_expected_(tag),
-                                                                  is_expecting_context_tag_(true),
-                                                                  has_context_(true) {
+                                                                  is_expecting_context_tag_(true) {
       setup();
     }
 
 private:
 
     inline void setup() {
-      start_rule  = tag_rule >> tag_validation_rule >> value_rule ;
+      start_rule  = tag_validation_rule >> value_rule ;
 
            tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&unsigned_integer_grammar::set_size, this, _1)] ;
 
 
-           tag_validation_rule = eps( boost::phoenix::bind(&unsigned_integer_grammar::is_as_expected, this) == true );
+           tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&unsigned_integer_grammar::is_as_expected, this) == true );
 
            value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
                        | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
@@ -126,17 +120,12 @@ private:
     }
 
     bool is_as_expected() {
-      if(has_context_) {
-        if(   tag_.is_context_tag_ == is_expecting_context_tag_
-           && tag_.number()  == tag_number_expected_ ) {
-          return true;
-        }
-        else {
-          return false;
-        }
+      if(   tag_.is_context_tag_ == is_expecting_context_tag_
+         && tag_.number()  == tag_number_expected_ ) {
+        return true;
       }
       else {
-        return true;
+        return false;
       }
     }
 
@@ -144,7 +133,6 @@ private:
     uint32_t size_{0};
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};
-    bool has_context_{false};
 };
 
 }}}}}
@@ -163,20 +151,24 @@ using boost::phoenix::bind;
 using boost::spirit::repository::karma::big_24word;
 
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::unsigned_integer;
+
 
 
 template<typename Iterator>
-struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
+struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
 
-    rule<Iterator, unsigned_integer()>  start_rule;
+    rule<Iterator, uint32_t()>          start_rule;
     rule<Iterator, tag()>               tag_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
     unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule) {
+      setup();
+    }
+private:
 
+    void setup () {
       start_rule  = tag_rule << value_rule ;
 
       tag_rule = eps[boost::phoenix::bind(&unsigned_integer_grammar::extract_size, this, _val)] << tag_grammar_[_1 = _val];
@@ -195,9 +187,7 @@ struct unsigned_integer_grammar : grammar<Iterator, unsigned_integer()> {
       debug(value_rule);
       debug(tag_rule);
       */
-
     }
-private:
 
     void extract_size(const tag &tag_) {
       size_ = tag_.length_value_type();
