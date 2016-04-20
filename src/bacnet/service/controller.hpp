@@ -48,9 +48,11 @@
 /**
  * SCOPE OF THIS LAYER
  * * decodes variable part of apdu
+ *   * dependant on unconfirmed or confirmed service
  * * offer height level api to send services
  * * holds list of known clients (DOI<--> Address mapping)
  * * sends who_is if DOI is not known
+ * *
  *
  */
 
@@ -60,9 +62,9 @@
 
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
-  static inline unconfirmed::possible_service parse(binary_data& data) {
+  static inline unconfirmed::possible_service parse(bacnet::apdu::frame::unconfirmed_request& frame) {
     unconfirmed::possible_service parsed_service{};
-
+    auto &data = frame.service_data;
     //todo make it nice and clean with boost spirit
     if(!data.empty()) {
       if(data.front() == uncomfirmed_service::who_is) {
@@ -97,6 +99,46 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     return parsed_service;
   }
 
+
+  using namespace bacnet::service;
+    static inline confirmed::possible_service parse(bacnet::apdu::frame::confirmed_request& frame) {
+      confirmed::possible_service parsed_service{};
+      auto &data = frame.service_data;
+      //todo make it nice and clean with boost spirit
+      if(!data.empty()) {
+        if(data.front() == uncomfirmed_service::who_is) {
+          //std::cout << "unconfirmed::possible_service parse who_is " << std::endl;
+          who_is service_;
+          if(bacnet::service::service::detail::parse(data , service_)) {
+            parsed_service = service_;
+          }
+          else {
+            std::cout << "unconfirmed::possible_service parse who_is failed" << std::endl;
+          }
+        }
+        else if(data.front() == uncomfirmed_service::i_am) {
+          //std::cout << "unconfirmed::possible_service parse i_am " << std::endl;
+          i_am service_;
+          if(bacnet::service::service::detail::parse(data , service_)){
+            parsed_service = service_;
+          }
+          else {
+            std::cout << "unconfirmed::possible_service parse i_am failed" << std::endl;
+          }
+        }
+        else {
+          std::cout << "unconfirmed::possible_service parse undefined " << std::endl;
+          bacnet::print(data);
+        }
+      }
+      else {
+        std::cout << "unconfirmed::possible_service parse data empty " << std::endl;
+      }
+
+      return parsed_service;
+    }
+
+
 }}}}
 
 
@@ -129,13 +171,15 @@ public:
 
           //parse and visitor for unconfirmed
           inbound_router_.meta_information(std::move(mi));
-          auto f = bacnet::service::service::detail::parse(request.service_data);
+          auto f = bacnet::service::service::detail::parse(request);
            f.apply_visitor(inbound_router_);
 
           },
         [this](bacnet::apdu::frame::confirmed_request request,  boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
             std::cout << "bacnet::service::controller received confirmed_request " << std::endl;
-
+            inbound_router_.meta_information(std::move(mi));
+            auto f = bacnet::service::service::detail::parse(request);
+             f.apply_visitor(inbound_router_);
             //parse and visitor for confirmed
           }
     );
@@ -165,15 +209,6 @@ public:
       async_send(i_am_message_, [](const boost::system::error_code& ec){});
     }
   }
-
-  void async_received_service_handler(bacnet::common::protocol::meta_information mi, bacnet::binary_data data) {
-   std::cout << "service async_receive_handler : " << std::endl;
-   bacnet::print(data);
-   auto possible_service_frame = bacnet::service::service::detail::parse(data);
-   inbound_router_.meta_information(mi);
-   possible_service_frame.apply_visitor(inbound_router_);
-  }
-
 
 
   /*
