@@ -39,12 +39,21 @@ namespace bacnet { namespace service { namespace service { namespace unconfirmed
       i_am
   > possible_service;
 
-//xxx todo implement possible responses
+}}}}
+
+
+
+namespace bacnet { namespace service { namespace service { namespace confirmed {
+
+
+
   typedef boost::variant<
       who_is,
       i_am
-  > possible_service_response;
+  > possible_service;
+
 }}}}
+
 
 
 namespace bacnet { namespace service {
