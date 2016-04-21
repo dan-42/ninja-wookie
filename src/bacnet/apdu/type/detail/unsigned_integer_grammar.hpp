@@ -50,6 +50,7 @@ using boost::phoenix::bind;
 using boost::spirit::repository::qi::big_24word;
 
 using bacnet::apdu::type::tag;
+using bacnet::apdu::type::application_tag;
 
 
 
@@ -57,7 +58,7 @@ template<typename Iterator>
 struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
 
 
-    rule<Iterator, uint32_t()>  start_rule;
+    rule<Iterator, uint32_t()>          start_rule;
     rule<Iterator, tag()>               tag_rule;
     rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator >                     tag_validation_rule;
@@ -151,27 +152,35 @@ using boost::phoenix::bind;
 using boost::spirit::repository::karma::big_24word;
 
 using bacnet::apdu::type::tag;
+using bacnet::apdu::type::application_tag;
 
 
 
 template<typename Iterator>
 struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
 
-    rule<Iterator, uint32_t()>          start_rule;
-    rule<Iterator, tag()>               tag_rule;
-    rule<Iterator, uint32_t()>          value_rule;
+    rule<Iterator, uint32_t()>   start_rule;
+    rule<Iterator, uint32_t()>   tag_rule;
+    rule<Iterator, uint32_t()>   value_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
-    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule) {
+    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), tag_(application_tag::unsigned_interger) {
       setup();
     }
+    unsigned_integer_grammar(uint8_t tag) : unsigned_integer_grammar::base_type(start_rule), tag_(tag, true) {
+      setup();
+    }
+
 private:
 
     void setup () {
-      start_rule  = tag_rule << value_rule ;
 
-      tag_rule = eps[boost::phoenix::bind(&unsigned_integer_grammar::extract_size, this, _val)] << tag_grammar_[_1 = _val];
+      start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
+
+
+      tag_rule = eps[boost::phoenix::bind(&unsigned_integer_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
+      //tag_rule = tag_grammar_[_1 = ref(tag_)];
 
       value_rule  = eps(ref(size_) == 1) << byte_
                     | eps(ref(size_) == 2) << big_word
@@ -189,11 +198,15 @@ private:
       */
     }
 
-    void extract_size(const tag &tag_) {
-      size_ = tag_.length_value_type();
+    bool extract_size(const uint32_t &unsigned_value) {
+      size_ = bacnet::apdu::type::detail::length_helper(unsigned_value);
+      tag_.length_value_type(size_);
+      return true;
     }
 
+
     uint8_t size_;
+    tag tag_;
 };
 
 }}}}}

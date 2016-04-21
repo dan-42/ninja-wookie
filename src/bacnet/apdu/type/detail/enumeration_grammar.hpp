@@ -20,14 +20,17 @@
 
 
 
-#ifndef NINJA_WOOKIE_OBJECT_IDENTIFIER_GRAMMAR_HPP
-#define NINJA_WOOKIE_OBJECT_IDENTIFIER_GRAMMAR_HPP
+#ifndef NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP
+#define NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP
 
 
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
+
+#include <bacnet/apdu/detail/boost/uint24_parser.hpp>
+#include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
 
@@ -45,14 +48,14 @@ using boost::spirit::repository::qi::big_24word;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::common::object_identifier;
+
 
 
 template<typename Iterator>
-struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
+struct enumeration_grammar : grammar<Iterator, uint32_t()> {
 
 
-    rule<Iterator, object_identifier()>          start_rule;
+    rule<Iterator, uint32_t()>          start_rule;
     rule<Iterator, tag()>               tag_rule;
     rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator >                     tag_validation_rule;
@@ -60,14 +63,14 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
 
    tag_grammar<Iterator> tag_grammar_;
 
-    object_identifier_grammar() :  object_identifier_grammar::base_type(start_rule),
+   enumeration_grammar() :  enumeration_grammar::base_type(start_rule),
                                                                   size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::unsigned_interger)),
+                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::enumerated)),
                                                                   is_expecting_context_tag_(false) {
       setup();
     }
 
-    object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule),
+   enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule),
                                                                   size_(0),
                                                                   tag_number_expected_(tag),
                                                                   is_expecting_context_tag_(true) {
@@ -79,12 +82,15 @@ private:
     inline void setup() {
       start_rule  = tag_validation_rule >> value_rule ;
 
-           tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&object_identifier_grammar::set_size, this, _1)] ;
+           tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&enumeration_grammar::set_size, this, _1)] ;
 
 
-           tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&object_identifier_grammar::is_as_expected, this) == true );
+           tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&enumeration_grammar::is_as_expected, this) == true );
 
-           value_rule  = big_dword;
+           value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
+                       | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
+                       | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
+                       | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
 
            tag_lower_rule = tag_grammar_;
 
@@ -144,22 +150,22 @@ using boost::spirit::repository::karma::big_24word;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::common::object_identifier;
+
 
 
 template<typename Iterator>
-struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
+struct enumeration_grammar : grammar<Iterator, uint32_t()> {
 
-    rule<Iterator, object_identifier()>   start_rule;
+    rule<Iterator, uint32_t()>   start_rule;
     rule<Iterator, uint32_t()>   tag_rule;
     rule<Iterator, uint32_t()>   value_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
-    object_identifier_grammar() : object_identifier_grammar::base_type(start_rule), tag_(application_tag::bacnet_object_identifier) {
+    enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::unsigned_interger) {
       setup();
     }
-    object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule), tag_(tag, true) {
+    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag, true) {
       setup();
     }
 
@@ -168,9 +174,15 @@ private:
     void setup () {
 
       start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
-      tag_rule = eps[boost::phoenix::bind(&object_identifier_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
 
-      value_rule  = big_dword;
+
+      tag_rule = eps[boost::phoenix::bind(&enumeration_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
+      //tag_rule = tag_grammar_[_1 = ref(tag_)];
+
+      value_rule  = eps(ref(size_) == 1) << byte_
+                    | eps(ref(size_) == 2) << big_word
+                    | eps(ref(size_) == 3) << big_24word
+                    | eps(ref(size_) == 4) << big_dword;
 
       start_rule.name("start_rule");
       tag_rule.name("tag_rule");
@@ -197,4 +209,4 @@ private:
 }}}}}
 
 
-#endif //NINJA_WOOKIE_OBJECT_IDENTIFIER_GRAMMAR_HPP
+#endif //NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP

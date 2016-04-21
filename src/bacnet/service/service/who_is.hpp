@@ -24,12 +24,13 @@
 #include <cstdint>
 
 #include <boost/fusion/include/define_struct.hpp>
+#include <boost/optional.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
   (bacnet)(service)(service), who_is,
-  (uint32_t, device_instance_range_low_limit)
-  (uint32_t, device_instance_range_high_limit)
+  (boost::optional<uint32_t>, device_instance_range_low_limit)
+  (boost::optional<uint32_t>, device_instance_range_high_limit)
 )
 
 

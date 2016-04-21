@@ -57,7 +57,7 @@ struct big_24word_parser
     template <typename Context, typename Iterator>
     struct attribute
     {
-        typedef uint32_t type;
+        typedef boost::endian::endian<boost::spirit::endian::endianness::big, uint32_t,     24> type;
     };
 
     // This function is called during the actual parsing process

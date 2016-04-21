@@ -25,8 +25,8 @@
 #include <bacnet/service/service/who_is.hpp>
 
 #include <bacnet/apdu/type/tag.hpp>
-#include <bacnet/apdu/type/unsigned_integer.hpp>
-#include <bacnet/apdu/type/unsigned_integer_generator.hpp>
+#include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+
 #include <bacnet/apdu/type/detail/helper.hpp>
 
 #include <bacnet/service/service/detail/service_grammar.hpp>
@@ -40,85 +40,94 @@ namespace bacnet { namespace service { namespace service { namespace detail {
 namespace service = bacnet::service::service;
 namespace apdu    = bacnet::apdu::type;
 
-template<>
-bacnet::binary_data generate<service::who_is>(const service::who_is& service) {
+namespace parser {
 
 
-  constexpr uint32_t device_instance_low_limit = 0;
-  constexpr uint32_t device_instance_high_limit = 4194303;
+using namespace boost::spirit;
+using namespace boost::spirit::qi;
+using namespace boost::phoenix;
 
-  constexpr uint8_t context_tag_number_0 = 0x00;
-  constexpr uint8_t context_tag_number_1 = 0x01;
-  constexpr bool is_conext_tag = true;
+using boost::spirit::qi::bit_field;
+using boost::spirit::qi::rule;
+using boost::spirit::qi::_1;
+using boost::phoenix::bind;
 
-  bacnet::binary_data binary;
+using boost::spirit::repository::qi::big_24word;
 
-  auto service_choice_command = service_choice<service::who_is>::value;
-  binary.push_back(service_choice_command);
-
-  if(service.device_instance_range_low_limit > device_instance_low_limit) {
-
-    apdu::tag tag_low_limit(context_tag_number_0, is_conext_tag, apdu::detail::length_helper(service.device_instance_range_low_limit));
-    apdu::tag tag_heigh_limit(context_tag_number_1, is_conext_tag, apdu::detail::length_helper(service.device_instance_range_high_limit));
-
-    apdu::unsigned_integer low_limit(tag_low_limit, service.device_instance_range_low_limit);
-    auto low_limit_binary = apdu::generate(low_limit);
-    binary.insert(binary.end(), low_limit_binary.begin(), low_limit_binary.end());
+using bacnet::apdu::type::detail::parser::unsigned_integer_grammar;
 
 
-    if(service.device_instance_range_high_limit > device_instance_low_limit) {
-      apdu::unsigned_integer high_limit(tag_heigh_limit, service.device_instance_range_high_limit);
-      auto high_limit_binary = apdu::generate(high_limit);
-      binary.insert(binary.end(), high_limit_binary.begin(), high_limit_binary.end());
-    }
-    else {
-      apdu::unsigned_integer high_limit(tag_heigh_limit, service.device_instance_range_low_limit);
-      auto high_limit_binary = apdu::generate(high_limit);
-      binary.insert(binary.end(), high_limit_binary.begin(), high_limit_binary.end());
-    }
+
+
+template<typename Iterator>
+struct who_is_grammar : grammar<Iterator, service::who_is> {
+
+
+  rule<Iterator, service::who_is()>  start_rule;
+
+  rule<Iterator, boost::optional<uint32_t>>  low_limit_rule;
+  rule<Iterator, boost::optional<uint32_t>>  height_limit_rule;
+
+  unsigned_integer_grammar tag_0_rule_(0);
+  unsigned_integer_grammar tag_1_rule_(1);
+
+
+  who_is_grammar() : who_is_grammar::base_type(start_rule) {
+
+    start_rule        = low_limit_rule ^ height_limit_rule;
+    low_limit_rule    = tag_0_rule_;
+    height_limit_rule = tag_1_rule_;
   }
 
-  return binary;
+};
+
+
 }
 
 
-template<>
-bool parse<service::who_is>(bacnet::binary_data& data, service::who_is &service) {
+
+namespace generator {
 
 
-  if(data.empty()) {
-    return false;
+using namespace boost::spirit;
+using namespace boost::spirit::karma;
+using namespace boost::phoenix;
+
+using boost::spirit::karma::bit_field;
+using boost::spirit::karma::rule;
+using boost::spirit::karma::_1;
+using boost::phoenix::bind;
+
+using boost::spirit::repository::karma::big_24word;
+
+using bacnet::apdu::type::detail::parser::unsigned_integer_grammar;
+
+
+
+
+template<typename Iterator>
+struct who_is_grammar : grammar<Iterator, service::who_is> {
+
+
+  rule<Iterator, service::who_is()>  start_rule;
+
+  rule<Iterator, boost::optional<uint32_t>>  low_limit_rule;
+  rule<Iterator, boost::optional<uint32_t>>  height_limit_rule;
+
+  unsigned_integer_grammar tag_0_rule_(0);
+  unsigned_integer_grammar tag_1_rule_(1);
+
+
+  who_is_grammar() : who_is_grammar::base_type(start_rule) {
+
+    start_rule        = (-low_limit_rule) << (-height_limit_rule);
+    low_limit_rule    = tag_0_rule_;
+    height_limit_rule = tag_1_rule_;
   }
 
-  /*it's allowed to have now payload*/
-  if(data.size() == 1 && data.front() == uncomfirmed_service::who_is) {
-    service.device_instance_range_low_limit = 0;
-    service.device_instance_range_high_limit = 0;
-    return true;
-  }
+};
 
-  data.erase(data.begin(), data.begin()+1);
 
-  apdu::unsigned_integer low_limit;
-  apdu::unsigned_integer high_limit;
-  bool has_succeeded = false;
-
-  has_succeeded = apdu::parse(data, low_limit);
-  if(!has_succeeded) {
-    std::cout << "parse<service::who_is> fail tag 0" << std::endl;
-    return false;
-  }
-
-  has_succeeded = apdu::parse(data, high_limit);
-  if(!has_succeeded) {
-    std::cout << "parse<service::who_is> fail tag 1" << std::endl;
-    return false;
-  }
-
-  service.device_instance_range_high_limit = high_limit.value_;
-  service.device_instance_range_low_limit  = low_limit.value_;
-
-  return true;
 }
 
 

@@ -54,7 +54,10 @@ struct big_24word_generator : boost::spirit::karma::primitive_generator<big_24wo
       if (!boost::spirit::traits::has_optional_value(attr))
         return false;
 
-      typename attribute<Context>::type p;
+      //typename attribute<Context>::type p;
+
+      boost::endian::endian<boost::spirit::endian::endianness::big, typename attribute<Context>::type, 24> p;
+
 
 #if defined(BOOST_MSVC)
       // warning C4244: 'argument' : conversion from 'const int' to 'foo', possible loss of data

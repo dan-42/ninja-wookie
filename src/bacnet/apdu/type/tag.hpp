@@ -24,7 +24,7 @@
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-
+#include <bacnet/apdu/type/detail/helper.hpp>
 
 
 namespace bacnet { namespace apdu {  namespace type {
@@ -52,7 +52,6 @@ enum class  application_tag : uint8_t {
 
 struct tag {
 
-    using application_tag;
 
     uint32_t length_value_type_;
     bool is_context_tag_;

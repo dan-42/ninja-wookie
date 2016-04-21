@@ -24,34 +24,13 @@
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/service/service/i_am.hpp>
 
-#include <bacnet/apdu/type/tag.hpp>
-#include <bacnet/apdu/type/unsigned_integer.hpp>
-#include <bacnet/apdu/type/object_identifier.hpp>
-#include <bacnet/apdu/type/enumeration.hpp>
-#include <bacnet/apdu/type/unsigned_integer_generator.hpp>
-#include <bacnet/apdu/type/object_identifier_generator.hpp>
-#include <bacnet/apdu/type/enumaration_grammar.hpp>
-#include <bacnet/apdu/type/detail/helper.hpp>
-
-
-
-
-
-
-
-
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <bacnet/apdu/detail/boost/uint24_parser.hpp>
-#include <bacnet/apdu/detail/boost/uint24_generator.hpp>
-
-#include <bacnet/apdu/type/unsigned_integer.hpp>
-#include <bacnet/apdu/type/tag.hpp>
-
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
 
 namespace bacnet { namespace  service { namespace service { namespace detail { namespace parser {
 
@@ -59,7 +38,6 @@ using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
 
-using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
 using boost::phoenix::bind;
@@ -121,12 +99,7 @@ struct i_am_grammar : grammar<Iterator, i_am()> {
     }
 private:
 
-    tag& set_size(tag& t) {
-      size_ = t.length_value_type();
-      return t;
-    }
 
-    uint32_t size_;
 };
 
 }}}}}
