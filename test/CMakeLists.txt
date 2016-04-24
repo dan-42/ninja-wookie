@@ -1,1 +1,2 @@
+project(test_wookie)
 add_subdirectory(unit_tests)

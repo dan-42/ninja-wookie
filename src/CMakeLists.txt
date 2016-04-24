@@ -15,6 +15,7 @@
 # Set minimum version of CMake. Since command 'project' use
 cmake_minimum_required(VERSION 3.2)
 
+
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Debug prior to calling PROJECT()
@@ -24,6 +25,9 @@ IF(DEFINED CMAKE_BUILD_TYPE)
 ELSE()
     SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the types of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release" )
 ENDIF()
+
+
+
 
 list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -std=c++14 

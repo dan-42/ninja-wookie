@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
 
-
 ### Hunter snapshot that will be used ###
 include("cmake/HunterGate.cmake")
 HunterGate(
@@ -11,12 +10,6 @@ HunterGate(
         SHA1 "db065c2f01e15d27207f9a3f37799b5b435f4c11"
 )
 
-####
-# Set variables:
-#   * PROJECT_NAME
-#   * PROJECT_VERSION
-project(wookie VERSION 0.0.1)
-
 
 #SET (CMAKE_C_COMPILER       "/usr/bin/clang")    
 #SET (CMAKE_CXX_COMPILER     "/usr/bin/clang++")
@@ -25,6 +18,13 @@ project(wookie VERSION 0.0.1)
 #SET (CMAKE_AR      "/home/dan/bin/ar")
 #SET (CMAKE_NM      "/home/dan/bin/nm")
 #SET (CMAKE_RANLIB  "/home/dan/bin/ranlib")
+
+
+####
+# Set variables:
+#   * PROJECT_NAME
+#   * PROJECT_VERSION
+project(wookie VERSION 0.0.1)
 
 add_subdirectory(src)
 add_subdirectory(example)
