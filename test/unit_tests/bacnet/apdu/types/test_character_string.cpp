@@ -24,24 +24,14 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/character_string.hpp>
-#include <bacnet/apdu/type/character_string_generator.hpp>
 #include <bacnet/apdu/type/detail/character_string_grammar.hpp>
 
 
 bool is_equal(const bacnet::apdu::type::character_string& a, const bacnet::apdu::type::character_string& b) {
-  if(a.encoding_ != b.encoding_) {
+  if(a.encoding != b.encoding) {
     return false;
   }
-  if(a.value_.compare(b.value_) != 0) {
-    return false;
-  }
-  if(a.tag_.number() != b.tag_.number()) {
-    return false;
-  }
-  if(a.tag_.is_context_tag() != b.tag_.is_context_tag()) {
-    return false;
-  }
-  if(a.tag_.length_value_type() != b.tag_.length_value_type()) {
+  if(a.value.compare(b.value) != 0) {
     return false;
   }
   return true;
@@ -62,8 +52,6 @@ BOOST_AUTO_TEST_SUITE( apdu_type_character_string )
 
 BOOST_AUTO_TEST_CASE( test_case1 ) {
 
-
-    bacnet::apdu::type::tag tag;
     bacnet::apdu::type::character_string character_string_to_generate;
     bacnet::apdu::type::character_string character_string_parsed;
 
@@ -71,11 +59,11 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     bacnet::binary_data generation_expected;
 
 
-    std::string string_to_generate("Français");
-
     generation_expected.push_back(0x75); //tag
     generation_expected.push_back(0x0a); //extended length
+
     generation_expected.push_back(0x00); //encoding
+
     generation_expected.push_back(0x46); //string
     generation_expected.push_back(0x72);
     generation_expected.push_back(0x61);
@@ -85,20 +73,32 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     generation_expected.push_back(0x61);
     generation_expected.push_back(0x69);
     generation_expected.push_back(0x73);
-    tag.is_context_tag(false);
-    tag.number(7);
-    tag.length_value_type(string_to_generate.size()+1);
 
-    character_string_to_generate.tag_ = tag;
-    character_string_to_generate.encoding_ = bacnet::apdu::type::string_encoding_type::iso_10646_utf_8;
-    character_string_to_generate.value_ = string_to_generate;
+    character_string_to_generate.encoding = bacnet::apdu::type::string_encoding_type::iso_10646_utf_8;
+    character_string_to_generate.value    = std::string {"Français"};
 
 
-    generated = bacnet::apdu::type::generate(character_string_to_generate);
+
+    std::back_insert_iterator <bacnet::binary_data> sink(generated);
+
+    bacnet::apdu::type::detail::generator::character_string_grammar<decltype(sink)> grammar_gen;
+    bool success_generating = boost::spirit::karma::generate(sink, grammar_gen, character_string_to_generate );
+    BOOST_TEST(success_generating, " failed to generate data");
+
+    bacnet::print(generated);
+
+    auto start = generated.begin();
+    auto end = generated.end();
+    bacnet::apdu::type::detail::parser::character_string_grammar<decltype(start)> grammar_parse;
+    auto success_parsing = boost::spirit::qi::parse(start, end, grammar_parse, character_string_parsed);
+    BOOST_TEST(success_parsing, " failed parsing data");
+
+
 
     BOOST_TEST(is_equal(generation_expected, generated), "fail tag generation failed");
-    BOOST_TEST(bacnet::apdu::type::parse(generated, character_string_parsed), "fail parse simple tag");
     BOOST_TEST(is_equal(character_string_to_generate, character_string_parsed), "failed parsed is not expected");
+
+    std::cout << "parsed string " << character_string_parsed.value << std::endl;
 
   }
 

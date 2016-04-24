@@ -26,7 +26,7 @@
 
 int main(int argc, char *argv[]) {
   try {
-    uint16_t    doi{1};
+    uint16_t    doi{0};
     uint16_t    port{0xBAC0};
     std::string ip{"0.0.0.0"};
 
@@ -72,30 +72,29 @@ int main(int argc, char *argv[]) {
 
     std::cout
     << "sending who is to "
-    << " doi: "     << doi
+    //<< " doi: "     << doi
     << " on " << ip << ":"  << port
     << std::endl;
 
     boost::asio::io_service io_service;
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port};
+    bacnet::config config;
+    config.send_i_am_frames = false;
+    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
-    service_controller.async_receive([](const bacnet::service::i_am &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi){
+    service_controller.async_receive([&](const bacnet::service::i_am &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi){
     	//std::cout << service << std::endl;
     });
 
 
-    //bacnet::common::object_identifier device_id{bacnet::object_type::device, 2};
+    service_controller.start();
     bacnet::service::service::who_is wi;
 
-    service_controller.async_send(wi, []
+    service_controller.async_send(wi, [&]
                  (const boost::system::error_code &ec){
                     std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
                  }
     );
-
-
-    service_controller.start();
 
     io_service.run();
   }

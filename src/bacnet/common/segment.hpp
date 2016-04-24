@@ -54,27 +54,29 @@ namespace bacnet { namespace common {
         segmented_ = s;
       }
 
-      inline void from_native(const underlying_type& seg_value) {
-        segmented_ = segment::none;
+      static inline segmentation from_native(const underlying_type& seg_value) {
+        segmentation seg{segment::none};
+
         switch(static_cast<segment>(seg_value)) {
           case segment::both :
-            segmented_ = segment::both;
+            seg.segmented(segment::both);
             break;
           case segment::transmit :
-            segmented_ = segment::transmit;
+            seg.segmented(segment::transmit);
             break;
           case segment::receive :
-            segmented_ = segment::receive;
+            seg.segmented(segment::receive);
             break;
           case segment::none :
-            segmented_ = segment::none;
+            seg.segmented(segment::none);
             break;
         }
+        return seg;
 
       }
 
-      inline underlying_type to_native() const {
-        return static_cast<underlying_type>(segmented_);
+      static inline underlying_type to_native(const segmentation& seg_value)  {
+        return static_cast<underlying_type>(seg_value.segmented());
       }
 
 

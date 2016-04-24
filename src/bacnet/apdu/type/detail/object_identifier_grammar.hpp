@@ -41,8 +41,6 @@ using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
 using boost::phoenix::bind;
 
-using boost::spirit::repository::qi::big_24word;
-
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
 using bacnet::common::object_identifier;
@@ -52,9 +50,7 @@ template<typename Iterator>
 struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
 
 
-    rule<Iterator, object_identifier()>          start_rule;
-    rule<Iterator, tag()>               tag_rule;
-    rule<Iterator, tag()>               tag_lower_rule;
+    rule<Iterator, object_identifier()> start_rule;
     rule<Iterator >                     tag_validation_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
@@ -77,43 +73,26 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
 private:
 
     inline void setup() {
-      start_rule  = tag_validation_rule >> value_rule ;
+      start_rule  =  tag_validation_rule
+                  >> value_rule ;
 
-           tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&object_identifier_grammar::set_size, this, _1)] ;
-
-
-           tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&object_identifier_grammar::is_as_expected, this) == true );
-
-           value_rule  = big_dword;
-
-           tag_lower_rule = tag_grammar_;
-
-           start_rule.name("start_rule");
-           tag_rule.name("tag_rule");
-           tag_lower_rule.name("tag_lower_rule");
-           value_rule.name("value_rule");
-
-     /*
-           debug(start_rule);
-           debug(tag_rule);
-           debug(tag_lower_rule);
-           debug(value_rule);
-     //*/
+      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&object_identifier_grammar::check_tag, this, _1) == true ];
+      value_rule  = big_dword;
+      start_rule.name("start_rule");
+      tag_validation_rule.name("tag_validation_rule");
+      value_rule.name("value_rule");
+      //
+      /*
+      debug(start_rule);
+      debug(tag_validation_rule);
+      debug(value_rule);
+      //*/
     }
 
-    /**
-     * using separate size value, as  accessing complex type
-     * does somehow not work here with spirit
-     */
-    tag& set_size(tag& t) {
-      tag_ = t;
-      size_ = t.length_value_type();
-      return t;
-    }
-
-    bool is_as_expected() {
-      if(   tag_.is_context_tag_ == is_expecting_context_tag_
-         && tag_.number()  == tag_number_expected_ ) {
+    bool check_tag(tag& t) {
+      if(   t.is_context_tag()    == is_expecting_context_tag_
+         && t.number()            == tag_number_expected_
+         && t.length_value_type() == 4) {
         return true;
       }
       else {
@@ -151,8 +130,9 @@ template<typename Iterator>
 struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
 
     rule<Iterator, object_identifier()>   start_rule;
-    rule<Iterator, uint32_t()>   tag_rule;
-    rule<Iterator, uint32_t()>   value_rule;
+    rule<Iterator, object_identifier()>   extract_rule;
+    rule<Iterator>                        tag_rule;
+    rule<Iterator>                        value_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
@@ -167,10 +147,15 @@ private:
 
     void setup () {
 
-      start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
-      tag_rule = eps[boost::phoenix::bind(&object_identifier_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
+      start_rule    = extract_rule
+                    << tag_rule
+                    << value_rule;
 
-      value_rule  = big_dword;
+      extract_rule  = eps[boost::phoenix::bind(&object_identifier_grammar::extract, this, _val)];
+
+      tag_rule      = tag_grammar_[_1 = ref(tag_)];
+
+      value_rule    = big_dword[ _1 = ref(value_)];
 
       start_rule.name("start_rule");
       tag_rule.name("tag_rule");
@@ -183,14 +168,14 @@ private:
       */
     }
 
-    bool extract_size(const uint32_t &unsigned_value) {
-      size_ = bacnet::apdu::type::detail::length_helper(unsigned_value);
-      tag_.length_value_type(size_);
+    bool extract(const object_identifier &v) {
+      value_ = v.to_native();
+      auto size = bacnet::apdu::type::detail::length_helper(value_);
+      tag_.length_value_type(size);
       return true;
     }
 
-
-    uint8_t size_;
+    uint32_t value_;
     tag tag_;
 };
 

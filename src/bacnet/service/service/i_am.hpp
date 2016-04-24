@@ -38,9 +38,9 @@ namespace bacnet { namespace service { namespace service {
 
 struct i_am {
     bacnet::common::object_identifier i_am_device_identifier;
-    uint32_t                        max_apdu_length_accepted;
-    bacnet::common::segmentation    segmentation_supported;
-    uint16_t                        vendor_id;
+    uint32_t                          max_apdu_length_accepted;
+    bacnet::common::segmentation      segmentation_supported;
+    uint16_t                          vendor_id;
 };
 
 static inline std::ostream& operator<<(std::ostream& os, const i_am& s) {

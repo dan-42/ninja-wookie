@@ -83,16 +83,15 @@ int main(int argc, char *argv[]) {
     << std::endl;
 
     boost::asio::io_service io_service;
-
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port};
+    bacnet::config config;
+    config.send_i_am_frames = false;
+    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
     bacnet::common::object_identifier device_id{bacnet::object_type::device, 2};
     bacnet::service::service::reinitialize_device reinitd{state, password};
 
     service_controller.start();
-
-
 
 
     service_controller.async_send(device_id, reinitd, [&]

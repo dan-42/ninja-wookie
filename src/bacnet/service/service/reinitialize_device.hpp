@@ -22,26 +22,52 @@
 
 
 #include <cstdint>
-
-#include <boost/fusion/include/define_struct.hpp>
+#include <boost/optional.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <bacnet/apdu/type/character_string.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-  (bacnet)(service)(service), reinitialize_device,
-  (uint32_t, reinitialize_state_of_device)
-  (std::string, passowrd)
+
+namespace bacnet { namespace service { namespace service {
+  struct reinitialize_device {
+
+    reinitialize_device() = default;
+
+    reinitialize_device(uint32_t state) :  reinitialize_state_of_device(state){
+
+    }
+
+    reinitialize_device(uint32_t state, bacnet::apdu::type::character_string pw ) :  reinitialize_state_of_device(state), password(pw){
+
+    }
+
+    reinitialize_device(uint32_t state, std::string pw ) :  reinitialize_state_of_device(state), password(pw){
+
+    }
+
+
+    uint32_t reinitialize_state_of_device{0};
+    boost::optional<bacnet::apdu::type::character_string> password;
+  };
+
+}}}
+
+BOOST_FUSION_ADAPT_STRUCT(
+  bacnet::service::service::reinitialize_device,
+  reinitialize_state_of_device,
+  password
 )
 
 
 namespace bacnet { namespace service { namespace service {
   namespace reinitialized_state_of_device {
-      uint32_t coldstart    = 0;
-      uint32_t warmstart    = 1;
-      uint32_t startbackup  = 2;
-      uint32_t endbackup    = 3;
-      uint32_t startrestore = 4;
-      uint32_t endrestore   = 5;
-      uint32_t abortrestore = 6;
+    static constexpr  uint32_t coldstart    = 0;
+    static constexpr  uint32_t warmstart    = 1;
+    static constexpr  uint32_t startbackup  = 2;
+    static constexpr  uint32_t endbackup    = 3;
+    static constexpr  uint32_t startrestore = 4;
+    static constexpr  uint32_t endrestore   = 5;
+    static constexpr  uint32_t abortrestore = 6;
   }
 }}}
 
@@ -55,9 +81,6 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     typedef reinitialize_device type;
   };
 
-  template<>
-  struct is_broadcast_service<reinitialize_device> : std::false_type {
-  };
 
 }}}}
 

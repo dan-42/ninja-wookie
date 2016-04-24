@@ -42,11 +42,10 @@ public:
   }
 
   template<typename T>
-  void operator()(T& t) {
-    T copy = t;
+  void operator()(T t) {
       bacnet::common::protocol::meta_information mi;
       mi.address = sender_endpoint_;
-      callback_manager_.invoke_callback(copy, mi);
+      callback_manager_.invoke_callback(std::move(t), std::move(mi));
   }
 
   void sender_endpoint(const bacnet::common::protocol::mac::address& sender_endpoint) {

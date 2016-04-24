@@ -23,14 +23,35 @@
 
 #include <cstdint>
 
-#include <boost/fusion/include/define_struct.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/optional.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 
-BOOST_FUSION_DEFINE_STRUCT(
-  (bacnet)(service)(service), who_is,
-  (boost::optional<uint32_t>, device_instance_range_low_limit)
-  (boost::optional<uint32_t>, device_instance_range_high_limit)
+namespace bacnet { namespace service { namespace service {
+struct who_is {
+
+  who_is() = default;
+
+  who_is(uint32_t device_instance) :  device_instance_range_low_limit(device_instance),
+                                      device_instance_range_high_limit(device_instance) {
+  }
+
+  who_is(uint32_t device_instance_low, uint32_t device_instance_high) : device_instance_range_low_limit(device_instance_low),
+                                                                        device_instance_range_high_limit(device_instance_high) {
+  }
+
+  boost::optional<uint32_t> device_instance_range_low_limit;
+  boost::optional<uint32_t> device_instance_range_high_limit;
+
+};
+
+}}}
+
+
+BOOST_FUSION_ADAPT_STRUCT(
+  bacnet::service::service::who_is,
+  device_instance_range_low_limit,
+  device_instance_range_high_limit
 )
 
 

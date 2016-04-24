@@ -56,8 +56,6 @@ struct enumeration_grammar : grammar<Iterator, uint32_t()> {
 
 
     rule<Iterator, uint32_t()>          start_rule;
-    rule<Iterator, tag()>               tag_rule;
-    rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator >                     tag_validation_rule;
     rule<Iterator, uint32_t()>          value_rule;
 
@@ -80,23 +78,18 @@ struct enumeration_grammar : grammar<Iterator, uint32_t()> {
 private:
 
     inline void setup() {
-      start_rule  = tag_validation_rule >> value_rule ;
+      start_rule  =  tag_validation_rule
+                  >> value_rule ;
 
-           tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&enumeration_grammar::set_size, this, _1)] ;
-
-
-           tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&enumeration_grammar::is_as_expected, this) == true );
+           tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::check_tag, this, _1) == true ];
 
            value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
                        | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
                        | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
                        | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
 
-           tag_lower_rule = tag_grammar_;
 
            start_rule.name("start_rule");
-           tag_rule.name("tag_rule");
-           tag_lower_rule.name("tag_lower_rule");
            value_rule.name("value_rule");
 
      /*
@@ -107,27 +100,16 @@ private:
      //*/
     }
 
-    /**
-     * using separate size value, as  accessing complex type
-     * does somehow not work here with spirit
-     */
-    tag& set_size(tag& t) {
-      tag_ = t;
+    bool check_tag(tag& t) {
       size_ = t.length_value_type();
-      return t;
-    }
-
-    bool is_as_expected() {
-      if(   tag_.is_context_tag_ == is_expecting_context_tag_
-         && tag_.number()  == tag_number_expected_ ) {
+      if(   t.is_context_tag() == is_expecting_context_tag_
+         && t.number()         == tag_number_expected_ ) {
         return true;
       }
       else {
         return false;
       }
     }
-
-    tag tag_;
     uint32_t size_{0};
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};

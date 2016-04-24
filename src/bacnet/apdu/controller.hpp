@@ -150,6 +150,7 @@ struct controller {
   void async_received_apdu_handler(bacnet::npdu::frame_body::apdu apdu, bacnet::common::protocol::meta_information meta_info) {
     auto data = apdu.data;
     frame::possible_frame f = frame::parser::parse(std::move(data));
+    //std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
     inbound_router_.meta_information(std::move(meta_info));
     f.apply_visitor(inbound_router_);
 

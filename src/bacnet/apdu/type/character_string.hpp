@@ -22,7 +22,7 @@
 #define NINJA_WOOKIE_BACNET_APDU_TYPE_CHARACTER_STRING_HPP
 
 #include <cstdint>
-#include <boost/fusion/include/define_struct.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/apdu/type/tag.hpp>
 
 
@@ -42,14 +42,31 @@ namespace bacnet { namespace apdu { namespace type {
         return os;
       }
 
+
+      struct character_string {
+
+        character_string() = default;
+        character_string(std::string s) : value(std::move(s)) {
+        }
+
+        character_string(string_encoding_type e, std::string s) : encoding(std::move(e)), value(std::move(s)) {
+
+        }
+
+
+        string_encoding_type encoding{string_encoding_type::iso_10646_utf_8};
+        std::string value;
+      };
+
 }}}
 
-BOOST_FUSION_DEFINE_STRUCT(
-    (bacnet)(apdu)(type), character_string,
-    (bacnet::apdu::type::tag, tag_)
-    (bacnet::apdu::type::string_encoding_type, encoding_)
-    (std::string, value_)
-)
+
+
+BOOST_FUSION_ADAPT_STRUCT(
+    bacnet::apdu::type::character_string,
+    encoding,
+    value
+);
 
 namespace bacnet { namespace apdu { namespace type {
 

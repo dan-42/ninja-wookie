@@ -24,15 +24,7 @@
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/service/service/who_is.hpp>
 
-#include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
-
-#include <bacnet/apdu/type/detail/helper.hpp>
-
-#include <bacnet/service/service/detail/service_grammar.hpp>
-
-
-
 
 namespace bacnet { namespace service { namespace service { namespace detail {
 
@@ -45,39 +37,41 @@ namespace parser {
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
-using namespace boost::phoenix;
-
-using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
-using boost::spirit::qi::_1;
-using boost::phoenix::bind;
-
-using boost::spirit::repository::qi::big_24word;
-
 using bacnet::apdu::type::detail::parser::unsigned_integer_grammar;
 
 
 
 
 template<typename Iterator>
-struct who_is_grammar : grammar<Iterator, service::who_is> {
+struct who_is_grammar : grammar<Iterator, service::who_is()> {
 
 
   rule<Iterator, service::who_is()>  start_rule;
 
-  rule<Iterator, boost::optional<uint32_t>>  low_limit_rule;
-  rule<Iterator, boost::optional<uint32_t>>  height_limit_rule;
+  rule<Iterator, boost::optional<uint32_t>()>  low_limit_rule;
+  rule<Iterator, boost::optional<uint32_t>()>  height_limit_rule;
 
-  unsigned_integer_grammar tag_0_rule_(0);
-  unsigned_integer_grammar tag_1_rule_(1);
+  unsigned_integer_grammar<Iterator> tag_0_rule_{0};
+  unsigned_integer_grammar<Iterator> tag_1_rule_{1};
 
 
   who_is_grammar() : who_is_grammar::base_type(start_rule) {
 
-    start_rule        = low_limit_rule ^ height_limit_rule;
-    low_limit_rule    = tag_0_rule_;
-    height_limit_rule = tag_1_rule_;
+    start_rule        =  byte_(service_choice<service::who_is>::value)
+                      >> low_limit_rule
+                      >> height_limit_rule;
+
+    low_limit_rule    = -tag_0_rule_;
+    height_limit_rule = -tag_1_rule_;
+    start_rule.name("start_rule");
+    low_limit_rule.name("low_limit_rule");
+    height_limit_rule.name("height_limit_rule");
+    /*debug(start_rule);
+    debug(low_limit_rule);
+    debug(height_limit_rule);*/
   }
+
 
 };
 
@@ -91,38 +85,35 @@ namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
-using namespace boost::phoenix;
-
-using boost::spirit::karma::bit_field;
 using boost::spirit::karma::rule;
-using boost::spirit::karma::_1;
-using boost::phoenix::bind;
-
-using boost::spirit::repository::karma::big_24word;
-
-using bacnet::apdu::type::detail::parser::unsigned_integer_grammar;
 
 
-
+using bacnet::apdu::type::detail::generator::unsigned_integer_grammar;
 
 template<typename Iterator>
-struct who_is_grammar : grammar<Iterator, service::who_is> {
+struct who_is_grammar : grammar<Iterator, service::who_is()> {
 
 
   rule<Iterator, service::who_is()>  start_rule;
 
-  rule<Iterator, boost::optional<uint32_t>>  low_limit_rule;
-  rule<Iterator, boost::optional<uint32_t>>  height_limit_rule;
+  rule<Iterator, boost::optional<uint32_t>()>  low_limit_rule;
+  rule<Iterator, boost::optional<uint32_t>()>  height_limit_rule;
 
-  unsigned_integer_grammar tag_0_rule_(0);
-  unsigned_integer_grammar tag_1_rule_(1);
+
+  unsigned_integer_grammar<Iterator> tag_0_rule_{0};
+  unsigned_integer_grammar<Iterator> tag_1_rule_{1};
 
 
   who_is_grammar() : who_is_grammar::base_type(start_rule) {
 
-    start_rule        = (-low_limit_rule) << (-height_limit_rule);
-    low_limit_rule    = tag_0_rule_;
-    height_limit_rule = tag_1_rule_;
+    start_rule        =  byte_(service_choice<service::who_is>::value)
+                      << low_limit_rule
+                      << height_limit_rule;
+
+    low_limit_rule    = -tag_0_rule_;
+    height_limit_rule = -tag_1_rule_;
+
+
   }
 
 };

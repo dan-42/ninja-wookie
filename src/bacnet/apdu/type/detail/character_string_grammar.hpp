@@ -55,39 +55,70 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
 
 
   rule<Iterator, character_string()>                    start_rule;
+  rule<Iterator >                                       tag_validation_rule;
   rule<Iterator, tag()>                                 tag_rule;
+  rule<Iterator, character_string()>                    value_rule;
   rule<Iterator, string_encoding_type()>                encoding_rule;
   rule<Iterator, std::string()>                         string_rule;
 
   tag_grammar<Iterator> tag_grammar_;
 
-  character_string_grammar() : character_string_grammar::base_type(start_rule), size_(0) {
+  character_string_grammar() : character_string_grammar::base_type(start_rule),
+                              tag_(application_tag::character_string),
+                              size_(0),
+                              tag_number_expected_(tag_.number()),
+                              is_expecting_context_tag_(tag_.is_context_tag_)  {
+    setup();
+  }
 
-    start_rule  = tag_rule >> encoding_rule >> string_rule ;
+  character_string_grammar(uint8_t tag) : character_string_grammar::base_type(start_rule),
+                                          tag_(tag, true),
+                                          size_(0),
+                                          tag_number_expected_(tag_.number()),
+                                          is_expecting_context_tag_(tag_.is_context_tag_) {
+    setup();
+  }
 
-    tag_rule = tag_grammar_[_val = boost::phoenix::bind(&character_string_grammar::set_size, this, _1)];
+
+private:
+
+  void setup() {
+    start_rule  =  tag_validation_rule
+                >> value_rule ;
+
+
+    value_rule  =  encoding_rule
+                >> string_rule ;
+
+
+
+    tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&character_string_grammar::is_as_expected, this) == true );
+
+    tag_rule = tag_grammar_[_val = boost::phoenix::bind(&character_string_grammar::set_size, this, _1)] ;
+
 
     encoding_rule =  byte_[ _val = boost::phoenix::bind(&character_string_grammar::to_encoding_type, this, _1)];
 
     string_rule  = repeat(ref(size_))[byte_];
 
-    start_rule.name("start_rule");
-    tag_rule.name("tag_rule");
-    encoding_rule.name("encoding_rule");
-    string_rule.name("string_rule");
+
+    start_rule.           name("start_rule");
+    tag_validation_rule.  name("tag_validation_rule");
+    tag_rule.             name("tag_rule");
+    value_rule.           name("value_rule");
+    encoding_rule.        name("encoding_rule");
+    string_rule.          name("string_rule");
+
+
     //
     /*
     debug(start_rule);
+    debug(tag_validation_rule);
     debug(tag_rule);
+    debug(value_rule);
     debug(encoding_rule);
     debug(string_rule);
     // */
-  }
-private:
-
-  tag& set_size(tag& t) {
-    size_ = t.length_value_type() -1;
-    return t;
   }
 
   string_encoding_type to_encoding_type(const uint8_t& underlying_value) {
@@ -95,7 +126,31 @@ private:
     return enum_value;
   }
 
-  uint32_t size_;
+
+  /**
+   * using separate size value, as  accessing complex type
+   * does somehow not work here with spirit
+   */
+  tag& set_size(tag& t) {
+   tag_ = t;
+   size_ = t.length_value_type() -1;
+   return t;
+  }
+
+  bool is_as_expected() {
+    if(   tag_.is_context_tag_ == is_expecting_context_tag_
+       && tag_.number()  == tag_number_expected_ ) {
+     return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  tag tag_;
+  uint32_t size_{0};
+  uint8_t tag_number_expected_{0};
+  bool is_expecting_context_tag_{false};
 
 };
 
@@ -119,17 +174,35 @@ template<typename Iterator>
 struct character_string_grammar : grammar<Iterator, character_string()> {
 
   rule<Iterator, character_string()>                    start_rule;
-  rule<Iterator, tag()>                                 tag_rule;
+  rule<Iterator, character_string()>                    tag_rule;
+  rule<Iterator, character_string()>                    value_rule;
   rule<Iterator, string_encoding_type()>                encoding_rule;
   rule<Iterator, std::string()>                         string_rule;
 
   tag_grammar<Iterator> tag_grammar_;
 
-  character_string_grammar() : character_string_grammar::base_type(start_rule) {
+  character_string_grammar() : character_string_grammar::base_type(start_rule),
+                              size_(0),
+                              tag_(application_tag::character_string) {
+    setup();
+  }
 
-    start_rule  = tag_rule << encoding_rule << string_rule ;
+  character_string_grammar(uint8_t tag) : character_string_grammar::base_type(start_rule),
+                                        size_(0),
+                                        tag_(tag, true) {
+    setup();
+  }
+private:
 
-    tag_rule = eps[boost::phoenix::bind(&character_string_grammar::extract_size, this, _val)] << tag_grammar_[_1 = _val];
+  void setup() {
+    start_rule  =  tag_rule[_1 = _val]
+                << value_rule[_1 = _val];
+
+    tag_rule = tag_grammar_[ _1 = boost::phoenix::bind(&character_string_grammar::get_tag, this, _val)];
+
+
+    value_rule =  encoding_rule
+               << string_rule;
 
     encoding_rule = byte_[ _1 = boost::phoenix::bind(&character_string_grammar::from_encoding_type, this, _val)];
 
@@ -147,17 +220,19 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
     debug(string_rule);
     // */
   }
-private:
 
-  void extract_size(const tag &tag_) {
-    size_ = tag_.length_value_type() -1;
-  }
+  tag get_tag(const character_string &char_string) {
+     size_ = char_string.value.size();
+     tag_.length_value_type(size_+1);
+     return tag_;
+   }
 
   uint8_t from_encoding_type(const string_encoding_type& enum_value) {
     return static_cast<uint8_t>(enum_value);
   }
 
   uint8_t size_;
+  tag tag_;
 };
 
 }}}}}

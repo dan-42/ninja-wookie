@@ -70,7 +70,7 @@ struct factory<ip_v4> {
                service_controller(ios, apdu_controller, c) {
     }
 
-  detail::ip_v4::service_controller_t &controller() {
+  detail::ip_v4::service_controller_t & controller() {
     return service_controller;
   }
 

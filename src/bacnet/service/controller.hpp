@@ -37,9 +37,8 @@
 #include <bacnet/service/detail/inbound_router.hpp>
 
 #include <bacnet/service/service.hpp>
-#include <bacnet/service/service/detail/who_is_grammar.hpp>
-#include <bacnet/service/service/detail/i_am_garmmar.hpp>
-#include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
+
+#include <bacnet/service/service/detail/service_grammar.hpp>
 #include <bacnet/common/configuration.hpp>
 
 #include <bacnet/apdu/api.hpp>
@@ -57,87 +56,14 @@
  */
 
 
-
-
-
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
   static inline unconfirmed::possible_service parse(bacnet::apdu::frame::unconfirmed_request& frame) {
-    unconfirmed::possible_service parsed_service{};
-    auto &data = frame.service_data;
-    //todo make it nice and clean with boost spirit
-    if(!data.empty()) {
-      if(data.front() == uncomfirmed_service::who_is) {
-        //std::cout << "unconfirmed::possible_service parse who_is " << std::endl;
-        who_is service_;
-        if(bacnet::service::service::detail::parse(data , service_)) {
-          parsed_service = service_;
-        }
-        else {
-          std::cout << "unconfirmed::possible_service parse who_is failed" << std::endl;
-        }
-      }
-      else if(data.front() == uncomfirmed_service::i_am) {
-        //std::cout << "unconfirmed::possible_service parse i_am " << std::endl;
-        i_am service_;
-        if(bacnet::service::service::detail::parse(data , service_)){
-          parsed_service = service_;
-        }
-        else {
-          std::cout << "unconfirmed::possible_service parse i_am failed" << std::endl;
-        }
-      }
-      else {
-        std::cout << "unconfirmed::possible_service parse undefined " << std::endl;
-        bacnet::print(data);
-      }
-    }
-    else {
-      std::cout << "unconfirmed::possible_service parse data empty " << std::endl;
-    }
-
-    return parsed_service;
+    return parse_unconfirmed(frame.service_data);
   }
-
-
-  using namespace bacnet::service;
-    static inline confirmed::possible_service parse(bacnet::apdu::frame::confirmed_request& frame) {
-      confirmed::possible_service parsed_service{};
-      auto &data = frame.service_data;
-      //todo make it nice and clean with boost spirit
-      if(!data.empty()) {
-        if(data.front() == uncomfirmed_service::who_is) {
-          //std::cout << "unconfirmed::possible_service parse who_is " << std::endl;
-          who_is service_;
-          if(bacnet::service::service::detail::parse(data , service_)) {
-            parsed_service = service_;
-          }
-          else {
-            std::cout << "unconfirmed::possible_service parse who_is failed" << std::endl;
-          }
-        }
-        else if(data.front() == uncomfirmed_service::i_am) {
-          //std::cout << "unconfirmed::possible_service parse i_am " << std::endl;
-          i_am service_;
-          if(bacnet::service::service::detail::parse(data , service_)){
-            parsed_service = service_;
-          }
-          else {
-            std::cout << "unconfirmed::possible_service parse i_am failed" << std::endl;
-          }
-        }
-        else {
-          std::cout << "unconfirmed::possible_service parse undefined " << std::endl;
-          bacnet::print(data);
-        }
-      }
-      else {
-        std::cout << "unconfirmed::possible_service parse data empty " << std::endl;
-      }
-
-      return parsed_service;
-    }
-
+  static inline confirmed::possible_service parse(bacnet::apdu::frame::confirmed_request& frame) {
+    return parse_confirmed(frame.service_data);
+  }
 
 }}}}
 
@@ -159,27 +85,21 @@ public:
                 timeout_timer_(io_service_),
                 inbound_router_(callback_manager_, device_manager_),
                 device_object_identifier_(bacnet::object_type::device, config.device_object_id),
-                config_(config){
-
-
+                config_(config) {
   }
 
   void start() {
     lower_layer_.register_callbacks(
         [this](bacnet::apdu::frame::unconfirmed_request request,  boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
-          std::cout << "bacnet::service::controller received unconfirmed_request " << std::endl;
-
-          //parse and visitor for unconfirmed
-          inbound_router_.meta_information(std::move(mi));
-          auto f = bacnet::service::service::detail::parse(request);
-           f.apply_visitor(inbound_router_);
-
-          },
-        [this](bacnet::apdu::frame::confirmed_request request,  boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
-            std::cout << "bacnet::service::controller received confirmed_request " << std::endl;
             inbound_router_.meta_information(std::move(mi));
             auto f = bacnet::service::service::detail::parse(request);
-             f.apply_visitor(inbound_router_);
+            f.apply_visitor(inbound_router_);
+            //parse and visitor for unconfirmed
+          },
+        [this](bacnet::apdu::frame::confirmed_request request,  boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
+            inbound_router_.meta_information(std::move(mi));
+            auto f = bacnet::service::service::detail::parse(request);
+            f.apply_visitor(inbound_router_);
             //parse and visitor for confirmed
           }
     );
@@ -196,12 +116,12 @@ public:
                                     };
       callback_manager_.add_who_is_service_callback([this](bacnet::service::who_is service, boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
         if(!ec)
-          if(  (     service.device_instance_range_low_limit  == 0
-                  && service.device_instance_range_high_limit == 0
+          if(  (     !service.device_instance_range_low_limit
+                  && !service.device_instance_range_high_limit
                )
                 ||
-               (     this->config_.device_object_id >= service.device_instance_range_low_limit
-                  && this->config_.device_object_id <= service.device_instance_range_high_limit
+               (     this->config_.device_object_id >= service.device_instance_range_low_limit.value()
+                  && this->config_.device_object_id <= service.device_instance_range_high_limit.value()
                )) {
             this->async_send(this->i_am_message_, [](const boost::system::error_code& ec){});
         }
@@ -216,14 +136,15 @@ public:
    */
   template<typename Service, typename Handler>
   void async_send(Service &&service, Handler handler) {
-    auto data =  bacnet::service::service::detail::generate(service);
+    auto data =  bacnet::service::service::detail::generate_unconfirmed(service);
 
     if( bacnet::service::service::detail::is_broadcast_service<typename std::decay<Service>::type>::value) {
-      lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, &handler]( const boost::system::error_code& ec) {
+      lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, handler]( const boost::system::error_code& ec) {
         handler(ec);
       });
     }
     else {
+      std::cerr << "async_send() is not a broadcast frame" << std::endl;
       auto ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
       handler(ec);
     }
@@ -241,8 +162,7 @@ public:
    */
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::address address, Service&& service, Handler handler) {
-    auto data =  bacnet::service::service::detail::generate(std::move(service));
-
+    auto data =  bacnet::service::service::detail::generate_confirmed(std::move(service));
     lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
                                                                        ( const boost::system::error_code& ec,
                                                                                bacnet::apdu::frame::possible_confirmed_respons frame,

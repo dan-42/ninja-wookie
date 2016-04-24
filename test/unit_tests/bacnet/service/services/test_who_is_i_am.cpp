@@ -217,8 +217,8 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
       ::bacnet::common::protocol::mac::address expected_adr(::bacnet::common::protocol::mac::address_ip::from_native(send_ep));
       BOOST_ASSERT_MSG(mi.address == expected_adr, " Error mac address  wrong");
 
-      BOOST_ASSERT_MSG(service.device_instance_range_high_limit == 0 , "Error range must be 0");
-      BOOST_ASSERT_MSG(service.device_instance_range_low_limit == 0 , "Error range must be 0");
+      BOOST_ASSERT_MSG(!service.device_instance_range_high_limit, "Error range must be 0");
+      BOOST_ASSERT_MSG(!service.device_instance_range_low_limit, "Error range must be 0");
 
     });
 

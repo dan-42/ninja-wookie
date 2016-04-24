@@ -27,7 +27,7 @@ project(wookie VERSION 0.0.1)
 #SET (CMAKE_RANLIB  "/home/dan/bin/ranlib")
 
 add_subdirectory(src)
-#add_subdirectory(example)
+add_subdirectory(example)
 add_subdirectory(test)
 
 

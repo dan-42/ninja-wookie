@@ -141,6 +141,7 @@ private:
    * called when a underlying layer received a broadcast message
    */
   void received_broadcast(bacnet::bvll::frame::original_broadcast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
+    //std::cout << "npdu::controller::received_broadcast()" << std::endl;
     auto frame = npdu::detail::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));
@@ -150,6 +151,7 @@ private:
    * called when a underlying layer received a unicast message
    */
   void received_unicast(bacnet::bvll::frame::original_unicast_npdu&& data, const bacnet::common::protocol::meta_information& mi) {
+    //std::cout << "npdu::controller::received_unicast()" << std::endl;
     auto frame = npdu::detail::parser::parse(std::move(data.npdu_data));
     inbound_router_.meta_information(mi);
     inbound_router_.route(std::move(frame));

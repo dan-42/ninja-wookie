@@ -35,9 +35,10 @@
 
 namespace bacnet { namespace service { namespace service { namespace unconfirmed {
   typedef boost::variant<
-      who_is,
-      i_am
-  > possible_service;
+                          who_is,
+                          i_am
+                        >
+          possible_service;
 
 }}}}
 
@@ -45,12 +46,11 @@ namespace bacnet { namespace service { namespace service { namespace unconfirmed
 
 namespace bacnet { namespace service { namespace service { namespace confirmed {
 
-
-
   typedef boost::variant<
-      who_is,
-      i_am
-  > possible_service;
+                            reinitialize_device,
+                            i_am
+                        >
+          possible_service;
 
 }}}}
 
