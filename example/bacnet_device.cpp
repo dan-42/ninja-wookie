@@ -91,6 +91,23 @@ int main(int argc, char *argv[]) {
          service_controller.response(mi, ack);
          */
 
+      },
+      [&](bacnet::service::read_property_request s, boost::system::error_code ec, bacnet::common::protocol::meta_information mi){
+        std::cout << "received read_property" << std::endl;
+        //xxx handle request
+        // send answer with OK or Error
+
+        /*
+        error
+        bacnet::service::error error(class, reason)
+        service_controller.response(mi, error);
+
+
+        success simple
+        bacnet::service::ack ack(s) //automatically choose service-choice by template specialization
+        service_controller.response(mi, ack);
+        */
+
       }
     );
 

@@ -106,7 +106,14 @@ namespace traits {
 template<typename Derived>
 class object : public detail::object_base {
 public:
+  /**
+   * minimum required properties by any object:
+    Object_Identifier
+    Object_Name
+    Object_Type
+    Property_List
 
+   */
   object() {
    // object_types_supported_.set(traits::supported_index<Derived>::value);
 

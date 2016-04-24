@@ -31,6 +31,7 @@
 
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
+#include <bacnet/service/service/read_property_request.hpp>
 #include <bacnet/service/service/reinitialize_device.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace unconfirmed {
@@ -48,7 +49,7 @@ namespace bacnet { namespace service { namespace service { namespace confirmed {
 
   typedef boost::variant<
                             reinitialize_device,
-                            i_am
+                            read_property_request
                         >
           possible_service;
 

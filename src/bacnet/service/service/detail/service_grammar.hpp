@@ -27,6 +27,7 @@
 
 #include <bacnet/service/service.hpp>
 #include <bacnet/service/service/detail/i_am_garmmar.hpp>
+#include <bacnet/service/service/detail/read_property_request_grammar.hpp>
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
 #include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
 
@@ -53,13 +54,13 @@ using namespace bacnet::service;
   template<typename Iterator>
   struct confirmed_service_grammar : grammar<Iterator, confirmed::possible_service()> {
     rule<Iterator, confirmed::possible_service()>   start_rule;
-    who_is_grammar<Iterator>                        who_is_grammar_;
-    i_am_grammar<Iterator>                          i_am_grammar_;
+
+    read_property_request_grammar<Iterator>                 read_property_grammar_;
     reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
     confirmed_service_grammar() : confirmed_service_grammar::base_type(start_rule) {
       start_rule  =
                      reinitialize_device_grammar_
-                  |  i_am_grammar_
+                  |  read_property_grammar_
                   ;
     }
   };
@@ -91,15 +92,13 @@ using namespace bacnet::service;
   template<typename Iterator>
   struct confirmed_service_grammar : grammar<Iterator, confirmed::possible_service()> {
     rule<Iterator,  confirmed::possible_service()>    start_rule;
-    who_is_grammar<Iterator>                          who_is_grammar_;
-    i_am_grammar<Iterator>                            i_am_grammar_;
-    reinitialize_device_grammar<Iterator>             reinitialize_device_grammar_;
+    read_property_request_grammar<Iterator>                 read_property_grammar_;
+    reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
     confirmed_service_grammar() : confirmed_service_grammar::base_type(start_rule) {
-
-      start_rule  =
-                     reinitialize_device_grammar_
-                  |  i_am_grammar_
-                  ;
+      start_rule =
+                    reinitialize_device_grammar_
+                 |  read_property_grammar_
+                 ;
     }
   };
 
