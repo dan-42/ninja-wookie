@@ -50,14 +50,15 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
     
 ELSE()
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections -flto")
+        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections")
+        #set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections -flto")
 
         list(APPEND WOOKIE_COMPILE_FLAGS
                 -fvisibility=hidden                
                 -ffunction-sections
                 -fdata-sections
-                -flto 
-                -fuse-linker-plugin                        
+            #    -flto 
+            #    -fuse-linker-plugin                        
         )
 
         
