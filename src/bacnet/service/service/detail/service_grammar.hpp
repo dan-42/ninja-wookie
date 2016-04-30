@@ -52,8 +52,8 @@ using namespace bacnet::service;
   };
 
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed::possible_service()> {
-    rule<Iterator, confirmed::possible_service()>   start_rule;
+  struct confirmed_service_grammar : grammar<Iterator, confirmed_request::possible_service()> {
+    rule<Iterator, confirmed_request::possible_service()>   start_rule;
 
     read_property_request_grammar<Iterator>                 read_property_grammar_;
     reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
@@ -90,8 +90,8 @@ using namespace bacnet::service;
     }
   };
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed::possible_service()> {
-    rule<Iterator,  confirmed::possible_service()>    start_rule;
+  struct confirmed_service_grammar : grammar<Iterator, confirmed_request::possible_service()> {
+    rule<Iterator,  confirmed_request::possible_service()>    start_rule;
     read_property_request_grammar<Iterator>                 read_property_grammar_;
     reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
     confirmed_service_grammar() : confirmed_service_grammar::base_type(start_rule) {
@@ -125,8 +125,8 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     }
     return parsed;
   }
-  confirmed::possible_service parse_confirmed(bacnet::binary_data& binary_data) {
-    confirmed::possible_service parsed{};
+  confirmed_request::possible_service parse_confirmed(bacnet::binary_data& binary_data) {
+    confirmed_request::possible_service parsed{};
     auto start = binary_data.begin();
     auto end = binary_data.end();
     bacnet::service::service::detail::parser::confirmed_service_grammar<bacnet::parse_iterator> grammar;
@@ -147,7 +147,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
      return bacnet::binary_data{};
     }
   }
-  bacnet::binary_data generate_confirmed(const confirmed::possible_service &service) {
+  bacnet::binary_data generate_confirmed(const confirmed_request::possible_service &service) {
     bacnet::binary_data data;
     bacnet::generate_iterator sink(data);
     bacnet::service::service::detail::generator::confirmed_service_grammar<bacnet::generate_iterator> grammar;

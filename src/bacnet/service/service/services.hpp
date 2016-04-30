@@ -32,7 +32,14 @@
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
 #include <bacnet/service/service/read_property_request.hpp>
+#include <bacnet/service/service/read_property_ack.hpp>
 #include <bacnet/service/service/reinitialize_device.hpp>
+
+namespace bacnet { namespace service { namespace service {
+
+  struct unused_service{};
+
+}}}
 
 namespace bacnet { namespace service { namespace service { namespace unconfirmed {
   typedef boost::variant<
@@ -45,7 +52,7 @@ namespace bacnet { namespace service { namespace service { namespace unconfirmed
 
 
 
-namespace bacnet { namespace service { namespace service { namespace confirmed {
+namespace bacnet { namespace service { namespace service { namespace confirmed_request {
 
   typedef boost::variant<
                             reinitialize_device,
@@ -55,6 +62,15 @@ namespace bacnet { namespace service { namespace service { namespace confirmed {
 
 }}}}
 
+namespace bacnet { namespace service { namespace service { namespace confirmed_response {
+
+  typedef boost::variant<
+                        unused_service,
+                        read_property_ack
+                        >
+          possible_service;
+
+}}}}
 
 
 namespace bacnet { namespace service {

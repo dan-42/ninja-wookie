@@ -61,7 +61,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   static inline unconfirmed::possible_service parse(bacnet::apdu::frame::unconfirmed_request& frame) {
     return parse_unconfirmed(frame.service_data);
   }
-  static inline confirmed::possible_service parse(bacnet::apdu::frame::confirmed_request& frame) {
+  static inline confirmed_request::possible_service parse(bacnet::apdu::frame::confirmed_request& frame) {
     return parse_confirmed(frame.service_data);
   }
 
