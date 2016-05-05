@@ -31,19 +31,19 @@ namespace bacnet { namespace apdu {  namespace type {
 
 
 enum class  application_tag : uint8_t {
-  null                     =  0,
-  boolean                  =  1,
-  unsigned_interger        =  2,
-  signed_integer           =  3, // (2's complement notation)
-  real                     =  4, //Real (ANSI/IEEE-754 floating point)
-  double_presision         =  5, //Double (ANSI/IEEE-754 double precision floating point)
-  octet_string             =  6,
-  character_string         =  7,
+    null                     =  0,
+    boolean                  =  1,
+    unsigned_integer         =  2,
+    signed_integer           =  3, // (2's complement notation)
+    real                     =  4, //Real (ANSI/IEEE-754 floating point)
+    double_presision         =  5, //Double (ANSI/IEEE-754 double precision floating point)
+    octet_string             =  6,
+    character_string         =  7,
   bit_string               =  8,
-  enumerated               =  9,
+    enumerated               =  9,
   date                     = 10,
   time                     = 11,
-  bacnet_object_identifier = 12,
+    bacnet_object_identifier = 12,
   reserved_13              = 13,
   reserved_14              = 14,
   reserved_15              = 15
@@ -59,20 +59,32 @@ struct tag {
     bool is_context_tag_;
     uint8_t number_;
 
-    tag() :   length_value_type_(0), is_context_tag_(0), number_(0) {
+    tag()                                             : length_value_type_(0),
+                                                        is_context_tag_(false),
+                                                        number_(0) {
     }
 
-    tag(const application_tag &n) : length_value_type_(0), is_context_tag_(0), number_(static_cast<decltype(number_)>(n)) {
+    tag(const application_tag &n)                     : length_value_type_(0),
+                                                        is_context_tag_(false),
+                                                        number_(static_cast<decltype(number_)>(n)) {
     }
 
-    tag(const uint8_t &n, const bool &is_context) : length_value_type_(0), is_context_tag_(is_context), number_(n) {
+    tag(const application_tag &n, const uint32_t &v)  : length_value_type_(v),
+                                                        is_context_tag_(false),
+                                                        number_(static_cast<decltype(number_)>(n)) {
+    }
+    tag(const uint8_t &n, const bool &is_context)     : length_value_type_(0),
+                                                        is_context_tag_(is_context),
+                                                        number_(n) {
     }
 
-    tag(const uint8_t &n, const bool &is_context, const uint32_t &v) : length_value_type_(v), is_context_tag_(is_context), number_(n) {
+    tag(const uint8_t &n, const bool &is_context, const uint32_t &v)
+                                                      : length_value_type_(v),
+                                                        is_context_tag_(is_context),
+                                                        number_(n) {
     }
 
-    tag(const application_tag &n, const uint32_t &v) : length_value_type_(v), is_context_tag_(false), number_(static_cast<decltype(number_)>(n)) {
-    }
+
 
     inline uint8_t number() const { return number_; }
 
@@ -90,10 +102,6 @@ struct tag {
     inline bool is_closing_tag() { return (is_context_tag_ && length_value_type_ == closing_tag_indication); }
 
 };
-
-
-
-struct null_t;
 
 
 }}}

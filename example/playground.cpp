@@ -23,7 +23,8 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
-
+#include <boost/dynamic_bitset.hpp>
+#include <bacnet/apdu/type/bit_string.hpp>
 
 
 namespace bacnet { namespace id {
@@ -174,22 +175,35 @@ private:
           return bacnet::binary_data{};
       }
 
+
       inline void write_prop_impl(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) {
           std::cout << "analog_output:: write_prop_impl" << std::endl;
       }
 
-
-    };
-
-
+  };
 }
-
 
 
 
 
 int main(int argc, char *argv[]) {
 
+/**
+ *
+   bit sting 10101
+
+   tag 0x82     ->  1000 0010
+   data 0x03 A8 ->  0000 0011  1010 1000
+
+
+ *
+ */
+
+  bacnet::apdu::type::bit_string bits;
+  bits.push_back(true);
+  bits.push_back(false);
+  bits.size();
+  bits[0] = false;
 
 
 

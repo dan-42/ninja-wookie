@@ -20,8 +20,8 @@
 
 
 
-#ifndef NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP
-#define NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP
+#ifndef NINJA_WOOKIE_SIGNED_INTEGER_GRAMMAR_HPP
+#define NINJA_WOOKIE_SIGNED_INTEGER_GRAMMAR_HPP
 
 
 #include <boost/spirit/include/karma.hpp>
@@ -32,6 +32,7 @@
 #include <bacnet/apdu/detail/boost/uint24_parser.hpp>
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
+#include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -40,6 +41,7 @@ using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
 
+using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
 using boost::phoenix::bind;
@@ -52,23 +54,25 @@ using bacnet::apdu::type::application_tag;
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, uint32_t()> {
+struct signed_integer_grammar : grammar<Iterator, int32_t()> {
 
 
-    rule<Iterator, uint32_t()>          start_rule;
+    rule<Iterator, int32_t()>          start_rule;
+    rule<Iterator, tag()>               tag_rule;
+    rule<Iterator, tag()>               tag_lower_rule;
     rule<Iterator >                     tag_validation_rule;
-    rule<Iterator, uint32_t()>          value_rule;
+    rule<Iterator, int32_t()>          value_rule;
 
    tag_grammar<Iterator> tag_grammar_;
 
-   enumeration_grammar() :  enumeration_grammar::base_type(start_rule),
+    signed_integer_grammar() :  signed_integer_grammar::base_type(start_rule),
                                                                   size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::enumerated)),
+                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::signed_integer)),
                                                                   is_expecting_context_tag_(false) {
       setup();
     }
 
-   enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule),
+    signed_integer_grammar(uint8_t tag) : signed_integer_grammar::base_type(start_rule),
                                                                   size_(0),
                                                                   tag_number_expected_(tag),
                                                                   is_expecting_context_tag_(true) {
@@ -78,18 +82,23 @@ struct enumeration_grammar : grammar<Iterator, uint32_t()> {
 private:
 
     inline void setup() {
-      start_rule  =  tag_validation_rule
-                  >> value_rule ;
+      start_rule  = tag_validation_rule >> value_rule ;
 
-           tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::check_tag, this, _1) == true ];
+           tag_rule = tag_lower_rule[_val = boost::phoenix::bind(&signed_integer_grammar::set_size, this, _1)] ;
 
-           value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
 
+           tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&signed_integer_grammar::is_as_expected, this) == true );
+
+           value_rule  = eps(boost::phoenix::ref(size_) == (int32_t)1) >> byte_
+                       | eps(boost::phoenix::ref(size_) == (int32_t)2) >> big_word
+                       | eps(boost::phoenix::ref(size_) == (int32_t)3) >> big_24word
+                       | eps(boost::phoenix::ref(size_) == (int32_t)4) >> big_dword;
+
+           tag_lower_rule = tag_grammar_;
 
            start_rule.name("start_rule");
+           tag_rule.name("tag_rule");
+           tag_lower_rule.name("tag_lower_rule");
            value_rule.name("value_rule");
 
      /*
@@ -100,17 +109,28 @@ private:
      //*/
     }
 
-    bool check_tag(tag& t) {
+    /**
+     * using separate size value, as  accessing complex type
+     * does somehow not work here with spirit
+     */
+    tag& set_size(tag& t) {
+      tag_ = t;
       size_ = t.length_value_type();
-      if(   t.is_context_tag() == is_expecting_context_tag_
-         && t.number()         == tag_number_expected_ ) {
+      return t;
+    }
+
+    bool is_as_expected() {
+      if(   tag_.is_context_tag_ == is_expecting_context_tag_
+         && tag_.number()  == tag_number_expected_ ) {
         return true;
       }
       else {
         return false;
       }
     }
-    uint32_t size_{0};
+
+    tag tag_;
+    int32_t size_{0};
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};
 };
@@ -136,18 +156,18 @@ using bacnet::apdu::type::application_tag;
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, uint32_t()> {
+struct signed_integer_grammar : grammar<Iterator, int32_t()> {
 
-    rule<Iterator, uint32_t()>   start_rule;
-    rule<Iterator, uint32_t()>   tag_rule;
-    rule<Iterator, uint32_t()>   value_rule;
+    rule<Iterator, int32_t()>   start_rule;
+    rule<Iterator, int32_t()>   tag_rule;
+    rule<Iterator, int32_t()>   value_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
-    enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::unsigned_integer) {
+    signed_integer_grammar() : signed_integer_grammar::base_type(start_rule), tag_(application_tag::signed_integer) {
       setup();
     }
-    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag, true) {
+    signed_integer_grammar(uint8_t tag) : signed_integer_grammar::base_type(start_rule), tag_(tag, true) {
       setup();
     }
 
@@ -158,7 +178,7 @@ private:
       start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
 
 
-      tag_rule = eps[boost::phoenix::bind(&enumeration_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
+      tag_rule = eps[boost::phoenix::bind(&signed_integer_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
       //tag_rule = tag_grammar_[_1 = ref(tag_)];
 
       value_rule  = eps(ref(size_) == 1) << byte_
@@ -177,8 +197,8 @@ private:
       */
     }
 
-    bool extract_size(const uint32_t &unsigned_value) {
-      size_ = bacnet::apdu::type::detail::length_helper(unsigned_value);
+    bool extract_size(const int32_t &signed_value) {
+      size_ = bacnet::apdu::type::detail::length_helper(signed_value);
       tag_.length_value_type(size_);
       return true;
     }
@@ -191,4 +211,4 @@ private:
 }}}}}
 
 
-#endif //NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP
+#endif //NINJA_WOOKIE_SIGNED_INTEGER_GRAMMAR_HPP

@@ -68,7 +68,7 @@ struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
 
     unsigned_integer_grammar() :  unsigned_integer_grammar::base_type(start_rule),
                                                                   size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::unsigned_interger)),
+                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::unsigned_integer)),
                                                                   is_expecting_context_tag_(false) {
       setup();
     }
@@ -165,7 +165,7 @@ struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
 
     tag_grammar<Iterator> tag_grammar_;
 
-    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), tag_(application_tag::unsigned_interger) {
+    unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), tag_(application_tag::unsigned_integer) {
       setup();
     }
     unsigned_integer_grammar(uint8_t tag) : unsigned_integer_grammar::base_type(start_rule), tag_(tag, true) {

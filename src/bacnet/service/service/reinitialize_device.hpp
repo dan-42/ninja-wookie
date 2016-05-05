@@ -56,7 +56,7 @@ BOOST_FUSION_ADAPT_STRUCT(
   bacnet::service::service::reinitialize_device,
   reinitialize_state_of_device,
   password
-)
+);
 
 
 namespace bacnet { namespace service { namespace service {

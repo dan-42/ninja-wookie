@@ -1,4 +1,10 @@
 
-add_new_test("apdu-types-tag" "./test_tag.cpp")
-add_new_test("apdu-types-character-string" "./test_character_string.cpp")
-add_new_test("apdu-types-unsigned-integer-grammar" "./test_unsigned_integer_grammar.cpp")
+add_new_test("apdu-types-tag"                       "./test_tag.cpp")
+add_new_test("apdu-types-null"                      "./test_null.cpp")
+add_new_test("apdu-types-boolean"                   "./test_boolean.cpp")
+add_new_test("apdu-types-unsigned-integer"          "./test_unsigned_integer.cpp")
+add_new_test("apdu-types-signed-integer"            "./test_signed_integer.cpp")
+add_new_test("apdu-types-real"                      "./test_real.cpp")
+add_new_test("apdu-types-double-presision"          "./test_double_presision.cpp")
+add_new_test("apdu-types-octet-string"              "./test_octet_string.cpp")
+add_new_test("apdu-types-character-string"          "./test_character_string.cpp")

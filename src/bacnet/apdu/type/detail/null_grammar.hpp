@@ -20,8 +20,8 @@
 
 
 
-#ifndef NINJA_WOOKIE_OBJECT_IDENTIFIER_GRAMMAR_HPP
-#define NINJA_WOOKIE_OBJECT_IDENTIFIER_GRAMMAR_HPP
+#ifndef NINJA_WOOKIE_NULL_GRAMMAR_HPP
+#define NINJA_WOOKIE_NULL_GRAMMAR_HPP
 
 
 #include <boost/spirit/include/karma.hpp>
@@ -30,6 +30,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/null.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -43,56 +44,49 @@ using boost::phoenix::bind;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::common::object_identifier;
+using bacnet::apdu::type::null;
 
 
 template<typename Iterator>
-struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
+struct null_grammar : grammar<Iterator, null()> {
 
 
-    rule<Iterator, object_identifier()> start_rule;
+    rule<Iterator, null()>              start_rule;
     rule<Iterator >                     tag_validation_rule;
-    rule<Iterator, uint32_t()>          value_rule;
 
    tag_grammar<Iterator> tag_grammar_;
 
-    object_identifier_grammar() :  object_identifier_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::unsigned_integer)),
-                                                                  is_expecting_context_tag_(false) {
+    null_grammar() :            null_grammar::base_type(start_rule),
+                                tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::null)),
+                                is_expecting_context_tag_(false) {
       setup();
     }
 
-    object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(tag),
-                                                                  is_expecting_context_tag_(true) {
+    null_grammar(uint8_t tag) : null_grammar::base_type(start_rule),
+                                tag_number_expected_(tag),
+                                is_expecting_context_tag_(true) {
       setup();
     }
 
 private:
 
     inline void setup() {
-      start_rule  =  tag_validation_rule
-                  >> value_rule ;
+      start_rule  =  tag_validation_rule;
 
-      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&object_identifier_grammar::check_tag, this, _1) == true ];
-      value_rule  = big_dword;
+      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&null_grammar::check_tag, this, _1) == true ];
       start_rule.name("start_rule");
       tag_validation_rule.name("tag_validation_rule");
-      value_rule.name("value_rule");
       //
       /*
       debug(start_rule);
       debug(tag_validation_rule);
-      debug(value_rule);
       //*/
     }
 
     bool check_tag(tag& t) {
       if(   t.is_context_tag()    == is_expecting_context_tag_
          && t.number()            == tag_number_expected_
-         && t.length_value_type() == 4) {
+         && t.length_value_type() == 0) {
         return true;
       }
       else {
@@ -101,7 +95,6 @@ private:
     }
 
     tag tag_;
-    uint32_t size_{0};
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};
 };
@@ -113,33 +106,27 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
-
-using boost::spirit::karma::bit_field;
 using boost::spirit::karma::rule;
 using boost::spirit::karma::_1;
-using boost::phoenix::bind;
-
-using boost::spirit::repository::karma::big_24word;
-
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::common::object_identifier;
-
 
 template<typename Iterator>
-struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
+struct null_grammar : grammar<Iterator, null()> {
 
-    rule<Iterator, object_identifier()>   start_rule;
-    rule<Iterator, object_identifier()>   extract_rule;
-    rule<Iterator>                        tag_rule;
-    rule<Iterator>                        value_rule;
+    rule<Iterator, null()>   start_rule;
+    rule<Iterator>           tag_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
-    object_identifier_grammar() : object_identifier_grammar::base_type(start_rule), tag_(application_tag::bacnet_object_identifier) {
+    static const constexpr uint32_t size = 0;
+
+    null_grammar() :            null_grammar::base_type(start_rule),
+                                tag_(application_tag::null, size) {
       setup();
     }
-    object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule), tag_(tag, true) {
+    null_grammar(uint8_t tag) : null_grammar::base_type(start_rule),
+                                tag_(tag, true, size) {
       setup();
     }
 
@@ -147,39 +134,22 @@ private:
 
     void setup () {
 
-      start_rule    = extract_rule
-                    << tag_rule
-                    << value_rule;
-
-      extract_rule  = eps[boost::phoenix::bind(&object_identifier_grammar::extract, this, _val)];
+      start_rule    =  tag_rule;
 
       tag_rule      = tag_grammar_[_1 = ref(tag_)];
 
-      value_rule    = big_dword[ _1 = ref(value_)];
-
       start_rule.name("start_rule");
       tag_rule.name("tag_rule");
-      value_rule.name("value_rule");
 
       /*
       debug(start_rule);
-      debug(value_rule);
       debug(tag_rule);
-      */
+     // */
     }
-
-    bool extract(const object_identifier &v) {
-      value_ = v.to_native();
-      auto size = bacnet::apdu::type::detail::length_helper(value_);
-      tag_.length_value_type(size);
-      return true;
-    }
-
-    uint32_t value_;
     tag tag_;
 };
 
 }}}}}
 
 
-#endif //NINJA_WOOKIE_OBJECT_IDENTIFIER_GRAMMAR_HPP
+#endif //NINJA_WOOKIE_NULL_GRAMMAR_HPP
