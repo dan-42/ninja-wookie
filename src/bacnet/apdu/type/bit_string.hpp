@@ -43,7 +43,10 @@ namespace bacnet { namespace apdu { namespace type {
 
 
       static std::ostream& operator<<(std::ostream& os, const bit_string& v) {
-
+        os << "(" << v.size() << ")";
+        for(auto &bit : v) {
+          os << (bit ? "1" : "0");
+        }
         return os;
       }
 
