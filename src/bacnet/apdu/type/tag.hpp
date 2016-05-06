@@ -39,7 +39,7 @@ enum class  application_tag : uint8_t {
     double_presision         =  5, //Double (ANSI/IEEE-754 double precision floating point)
     octet_string             =  6,
     character_string         =  7,
-  bit_string               =  8,
+    bit_string               =  8,
     enumerated               =  9,
   date                     = 10,
   time                     = 11,
