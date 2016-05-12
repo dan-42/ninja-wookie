@@ -204,7 +204,6 @@ namespace bacnet { namespace type {
 
  */
 struct null {
-  void value;
 };
 
 struct boolean {
