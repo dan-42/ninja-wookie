@@ -112,7 +112,7 @@ public:
     Object_Identifier
     Object_Name
     Object_Type
-    Property_List
+    Property_List //different for each instance
 
    */
   object() {
@@ -183,7 +183,132 @@ private:
   };
 }
 
+namespace bacnet { namespace type {
 
+/*
+ 0 = null
+ 1 = Boolean
+2 = Unsigned Integer
+3 = Signed Integer (2's complement notation)
+4 = Real (ANSI/IEEE-754 floating point)
+5 = Double (ANSI/IEEE-754 double precision floating po
+6 = Octet String
+7 = Character String
+8 = Bit String
+9 = Enumerated
+10 = Date
+11 = Time
+12 = BACnetObjectIdentifier
+13, 14, 15 = Reserved for ASHRAE
+
+
+ */
+struct null {
+  void value;
+};
+
+struct boolean {
+  bool value{false};
+};
+
+struct unsigned_integer {
+  uint32_t value{0};
+};
+
+struct signed_integer {
+  int32_t value{0};
+};
+
+struct real {
+  float value;
+};
+
+struct double_ {
+  double value;
+};
+
+struct octet_string{
+  std::vector<uint8_t> value;
+};
+
+struct character_string {
+  uint8_t encoding;
+  std::string value;
+};
+
+struct bit_string {
+  boost::container::vector<bool> value{0};
+};
+
+struct enumerated {
+  uint32_t value{0};
+};
+
+struct date {
+  uint8_t year ;
+  uint8_t month ;
+  uint8_t day ;
+  uint8_t week_day ;
+
+};
+struct time {
+  uint8_t hour;
+  uint8_t minute;
+  uint8_t second;
+  uint8_t millisecond;
+};
+
+struct object_identifier {
+  uint32_t type;
+  uint32_t instance;
+  uint32_t value;
+};
+
+
+typedef boost::variant<
+    null,
+    boolean,
+    unsigned_integer,
+    signed_integer,
+    real,
+    double_,
+    octet_string,
+    character_string,
+    bit_string,
+    enumerated,
+    date,
+    time,
+    object_identifier
+                        > primitive_type;
+
+/**
+ * types differ
+ */
+struct sequence {
+  std::vector<primitive_type> value;
+};
+
+// types are the same
+struct sequence_of {
+  std::vector<primitive_type> value;
+};
+
+
+struct choice {
+  primitive_type value;
+};
+
+typedef boost::variant<
+    sequence,
+    sequence_of,
+    choice
+> constructed_type;
+
+
+
+
+
+}}
 
 
 int main(int argc, char *argv[]) {

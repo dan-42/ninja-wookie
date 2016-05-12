@@ -243,10 +243,6 @@ private:
     bacnet::common::object_identifier device_object_identifier_;
     bacnet::config config_;
     service::i_am i_am_message_;
-
-
-
-
 };
 
 }}

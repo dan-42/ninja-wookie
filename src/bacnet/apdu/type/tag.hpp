@@ -41,8 +41,8 @@ enum class  application_tag : uint8_t {
     character_string         =  7,
     bit_string               =  8,
     enumerated               =  9,
-  date                     = 10,
-  time                     = 11,
+    date                     = 10,
+    time                     = 11,
     bacnet_object_identifier = 12,
   reserved_13              = 13,
   reserved_14              = 14,
@@ -108,9 +108,9 @@ struct tag {
 
 static inline std::ostream& operator<<(std::ostream& os, const bacnet::apdu::type::tag &tag_) {
 
-  os << " number: "            << std::dec << (uint32_t) tag_.number()
-  << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
-  << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
+  os  << " number: "            << std::dec << (uint32_t) tag_.number()
+      << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
+      << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
 
   return os;
 }

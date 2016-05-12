@@ -16,7 +16,6 @@
 #include <boost/variant/static_visitor.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
 
-#include <bacnet/apdu/detail/request_manager.hpp>
 
 
 namespace bacnet { namespace  apdu { namespace  detail {
@@ -24,12 +23,12 @@ namespace bacnet { namespace  apdu { namespace  detail {
 
 using namespace bacnet::apdu;
 
-template<typename CallbackManager>
+template<typename CallbackManager, typename RequestManager>
 class inbound_router : public boost::static_visitor<> {
 
 public:
 
-  inbound_router(CallbackManager& cbm, request_manager& rm) : callback_manager_(cbm), request_manager_(rm){
+  inbound_router(CallbackManager& cbm, RequestManager& rm) : callback_manager_(cbm), request_manager_(rm){
   }
 
   inline void meta_information(bacnet::common::protocol::meta_information meta) {
@@ -45,11 +44,17 @@ public:
     std::cout << "apdu::detail::inbound_router segment_ack" << std::endl;
   }
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //// new requests
+
   void operator()(frame::confirmed_request request) {
-    std::cout << "apdu::detail::inbound_router confirmed_request" << std::endl;
-    boost::system::error_code ec;
-    callback_manager_.invoke_callback(request, ec, meta_information_);
+    if( request.pdu_type_and_control_information.is_segmented()) {
+
+    }
+    else {
+      boost::system::error_code ec;
+      callback_manager_.invoke_callback(request, ec, meta_information_);
+    }
   }
 
   void operator()(frame::unconfirmed_request request) {
@@ -57,8 +62,9 @@ public:
     callback_manager_.invoke_callback(request, ec, meta_information_);
   }
 
-
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //// responses to requests
+
   void operator()(frame::simple_ack response) {
     std::cout << "apdu::detail::inbound_router simple_ack" << std::endl;
     boost::system::error_code ec;
@@ -108,7 +114,7 @@ public:
 
 private:
   CallbackManager& callback_manager_;
-  request_manager& request_manager_;
+  RequestManager& request_manager_;
   bacnet::common::protocol::meta_information meta_information_;
 
 };

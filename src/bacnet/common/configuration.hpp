@@ -59,7 +59,17 @@ enum  max_apdu_length_accepted : uint8_t {
 };
 
 
-
+//   20.1.2.4   max-segments-accepted
+    enum class max_segments_accepted : uint8_t {
+      unspecified = 0b000,
+      segments_2  = 0b001,
+      segments_4  = 0b010,
+      segments_8  = 0b011,
+      segments_16 = 0b100,
+      segments_32 = 0b101,
+      segments_64 = 0b110,
+      segments_more_then_64 = 0b111
+    };
 
 
 
@@ -113,6 +123,13 @@ enum  max_apdu_length_accepted : uint8_t {
     * wer das liesst ist doof.(my gf)
     */
    bool send_i_am_frames = true;
+
+   /**
+    * flag defined in APDU frames for segmentation
+    */
+   bool is_server        = true;
+
+
  };
 
 }

@@ -120,18 +120,16 @@ struct controller {
   void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, confirmed_request_handler_type handler) {
     bacnet::common::protocol::mac::endpoint ep{adr};
 
-
-    frame::confirmed_request frame;
-    bacnet::apdu::detail::header::segmentation_t seg;
-    auto invoke_id = request_manager_.get_next_invoke_id(adr);
-    frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::confirmed_request;
-
-    seg.max_accepted_apdu_ = ApduSize::size_as_enum;
-    frame.invoke_id        = invoke_id;
-    frame.segmentation     = seg;
-
-    frame.service_data     = payload;
-    auto data = frame::generator::generate(frame);
+    frame::confirmed_request                            frame;
+    bacnet::apdu::detail::header::segmentation_t        seg;
+    auto invoke_id                                    = request_manager_.get_next_invoke_id(adr);
+    seg.max_accepted_apdu_                            = ApduSize::size_as_enum;
+    frame.invoke_id                                   = invoke_id;
+    frame.segmentation                                = seg;
+    frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::confirmed_request;
+    frame.service_data                                = payload;
+    frame.proposed_window_size                        = 1;
+    auto data                                         = frame::generator::generate(frame);
 
 
     // don't forget timeout!
@@ -150,10 +148,8 @@ struct controller {
   void async_received_apdu_handler(bacnet::npdu::frame_body::apdu apdu, bacnet::common::protocol::meta_information meta_info) {
     auto data = apdu.data;
     frame::possible_frame f = frame::parser::parse(std::move(data));
-    //std::cout << "apdu::controller::async_received_apdu_handler()" << std::endl;
     inbound_router_.meta_information(std::move(meta_info));
     f.apply_visitor(inbound_router_);
-
   }
 
 private:
@@ -163,9 +159,9 @@ private:
   boost::asio::io_service &io_service_;
   UnderlyingLayerController& underlying_controller_;
   util::callback::callback_manager<detail::callback_map_type>  callback_manager_;
-  detail::inbound_router<decltype(callback_manager_)>  inbound_router_;
-
   detail::request_manager request_manager_;
+  detail::inbound_router<decltype(callback_manager_), decltype(request_manager_)>  inbound_router_;
+
 };
 
 }}
