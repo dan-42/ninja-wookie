@@ -23,11 +23,9 @@
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/apdu/type/tag.hpp>
 
 
-
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace type {
   enum class day_of_weeks : uint8_t {
       monday    = 1,
       tuesday   = 2,
@@ -93,19 +91,19 @@ namespace bacnet { namespace apdu { namespace type {
 
   };
 
-}}}
+}}
 
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-    bacnet::apdu::type::date,
+    bacnet::type::date,
     year_minus_1900,
     month,
     day_of_month,
     day_of_week
 );
 
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace type {
 
 
   static std::ostream& operator<<(std::ostream& os, const date& v) {
@@ -113,6 +111,6 @@ namespace bacnet { namespace apdu { namespace type {
     return os;
   }
 
-}}}
+}}
 
 #endif //NINJA_WOOKIE_BACNET_APDU_TYPE_DATE_HPP

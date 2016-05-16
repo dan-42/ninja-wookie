@@ -29,7 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
-#include <bacnet/apdu/type/bit_string.hpp>
+#include <bacnet/type/bit_string.hpp>
 #include <bacnet/detail/common/types.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -39,7 +39,7 @@ using namespace boost::spirit::qi;
 using namespace boost::phoenix;
 
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::bit_string;
+using bacnet::type::bit_string;
 
 template<typename Iterator>
 struct bit_string_grammar : grammar<Iterator, bit_string()> {
@@ -150,7 +150,7 @@ using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::bit_string;
+using bacnet::type::bit_string;
 
 template<typename Iterator>
 struct bit_string_grammar : grammar<Iterator, bit_string()> {

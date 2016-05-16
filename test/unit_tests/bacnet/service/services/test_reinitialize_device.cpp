@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
   using namespace bacnet;
   using namespace bacnet::transport;
 
-  bacnet::common::object_identifier device_doi{2};
+  bacnet::type::object_identifier device_doi{2};
   auto who_is_2_request           = bacnet::make_binary<bacnet::hex_string>("81 0b 00 10 01 20 ff ff 00 ff 10 08  09 02  19 02");
   auto i_am_answer                = bacnet::make_binary<bacnet::hex_string>("81 0b 00 19 01 20 ff ff 00 ff 10 00 c4 02 00 00 02 22 05 c4 91 03 22 01 04");
   // id 0  pw 12345

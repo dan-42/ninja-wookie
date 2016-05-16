@@ -23,11 +23,9 @@
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/apdu/type/tag.hpp>
 
 
-
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace type {
 
   struct time {
     time() = default;
@@ -51,19 +49,19 @@ namespace bacnet { namespace apdu { namespace type {
 
   };
 
-}}}
+}}
 
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-    bacnet::apdu::type::time,
+    bacnet::type::time,
     hours,
     minutes,
     seconds,
     hundreds
 );
 
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace type {
 
 
   static std::ostream& operator<<(std::ostream& os, const time& v) {
@@ -71,6 +69,6 @@ namespace bacnet { namespace apdu { namespace type {
     return os;
   }
 
-}}}
+}}
 
 #endif //NINJA_WOOKIE_BACNET_APDU_TYPE_time_HPP

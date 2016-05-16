@@ -23,11 +23,11 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/date.hpp>
+#include <bacnet/type/date.hpp>
 #include <bacnet/apdu/type/detail/date_grammar.hpp>
 
 
-bool is_equal(const bacnet::apdu::type::date& a, const bacnet::apdu::type::date& b) {
+bool is_equal(const bacnet::type::date& a, const bacnet::type::date& b) {
   if(a.year_minus_1900 != b.year_minus_1900) {
     return false;
   }
@@ -63,8 +63,8 @@ using namespace bacnet::apdu::type;
   bacnet::apdu::type::detail::generator::date_grammar< std::back_insert_iterator <bacnet::binary_data> >  grammar_gen;
   bacnet::apdu::type::detail::parser::date_grammar<bacnet::parse_iterator>                                grammar_parse;
   {
-    bacnet::apdu::type::date date_to_generate;
-    bacnet::apdu::type::date date_parsed;
+    bacnet::type::date date_to_generate;
+    bacnet::type::date date_parsed;
     bacnet::binary_data generated;
     bacnet::binary_data generation_expected;
     generation_expected.push_back(0xA4); //tag

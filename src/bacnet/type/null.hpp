@@ -18,38 +18,36 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_BIT_STRING_HPP
-#define NINJA_WOOKIE_BACNET_APDU_TYPE_BIT_STRING_HPP
+#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_NULL_HPP
+#define NINJA_WOOKIE_BACNET_APDU_TYPE_NULL_HPP
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/container/vector.hpp>
-#include <bacnet/apdu/type/tag.hpp>
+
+namespace bacnet { namespace type {
+
+
+      struct null {
+
+        null() = default;
+
+     };
+
+}}
 
 
 
-namespace bacnet { namespace apdu { namespace type {
+BOOST_FUSION_ADAPT_STRUCT(
+    bacnet::type::null
+);
 
+namespace bacnet { namespace type {
 
-typedef bool bit;
-typedef boost::container::vector<bit> bit_string;
+static std::ostream& operator<<(std::ostream& os, const null& v) {
+  os << "null";
+  return os;
+}
 
+}}
 
-}}}
-
-
-
-namespace bacnet { namespace apdu { namespace type {
-
-
-      static std::ostream& operator<<(std::ostream& os, const bit_string& v) {
-        os << "(" << v.size() << ")";
-        for(auto &bit : v) {
-          os << (bit ? "1" : "0");
-        }
-        return os;
-      }
-
-    }}}
-
-#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_BIT_STRING_HPP
+#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_NULL_HPP

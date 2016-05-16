@@ -18,40 +18,57 @@
  * Authors: Daniel Friedrich
  */
 
-#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_NULL_HPP
-#define NINJA_WOOKIE_BACNET_APDU_TYPE_NULL_HPP
+#ifndef NINJA_WOOKIE_BACNET_TYPE_ENUMERATED_HPP
+#define NINJA_WOOKIE_BACNET_TYPE_ENUMERATED_HPP
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/apdu/type/tag.hpp>
 
 
+namespace bacnet { namespace type {
 
-namespace bacnet { namespace apdu { namespace type {
+
+struct enumerated {
+
+  enum class e {
+    undefined,
+    BACnetDeviceStatus ,
+    BACnetDoorAlarmState ,
+    BACnetDoorSecuredStatus ,
+    BACnetDoorStatus ,
+    BACnetDoorValue,
+    BACnetEngineeringUnits ,
+    BACnetEventState,
+    BACnetEventType,
+    BACnetFaultType,
+    BACnetFileAccessMethod,BACnetLifeSafetyMode,
+    BACnetLifeSafetyOperation ,
+    BACnetLifeSafetyState,
+    BACnetLightingInProgress ,
+    BACnetLightingOperation ,
+    BACnetLightingTransition,
+    BACnetLockStatus ,
+    BACnetLoggingType,
+  };
+  e type{e::undefined};
+  uint32_t value{0};
 
 
-      struct null {
+  friend std::ostream& operator<<(std::ostream& os, const enumerated& v) {
 
-        null() = default;
+    return os;
+  }
+};
 
-     };
 
-}}}
-
+}}
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-    bacnet::apdu::type::null
+    bacnet::type::enumerated,
+    type,
+    value
 );
 
-namespace bacnet { namespace apdu { namespace type {
 
-
-      static std::ostream& operator<<(std::ostream& os, const null& v) {
-
-        return os;
-      }
-
-    }}}
-
-#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_NULL_HPP
+#endif //NINJA_WOOKIE_BACNET_TYPE_ENUMERATED_HPP

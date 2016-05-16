@@ -30,14 +30,14 @@
 #include <bacnet/service/service/detail/service_choice.hpp>
 
 
-#include <bacnet/common/object_identifier.hpp>
+#include <bacnet/type/object_identifier.hpp>
 #include <bacnet/common/segment.hpp>
 
 
 namespace bacnet { namespace service { namespace service {
 
 struct i_am {
-    bacnet::common::object_identifier i_am_device_identifier;
+    bacnet::type::object_identifier i_am_device_identifier;
     uint32_t                          max_apdu_length_accepted;
     bacnet::common::segmentation      segmentation_supported;
     uint16_t                          vendor_id;

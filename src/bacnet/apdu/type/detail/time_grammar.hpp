@@ -29,7 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
-#include <bacnet/apdu/type/time.hpp>
+#include <bacnet/type/time.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -38,7 +38,7 @@ using namespace boost::spirit::qi;
 using namespace boost::phoenix;
 
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::time;
+using bacnet::type::time;
 
 template<typename Iterator>
 struct time_grammar : grammar<Iterator, time()> {
@@ -119,7 +119,7 @@ using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::time;
+using bacnet::type::time;
 
 template<typename Iterator>
 struct time_grammar : grammar<Iterator, time()> {

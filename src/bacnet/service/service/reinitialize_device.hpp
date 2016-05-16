@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <boost/optional.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/apdu/type/character_string.hpp>
+#include <bacnet/type/character_string.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 
 
@@ -37,7 +37,7 @@ namespace bacnet { namespace service { namespace service {
 
     }
 
-    reinitialize_device(uint32_t state, bacnet::apdu::type::character_string pw ) :  reinitialize_state_of_device(state), password(pw){
+    reinitialize_device(uint32_t state, bacnet::type::character_string pw ) :  reinitialize_state_of_device(state), password(pw){
 
     }
 
@@ -47,7 +47,7 @@ namespace bacnet { namespace service { namespace service {
 
 
     uint32_t reinitialize_state_of_device{0};
-    boost::optional<bacnet::apdu::type::character_string> password;
+    boost::optional<bacnet::type::character_string> password;
   };
 
 }}}

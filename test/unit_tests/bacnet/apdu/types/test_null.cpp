@@ -23,7 +23,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/null.hpp>
+#include <bacnet/type/null.hpp>
 #include <bacnet/apdu/type/detail/null_grammar.hpp>
 
 
@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_SUITE( apdu_type_null )
 
 BOOST_AUTO_TEST_CASE( test_case_application_tag ) {
 
-  bacnet::apdu::type::null to_generate;
-  bacnet::apdu::type::null parsed;
+  bacnet::type::null to_generate;
+  bacnet::type::null parsed;
 
   bacnet::binary_data generated;
   bacnet::binary_data generation_expected;
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE( test_case_application_tag ) {
 
 BOOST_AUTO_TEST_CASE( test_case_context_tag ) {
 
-  bacnet::apdu::type::null to_generate;
-  bacnet::apdu::type::null parsed;
+  bacnet::type::null to_generate;
+  bacnet::type::null parsed;
 
   bacnet::binary_data generated;
   bacnet::binary_data generation_expected;

@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <boost/optional.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/common/object_identifier.hpp>
+#include <bacnet/type/object_identifier.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 
 
@@ -33,17 +33,17 @@ namespace bacnet { namespace service { namespace service {
 
     read_property_request() = default;
 
-    read_property_request(bacnet::common::object_identifier oi, uint16_t pi) :  object_identifier(oi),
+    read_property_request(bacnet::type::object_identifier oi, uint16_t pi) :  object_identifier(oi),
                                                                         property_identifier(pi) {
     }
 
-    read_property_request(bacnet::common::object_identifier oi, uint16_t pi, uint32_t array_index) :
+    read_property_request(bacnet::type::object_identifier oi, uint16_t pi, uint32_t array_index) :
                                                                         object_identifier(oi),
                                                                         property_identifier(pi),
                                                                         property_array_index(array_index) {
     }
 
-    bacnet::common::object_identifier object_identifier{};
+    bacnet::type::object_identifier object_identifier{};
     uint16_t                          property_identifier {0};
     boost::optional<uint32_t>         property_array_index;
   };

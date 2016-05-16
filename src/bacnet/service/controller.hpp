@@ -184,7 +184,7 @@ public:
   }
 
   template<typename Service, typename Handler>
-  void async_send(bacnet::common::object_identifier device_object_identifier, Service service, Handler handler) {
+  void async_send(bacnet::type::object_identifier device_object_identifier, Service service, Handler handler) {
 
     /* lookup doi */
     auto endpoints = device_manager_.get_endpoint(device_object_identifier);
@@ -240,7 +240,7 @@ private:
     bacnet::service::detail::device_manager device_manager_;
     bacnet::service::detail::callback_manager callback_manager_;
     bacnet::service::detail::inbound_router inbound_router_;
-    bacnet::common::object_identifier device_object_identifier_;
+    bacnet::type::object_identifier device_object_identifier_;
     bacnet::config config_;
     service::i_am i_am_message_;
 };

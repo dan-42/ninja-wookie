@@ -23,11 +23,9 @@
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/apdu/type/tag.hpp>
 
 
-
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace type {
   enum class string_encoding_type : uint8_t {
       iso_10646_utf_8     = 0,
       ibm_microsoft_dbcs  = 1,
@@ -58,17 +56,17 @@ namespace bacnet { namespace apdu { namespace type {
         std::string value;
       };
 
-}}}
+}}
 
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-    bacnet::apdu::type::character_string,
+    bacnet::type::character_string,
     encoding,
     value
 );
 
-namespace bacnet { namespace apdu { namespace type {
+namespace bacnet { namespace type {
 
 
       static std::ostream& operator<<(std::ostream& os, const character_string& v) {
@@ -76,6 +74,6 @@ namespace bacnet { namespace apdu { namespace type {
         return os;
       }
 
-    }}}
+    }}
 
 #endif //NINJA_WOOKIE_BACNET_APDU_TYPE_CHARACTER_STRING_HPP

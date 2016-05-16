@@ -18,14 +18,25 @@
  * Authors: Daniel Friedrich
  */
 
+
+#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+#define BOOST_MPL_LIMIT_VECTOR_SIZE 600
+
+
+#include <bacnet/type/properties.hpp>
 #include <bacnet/stack/factory.hpp>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/dynamic_bitset.hpp>
-#include <bacnet/apdu/type/bit_string.hpp>
+#include <bacnet/type/bit_string.hpp>
+#include <bacnet/type/types.hpp>
 
+
+
+#include <boost/fusion/adapted/mpl.hpp>
+#include <boost/fusion/include/mpl.hpp>
 
 namespace bacnet { namespace id {
 
@@ -43,45 +54,18 @@ namespace object {
   static const constexpr uint32_t device            =  8;
 }
 
-
-namespace property {
-  static const constexpr uint16_t object_name              =  77;
-  static const constexpr uint16_t object_identifier        =  77;
-  static const constexpr uint16_t present_value            =  85;
-}
-
-}
-
-namespace type {
-
-namespace property {
-
-  template<uint32_t object_type, uint16_t property_t, typename Type >
-  struct property_type {
-    typedef Type type;
-  };
-
-
-
-    namespace o_id = bacnet::id::object;
-    namespace p_id = bacnet::id::property;
-
-
-    template<> struct property_type<o_id::analog_input, id::property::object_name,         std::string>;
-    template<> struct property_type<o_id::analog_input, id::property::object_identifier,   std::string>;
-    template<> struct property_type<o_id::analog_input, id::property::present_value,       std::string>;
-
-
-
-  }
-
-
-
-}
+}}
 
 
 
 
+
+
+
+
+
+
+namespace bacnet {
 namespace detail {
 
   class object_base {
@@ -104,17 +88,12 @@ namespace traits {
 }
 
 
-template<typename Derived>
+template<typename Derived, typename PropertieMap>
 class object : public detail::object_base {
 public:
-  /**
-   * minimum required properties by any object:
-    Object_Identifier
-    Object_Name
-    Object_Type
-    Property_List //different for each instance
 
-   */
+  boost::mpl::vector<>
+
   object() {
    // object_types_supported_.set(traits::supported_index<Derived>::value);
 
@@ -124,7 +103,8 @@ public:
 
   Derived& self() { return static_cast<Derived&>(*this); }
 
-  inline bacnet::binary_data read_prop(uint16_t property_id, boost::optional<uint16_t> index) final {
+  template<typename Property, typename PropertyType>
+  inline bacnet::binary_data read_prop(Property property_id, boost::optional<uint16_t> index) final {
 
     if(traits::has_read_property<Derived>::value) {
       std::cout << "object:: read_prop" << std::endl;
@@ -133,7 +113,10 @@ public:
     std::cout << "object:: read_prop not supported" << std::endl;
     return bacnet::binary_data{};
   }
-  inline void write_prop(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) final {
+
+
+  template<typename Property, typename PropertyType>
+  inline void write_prop(Property property_id, boost::optional<uint16_t> index, bacnet::binary_data data) final {
     std::cout << "object:: write_prop" << std::endl;
     self().write_prop_impl(property_id, index, data);
   }
@@ -146,17 +129,38 @@ private:
 };
 
 
+namespace object_properties {
+using namespace bacnet::type;
+
+  typedef boost::fusion::map<
+      boost::fusion::pair<property::all,  unsigned_integer>
+
+    > analog_input_type_map;
+}
 
 
 
-  struct analog_input final : public object<analog_input> {
+
+
+  struct analog_input final : public object<analog_input, object_properties::analog_input_type_map> {
+    namespace property = bacnet::type::property;
+    using namespace bacnet::type;
 
     inline bacnet::binary_data read_prop_impl(uint16_t property_id, boost::optional<uint16_t> index) {
       std::cout << "analog_input:: read_prop_impl" << std::endl;
         return bacnet::binary_data{};
     }
 
-    inline void write_prop_impl(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) {
+
+
+
+
+    inline void write_prop_impl(property::alarm_value, boost::optional<uint16_t> index, type::possible_type data) {
+        std::cout << "analog_input:: write_prop_impl" << std::endl;
+    }
+
+
+    inline void write_prop_impl(property::action, boost::optional<uint16_t> index, bacnet::binary_data data) {
         std::cout << "analog_input:: write_prop_impl" << std::endl;
     }
 
@@ -183,153 +187,11 @@ private:
   };
 }
 
-namespace bacnet { namespace type {
-
-/*
- 0 = null
- 1 = Boolean
-2 = Unsigned Integer
-3 = Signed Integer (2's complement notation)
-4 = Real (ANSI/IEEE-754 floating point)
-5 = Double (ANSI/IEEE-754 double precision floating po
-6 = Octet String
-7 = Character String
-8 = Bit String
-9 = Enumerated
-10 = Date
-11 = Time
-12 = BACnetObjectIdentifier
-13, 14, 15 = Reserved for ASHRAE
-
-
- */
-struct null {
-  void value;
-};
-
-struct boolean {
-  bool value{false};
-};
-
-struct unsigned_integer {
-  uint32_t value{0};
-};
-
-struct signed_integer {
-  int32_t value{0};
-};
-
-struct real {
-  float value;
-};
-
-struct double_ {
-  double value;
-};
-
-struct octet_string{
-  std::vector<uint8_t> value;
-};
-
-struct character_string {
-  uint8_t encoding;
-  std::string value;
-};
-
-struct bit_string {
-  boost::container::vector<bool> value{0};
-};
-
-struct enumerated {
-  uint32_t value{0};
-};
-
-struct date {
-  uint8_t year ;
-  uint8_t month ;
-  uint8_t day ;
-  uint8_t week_day ;
-
-};
-struct time {
-  uint8_t hour;
-  uint8_t minute;
-  uint8_t second;
-  uint8_t millisecond;
-};
-
-struct object_identifier {
-  uint32_t type;
-  uint32_t instance;
-  uint32_t value;
-};
-
-
-typedef boost::variant<
-    null,
-    boolean,
-    unsigned_integer,
-    signed_integer,
-    real,
-    double_,
-    octet_string,
-    character_string,
-    bit_string,
-    enumerated,
-    date,
-    time,
-    object_identifier
-                        > primitive_type;
-
-/**
- * types differ
- */
-struct sequence {
-  std::vector<primitive_type> value;
-};
-
-// types are the same
-struct sequence_of {
-  std::vector<primitive_type> value;
-};
-
-
-struct choice {
-  primitive_type value;
-};
-
-typedef boost::variant<
-    sequence,
-    sequence_of,
-    choice
-> constructed_type;
-
-
-
-
-
-}}
-
 
 int main(int argc, char *argv[]) {
 
-/**
- *
-   bit sting 10101
 
-   tag 0x82     ->  1000 0010
-   data 0x03 A8 ->  0000 0011  1010 1000
-
-
- *
- */
-
-  bacnet::apdu::type::bit_string bits;
-  bits.push_back(true);
-  bits.push_back(false);
-  bits.size();
-  bits[0] = false;
-
+  bacnet::type::property::supported_properties t;
 
 
   bacnet::object_ptr_list_t object_list;

@@ -62,7 +62,7 @@ Service ACK Choice=20 (ReinitializeDevice)
 #include <bacnet/service/service/reinitialize_device.hpp>
 
 #include <bacnet/apdu/type/tag.hpp>
-#include <bacnet/apdu/type/character_string.hpp>
+#include <bacnet/type/character_string.hpp>
 #include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
 #include <bacnet/apdu/type/detail/character_string_grammar.hpp>
 
@@ -74,6 +74,7 @@ using namespace boost::spirit;
 using namespace boost::spirit::qi;
 
 using namespace bacnet::apdu::type;
+using namespace bacnet::type;
 using namespace bacnet::apdu::type::detail::parser;
 
 template<typename Iterator>
@@ -108,6 +109,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {  n
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace bacnet::apdu::type;
+using namespace bacnet::type;
 using namespace bacnet::apdu::type::detail::generator;
 
 template<typename Iterator>

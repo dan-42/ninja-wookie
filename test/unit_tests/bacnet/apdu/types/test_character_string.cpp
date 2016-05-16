@@ -23,11 +23,11 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/character_string.hpp>
+#include <bacnet/type/character_string.hpp>
 #include <bacnet/apdu/type/detail/character_string_grammar.hpp>
 
 
-bool is_equal(const bacnet::apdu::type::character_string& a, const bacnet::apdu::type::character_string& b) {
+bool is_equal(const bacnet::type::character_string& a, const bacnet::type::character_string& b) {
   if(a.encoding != b.encoding) {
     return false;
   }
@@ -52,8 +52,8 @@ BOOST_AUTO_TEST_SUITE( apdu_type_character_string )
 
 BOOST_AUTO_TEST_CASE( test_case1 ) {
 
-    bacnet::apdu::type::character_string character_string_to_generate;
-    bacnet::apdu::type::character_string character_string_parsed;
+    bacnet::type::character_string character_string_to_generate;
+    bacnet::type::character_string character_string_parsed;
 
     bacnet::binary_data generated;
     bacnet::binary_data generation_expected;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     generation_expected.push_back(0x69);
     generation_expected.push_back(0x73);
 
-    character_string_to_generate.encoding = bacnet::apdu::type::string_encoding_type::iso_10646_utf_8;
+    character_string_to_generate.encoding = bacnet::type::string_encoding_type::iso_10646_utf_8;
     character_string_to_generate.value    = std::string {"Français"};
 
 

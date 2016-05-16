@@ -30,7 +30,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
-#include <bacnet/apdu/type/null.hpp>
+#include <bacnet/type/null.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -44,7 +44,7 @@ using boost::phoenix::bind;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::apdu::type::null;
+using bacnet::type::null;
 
 
 template<typename Iterator>
@@ -110,6 +110,7 @@ using boost::spirit::karma::rule;
 using boost::spirit::karma::_1;
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
+using bacnet::type::null;
 
 template<typename Iterator>
 struct null_grammar : grammar<Iterator, null()> {

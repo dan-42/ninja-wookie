@@ -25,7 +25,7 @@
 #include <chrono>
 #include <boost/format.hpp>
 #include <bacnet/common/protocol/mac/address.hpp>
-#include <bacnet/common/object_identifier.hpp>
+#include <bacnet/type/object_identifier.hpp>
 #include <bacnet/common/segment.hpp>
 
 namespace bacnet { namespace service { namespace detail {
@@ -41,7 +41,7 @@ class device_manager {
 public:
 
   inline void insert_device(const bacnet::common::protocol::mac::endpoint& endpoint,
-                            const bacnet::common::object_identifier& object_identifier,
+                            const bacnet::type::object_identifier& object_identifier,
                             const uint32_t& max_apdu_size,
                             const bacnet::common::segmentation& max_segmentaions,
                             const uint16_t& vendor_id) {
@@ -55,7 +55,7 @@ public:
     }
   }
 
-  std::vector<bacnet::common::protocol::mac::endpoint> get_endpoint( const bacnet::common::object_identifier& object_identifier) {
+  std::vector<bacnet::common::protocol::mac::endpoint> get_endpoint( const bacnet::type::object_identifier& object_identifier) {
     //print_device_list();
     std::vector<bacnet::common::protocol::mac::endpoint> endpoints;
     for(auto& device: devices) {
@@ -89,7 +89,7 @@ public:
 private:
   struct device {
     bacnet::common::protocol::mac::endpoint endpoint;
-    bacnet::common::object_identifier device_object_identifier;
+    bacnet::type::object_identifier device_object_identifier;
     uint32_t max_apdu_size;
     bacnet::common::segmentation max_segemnations;
     uint16_t vendor_id;
@@ -106,7 +106,7 @@ private:
     return false;
   }
 
-  bool has_device(const bacnet::common::object_identifier& object_identifier) {
+  bool has_device(const bacnet::type::object_identifier& object_identifier) {
     if(devices.count(object_identifier) > 0) {
       return true;
     }
@@ -114,7 +114,7 @@ private:
   }
 
   bool update(const bacnet::common::protocol::mac::endpoint& endpoint,
-              const bacnet::common::object_identifier& object_identifier,
+              const bacnet::type::object_identifier& object_identifier,
               const uint32_t& max_apdu_size,
               const bacnet::common::segmentation& max_segemnations,
               const uint16_t& vendor_id) {
@@ -130,7 +130,7 @@ private:
   }
 
  // std::list<device> devices;
-    std::multimap<bacnet::common::object_identifier, device> devices;
+    std::multimap<bacnet::type::object_identifier, device> devices;
 
 };
 

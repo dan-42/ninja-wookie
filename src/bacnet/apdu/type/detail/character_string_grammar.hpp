@@ -32,7 +32,7 @@
 #include <bacnet/apdu/detail/boost/uint24_parser.hpp>
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
-#include <bacnet/apdu/type/character_string.hpp>
+#include <bacnet/type/character_string.hpp>
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -47,8 +47,8 @@ using boost::spirit::qi::_1;
 using boost::phoenix::bind;
 
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::character_string;
-using bacnet::apdu::type::string_encoding_type;
+using bacnet::type::character_string;
+using bacnet::type::string_encoding_type;
 
 template<typename Iterator>
 struct character_string_grammar : grammar<Iterator, character_string()> {
@@ -168,7 +168,8 @@ using boost::spirit::karma::_1;
 using boost::phoenix::bind;
 
 using bacnet::apdu::type::tag;
-using bacnet::apdu::type::character_string;
+using bacnet::type::character_string;
+using bacnet::type::string_encoding_type;
 
 template<typename Iterator>
 struct character_string_grammar : grammar<Iterator, character_string()> {

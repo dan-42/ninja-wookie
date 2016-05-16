@@ -23,11 +23,11 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/bit_string.hpp>
+#include <bacnet/type/bit_string.hpp>
 #include <bacnet/apdu/type/detail/bit_string_grammar.hpp>
 
 
-bool is_equal(const bacnet::apdu::type::bit_string& a, const bacnet::apdu::type::bit_string& b) {
+bool is_equal(const bacnet::type::bit_string& a, const bacnet::type::bit_string& b) {
   if(a.size() != b.size()) {
     return false;
   }
@@ -59,8 +59,8 @@ using namespace bacnet::apdu::type;
   bacnet::apdu::type::detail::generator::bit_string_grammar< std::back_insert_iterator <bacnet::binary_data> >  grammar_gen;
   bacnet::apdu::type::detail::parser::bit_string_grammar<bacnet::parse_iterator>                                grammar_parse;
   {
-    bacnet::apdu::type::bit_string bit_string_to_generate;
-    bacnet::apdu::type::bit_string bit_string_parsed;
+    bacnet::type::bit_string bit_string_to_generate;
+    bacnet::type::bit_string bit_string_parsed;
     bacnet::binary_data generated;
     bacnet::binary_data generation_expected;
     generation_expected.push_back(0x82); //tag
@@ -96,8 +96,8 @@ using namespace bacnet::apdu::type;
 
   std::cout << std::endl << "--------------------------------------------------------------" << std::endl;
   {
-    bacnet::apdu::type::bit_string bit_string_to_generate;
-    bacnet::apdu::type::bit_string bit_string_parsed;
+    bacnet::type::bit_string bit_string_to_generate;
+    bacnet::type::bit_string bit_string_parsed;
     bacnet::binary_data generated;
     bit_string_to_generate.push_back(true);
     bit_string_to_generate.push_back(true);
@@ -131,8 +131,8 @@ using namespace bacnet::apdu::type;
 
   std::cout << std::endl << "--------------------------------------------------------------" << std::endl;
   {
-    bacnet::apdu::type::bit_string bit_string_to_generate;
-    bacnet::apdu::type::bit_string bit_string_parsed;
+    bacnet::type::bit_string bit_string_to_generate;
+    bacnet::type::bit_string bit_string_parsed;
     bacnet::binary_data generated;
     std::cout << "bit_string_to_generate " << bit_string_to_generate << std::endl;
 
@@ -155,8 +155,8 @@ using namespace bacnet::apdu::type;
 
   std::cout << std::endl << "--------------------------------------------------------------" << std::endl;
    {
-     bacnet::apdu::type::bit_string bit_string_to_generate;
-     bacnet::apdu::type::bit_string bit_string_parsed;
+     bacnet::type::bit_string bit_string_to_generate;
+     bacnet::type::bit_string bit_string_parsed;
      bacnet::binary_data generated;
      std::srand(42);
      for(int i = 0; i < 1337; ++i) {

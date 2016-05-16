@@ -88,7 +88,7 @@ namespace bacnet {
 }
 
 
-namespace bacnet { namespace common {
+namespace bacnet { namespace type {
 
   struct object_identifier  {
 
@@ -192,11 +192,9 @@ static inline std::ostream& operator<<(std::ostream& os, const object_identifier
 
 
 BOOST_FUSION_ADAPT_ADT(
-    bacnet::common::object_identifier,
+    bacnet::type::object_identifier,
     (obj.to_native(), obj.from_native(val))
-)
-
-
+);
 
 
 #endif //NINJA_WOOKIE_BACNET_COMMON_OBJECT_IDENTIFIER_HPP

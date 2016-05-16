@@ -23,11 +23,11 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/time.hpp>
+#include <bacnet/type/time.hpp>
 #include <bacnet/apdu/type/detail/time_grammar.hpp>
 
 
-bool is_equal(const bacnet::apdu::type::time& a, const bacnet::apdu::type::time& b) {
+bool is_equal(const bacnet::type::time& a, const bacnet::type::time& b) {
   if(a.hours != b.hours) {
     return false;
   }
@@ -63,8 +63,8 @@ using namespace bacnet::apdu::type;
   bacnet::apdu::type::detail::generator::time_grammar< std::back_insert_iterator <bacnet::binary_data> >  grammar_gen;
   bacnet::apdu::type::detail::parser::time_grammar<bacnet::parse_iterator>                                grammar_parse;
   {
-    bacnet::apdu::type::time time_to_generate;
-    bacnet::apdu::type::time time_parsed;
+    bacnet::type::time time_to_generate;
+    bacnet::type::time time_parsed;
     bacnet::binary_data generated;
     bacnet::binary_data generation_expected;
     generation_expected.push_back(0xB4); //tag

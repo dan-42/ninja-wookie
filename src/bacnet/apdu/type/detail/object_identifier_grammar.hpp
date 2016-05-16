@@ -30,6 +30,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/type/object_identifier.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -43,7 +44,7 @@ using boost::phoenix::bind;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::common::object_identifier;
+using bacnet::type::object_identifier;
 
 
 template<typename Iterator>
@@ -123,7 +124,7 @@ using boost::spirit::repository::karma::big_24word;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-using bacnet::common::object_identifier;
+using bacnet::type::object_identifier;
 
 
 template<typename Iterator>
