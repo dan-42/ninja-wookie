@@ -19,10 +19,6 @@
  */
 
 
-#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-#define BOOST_MPL_LIMIT_VECTOR_SIZE 600
-
-
 #include <bacnet/type/properties.hpp>
 #include <bacnet/stack/factory.hpp>
 #include <exception>
@@ -63,7 +59,7 @@ namespace object {
 
 
 
-
+/*
 
 namespace bacnet {
 namespace detail {
@@ -92,7 +88,7 @@ template<typename Derived, typename PropertieMap>
 class object : public detail::object_base {
 public:
 
-  boost::mpl::vector<>
+
 
   object() {
    // object_types_supported_.set(traits::supported_index<Derived>::value);
@@ -186,11 +182,11 @@ using namespace bacnet::type;
 
   };
 }
-
+*/
 
 int main(int argc, char *argv[]) {
 
-
+/*
   bacnet::type::property::supported_properties t;
 
 
@@ -209,5 +205,5 @@ int main(int argc, char *argv[]) {
     o->write_prop(property_id, index, data);
     o->read_prop(property_id, index);
   }
-
+*/
 }

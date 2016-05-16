@@ -8,7 +8,11 @@
 #ifndef WOOKIE_BACNET_TYPE_DETAIL_PROPERTY_IMPL_HPP_
 #define WOOKIE_BACNET_TYPE_DETAIL_PROPERTY_IMPL_HPP_
 
+#include <cstdint>
+#include <string>
+#include <type_traits>
 
+#include <boost/preprocessor.hpp>
 #include <boost/mpl/vector.hpp>
 
 
@@ -66,7 +70,7 @@ namespace bacnet { namespace type { namespace property {
             property_name;                                                     \
     template<>                                                                 \
     struct name<property_name> {                                               \
-        const std::string value{#property_name};                               \
+      static constexpr const char* const value = #property_name;               \
     };                                                                         \
                                                                                \
 
@@ -129,7 +133,8 @@ namespace bacnet { namespace type { namespace property {
                             unused,                                            \
                             property_seq  )                                    \
                                                                                \
-  typedef boost::mpl::vector<                                                  \
+/*  typedef boost::mpl::vector<                                                  \
+
       BOOST_PP_SEQ_FOR_EACH(  EXTRACT_PROPERTY_NAME_WITH_COMMA,                \
                               unused,                                          \
                               BOOST_PP_SEQ_POP_BACK(property_seq)  )           \
@@ -141,7 +146,7 @@ namespace bacnet { namespace type { namespace property {
        )                                                                       \
      )                                                                         \
   > supported_properties;
-
+*/
 
 
 

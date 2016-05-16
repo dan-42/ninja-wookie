@@ -7,6 +7,8 @@
 
 #ifndef NINJA_WOOKIE_BACNET_TYPE_UNSIGNED_INTEGER_HPP
 #define NINJA_WOOKIE_BACNET_TYPE_UNSIGNED_INTEGER_HPP
+#include <cstdint>
+
 namespace bacnet { namespace type {
 
 typedef uint32_t unsigned_integer;

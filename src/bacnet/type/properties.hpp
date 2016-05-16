@@ -43,7 +43,7 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  change_of_state_count,                15  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  change_of_state_time,                 16  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  notification_class,                   17  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    /*                                        18        ,deleted   */
+    /*                                        18     deleted   */
     ((  controlled_variable_reference,        19  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  controlled_variable_units,            20  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  controlled_variable_value,            21  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -76,11 +76,11 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  instance_of,                          48  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  integral_constant,                    49  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  integral_constant_units,              50  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-   /*  issue_confirmed_notifications,      51        ,  removed in version 1 revision 4     */
+   /*  issue_confirmed_notifications,         51        removed in version 1 revision 4     */
     ((  limit_enable,                         52  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  list_of_group_members,                53  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  list_of_object_property_references,   54  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    /*  value 55 is unassigned,*/
+    /*                                  value 55 is unassigned  */
     ((  local_date,                           56  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  local_time,                           57  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  location,                             58  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -120,17 +120,17 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  program_state,                        92  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  proportional_constant,                93  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  proportional_constant_units,          94  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    /*  protocol_conformance_class,           95        removed in version 1 revision 2. */
+    /*  protocol_conformance_class,           95     removed in version 1 revision 2. */
     ((  protocol_object_types_supported,      96  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  protocol_services_supported,          97  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  protocol_version,                     98  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  read_only,                            99  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  reason_for_halt,                      100 ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     /*  recipient,                            101        removed in version 1 revision 4.   */
- /*   ((  recipient_list,                       102  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    ((  reliability                           103  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+    ((  recipient_list,                       102  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+    ((  reliability,                          103  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  relinquish_default,                   104  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    ((  required,                             105  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+     ((  required,                             105  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  resolution,                           106  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  segmentation_supported,               107  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  setpoint,                             108  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -154,17 +154,17 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  buffer_size,                          126  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  client_cov_increment,                 127  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  cov_resubscription_interval,          128  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-  */  /*  current_notify_time,                  129        removed in version 1 revision 3.*/
- /*   ((  event_time_stamps,                    130  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+ /*     current_notify_time,                  129     removed in version 1 revision 3.*/
+    ((  event_time_stamps,                    130  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  log_buffer,                           131  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  log_device_object_property,           132  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-*/ /*    ((  enable,                               133        ,"log_enable was renamed to enable in version 1 revision 5  ,   )) */
- /*   ((  log_interval,                         134  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+ /*     enable,                               133     log_enable was renamed to enable in version 1 revision 5  */
+    ((  log_interval,                         134  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  maximum_value,                        135  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  minimum_value,                        136  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  notification_threshold,               137  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-  */  /*((  previous_notify_time,                 138        removed in version 1 revision 3.  */
- /*   ((  protocol_revision,                    139  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+ /*     previous_notify_time,                 138        removed in version 1 revision 3.  */
+    ((  protocol_revision,                    139  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  records_since_notification,           140  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  record_count,                         141  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  start_time,                           142  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -219,12 +219,12 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  value_set,                            191  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  value_change_time,                    192  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  align_intervals,                      193  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-  */  /*  value 194  unassigned   */
- /*   ((  interval_offset,                      195  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+                                    /*  value 194  unassigned   */
+    ((  interval_offset,                      195  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  last_restart_reason,                  196  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  logging_type,                         197  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-  */  /*   198_201 unassigned   */
- /*   ((  restart_notification_recipients,      202  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+ /*                                          198_201 unassigned   */
+    ((  restart_notification_recipients,      202  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  time_of_device_restart,               203  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  time_synchronization_interval,        204  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  trigger,                              205  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -238,14 +238,14 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  duty_window,                          213  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  expected_shed_level,                  214  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  full_duty_baseline,                   215  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
- */   /*   values 216_217 are unassigned */
-  /*  ((  requested_shed_level,                 218  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+  /*                                  values 216_217 are unassigned */
+    ((  requested_shed_level,                 218  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  shed_duration,                        219  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  shed_level_descriptions,              220  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  shed_levels,                          221  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  state_description,                    222  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-   */ /*  values 223_225 are unassigned  */
-  /*  ((  door_alarm_state,                     226  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+  /*                                   values 223_225 are unassigned  */
+    ((  door_alarm_state,                     226  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  door_extended_pulse_time,             227  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  door_members,                         228  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  door_open_too_long_time,              229  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -255,8 +255,8 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  lock_status,                          233  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  masked_alarm_values,                  234  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  secured_status,                       235  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-   */ /*  Values 236-243 unassigned   */
- /*   ((  absentee_limit,                       244  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+  /*                                    Values 236-243 unassigned   */
+    ((  absentee_limit,                       244  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  access_alarm_events,                  245  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  access_doors,                         246  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  access_event,                         247  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -282,7 +282,7 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  days_remaining,                       267  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  entry_points,                         268  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  exit_points,                          269  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    ((  expiry_time,                          270  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+//    ((  expiry_time,                          270  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  extended_time_enable,                 271  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  failed_attempt_events,                272  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  failed_attempts,                      273  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
@@ -295,8 +295,8 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
     ((  last_credential_removed_time,         280  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  last_use_time,                        281  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  lockout,                              282  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-    ((  lockout_relinquish_time,              283  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
-  */  /*  master_exemption,                     284        removed in version 1 revision 13  */
+ //   ((  lockout_relinquish_time,              283  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
+  /*  master_exemption,                     284        removed in version 1 revision 13  */
 /*    ((  max_failed_attempts,                  285  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  members,                              286  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
     ((  muster_point,                         287  ,  WOOKIE_BACNET_IS_STANDARD_PROPERTY, WOOKIE_BACNET_IS_SPECIAL_PROPERTY  ))
