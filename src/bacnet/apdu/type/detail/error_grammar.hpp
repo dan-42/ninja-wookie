@@ -48,16 +48,19 @@ template<typename Iterator>
 struct error_grammar : grammar<Iterator, bacnet::type::error()> {
 
 
-    rule<Iterator, bacnet::type::error()>          start_rule;
+    rule<Iterator, bacnet::type::error()>  start_rule;
+
+    rule<Iterator, bacnet::type::error()>  context_rule;
+    rule<Iterator, bacnet::type::error()>  error_rule;
+
+    rule<Iterator>                         open_tag_rule;
+    rule<Iterator>                         close_tag_rule;
 
     enumeration_grammar<Iterator>          enumeration_grammar_;
 
    tag_grammar<Iterator> tag_grammar_;
 
-   error_grammar() :  error_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::enumerated)),
-                                                                  is_expecting_context_tag_(false) {
+   error_grammar() :  error_grammar::base_type(start_rule) {
       setup();
     }
 
@@ -71,8 +74,16 @@ struct error_grammar : grammar<Iterator, bacnet::type::error()> {
 private:
 
     inline void setup() {
-      start_rule  =  tag_validation_rule
-                  >> value_rule ;
+      start_rule    =  context_rule
+                    | error_rule ;
+
+      context_rule  =  open_tag_rule
+                    >> error_rule
+                    >> close_tag_rule
+                    ;
+
+      error_rule  =  enumeration_grammar_
+                  >> enumeration_grammar_;
 
            tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::check_tag, this, _1) == true ];
 
