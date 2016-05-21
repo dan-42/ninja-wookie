@@ -7,7 +7,7 @@
  *
  * ninja-wooki is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * License, or (at your option) service later version.
  *
  * ninja-wooki is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -28,6 +28,7 @@
 #include <bacnet/service/service.hpp>
 #include <bacnet/service/service/detail/i_am_garmmar.hpp>
 #include <bacnet/service/service/detail/read_property_request_grammar.hpp>
+#include <bacnet/service/service/detail/read_property_ack_grammar.hpp>
 #include <bacnet/service/service/detail/who_is_grammar.hpp>
 #include <bacnet/service/service/detail/reinitialize_device_grammar.hpp>
 
@@ -36,10 +37,11 @@ namespace bacnet { namespace service { namespace service { namespace detail { na
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace bacnet::service;
+using namespace bacnet::service::service;
 
   template<typename Iterator>
-  struct unconfirmed_service_grammar : grammar<Iterator, unconfirmed::possible_service()> {
-    rule<Iterator, unconfirmed::possible_service()>   start_rule;
+  struct unconfirmed_service_grammar : grammar<Iterator, service::unconfirmed::service()> {
+    rule<Iterator, unconfirmed::service()>   start_rule;
     who_is_grammar<Iterator>                          who_is_grammar_;
     i_am_grammar<Iterator>                            i_am_grammar_;
     reinitialize_device_grammar<Iterator>             reinitialize_device_grammar_;
@@ -52,8 +54,8 @@ using namespace bacnet::service;
   };
 
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed_request::possible_service()> {
-    rule<Iterator, confirmed_request::possible_service()>   start_rule;
+  struct confirmed_service_grammar : grammar<Iterator, confirmed::service()> {
+    rule<Iterator, confirmed::service()>   start_rule;
 
     read_property_request_grammar<Iterator>                 read_property_grammar_;
     reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
@@ -76,8 +78,8 @@ using namespace boost::spirit::qi;
 using namespace bacnet::service;
 
   template<typename Iterator>
-  struct unconfirmed_service_grammar : grammar<Iterator, unconfirmed::possible_service()> {
-    rule<Iterator,  unconfirmed::possible_service()>  start_rule;
+  struct unconfirmed_service_grammar : grammar<Iterator, unconfirmed::service()> {
+    rule<Iterator,  unconfirmed::service()>  start_rule;
     who_is_grammar<Iterator>                          who_is_grammar_;
     i_am_grammar<Iterator>                            i_am_grammar_;
     reinitialize_device_grammar<Iterator>             reinitialize_device_grammar_;
@@ -90,14 +92,16 @@ using namespace bacnet::service;
     }
   };
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed_request::possible_service()> {
-    rule<Iterator,  confirmed_request::possible_service()>    start_rule;
-    read_property_request_grammar<Iterator>                 read_property_grammar_;
+  struct confirmed_service_grammar : grammar<Iterator, confirmed::request()> {
+    rule<Iterator,  confirmed::request()>    start_rule;
+    read_property_request_grammar<Iterator>         read_property_request_grammar_;
+    read_property_ack_grammar<Iterator>             read_property_ack_grammar_;
     reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
     confirmed_service_grammar() : confirmed_service_grammar::base_type(start_rule) {
       start_rule =
                     reinitialize_device_grammar_
-                 |  read_property_grammar_
+                 |  read_property_request_grammar_
+                 //|  read_property_ack_grammar_
                  ;
     }
   };
@@ -114,8 +118,8 @@ using namespace bacnet::service;
 
 namespace bacnet { namespace service { namespace service { namespace detail {
 
-  unconfirmed::possible_service parse_unconfirmed(bacnet::binary_data& binary_data) {
-    unconfirmed::possible_service parsed{};
+  bacnet::service::service::unconfirmed::service parse_unconfirmed(bacnet::binary_data& binary_data) {
+    bacnet::service::service::unconfirmed::service parsed{};
     auto start = binary_data.begin();
     auto end = binary_data.end();
     bacnet::service::service::detail::parser::unconfirmed_service_grammar<bacnet::parse_iterator> grammar;
@@ -125,8 +129,8 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     }
     return parsed;
   }
-  confirmed_request::possible_service parse_confirmed(bacnet::binary_data& binary_data) {
-    confirmed_request::possible_service parsed{};
+  confirmed::request parse_confirmed(bacnet::binary_data& binary_data) {
+    confirmed::request parsed{};
     auto start = binary_data.begin();
     auto end = binary_data.end();
     bacnet::service::service::detail::parser::confirmed_service_grammar<bacnet::parse_iterator> grammar;
@@ -135,7 +139,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   }
 
 
-  bacnet::binary_data generate_unconfirmed(const unconfirmed::possible_service &service) {
+  bacnet::binary_data generate_unconfirmed(const unconfirmed::service &service) {
     bacnet::binary_data data;
     bacnet::generate_iterator sink(data);
     bacnet::service::service::detail::generator::unconfirmed_service_grammar<bacnet::generate_iterator> grammar;
@@ -147,7 +151,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
      return bacnet::binary_data{};
     }
   }
-  bacnet::binary_data generate_confirmed(const confirmed_request::possible_service &service) {
+  bacnet::binary_data generate_confirmed(const confirmed::service &service) {
     bacnet::binary_data data;
     bacnet::generate_iterator sink(data);
     bacnet::service::service::detail::generator::confirmed_service_grammar<bacnet::generate_iterator> grammar;

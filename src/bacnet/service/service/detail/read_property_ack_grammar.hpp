@@ -45,7 +45,7 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
   rule<Iterator, object_identifier()>           object_identifier_rule;
   rule<Iterator, uint32_t()>                    property_identifier_rule;
   rule<Iterator, boost::optional<uint32_t>()>   property_array_index_rule;
-  rule<Iterator, bacnet::make_binary()>         binary_data_rule;
+  rule<Iterator, bacnet::binary_data()>         binary_data_rule;
 
   object_identifier_grammar<Iterator>      tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
@@ -61,7 +61,7 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     object_identifier_rule              =  tag_0_rule_;
     property_identifier_rule            =  tag_1_rule_;
     property_array_index_rule           = -tag_2_rule_;
-    binary_data_rule                    = repeate[byte_];
+    binary_data_rule                    = repeat[byte_];
   }
 };
 
@@ -82,7 +82,7 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
   rule<Iterator, object_identifier()>           object_identifier_rule;
   rule<Iterator, uint32_t()>                    property_identifier_rule;
   rule<Iterator, boost::optional<uint32_t>()>   property_array_index_rule;
-  rule<Iterator, bacnet::make_binary()>         binary_data_rule;
+  rule<Iterator, bacnet::binary_data()>         binary_data_rule;
 
   object_identifier_grammar<Iterator>      tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
@@ -98,7 +98,7 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     object_identifier_rule              =  tag_0_rule_;
     property_identifier_rule            =  tag_1_rule_;
     property_array_index_rule           = -tag_2_rule_;
-    binary_data_rule                    = repeate[byte_];
+    binary_data_rule                    = repeat[byte_];
   }
 };
 

@@ -18,7 +18,6 @@
  * Authors: Daniel Friedrich
  */
 
-
 #include <bacnet/type/properties.hpp>
 #include <bacnet/stack/factory.hpp>
 #include <exception>
@@ -55,14 +54,7 @@ namespace object {
 
 
 
-
-
-
-
-/*
-
-namespace bacnet {
-namespace detail {
+namespace bacnet { namespace detail {
 
   class object_base {
   public:
@@ -72,7 +64,8 @@ namespace detail {
 
   };
   typedef std::shared_ptr<object_base> object_base_ptr_t;
-}//detail
+
+}
 
 typedef std::vector<detail::object_base_ptr_t> object_ptr_list_t;
 
@@ -99,22 +92,23 @@ public:
 
   Derived& self() { return static_cast<Derived&>(*this); }
 
-  template<typename Property, typename PropertyType>
-  inline bacnet::binary_data read_prop(Property property_id, boost::optional<uint16_t> index) final {
+  
+  virtual inline bacnet::binary_data read_prop(uint16_t property_id, boost::optional<uint16_t> index) final {
 
     if(traits::has_read_property<Derived>::value) {
       std::cout << "object:: read_prop" << std::endl;
-      return self().read_prop_impl(property_id, index);
+      //xxx map uint16_t  to property_type
+      //return self().read_prop_impl(property_id, index);
     }
     std::cout << "object:: read_prop not supported" << std::endl;
     return bacnet::binary_data{};
   }
 
 
-  template<typename Property, typename PropertyType>
-  inline void write_prop(Property property_id, boost::optional<uint16_t> index, bacnet::binary_data data) final {
+  
+  virtual inline void write_prop(uint16_t property_id, boost::optional<uint16_t> index, bacnet::binary_data data) final {
     std::cout << "object:: write_prop" << std::endl;
-    self().write_prop_impl(property_id, index, data);
+    //self().write_prop_impl(property_id, index, data);
   }
 
 
@@ -138,9 +132,8 @@ using namespace bacnet::type;
 
 
 
-  struct analog_input final : public object<analog_input, object_properties::analog_input_type_map> {
-    namespace property = bacnet::type::property;
-    using namespace bacnet::type;
+  struct analog_input final : public object<analog_input, object_properties::analog_input_type_map> {    
+    //using namespace bacnet::type;
 
     inline bacnet::binary_data read_prop_impl(uint16_t property_id, boost::optional<uint16_t> index) {
       std::cout << "analog_input:: read_prop_impl" << std::endl;
@@ -151,12 +144,12 @@ using namespace bacnet::type;
 
 
 
-    inline void write_prop_impl(property::alarm_value, boost::optional<uint16_t> index, type::possible_type data) {
+    inline void write_prop_impl(bacnet::type::property::alarm_value, boost::optional<uint16_t> index, type::possible_type data) {
         std::cout << "analog_input:: write_prop_impl" << std::endl;
     }
 
 
-    inline void write_prop_impl(property::action, boost::optional<uint16_t> index, bacnet::binary_data data) {
+    inline void write_prop_impl(bacnet::type::property::action, boost::optional<uint16_t> index, bacnet::binary_data data) {
         std::cout << "analog_input:: write_prop_impl" << std::endl;
     }
 
@@ -168,7 +161,7 @@ using namespace bacnet::type;
 
 
 
-  struct analog_output final : public object<analog_output> {
+  struct analog_output final : public object<analog_output, object_properties::analog_input_type_map> {
 
       inline bacnet::binary_data read_prop_impl(uint16_t property_id, boost::optional<uint16_t> index) {
         std::cout << "analog_output:: read_prop_impl" << std::endl;
@@ -182,12 +175,12 @@ using namespace bacnet::type;
 
   };
 }
-*/
+
 
 int main(int argc, char *argv[]) {
 
-/*
-  bacnet::type::property::supported_properties t;
+
+  //bacnet::type::property::supported_properties t;
 
 
   bacnet::object_ptr_list_t object_list;
@@ -205,5 +198,5 @@ int main(int argc, char *argv[]) {
     o->write_prop(property_id, index, data);
     o->read_prop(property_id, index);
   }
-*/
+
 }

@@ -26,6 +26,8 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/optional.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
+#include <bacnet/service/service/traits.hpp>
+
 
 namespace bacnet { namespace service { namespace service {
 struct who_is {
@@ -70,5 +72,15 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   };
 
 }}}}
+
+
+namespace bacnet { namespace service { namespace service {    
+    
+    template<> struct is_unconfirmed<who_is> :  boost::mpl::true_ {};
+    
+    template<> struct is_request<who_is> :      boost::mpl::true_ {};
+    template<> struct is_response<who_is> :     boost::mpl::true_ {};    
+    
+}}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERCICE_WHO_IS_HPP_HPP

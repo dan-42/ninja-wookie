@@ -27,6 +27,7 @@
 #include <bacnet/type/object_identifier.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
+#include <bacnet/service/service/traits.hpp>
 
 
 namespace bacnet { namespace service { namespace service {
@@ -77,5 +78,14 @@ namespace bacnet { namespace service { namespace service { namespace detail {
 
 
 }}}}
+
+
+namespace bacnet { namespace service { namespace service {    
+    
+    template<> struct is_confirmed<read_property_ack> :  boost::mpl::true_ {};    
+    
+    template<> struct is_response<read_property_ack> :   boost::mpl::true_ {};    
+    
+}}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERCICE_READ_PROPETRY_ACK_HPP

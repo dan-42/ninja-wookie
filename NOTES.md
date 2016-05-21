@@ -9,6 +9,9 @@
 
 
 # TODO - next setps
+ - [ ] apdu controller add timeout handling for confirmed services
+ - [ ] service controller manage handel hasking for doi
+ - [ ] error handling !
  - [ ] add information to the README.md
  - [ ] example script as client, sending reinit, write properties, and others in sequence if successful 
  - [ ] simple bacnet-browser:

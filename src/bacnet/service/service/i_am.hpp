@@ -28,7 +28,7 @@
 
 #include <boost/fusion/include/define_struct.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
-
+#include <bacnet/service/service/traits.hpp>
 
 #include <bacnet/type/object_identifier.hpp>
 #include <bacnet/common/segment.hpp>
@@ -54,6 +54,7 @@ static inline std::ostream& operator<<(std::ostream& os, const i_am& s) {
 
 }}}
 
+
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::service::service::i_am,
     i_am_device_identifier,
@@ -62,15 +63,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     vendor_id
 )
 
-/*
-BOOST_FUSION_DEFINE_STRUCT(
-    (bacnet)(service)(service), i_am,
-    (bacnet::common::object_identifier, i_am_device_identifier)
-    (uint32_t, max_apdu_length_accepted)
-    (bacnet::common::segmentation, segmentation_supported)
-    (uint16_t, vendor_id)
-)
-*/
+
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service::service;
 
@@ -86,5 +79,14 @@ namespace bacnet { namespace service { namespace service { namespace detail {
 
 }}}}
 
+
+namespace bacnet { namespace service { namespace service {    
+    
+    template<> struct is_unconfirmed<i_am> :  boost::mpl::true_ {};
+    
+    template<> struct is_request<i_am> :      boost::mpl::true_ {};
+    template<> struct is_response<i_am> :     boost::mpl::true_ {};    
+    
+}}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERCICE_I_AM_HPP

@@ -26,6 +26,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/type/character_string.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
+#include <bacnet/service/service/traits.hpp>
 
 
 namespace bacnet { namespace service { namespace service {
@@ -83,5 +84,15 @@ namespace bacnet { namespace service { namespace service { namespace detail {
 
 
 }}}}
+
+
+namespace bacnet { namespace service { namespace service {    
+    
+    template<> struct is_confirmed<reinitialize_device> :  boost::mpl::true_ {};
+    
+    template<> struct is_request<reinitialize_device> :    boost::mpl::true_ {};
+    
+    
+}}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERCICE_REINITIALIZE_DEVICE_HPP

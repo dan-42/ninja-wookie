@@ -58,12 +58,13 @@
 
 namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service;
-  static inline unconfirmed::possible_service parse(bacnet::apdu::frame::unconfirmed_request& frame) {
+  static inline unconfirmed::service parse(bacnet::apdu::frame::unconfirmed_request frame) {
     return parse_unconfirmed(frame.service_data);
   }
-  static inline confirmed_request::possible_service parse(bacnet::apdu::frame::confirmed_request& frame) {
-    return parse_confirmed(frame.service_data);
+  static inline confirmed::request parse(bacnet::apdu::frame::confirmed_request frame) {
+    return parse_confirmed(frame.service_data);      
   }
+
 
 }}}}
 
@@ -172,7 +173,7 @@ public:
        *
        */
       if(ec) {
-        handler(ec, bacnet::service::possible_service_response());
+        handler(ec, bacnet::service::confirmed::response{});
       }
       else {
         inbound_router_.meta_information(std::move(mi));
@@ -194,36 +195,37 @@ public:
     }
     else {
       /**
-       * send who is, and if more then one answers, send error up to calling layer
+       * here we have 0 or more the 1 doi, so we send a new who_is
        */
      auto callback_idx =  callback_manager_.set_i_am_service_callback(
-         [handler, service, endpoints, device_object_identifier, this]
-           (bacnet::service::i_am i_am, boost::system::error_code ec, bacnet::common::protocol::meta_information mi) {
-               if(i_am.i_am_device_identifier == device_object_identifier) {
-                 async_send(mi.address, service, handler);
-               }
-            });
+                                 [handler, service, device_object_identifier, this]
+                                      (bacnet::service::i_am i_am, boost::system::error_code ec, bacnet::common::protocol::meta_information mi) {
+                                        if(i_am.i_am_device_identifier == device_object_identifier) {
+                                          async_send(mi.address, service, handler);
+                                        }
+                                       });
 
-     bacnet::service::service::who_is wi(device_object_identifier.instance_number(), device_object_identifier.instance_number());
+     bacnet::service::service::who_is wi(device_object_identifier.instance_number());
      async_send(wi, [handler](boost::system::error_code ec) {  });
 
 
       timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
-      timeout_timer_.async_wait([handler,callback_idx,  this](boost::system::error_code ec) {
-        callback_manager_.clear_i_am_service_callback(callback_idx);
+      timeout_timer_.async_wait(
+                        [handler,callback_idx,  this]
+                             (boost::system::error_code ec) {
+                                    callback_manager_.clear_i_am_service_callback(callback_idx);
 
-        if(ec == boost::asio::error::operation_aborted) {
-            //todo store handler and wait for answer!
-            bacnet::service::possible_service_response res;
-            handler(ec, res);
-          }
-        else {
-          std::cout << "no device with doi found  " << std::endl;
-          //todo set special error_code on error
-          bacnet::service::possible_service_response res;
-          handler(ec, res);
-        }
-      });
+                                    if(ec == boost::asio::error::operation_aborted) {
+                                        bacnet::service::confirmed::response res;
+                                        handler(ec, res);
+                                      }
+                                    else {
+                                      std::cout << "no device with doi found  " << std::endl;
+                                      //todo set special error_code on error
+                                      bacnet::service::confirmed::response res;
+                                      handler(ec, res);
+                                    }
+                              });
     }
   }
 

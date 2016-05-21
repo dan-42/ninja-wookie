@@ -132,7 +132,7 @@ struct controller {
     auto data                                         = frame::generator::generate(frame);
 
 
-    // don't forget timeout!
+    // xxx don't forget timeout!
     underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const boost::system::error_code& ec) {
             if(ec) {
               this->request_manager_.purge_invoke_id(adr, invoke_id);
