@@ -37,11 +37,94 @@
 
 #include <bacnet/service/service/traits.hpp>
 
+
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
 #include <bacnet/service/service/read_property_request.hpp>
 #include <bacnet/service/service/read_property_ack.hpp>
 #include <bacnet/service/service/reinitialize_device.hpp>
+
+
+/*
+ -- ASHRAE. Proprietary extensions are made by using the UnconfirmedPrivateTransfer service. See Clause 23.
+BACnet-Unconfirmed-Service  is request and response
+    - [x] i-Am
+    - [ ] i-Have
+    - [ ] unconfirmedCOVNotification
+    - [ ] unconfirmedEventNotification
+    - [ ] unconfirmedPrivateTransfer
+    - [ ] unconfirmedTextMessage
+    - [ ] timeSynchronization
+    - [ ] who-Has
+    - [x] who-Is
+    - [ ] utcTimeSynchronization
+    - [ ] writeGroup
+
+
+## confirmed requests
+
+    - [ ] AcknowledgeAlarm-Request,
+    - [ ] ConfirmedCOVNotification-Request,
+    - [ ] ConfirmedEventNotification-Request,
+
+    - [ ] GetEnrollmentSummary-Request,
+    - [ ] GetEventInformation-Request,
+    - [ ] SubscribeCOV-Request,
+    - [ ] SubscribeCOVProperty-Request,
+    - [ ] LifeSafetyOperation-Request,
+
+    - [ ] AtomicReadFile-Request,
+    - [ ] AtomicWriteFile-Request,
+
+    - [ ] AddListElement-Request,
+    - [ ] RemoveListElement-Request,
+    - [ ] CreateObject-Request,
+    - [ ] DeleteObject-Request,
+    - [ ] ReadProperty-Request,
+    - [ ] ReadPropertyMultiple-Request,
+    - [ ] ReadRange-Request,
+    - [ ] WriteProperty-Request,
+    - [ ] WritePropertyMultiple-Request,
+
+
+    - [ ] DeviceCommunicationControl-Request,
+    - [ ] ConfirmedPrivateTransfer-Request,
+    - [ ] ConfirmedTextMessage-Request,
+    - [x] ReinitializeDevice-Request,
+
+    - [ ] VT-Open-Request,
+    - [ ] VT-Close-Request,
+    - [ ] VT-Data-Request
+
+    -- added after 1995 see separate part
+    - [ ] readRange
+    - [ ] lifeSafetyOperation
+    - [ ] subscribeCOVProperty
+
+    - [ ] getEventInformation
+
+
+## confirmed responses
+    - [ ] GetAlarmSummary-ACK,
+    - [ ] GetEnrollmentSummary-ACK,
+    - [ ] GetEventInformation-ACK,
+
+    - [ ] AtomicReadFile-ACK,
+    - [ ] AtomicWriteFile-ACK,
+
+    - [ ] CreateObject-ACK,
+    - [ ] ReadProperty-ACK,
+    - [ ] ReadPropertyMultiple-ACK,
+    - [ ] ReadRange-ACK,
+
+    - [ ] ConfirmedPrivateTransfer-ACK,
+
+    - [ ] VT-Open-ACK,
+    - [ ] VT-Data-ACK
+
+ */
+
+ // /*
 
 namespace bacnet { namespace service { namespace service {
 
@@ -57,6 +140,14 @@ namespace bacnet { namespace service { namespace service {
                         
   > possible_services;
   
+
+
+
+
+
+
+
+
   typedef boost::mpl::remove_if<
     bacnet::service::service::possible_services,
     boost::mpl::lambda< 
@@ -125,5 +216,90 @@ namespace bacnet { namespace service { namespace service { namespace confirmed {
 }}}}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// */
+//////////////////////////////////////////////////////////////////////////////////
+
+/*
+
+namespace bacnet { namespace service { namespace service {
+
+  
+                        
+  
+  typedef boost::variant< 
+                                who_is,  
+                                i_am,
+  
+                        
+                                read_property_request,
+                                read_property_ack,
+
+                                reinitialize_device
+  > supported_service;
+  
+
+}}}
+
+namespace bacnet { namespace service { namespace service { namespace unconfirmed {
+
+  typedef boost::variant< 
+                                who_is,  
+                                i_am
+  
+  > service;
+
+}}}}
+
+
+
+namespace bacnet { namespace service { namespace service { namespace confirmed {
+
+   typedef boost::variant<                                
+                        
+                                read_property_request,
+                                read_property_ack,
+
+                                reinitialize_device
+  >  service;                                
+  
+  
+  
+   typedef boost::variant<  
+                                read_property_request,                                
+
+                                reinitialize_device
+  >   request;
+  
+  
+  
+  
+
+   typedef boost::variant<      
+                                read_property_ack
+                                
+  >   response;
+
+
+    typedef read_property_ack response;
+
+}}}}
+
+*/
 
 #endif //NINJA_WOOKIE_SERVICES_HPP

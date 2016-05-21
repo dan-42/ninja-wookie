@@ -97,7 +97,7 @@ using integral_constant_ = std::integral_constant<bacnet::type::property_type, T
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
 
 
-#define WOOKIE_DEFINE_BACNET_PROPERTY_ALL(property_name, property_id, is_standard, is_normal) \
+#define WOOKIE_DEFINE_BACNET_PROPERTY(property_name, property_id, is_standard, is_normal) \
     WOOKIE_DEFINE_BACNET_PROPERTY_SIMPLE_1(property_name, property_id)           \
                                                                                \
                                                                                \
@@ -117,25 +117,25 @@ using integral_constant_ = std::integral_constant<bacnet::type::property_type, T
  * who provided me with this awesome macro solution
  */
 
-#define NM_BACNET_FILLER_0(X)                                                 \
-   WOOKIE_DEFINE_BACNET_PROPERTY_ALL X                                                    \
+#define NM_BACNET_FILLER_0(X)                                                  \
+   WOOKIE_DEFINE_BACNET_PROPERTY X                                             \
     NM_BACNET_FILLER_1
 
 #define NM_BACNET_FILLER_1(X)                                                  \
-    WOOKIE_DEFINE_BACNET_PROPERTY_ALL X                                                    \
+    WOOKIE_DEFINE_BACNET_PROPERTY X                                            \
     NM_BACNET_FILLER_0
 
 #define NM_BACNET_FILLER_0_END
 #define NM_BACNET_FILLER_1_END
 
-#define WOOKIE_DEFINE_BACNET_PROPERTIES(elems)                                   \
-            BOOST_PP_CAT( NM_BACNET_FILLER_0 elems ,_END)                        \
+#define WOOKIE_DEFINE_BACNET_PROPERTIES(elems)                                 \
+            BOOST_PP_CAT( NM_BACNET_FILLER_0 elems ,_END)                      \
 
 
 
 
 
-/*  typedef boost::mpl::vector<                                                  \
+/*  typedef boost::mpl::vector<                                                \
 
       BOOST_PP_SEQ_FOR_EACH(  EXTRACT_PROPERTY_NAME_WITH_COMMA,                \
                               unused,                                          \

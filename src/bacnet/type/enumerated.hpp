@@ -32,27 +32,35 @@ struct enumerated {
 
   enum class e {
     undefined,
-    BACnetDeviceStatus ,
-    BACnetDoorAlarmState ,
-    BACnetDoorSecuredStatus ,
-    BACnetDoorStatus ,
-    BACnetDoorValue,
-    BACnetEngineeringUnits ,
-    BACnetEventState,
-    BACnetEventType,
-    BACnetFaultType,
-    BACnetFileAccessMethod,BACnetLifeSafetyMode,
-    BACnetLifeSafetyOperation ,
-    BACnetLifeSafetyState,
-    BACnetLightingInProgress ,
-    BACnetLightingOperation ,
-    BACnetLightingTransition,
-    BACnetLockStatus ,
-    BACnetLoggingType,
+    error_code,
+    error_class,
+    DeviceStatus ,
+    DoorAlarmState ,
+    DoorSecuredStatus ,
+    DoorStatus ,
+    DoorValue,
+    EngineeringUnits ,
+    EventState,
+    EventType,
+    FaultType,
+    FileAccessMethod,LifeSafetyMode,
+    LifeSafetyOperation ,
+    LifeSafetyState,
+    LightingInProgress ,
+    LightingOperation ,
+    LightingTransition,
+    LockStatus ,
+    LoggingType,
   };
   e type{e::undefined};
   uint32_t value{0};
 
+
+  enumerated() = default;
+
+  enumerated(enumerated e, uint32_t v) : type(e), value(v) {}
+
+  enumerated(uint32_t v) : type(e::undefined), value(v) {}
 
   friend std::ostream& operator<<(std::ostream& os, const enumerated& v) {
 
