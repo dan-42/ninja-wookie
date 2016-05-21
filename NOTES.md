@@ -12,6 +12,12 @@
  - [ ] apdu controller add timeout handling for confirmed services
  - [ ] service controller manage handel hasking for doi
  - [ ] error handling !
+  - [ ] make enumerated grammar parse generate from/to  enumerated type
+  - [ ] add print function for enumerated
+  - [ ] add print function for error -> to_json from pre
+  - [ ] add test for type::error with and without test
+  - [ ] add error-test with reinitialize device test
+  - [ ] improve example reinitialize device with printing error or success 
  - [ ] add information to the README.md
  - [ ] example script as client, sending reinit, write properties, and others in sequence if successful 
  - [ ] simple bacnet-browser:

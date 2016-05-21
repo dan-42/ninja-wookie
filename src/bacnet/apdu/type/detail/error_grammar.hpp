@@ -85,16 +85,12 @@ private:
       error_rule  =  enumeration_grammar_
                   >> enumeration_grammar_;
 
-           tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::check_tag, this, _1) == true ];
-
-           value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
+      open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_open_tag, this, _1) == true ];
+      close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_close_tag, this, _1) == true ];
 
 
-           start_rule.name("start_rule");
-           value_rule.name("value_rule");
+     start_rule.name("start_rule");
+     value_rule.name("value_rule");
 
      /*
            debug(start_rule);
@@ -104,7 +100,7 @@ private:
      //*/
     }
 
-    bool check_tag(tag& t) {
+    bool check_open_tag(tag& t) {
       size_ = t.length_value_type();
       if(   t.is_context_tag() == is_expecting_context_tag_
          && t.number()         == tag_number_expected_ ) {
@@ -114,6 +110,17 @@ private:
         return false;
       }
     }
+
+    bool check_close_tag(tag& t) {
+          size_ = t.length_value_type();
+          if(   t.is_context_tag() == is_expecting_context_tag_
+             && t.number()         == tag_number_expected_ ) {
+            return true;
+          }
+          else {
+            return false;
+          }
+        }
     uint32_t size_{0};
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};
