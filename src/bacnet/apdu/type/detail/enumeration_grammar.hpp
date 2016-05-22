@@ -33,6 +33,7 @@
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/type/enumerated.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -48,16 +49,18 @@ using boost::spirit::repository::qi::big_24word;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
+using bacnet::type::enumerated;
 
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, uint32_t()> {
+struct enumeration_grammar : grammar<Iterator, enumerated()> {
 
 
-    rule<Iterator, uint32_t()>          start_rule;
-    rule<Iterator >                     tag_validation_rule;
-    rule<Iterator, uint32_t()>          value_rule;
+    rule<Iterator, enumerated()>          start_rule;
+    rule<Iterator >                       tag_validation_rule;
+    rule<Iterator, enumerated::e()>       type_rule;
+    rule<Iterator, enumerated()>          value_rule;
 
    tag_grammar<Iterator> tag_grammar_;
 
@@ -82,6 +85,8 @@ private:
                   >> value_rule ;
 
            tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::check_tag, this, _1) == true ];
+
+           type_rule   = eps[ _val = enumerated::e::undefined ];
 
            value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
                        | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
@@ -132,19 +137,20 @@ using boost::spirit::repository::karma::big_24word;
 
 using bacnet::apdu::type::tag;
 using bacnet::apdu::type::application_tag;
-
+using bacnet::type::enumerated;
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, uint32_t()> {
+struct enumeration_grammar : grammar<Iterator, enumerated()> {
 
-    rule<Iterator, uint32_t()>   start_rule;
-    rule<Iterator, uint32_t()>   tag_rule;
-    rule<Iterator, uint32_t()>   value_rule;
+    rule<Iterator, enumerated()>    start_rule;
+    rule<Iterator, enumerated()>    tag_rule;
+    rule<Iterator, enumerated::e()> type_rule;
+    rule<Iterator, enumerated()>    value_rule;
 
     tag_grammar<Iterator> tag_grammar_;
 
-    enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::unsigned_integer) {
+    enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::enumerated) {
       setup();
     }
     enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag, true) {
@@ -158,13 +164,19 @@ private:
       start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
 
 
-      tag_rule = eps[boost::phoenix::bind(&enumeration_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
-      //tag_rule = tag_grammar_[_1 = ref(tag_)];
+      tag_rule    =  eps[boost::phoenix::bind(&enumeration_grammar::extract_size, this, _val)]
+                  << tag_grammar_[_1 = ref(tag_)];
 
-      value_rule  = eps(ref(size_) == 1) << byte_
-                    | eps(ref(size_) == 2) << big_word
-                    | eps(ref(size_) == 3) << big_24word
-                    | eps(ref(size_) == 4) << big_dword;
+
+      value_rule  = type_rule << (
+                        eps(ref(size_) == 1) << byte_
+                      | eps(ref(size_) == 2) << big_word
+                      | eps(ref(size_) == 3) << big_24word
+                      | eps(ref(size_) == 4) << big_dword
+                    )
+                  ;
+
+      type_rule   = eps;
 
       start_rule.name("start_rule");
       tag_rule.name("tag_rule");
@@ -177,8 +189,8 @@ private:
       */
     }
 
-    bool extract_size(const uint32_t &unsigned_value) {
-      size_ = bacnet::apdu::type::detail::length_helper(unsigned_value);
+    bool extract_size(const enumerated &enumerated_value) {
+      size_ = bacnet::apdu::type::detail::length_helper(enumerated_value.value);
       tag_.length_value_type(size_);
       return true;
     }
