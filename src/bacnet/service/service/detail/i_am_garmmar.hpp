@@ -77,7 +77,7 @@ struct i_am_grammar : grammar<Iterator, service::i_am()> {
 
     object_identifier_rule        = object_identifier_grammar_;
     max_apdu_length_accepted_rule = unsigned_integer_grammar_;
-    segmentation_supported_rule   = enumeration_grammar_[_val = boost::phoenix::bind(segmentation::from_native, _1)];
+    segmentation_supported_rule   = enumeration_grammar_[_val = boost::phoenix::bind(segmentation::from_enumerated, _1)];
     vendor_id_rule                = unsigned_integer_grammar_;
 
     start_rule.name("start_rule");

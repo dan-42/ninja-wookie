@@ -83,7 +83,7 @@ struct reinitialize_device_grammar : grammar<Iterator, service::reinitialize_dev
 
   rule<Iterator, service::reinitialize_device()>       start_rule;
 
-  rule<Iterator, uint32_t()>                           reinitialize_state_of_device_rule;
+  rule<Iterator, enumerated()>                           reinitialize_state_of_device_rule;
   rule<Iterator, boost::optional<character_string>()>  password_rule;
 
   enumeration_grammar<Iterator>      tag_0_rule_{0};
@@ -118,7 +118,7 @@ struct reinitialize_device_grammar : grammar<Iterator, service::reinitialize_dev
 
   rule<Iterator, service::reinitialize_device()>  start_rule;
 
-  rule<Iterator, uint32_t()>                           reinitialize_state_of_device_rule;
+  rule<Iterator, enumerated()>                           reinitialize_state_of_device_rule;
   rule<Iterator, boost::optional<character_string>()>  password_rule;
 
   enumeration_grammar<Iterator>      tag_0_rule_{0};

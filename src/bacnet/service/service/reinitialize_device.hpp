@@ -27,27 +27,28 @@
 #include <bacnet/type/character_string.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 #include <bacnet/service/service/traits.hpp>
-
+#include <bacnet/type/enumerated.hpp>
 
 namespace bacnet { namespace service { namespace service {
   struct reinitialize_device {
 
     reinitialize_device() = default;
 
-    reinitialize_device(uint32_t state) :  reinitialize_state_of_device(state){
+    reinitialize_device(uint32_t state) :  reinitialize_state_of_device(enum_type, state){
 
     }
 
-    reinitialize_device(uint32_t state, bacnet::type::character_string pw ) :  reinitialize_state_of_device(state), password(pw){
+    reinitialize_device(uint32_t state, bacnet::type::character_string pw ) :  reinitialize_state_of_device(enum_type, state), password(pw){
 
     }
 
-    reinitialize_device(uint32_t state, std::string pw ) :  reinitialize_state_of_device(state), password(pw){
+    reinitialize_device(uint32_t state, std::string pw ) :  reinitialize_state_of_device(enum_type, state), password(pw){
 
     }
 
+    static constexpr bacnet::type::enumerated::e enum_type = bacnet::type::enumerated::e::device_status;
 
-    uint32_t reinitialize_state_of_device{0};
+    bacnet::type::enumerated reinitialize_state_of_device{enum_type, 0};
     boost::optional<bacnet::type::character_string> password;
   };
 

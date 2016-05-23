@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <bacnet/type/enumerated.hpp>
 
 namespace bacnet { namespace common {
 
@@ -68,6 +69,10 @@ namespace bacnet { namespace common {
 
       inline void segmented(segment s) {
         segmented_ = s;
+      }
+
+      static inline segmentation from_enumerated(const bacnet::type::enumerated& e) {
+        return from_native(e.value);
       }
 
       static inline segmentation from_native(const underlying_type& seg_value) {
