@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
-    bacnet::type::object_identifier device_id{bacnet::object_type::device, 2};
+    bacnet::type::object_identifier device_id{bacnet::object_type::device, doi};
     bacnet::service::service::reinitialize_device reinitd{state, password};
 
     service_controller.start();
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
   }
   catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";
-    throw;
+    throw e;
   }
 
   return 0;

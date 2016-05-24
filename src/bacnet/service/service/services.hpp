@@ -23,6 +23,7 @@
 #define NINJA_WOOKIE_SERVICES_HPP
 
 
+#include <bacnet/service/service/error_response.hpp>
 #include <cstdint>
 
 #include <boost/variant.hpp>
@@ -40,7 +41,6 @@
 
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
-#include <bacnet/service/service/error.hpp>
 #include <bacnet/service/service/read_property_request.hpp>
 #include <bacnet/service/service/read_property_ack.hpp>
 #include <bacnet/service/service/reinitialize_device.hpp>
@@ -129,11 +129,13 @@ BACnet-Unconfirmed-Service  is request and response
 
 namespace bacnet { namespace service { namespace service {
 
+
+
   typedef boost::mpl::vector<
                                 who_is,  
                                 i_am,
   
-                                error,
+                                error_response,
 
                                 read_property_request,
                                 read_property_ack,
