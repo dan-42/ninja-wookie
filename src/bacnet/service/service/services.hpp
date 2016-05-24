@@ -40,6 +40,7 @@
 
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
+#include <bacnet/service/service/error.hpp>
 #include <bacnet/service/service/read_property_request.hpp>
 #include <bacnet/service/service/read_property_ack.hpp>
 #include <bacnet/service/service/reinitialize_device.hpp>
@@ -132,7 +133,8 @@ namespace bacnet { namespace service { namespace service {
                                 who_is,  
                                 i_am,
   
-                        
+                                error,
+
                                 read_property_request,
                                 read_property_ack,
 

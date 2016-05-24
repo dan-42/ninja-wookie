@@ -72,15 +72,16 @@ int main(int argc, char *argv[]) {
 
       return 1;
     }
-
-
     std::cout
-    << "sending reinitialize_device to "
-    << " doi: "     << doi
-    << " state: "   << state
-    << " with password: "   << password
-    << " on " << ip << ":"  << port
-    << std::endl;
+                << "sending reinitialize_device to "
+                << " doi: "     << doi
+                << " state: "   << state
+                << " with password: "   << password
+                << " on " << ip << ":"  << port
+                << std::endl;
+
+
+
 
     boost::asio::io_service io_service;
     bacnet::config config;

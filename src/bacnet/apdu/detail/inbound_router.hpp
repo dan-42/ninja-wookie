@@ -37,7 +37,7 @@ public:
 
   /**
    * handle segmentation, each complex message could be segmented,
-   * and would need concatinatinon before sending up
+   * and would need concatenation before sending up
    */
   void operator()(frame::segment_ack response) {
     //xxx build up whole frame and then invoke handler

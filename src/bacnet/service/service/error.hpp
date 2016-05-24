@@ -29,20 +29,43 @@
 #include <bacnet/service/service/traits.hpp>
 
 #include <bacnet/type/enumerated.hpp>
+
+
 //see page 656 chapter 21 Error ::= SEQUENCE {
+
+/*
+
+ NOTE: The valid combinations of error-class and error-code are defined in Clauerror-class
+ ENUMERATED {
+device  (0),
+object  (1),
+property (2),
+resources (3),
+security (4),
+services (5),
+vt (6),
+communication (7),
+...
+},
+
+
+ */
 
 namespace bacnet { namespace service { namespace service {
 struct error {
 
   error() = default;
 
-  error(uint32_t device_instance) :  device_instance_range_low_limit(device_instance),
-                                      device_instance_range_high_limit(device_instance) {
+  error(uint32_t code_) :  error_class(device_instance),
+                          error_code(code_) {
   }
 
-  error(uint32_t device_instance_low, uint32_t device_instance_high) : device_instance_range_low_limit(device_instance_low),
-                                                                        device_instance_range_high_limit(device_instance_high) {
+  error(uint32_t class_, uint32_t code_) :  error_class(class_),
+                                            error_code(code_) {
   }
+
+  static constexpr auto enum_type_class = bacnet::type::enumerated::e::error_class;
+  static constexpr auto enum_type_code = bacnet::type::enumerated::e::error_code;
 
   bacnet::type::enumerated error_class;
   bacnet::type::enumerated error_code;
@@ -53,35 +76,18 @@ struct error {
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-  bacnet::service::service::who_is,
-  device_instance_range_low_limit,
-  device_instance_range_high_limit
+  bacnet::service::service::error,
+  error_class,
+  error_code
 )
 
-
-namespace bacnet { namespace service { namespace service { namespace detail {
-
-  using namespace bacnet::service::service;
-
-  template<>
-  struct service_choice<who_is> {
-    static constexpr  uint8_t value = 8;
-    typedef who_is type;
-  };
-
-  template<>
-  struct is_broadcast_service<who_is> : std::true_type {
-  };
-
-}}}}
 
 
 namespace bacnet { namespace service { namespace service {    
     
-    template<> struct is_unconfirmed<who_is> :  boost::mpl::true_ {};
+    template<> struct is_unconfirmed<error> :  boost::mpl::true_ {};
     
-    template<> struct is_request<who_is> :      boost::mpl::true_ {};
-    template<> struct is_response<who_is> :     boost::mpl::true_ {};    
+    template<> struct is_response<error> :     boost::mpl::true_ {};
     
 }}}
 

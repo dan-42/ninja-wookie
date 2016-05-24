@@ -169,19 +169,19 @@ public:
                                                                                bacnet::apdu::frame::possible_confirmed_respons frame,
                                                                                bacnet::common::protocol::meta_information mi) {
 
-      /*
-       *
-       */
-      if(ec) {
-        handler(ec, bacnet::service::confirmed::response{});
-      }
-      else {
-        inbound_router_.meta_information(std::move(mi));
-        //xxx frame must be service
-        //frame.apply_visitor(inbound_router_);
-      }
+                                      /*
+                                       *
+                                       */
+                                      if(ec) {
+                                        handler(ec, bacnet::service::confirmed::response{});
+                                      }
+                                      else {
+                                        inbound_router_.meta_information(std::move(mi));
+                                        //xxx frame must be service
+                                        //frame.apply_visitor(inbound_router_);
+                                      }
 
-    });
+                                    });
   }
 
   template<typename Service, typename Handler>
