@@ -55,6 +55,7 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
   boost::asio::ip::udp::endpoint unicast_endpoint_device(boost::asio::ip::address_v4::from_string("192.168.10.1"), 0xBAC0);
   boost::asio::ip::udp::endpoint unicast_endpoint_client(boost::asio::ip::address_v4::from_string("192.168.10.2"), 0xBAC0);
   auto ec_succsess = boost::system::errc::make_error_code(boost::system::errc::success);
+  auto bacnet_ec_succsess = bacnet::error_code(ec_succsess);
 
 
 
@@ -105,8 +106,8 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
 
     bacnet::service::reinitialize_device reinitialize_device_{bacnet::service::reinitialized_state_of_device::coldstart, ""};
     service_controller.async_send(device_doi, reinitialize_device_, []
-                 (const boost::system::error_code &ec, bacnet::service::confirmed::response response){
-                    std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
+                 (const bacnet::error_code &ec, bacnet::service::confirmed::response response){
+                    std::cout << "async_send::reinitialize_device " << ec <<  std::endl;
                  }
     );
 
@@ -163,8 +164,8 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
 
     bacnet::service::reinitialize_device reinitialize_device_{bacnet::service::reinitialized_state_of_device::coldstart, ""};
     service_controller.async_send(device_doi, reinitialize_device_, []
-                 (const boost::system::error_code &ec, bacnet::service::confirmed::response response){
-                    std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
+                 (const bacnet::error_code &ec, bacnet::service::confirmed::response response){
+                    std::cout << "async_send::reinitialize_device " << ec <<  std::endl;
                  }
     );
 

@@ -40,7 +40,7 @@ install(TARGETS who_is DESTINATION bin)
 
 
 
-add_executable(bacnet_device bacnet_device.cpp)
-target_link_libraries(bacnet_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
-set_target_properties(bacnet_device PROPERTIES DEBUG_POSTFIX "d")
-install(TARGETS bacnet_device DESTINATION bin)
+#add_executable(bacnet_device bacnet_device.cpp)
+#target_link_libraries(bacnet_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+#set_target_properties(bacnet_device PROPERTIES DEBUG_POSTFIX "d")
+#install(TARGETS bacnet_device DESTINATION bin)

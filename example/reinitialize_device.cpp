@@ -96,9 +96,9 @@ int main(int argc, char *argv[]) {
 
 
     service_controller.async_send(device_id, reinitd, [&]
-                 (const boost::system::error_code &ec, bacnet::service::confirmed::response response){
-                    std::cout << "async_send::reinitialize_device " << ec.category().name() << " " << ec.message() <<  std::endl;
-                  }
+                 (const bacnet::error_code &ec, bacnet::service::confirmed::response response) {
+                    std::cout << "async_send::reinitialize_device::result: " << ec <<  std::endl;
+                 }
     );
 
 

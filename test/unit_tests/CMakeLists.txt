@@ -48,6 +48,7 @@ function(add_new_test test_name file_path)
 endfunction(add_new_test)
 
 
+add_subdirectory(bacnet/error)
 add_subdirectory(bacnet/transport)
 add_subdirectory(bacnet/bvll)
 add_subdirectory(bacnet/npdu)

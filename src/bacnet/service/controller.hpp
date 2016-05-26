@@ -42,7 +42,7 @@
 #include <bacnet/common/configuration.hpp>
 
 #include <bacnet/apdu/api.hpp>
-
+#include <bacnet/error/error.hpp>
 
 /**
  * SCOPE OF THIS LAYER
@@ -173,7 +173,8 @@ public:
                                        *
                                        */
                                       if(ec) {
-                                        handler(ec, bacnet::service::confirmed::response{});
+                                        bacnet::error_code bec(ec);
+                                        handler(bec, bacnet::service::confirmed::response{});
                                       }
                                       else {
                                         inbound_router_.meta_information(std::move(mi));
