@@ -17,14 +17,15 @@
 #define NINJA_WOOKIE_BACNET_ERROR_ERROR_HPP
 
 
-/*
+
 #include <string>
 #include <iostream>
 #include <stdexcept>
 #include <functional>
 
 
-
+#include <boost/core/explicit_operator_bool.hpp>
+#include <boost/system/error_code.hpp>
 #include <bacnet/error/code.hpp>
 
 #include <boost/cstdint.hpp>
@@ -33,123 +34,86 @@
 #include <boost/utility/enable_if.hpp>
 
 
-namespace bacnet { namespace error  {
+namespace bacnet {
 
     class error_code;
-    class error_condition;
-
-    //  "Concept" helpers  ---------------------------------------------------//
-    template< class T >
-    struct is_error_code_enum {
-      static const bool value = false;
-    };
-
-    template< class T >
-    struct is_error_class_enum {
-      static const bool value = false;
-    };
-
-    template<>
-    struct is_error_condition_enum<error_code::errc_t> {
-      static const bool value = true;
-    };
-
-    template<>
-    struct is_error_class_enum<error_class::errc_t > {
-      static const bool value = true;
-    };
 
 
-    //  class error_category  ------------------------------------------------//
-    class error_category : public noncopyable   {
-    public:
-      virtual ~error_category(){}
 
-      virtual const char *     name() const noexcept = 0;
-      virtual std::string      message( int ev ) const = 0;
-
-      bool operator==(const error_category & rhs) const noexcept {
-        return this == &rhs;
-      }
-
-      bool operator!=(const error_category & rhs) const noexcept {
-        return this != &rhs;
-      }
-
-      bool operator<( const error_category & rhs ) const noexcept {
-        return std::less<const error_category*>()( this, &rhs );
-      }
-    };
-
-    //  predefined error categories  -----------------------------------------//
-
-    inline const error_category &  system_category() noexcept;
-    inline const error_category &  generic_category() noexcept;
+    inline const boost::system::error_category &  bacnet_category() noexcept;
 
 
 
     class error_code {
     public:
 
-      // constructors:
-      error_code() noexcept : m_val(0), m_cat(&system_category()) {}
-      error_code( int val, const error_category & cat ) noexcept : m_val(val), m_cat(&cat) {}
 
-      template <class ErrorCodeEnum>
-      error_code(ErrorCodeEnum e, typename boost::enable_if<is_error_code_enum<ErrorCodeEnum> >::type* = 0) noexcept  {
-        *this = make_error_code(e);
-      }
+      error_code() noexcept : error_category_(&boost::system::system_category()) {}
+
+      error_code(const boost::system::error_code& ec) noexcept : error_code_value_(ec.value()), error_category_(ec.category()) {}
+
+      error_code( int val, const boost::system::error_category & cat ) noexcept : error_code_value_(val), error_category_(&cat) {}
+
+      error_code( int e_code, int e_class, const boost::system::error_category & cat ) noexcept :
+                error_code_value_(e_code), error_class_value_(e_class), error_category_(&cat) {}
+
 
       // modifiers:
-      void assign( int val, const error_category & cat ) noexcept  {
-        m_val = val;
-        m_cat = &cat;
-      }
-
-      template<typename ErrorCodeEnum>
-      typename boost::enable_if<is_error_code_enum<ErrorCodeEnum>, error_code>::type & operator=( ErrorCodeEnum val ) noexcept {
-        *this = make_error_code(val);
-        return *this;
+      void assign( int e_code, int e_class, const boost::system::error_category & cat  ) noexcept  {
+        error_code_value_   = e_code;;
+        error_class_value_  = e_class;
+        error_category_     = &cat;
       }
 
       void clear() noexcept {
-        m_val = 0;
-        m_cat = &system_category();
+        error_code_value_   = 0;
+        error_class_value_  = 0;
+        error_category_     = &boost::system::system_category();
       }
 
-      // observers:
-      int                     value() const  noexcept   { return m_val; }
-      const error_category &  category() const noexcept { return *m_cat; }
-      error_condition         default_error_condition() const noexcept  { return m_cat->default_error_condition(value()); }
-      std::string             message() const  { return m_cat->message(value()); }
 
-      typedef void (*unspecified_bool_type)();
-      static void unspecified_bool_true() {}
+      int                     error_code() const  noexcept   { return error_code_value_; }
+      int                     error_class() const  noexcept   { return error_class_value_; }
+      const boost::system::error_category &  category() const noexcept { return *error_category_; }
 
-      operator unspecified_bool_type() const  noexcept { // true if error
-        return m_val == 0 ? 0 : unspecified_bool_true;
+      std::string             message() const  {
+        if(error_category_ == bacnet_category() ) {
+          return error_category_->message(error_code(), error_class());
+        }
+        else {
+          return error_category_->message(error_code());
+        }
       }
 
-      bool operator!() const  noexcept { // true if no error
-        return m_val == 0;
+
+      BOOST_EXPLICIT_OPERATOR_BOOL()
+
+      bool operator!() const  noexcept {
+        if(error_category_ == boost::system::system_category() &&  error_code_value_ == 0 )
+          return true;
+        else
+          return false;
       }
 
       // relationals:
       inline friend bool operator==( const error_code & lhs, const error_code & rhs ) noexcept {
         //  the more symmetrical non-member syntax allows enum
         //  conversions work for both rhs and lhs.
-        return lhs.m_cat == rhs.m_cat && lhs.m_val == rhs.m_val;
+        return lhs.error_category_ == rhs.error_category_ && lhs.error_code_value_ == rhs.error_code_value_ && lhs.error_class_value_ == rhs.error_class_value_;
       }
 
       inline friend bool operator<( const error_code & lhs, const error_code & rhs ) noexcept {
         //  the more symmetrical non-member syntax allows enum
         //  conversions work for both rhs and lhs.
-        return lhs.m_cat < rhs.m_cat   || (lhs.m_cat == rhs.m_cat && lhs.m_val < rhs.m_val);
+        return    lhs.error_category_ < rhs.error_category_
+              || (lhs.error_category_ == rhs.error_category_ && lhs.error_class_value_ < rhs.error_class_value_)
+              || (lhs.error_category_ == rhs.error_category_ && lhs.error_class_value_ == rhs.error_class_value_ && lhs.error_code_value_ < rhs. error_code_value_);
       }
 
     private:
-      int                     m_val;
-      const error_category *  m_cat;
+      int                                   error_code_value_{0};
+      int                                   error_class_value_{0};
+      const boost::system::error_category * error_category_;
 
     };
 
@@ -161,10 +125,10 @@ namespace bacnet { namespace error  {
     //  existing code is a bit of a problem. The workaround is to place the
     //  "throws" function in namespace boost rather than namespace boost::system.
 
-  }  // namespace error
+
 
   namespace detail {
-    inline error::error_code * throws() {
+    inline bacnet::error_code * throws() {
       return 0;
     }
   }
@@ -175,11 +139,11 @@ namespace bacnet { namespace error  {
     //  from order of initialization problems. In practice, it also seems
     //  cause user function error handling implementation errors to be detected
     //  very early in the development cycle.
-  inline error::error_code & throws() {
+  inline error_code & throws() {
       return *detail::throws();
   }
 
-  namespace error {
+
 
     //  non-member functions  ------------------------------------------------//
     inline bool operator!=( const error_code & lhs, const error_code & rhs ) noexcept {
@@ -188,30 +152,26 @@ namespace bacnet { namespace error  {
 
     template <class charT, class traits>
     inline std::basic_ostream<charT,traits>& operator<< (std::basic_ostream<charT,traits>& os, error_code ec) {
-      os << ec.category().name() << ':' << ec.value();
+      os << ec.category().name() << ':' << ec.error_class_value_() << ':' << ec.error_code_value_;
       return os;
     }
 
     inline std::size_t hash_value( const error_code & ec ) {
-      return static_cast<std::size_t>(ec.value()) + reinterpret_cast<std::size_t>(&ec.category());
+      return static_cast<std::size_t>(ec.error_code()) + static_cast<std::size_t>(ec.error_class()) + reinterpret_cast<std::size_t>(&ec.category());
     }
 
-    //  make_* functions for errc::errc_t  -----------------------------//
-    namespace errc {
-      //  explicit conversion:
-      inline error_code make_error_code( errc_t e ) noexcept {
-        return error_code( e, generic_category() );
-      }
+    inline error_code make_error_code( int c, int e ) noexcept {
+       return error_code( e, c, bacnet::bacnet_category() );
     }
 
-  } // namespace system
-} // namespace boost
+
+} // namespace bacnet
 
 
 # ifdef BOOST_ERROR_CODE_HEADER_ONLY
 #   include <boost/system/detail/error_code.ipp>
 # endif
 
-*/
+
 
 #endif //NINJA_WOOKIE_BACNET_ERROR_ERROR_HPP
