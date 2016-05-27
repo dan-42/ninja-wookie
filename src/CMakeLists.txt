@@ -58,8 +58,8 @@ ELSE()
                 -fvisibility=hidden                
                 -ffunction-sections
                 -fdata-sections
-               -flto 
-                -fuse-linker-plugin                        
+               # -flto 
+               # -fuse-linker-plugin                        
         )
 
         
