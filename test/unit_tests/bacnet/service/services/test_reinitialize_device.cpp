@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
     };
 
     transport_mockup.set_from_application_callback(from_application_callback_);
-    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
     /**   *    */
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
     };
 
     transport_mockup.set_from_application_callback(from_application_callback_);
-    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
     /**   *    */

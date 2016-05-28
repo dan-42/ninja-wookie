@@ -25,8 +25,8 @@
 
 #include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
+#include <bacnet/error/error.hpp>
 #include <bacnet/bvll/api.hpp>
-
 #include <bacnet/detail/common/types.hpp>
 #include <util/callback_manager.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>

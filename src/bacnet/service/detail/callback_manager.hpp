@@ -32,7 +32,7 @@ typedef boost::fusion::map<
         }
 
         template<typename Service>
-        void invoke(const Service &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
+        void invoke(const Service &service, const bacnet::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
           callback_manager_.invoke_callback(service, ec, mi);
         }
 
@@ -65,7 +65,7 @@ typedef boost::fusion::map<
 
 
       template<>
-      void callback_manager::invoke<service::i_am>(const service::i_am &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
+      void callback_manager::invoke<service::i_am>(const service::i_am &service, const bacnet::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
         for(auto &callback :  callbacks_service_i_am) {
           if(callback.second) {
             callback.second(service, ec, mi );
@@ -75,7 +75,7 @@ typedef boost::fusion::map<
       }
 
       template<>
-      void callback_manager::invoke<service::who_is>(const service::who_is &service, const boost::system::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
+      void callback_manager::invoke<service::who_is>(const service::who_is &service, const bacnet::error_code &ec, const bacnet::common::protocol::meta_information &mi) {
         for(auto &callback :  callbacks_service_who_is) {
           if(callback) {
             callback(service, ec, mi );

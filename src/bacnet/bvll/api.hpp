@@ -22,6 +22,7 @@
 #define NINJA_WOOKIE_BVLL_API_HPP
 
 #include <functional>
+
 #include <bacnet/bvll/frames.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
 

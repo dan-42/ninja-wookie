@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
   transport_.set_from_application_callback(from_application_callback_);
-  transport_.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
+  transport_.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
 
   });
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   bacnet::binary_data data_to_send;
   data_to_send.push_back(0x10); //unconfirmed service
   data_to_send.push_back(0x08); //who is
-  npdu_controller_.async_send_broadcast(data_to_send, [](const boost::system::error_code &ec) {
+  npdu_controller_.async_send_broadcast(data_to_send, [](const bacnet::error_code &ec) {
   });
 
   ios.run();
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   boost::asio::io_service ios;
   ip_v4_mockup transport_(ios);
   transport_.set_from_application_callback(from_application_callback_);
-  transport_.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
+  transport_.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
 
   });
 
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   bacnet::binary_data data_to_send;
   data_to_send.push_back(0x10); //unconfirmed service
   data_to_send.push_back(0x08); //who is
-  npdu_controller_.async_send_unicast(endpoint, data_to_send, [](const boost::system::error_code &ec) {
+  npdu_controller_.async_send_unicast(endpoint, data_to_send, [](const bacnet::error_code &ec) {
   });
 
   ios.run();
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE( test_receive_broadcast ) {
     return ec;
   };
 
-  auto async_receive_callback_ = [](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
+  auto async_receive_callback_ = [](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data){
   };
 
 

@@ -52,13 +52,13 @@ public:
 
     }
     else {
-      boost::system::error_code ec;
+      bacnet::error_code ec;
       callback_manager_.invoke_callback(request, ec, meta_information_);
     }
   }
 
   void operator()(frame::unconfirmed_request request) {
-    boost::system::error_code ec;
+    bacnet::error_code ec;
     callback_manager_.invoke_callback(request, ec, meta_information_);
   }
 
@@ -67,7 +67,7 @@ public:
 
   void operator()(frame::simple_ack response) {
     std::cout << "apdu::detail::inbound_router simple_ack" << std::endl;
-    boost::system::error_code ec;
+    bacnet::error_code ec;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       handler(ec, response, meta_information_);
@@ -76,7 +76,7 @@ public:
 
   void operator()(frame::complex_ack response) {
     std::cout << "apdu::detail::inbound_router complex_ack" << std::endl;
-    boost::system::error_code ec;
+    bacnet::error_code ec;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       handler(ec, response, meta_information_);
@@ -85,7 +85,7 @@ public:
 
   void operator()(frame::error response) {
     std::cout << "apdu::detail::inbound_router error" << std::endl;
-    boost::system::error_code ec;
+    bacnet::error_code ec;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       handler(ec, response, meta_information_);
@@ -94,7 +94,7 @@ public:
 
   void operator()(frame::reject response) {
     std::cout << "apdu::detail::inbound_router reject" << std::endl;
-    boost::system::error_code ec;
+    bacnet::error_code ec;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       handler(ec, response, meta_information_);
@@ -103,7 +103,7 @@ public:
 
   void operator()(frame::abort response) {
     std::cout << "apdu::detail::inbound_router abort" << std::endl;
-    boost::system::error_code ec;
+    bacnet::error_code ec;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       handler(ec, response, meta_information_);

@@ -31,9 +31,8 @@
 #include <boost/bind.hpp>
 
 #include <util/callback_manager.hpp>
-
+#include <bacnet/error/error.hpp>
 #include <bacnet/transport/api.hpp>
-
 #include <bacnet/bvll/frames.hpp>
 #include <bacnet/bvll/api.hpp>
 
@@ -81,7 +80,7 @@ public:
 
   void start() {
     //transporter_.register_receive_callback(boost::bind(&controller::handle_async_receive, this, boost::asio::placeholders::error, _2, _3));
-    transporter_.register_receive_callback([this](boost::system::error_code &&error, bacnet::common::protocol::mac::address &&sender, bacnet::binary_data&& data) {
+    transporter_.register_receive_callback([this](bacnet::error_code &&error, bacnet::common::protocol::mac::address &&sender, bacnet::binary_data&& data) {
       handle_async_receive(std::move(error), std::move(sender), std::move(data));
     });
     transporter_.start();
@@ -112,7 +111,7 @@ public:
 
 private:
 
-  void handle_async_receive(boost::system::error_code &&error, bacnet::common::protocol::mac::address &&sender, bacnet::binary_data&& data) {
+  void handle_async_receive(bacnet::error_code &&error, bacnet::common::protocol::mac::address &&sender, bacnet::binary_data&& data) {
     if (!error) {
       //std::cout << "bvll::controller::handle_async_receive()" << std::endl;
       frame::possible_bvll_frame f = parser::parse(std::move(data));

@@ -94,7 +94,7 @@ public:
     inline std::string to_string() const;
 
     inline static address from_string(const char* str);
-    inline static address from_string(const char* str, boost::system::error_code& ec);
+    inline static address from_string(const char* str, bacnet::error_code& ec);
     inline static address from_string(const std::string& str);
 
     inline bool is_multicast() const;
@@ -213,13 +213,13 @@ std::string address::to_string() const {
 }
 
 address address::from_string(const char* str) {
-  boost::system::error_code ec;
+  bacnet::error_code ec;
   address addr = from_string(str, ec);
   boost::asio::detail::throw_error(ec);
   return addr;
 }
 
-address address::from_string(const char* str, boost::system::error_code& ec) {
+address address::from_string(const char* str, bacnet::error_code& ec) {
   boost::asio::ip::address ip_address =  boost::asio::ip::address::from_string(str, ec);
   if (!ec)
   {

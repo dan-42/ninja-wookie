@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
     transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
-    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      */
     bacnet::service::who_is who_is_service{};
 
-    service_controller.async_send(who_is_service, [](const boost::system::error_code &ec){
+    service_controller.async_send(who_is_service, [](const bacnet::error_code &ec){
 
     });
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
     transport_mockup.set_from_application_callback(async_send_from_stack_callback_);
-    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      */
 
     bacnet::service::who_is who_is_service{1,1};
-    service_controller.async_send(who_is_service, [](const boost::system::error_code &ec){
+    service_controller.async_send(who_is_service, [](const bacnet::error_code &ec){
 
     });
 
@@ -208,9 +208,9 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /**
      * receiving who_is
      */
-    service_controller.async_receive([&](bacnet::service::who_is service, boost::system::error_code ec, bacnet::common::protocol::meta_information mi) {
+    service_controller.async_receive([&](bacnet::service::who_is service, bacnet::error_code ec, bacnet::common::protocol::meta_information mi) {
 
-      boost::system::error_code expected_ec{bacnet::service::error::errc::success, bacnet::service::error::get_error_category()};
+      bacnet::error_code expected_ec{bacnet::service::error::errc::success, bacnet::service::error::get_error_category()};
       BOOST_ASSERT_MSG(ec == expected_ec, " Error code is wrong ");
 
       boost::asio::ip::udp::endpoint expected_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     boost::asio::io_service ios;
     ip_v4_mockup transport_mockup(ios);
     transport_mockup.set_from_application_callback(from_application_callback_);
-    transport_mockup.register_receive_callback([](boost::system::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
+    transport_mockup.register_receive_callback([](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
     });
 
 
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      */
 
     bacnet::service::who_is who_is_service{1,1};
-    service_controller.async_send(who_is_service, [](const boost::system::error_code &ec){
+    service_controller.async_send(who_is_service, [](const bacnet::error_code &ec){
 
     });
 

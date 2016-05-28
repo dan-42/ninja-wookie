@@ -29,6 +29,7 @@
 #include <boost/variant.hpp>
 #include <boost/bind.hpp>
 
+#include <bacnet/error/error.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/detail/pdu_type.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
@@ -133,7 +134,7 @@ struct controller {
 
 
     // xxx don't forget timeout!
-    underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const boost::system::error_code& ec) {
+    underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const bacnet::error_code& ec) {
             if(ec) {
               this->request_manager_.purge_invoke_id(adr, invoke_id);
               handler(ec, frame::possible_confirmed_respons(), bacnet::common::protocol::meta_information());

@@ -65,16 +65,34 @@ namespace bacnet {
 
       error_code() noexcept : error_category_(&boost::system::system_category()) {}
 
+      error_code(const bacnet::error_code& ec) noexcept :
+                error_code_value_(ec.value()), error_category_(&ec.category()) {}
+      error_code(bacnet::error_code&& ec) noexcept :
+                error_code_value_(ec.value()), error_category_(&ec.category()) {}
+
       error_code(const boost::system::error_code& ec) noexcept :
                 error_code_value_(ec.value()), error_category_(&ec.category()) {}
       error_code(boost::system::error_code&& ec) noexcept :
                 error_code_value_(ec.value()), error_category_(&ec.category()) {}
+
+      template <class ErrorCodeEnum>
+      error_code(ErrorCodeEnum e,  typename boost::enable_if<boost::system::is_error_code_enum<ErrorCodeEnum> >::type* = 0) noexcept  :
+                error_code_value_(e), error_category_(&boost::system::generic_category() ) {}
+
+      template <class ErrorCodeEnum>
+      error_code(ErrorCodeEnum e,  typename boost::enable_if<boost::system::is_error_condition_enum<ErrorCodeEnum> >::type* = 0) noexcept  :
+                error_code_value_(e), error_category_(&boost::system::generic_category() ) {}
+
+
       error_code( int val, const boost::system::error_category & cat ) noexcept :
                 error_code_value_(val), error_category_(&cat) {}
       error_code( int e_code, int e_class, const boost::system::error_category & cat ) noexcept :
                 error_code_value_(e_code), error_class_value_(e_class), error_category_(&cat) {}
       error_code( int e_code, int e_class) noexcept :
                 error_code_value_(e_code), error_class_value_(e_class), error_category_(&bacnet_category()) {}
+
+
+
 
 
       // modifiers:
@@ -91,7 +109,8 @@ namespace bacnet {
       }
 
 
-      int                     code() const  noexcept   { return error_code_value_; }
+      int                     code() const  noexcept    { return error_code_value_; }
+      int                     value() const  noexcept   { return error_code_value_; }
       int                     error_class() const  noexcept   { return error_class_value_; }
       const boost::system::error_category &  category() const noexcept { return *error_category_; }
 

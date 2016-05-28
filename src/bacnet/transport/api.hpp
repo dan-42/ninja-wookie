@@ -6,9 +6,10 @@
 #define NINJA_WOOKIE_BACNET_TRANSPORT_API_HPP
 
 
-#include <boost/system/error_code.hpp>
+
 #include <functional>
 
+#include <bacnet/error/error.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/mac/address.hpp>
 
@@ -25,7 +26,7 @@
  */
 namespace bacnet { namespace transport {
 
-    typedef std::function<void(boost::system::error_code&&, bacnet::common::protocol::mac::address&&, bacnet::binary_data&&)> receive_callback;
+    typedef std::function<void(bacnet::error_code&&, bacnet::common::protocol::mac::address&&, bacnet::binary_data&&)> receive_callback;
 
     namespace config {
       static const constexpr char*  DEFAULT_LISTENING_ADDRESS{"0.0.0.0"};
