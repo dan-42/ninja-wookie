@@ -46,7 +46,37 @@ using namespace bacnet::apdu::frame;
 using namespace bacnet::apdu::detail;
 using namespace bacnet::apdu::detail::header;
 
+/**
 
+ chapter 21 page 654
+
+ BACnetRejectReason ::= ENUMERATED {
+other
+ (0),
+buffer-overflow
+ (1),
+inconsistent-parameters
+ (2),
+invalid-parameter-data-type
+ (3),
+invalid-tag
+ (4),
+missing-required-parameter
+ (5),
+parameter-out-of-range
+ (6),
+too-many-arguments
+ (7),
+undefined-enumeration
+ (8),
+unrecognized-service
+ (9),
+...
+}
+
+
+ *
+ */
 template<typename Iterator>
 struct reject_grammar : grammar<Iterator, reject() >{
 

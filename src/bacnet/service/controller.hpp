@@ -76,6 +76,9 @@ using namespace bacnet::service;
 
 template<class Service, class Enable = void>
 struct invoke_handler_ {
+
+  static constexpr bool expect_response = false;
+
   template<typename Handler>
   static inline void invoke(Handler &&handler, bacnet::error_code ec, bacnet::service::confirmed::response&& response ) {
       handler(std::move(ec));
@@ -88,6 +91,9 @@ struct invoke_handler_ {
 
 template<class Service>
 struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_response<Service>::value  >::type> {
+
+  static constexpr bool expect_response = true;
+
   template<typename Handler>
   static inline void invoke(Handler &&handler, bacnet::error_code ec, bacnet::service::confirmed::response&& response ) {
       handler(std::move(ec), std::move(response));
@@ -139,7 +145,7 @@ public:
 
     lower_layer_.start();
     /*
-     * dependant on the config, a callback for who_is request is registered, and requests are automaticly answered
+     * Dependent on the config, a callback for who_is request is registered, and requests are automatically answered
      */
     if(config_.send_i_am_frames) {
       i_am_message_ = service::i_am{device_object_identifier_,
@@ -201,10 +207,8 @@ public:
                                                                                bacnet::apdu::frame::possible_confirmed_respons frame,
                                                                                bacnet::common::protocol::meta_information mi) {
 
-                                      /*
-                                       *
-                                       */
-                                      if(ec) {
+
+                                      if(ec || !invoker::expect_response) {
                                         invoker::invoke(handler, ec);
                                       }
                                       else {
@@ -248,9 +252,12 @@ public:
                              (boost::system::error_code ec) {
                                     callback_manager_.clear_i_am_service_callback(callback_idx);
 
-                                    if(ec == boost::asio::error::operation_aborted) {
+                                    if(!ec) {
+                                        /*no op*/
+                                    }
+                                    else if(ec == boost::asio::error::operation_aborted) {
                                       invoker::invoke(handler, ec);
-                                      }
+                                    }
                                     else {
                                       std::cout << "no device with doi found  " << std::endl;
                                       //todo set special error_code on error
@@ -267,9 +274,6 @@ public:
 
 
 private:
-
-
-
 
 
     boost::asio::io_service& io_service_;

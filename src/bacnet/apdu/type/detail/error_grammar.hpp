@@ -57,7 +57,6 @@ struct error_grammar : grammar<Iterator, bacnet::type::error()> {
     rule<Iterator>                         close_tag_rule;
 
     enumeration_grammar<Iterator>          enumeration_grammar_;
-
    tag_grammar<Iterator> tag_grammar_;
 
    error_grammar() :  error_grammar::base_type(start_rule) {
@@ -65,17 +64,16 @@ struct error_grammar : grammar<Iterator, bacnet::type::error()> {
     }
 
    error_grammar(uint8_t tag) : error_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(tag),
-                                                                  is_expecting_context_tag_(true) {
-      setup();
-    }
+                                tag_number_expected_(tag),
+                                is_expecting_context_tag_(true) {
+     setup();
+   }
 
 private:
 
     inline void setup() {
       start_rule    =  context_rule
-                    | error_rule ;
+                    |  error_rule ;
 
       context_rule  =  open_tag_rule
                     >> error_rule
@@ -90,7 +88,6 @@ private:
 
 
      start_rule.name("start_rule");
-     value_rule.name("value_rule");
 
      /*
            debug(start_rule);
@@ -101,8 +98,8 @@ private:
     }
 
     bool check_open_tag(tag& t) {
-      size_ = t.length_value_type();
-      if(   t.is_context_tag() == is_expecting_context_tag_
+      if(   t.is_opening_tag()
+         && t.is_context_tag() == is_expecting_context_tag_
          && t.number()         == tag_number_expected_ ) {
         return true;
       }
@@ -112,8 +109,9 @@ private:
     }
 
     bool check_close_tag(tag& t) {
-          size_ = t.length_value_type();
-          if(   t.is_context_tag() == is_expecting_context_tag_
+
+          if(   t.is_closing_tag()
+             && t.is_context_tag() == is_expecting_context_tag_
              && t.number()         == tag_number_expected_ ) {
             return true;
           }
@@ -121,7 +119,6 @@ private:
             return false;
           }
         }
-    uint32_t size_{0};
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};
 };
@@ -147,39 +144,44 @@ using bacnet::apdu::type::application_tag;
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, uint32_t()> {
+struct error_grammar : grammar<Iterator, bacnet::type::error()> {
 
-    rule<Iterator, uint32_t()>   start_rule;
-    rule<Iterator, uint32_t()>   tag_rule;
-    rule<Iterator, uint32_t()>   value_rule;
 
-    tag_grammar<Iterator> tag_grammar_;
+  rule<Iterator, bacnet::type::error()>  start_rule;
+  rule<Iterator, bacnet::type::error()>  error_rule;
+  rule<Iterator>                         open_tag_rule;
+  rule<Iterator>                         close_tag_rule;
 
-    enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::unsigned_integer) {
-      setup();
-    }
-    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag, true) {
-      setup();
-    }
+  enumeration_grammar<Iterator>          enumeration_grammar_;
+  tag_grammar<Iterator> tag_grammar_;
+
+
+  error_grammar() : error_grammar::base_type(start_rule), add_surrounding_tag_(false) {
+    setup();
+  }
+  error_grammar(uint8_t tag_id) : error_grammar::base_type(start_rule),
+                                  add_surrounding_tag_(true),
+                                  opening_tag_(tag_id, true, tag::opening_tag_indication),
+                                  closing_tag_(tag_id, true, tag::closing_tag_indication) {
+    setup();
+  }
 
 private:
 
     void setup () {
 
-      start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
+      start_rule  =  open_tag_rule
+                  << error_rule
+                  << close_tag_rule
+                  ;
 
+      open_tag_rule  = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(opening_tag_)] | eps;
+      close_tag_rule = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(closing_tag_)] | eps;
 
-      tag_rule = eps[boost::phoenix::bind(&enumeration_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
-      //tag_rule = tag_grammar_[_1 = ref(tag_)];
-
-      value_rule  = eps(ref(size_) == 1) << byte_
-                    | eps(ref(size_) == 2) << big_word
-                    | eps(ref(size_) == 3) << big_24word
-                    | eps(ref(size_) == 4) << big_dword;
+      error_rule  =  enumeration_grammar_
+                  << enumeration_grammar_;
 
       start_rule.name("start_rule");
-      tag_rule.name("tag_rule");
-      value_rule.name("value_rule");
 
       /*
       debug(start_rule);
@@ -188,15 +190,10 @@ private:
       */
     }
 
-    bool extract_size(const uint32_t &unsigned_value) {
-      size_ = bacnet::apdu::type::detail::length_helper(unsigned_value);
-      tag_.length_value_type(size_);
-      return true;
-    }
 
-
-    uint8_t size_;
-    tag tag_;
+    bool add_surrounding_tag_{false};
+    tag  opening_tag_;
+    tag  closing_tag_;
 };
 
 }}}}}

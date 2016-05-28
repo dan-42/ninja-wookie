@@ -66,11 +66,10 @@ public:
   //// responses to requests
 
   void operator()(frame::simple_ack response) {
-    std::cout << "apdu::detail::inbound_router simple_ack" << std::endl;
-    bacnet::error_code ec;
+    bacnet::error_code success;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
-      handler(ec, response, meta_information_);
+      handler(success, response, meta_information_);
     }
   }
 
@@ -84,10 +83,26 @@ public:
   }
 
   void operator()(frame::error response) {
-    std::cout << "apdu::detail::inbound_router error" << std::endl;
-    bacnet::error_code ec;
+
+    /**
+     * xxx
+     * parse response, erro_choice indicates content_type
+     *
+     * possible types
+     *  * error
+     *  * change_list_error (error, unsigned)
+     *  * create_object_error(error, unsigned)
+     *  * write_property_multiple_error (error, (object_property_reference) )
+     *  * confirmed_private_transfer_error (error, uint16, uint8_t, abstract_data_optional)
+     *  * vt_close_error (error, list_of_uint8_t)
+     * all contain error_class error_code -> mapped to bacnet::error_code
+     */
+
+
+
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
+      bacnet::error_code ec(response.error_.error_code.value, response.error_.error_class.value);
       handler(ec, response, meta_information_);
     }
   }

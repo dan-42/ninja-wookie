@@ -26,17 +26,19 @@
 #include <cstdint>
 
 #include <boost/fusion/include/define_struct.hpp>
+#include <boost/optional.hpp>
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/detail/headers.hpp>
-
+#include <bacnet/type/error.hpp>
 
 BOOST_FUSION_DEFINE_STRUCT(
         (bacnet)(apdu)(frame), error,
         (bacnet::apdu::detail::header::pdu_type_and_control_information_t, pdu_type_and_control_information)
         (uint8_t, original_invoke_id)
         (uint8_t, error_choice)
-        (bacnet::binary_data, error_data)
+        (bacnet::type::error, error_)
+        (boost::optional<bacnet::binary_data>, error_data)
 )
 
 

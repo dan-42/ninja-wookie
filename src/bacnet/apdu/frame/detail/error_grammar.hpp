@@ -27,6 +27,7 @@
 #include <bacnet/detail/common/types.hpp>
 
 #include <bacnet/apdu/frame/error.hpp>
+#include <bacnet/apdu/type/detail/error_grammar.hpp>
 #include <bacnet/apdu/detail/pdu_type.hpp>
 
 
@@ -58,6 +59,7 @@ struct error_grammar : grammar<Iterator, error() >{
 
   rule<Iterator>                                          pdu_type_check_rule;
 
+  type::detail::parser::error_grammar<Iterator>           error_type_rule;
 
   bit_field<Iterator, pdu_type_and_control_information_t> pdu_type_and_control_information_grammar;
 
@@ -66,7 +68,8 @@ struct error_grammar : grammar<Iterator, error() >{
     error_rule  = pdu_header_rule
                >> original_invoke_id_rule
                >> error_choice_rule
-               >> error_data_rule;
+               >> error_type_rule
+               >> -error_data_rule;
 
 
     pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _1])[_val = _1]  >> pdu_type_check_rule;
@@ -138,7 +141,7 @@ struct error_grammar : grammar<Iterator, error() >{
   rule<Iterator, bacnet::binary_data()>                   error_data_rule;
 
   rule<Iterator>                                          pdu_type_check_rule;
-
+  type::detail::generator::error_grammar<Iterator>        error_type_rule;
 
   bit_field<Iterator, pdu_type_and_control_information_t> pdu_type_and_control_information_grammar;
 
@@ -147,7 +150,8 @@ struct error_grammar : grammar<Iterator, error() >{
     error_rule  = pdu_header_rule
                << original_invoke_id_rule
                << error_choice_rule
-               << error_data_rule;
+               << error_type_rule
+               << -error_data_rule;
 
 
     pdu_header_rule           = (pdu_type_and_control_information_grammar[ref(pdu_header_) = _val])[_1 = _val]  << pdu_type_check_rule;

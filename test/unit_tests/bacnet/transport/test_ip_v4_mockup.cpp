@@ -79,7 +79,8 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
   transport.set_from_application_callback(async_send_from_stack_callback_);
 
   transport.async_send(data_to_send, receiver, [](const bacnet::error_code& ec){
-    BOOST_TEST(ec, "SEND WAS NOT SUCCESSFULL");
+    bacnet::error_code success = bacnet::error_code(boost::system::errc::success);
+    BOOST_TEST(ec == success, "SEND WAS NOT SUCCESSFULL");
   });
 
   auto ec = boost::system::errc::make_error_code(boost::system::errc::argument_list_too_long);

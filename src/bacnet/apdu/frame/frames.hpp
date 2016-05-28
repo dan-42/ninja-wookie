@@ -52,8 +52,10 @@ typedef boost::variant<
 
 
 typedef boost::variant<
-    simple_ack,
     complex_ack,
+
+    simple_ack,
+
     error,
     abort,
     reject

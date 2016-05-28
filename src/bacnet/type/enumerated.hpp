@@ -116,7 +116,7 @@ struct enumerated {
 
 
   template<typename T>
-  std::string to_string() {
+  inline std::string to_string() {
     std::stringstream os;
     os << "type: " << type << "  value: " << value;
     return os.str();
@@ -156,7 +156,8 @@ struct device_status{
 };
 
 
-template<> std::string enumerated::to_string<device_status> () {
+template<>
+inline std::string enumerated::to_string<device_status> () {
   std::stringstream os;
   os << type << ":";
   switch(value) {
