@@ -93,6 +93,8 @@ namespace bacnet { namespace service { namespace service {
     
     template<> struct is_request<reinitialize_device> :    boost::mpl::true_ {};
     
+    template<> struct has_complex_response<reinitialize_device> :    boost::mpl::false_ {};
+
     
 }}}
 

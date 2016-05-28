@@ -22,6 +22,8 @@ namespace bacnet { namespace service { namespace service {
 
     template  <typename T> struct is_supported :    boost::mpl::true_ {};        
     
+    template  <typename T> struct has_complex_response :    boost::mpl::false_ {};
+
 }}}
 
 

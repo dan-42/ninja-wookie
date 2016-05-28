@@ -70,6 +70,37 @@ namespace bacnet { namespace service { namespace service { namespace detail {
 }}}}
 
 
+namespace bacnet { namespace service { namespace detail {
+
+using namespace bacnet::service;
+
+template<class Service, class Enable = void>
+struct invoke_handler_ {
+  template<typename Handler>
+  static inline void invoke(Handler &&handler, bacnet::error_code ec, bacnet::service::confirmed::response&& response ) {
+      handler(std::move(ec));
+  }
+  template<typename Handler>
+  static inline void invoke(Handler &&handler, bacnet::error_code ec) {
+    handler(std::move(ec));
+  }
+};
+
+template<class Service>
+struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_response<Service>::value  >::type> {
+  template<typename Handler>
+  static inline void invoke(Handler &&handler, bacnet::error_code ec, bacnet::service::confirmed::response&& response ) {
+      handler(std::move(ec), std::move(response));
+  }
+  template<typename Handler>
+  static inline void invoke(Handler &&handler, bacnet::error_code ec) {
+    handler(std::move(ec), bacnet::service::confirmed::response{});
+  }
+
+};
+
+}}}
+
 
 namespace bacnet { namespace service {
 
@@ -141,29 +172,29 @@ public:
     auto data =  bacnet::service::service::detail::generate_unconfirmed(service);
 
     if( bacnet::service::service::detail::is_broadcast_service<typename std::decay<Service>::type>::value) {
-      lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), [this, handler]( const bacnet::error_code& ec) {
-        handler(ec);
-      });
+      lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), handler);
     }
     else {
-      std::cerr << "async_send() is not a broadcast frame" << std::endl;
+      std::cerr << "async_send() is not a broadcast service" << std::endl;
       auto ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
       handler(ec);
     }
   }
+
+
 
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::endpoint mac_endpoint, Service&& service, Handler handler) {
     async_send(mac_endpoint.address(), std::move(service), handler);
   }
 
-
-
   /*
    * handler accepts only possible service responses
    */
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::address address, Service&& service, Handler handler) {
+    using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
+
     auto data =  bacnet::service::service::detail::generate_confirmed(std::move(service));
     lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
                                                                        ( const bacnet::error_code& ec,
@@ -174,8 +205,7 @@ public:
                                        *
                                        */
                                       if(ec) {
-                                        bacnet::error_code bec(ec);
-                                        handler(bec, bacnet::service::confirmed::response{});
+                                        invoker::invoke(handler, ec);
                                       }
                                       else {
                                         inbound_router_.meta_information(std::move(mi));
@@ -188,6 +218,7 @@ public:
 
   template<typename Service, typename Handler>
   void async_send(bacnet::type::object_identifier device_object_identifier, Service service, Handler handler) {
+    using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
 
     /* lookup doi */
     auto endpoints = device_manager_.get_endpoint(device_object_identifier);
@@ -208,7 +239,7 @@ public:
                                        });
 
      bacnet::service::service::who_is wi(device_object_identifier.instance_number());
-     async_send(wi, [handler](bacnet::error_code ec) {  });
+     async_send(wi, [](bacnet::error_code ec) {  });
 
 
       timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
@@ -218,14 +249,12 @@ public:
                                     callback_manager_.clear_i_am_service_callback(callback_idx);
 
                                     if(ec == boost::asio::error::operation_aborted) {
-                                        bacnet::service::confirmed::response res;
-                                        handler(ec, res);
+                                      invoker::invoke(handler, ec);
                                       }
                                     else {
                                       std::cout << "no device with doi found  " << std::endl;
                                       //todo set special error_code on error
-                                      bacnet::service::confirmed::response res;
-                                      handler(ec, res);
+                                      invoker::invoke(handler, ec);
                                     }
                               });
     }
@@ -238,6 +267,11 @@ public:
 
 
 private:
+
+
+
+
+
     boost::asio::io_service& io_service_;
     UnderlyingLayer &lower_layer_;
     boost::asio::steady_timer timeout_timer_;
