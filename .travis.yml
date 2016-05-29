@@ -28,3 +28,8 @@ script:
   - make
   - cd test/unit_tests
   - ctest
+
+  
+cache:
+  directories:
+  - $HOME/.hunter
