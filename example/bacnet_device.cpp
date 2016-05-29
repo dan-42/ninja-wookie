@@ -67,15 +67,15 @@ int main(int argc, char *argv[]) {
 
 
     service_controller.async_receive(
-      [&](bacnet::service::i_am s, bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+      [&](bacnet::service::i_am s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         std::cout << "received i_am" << std::endl;
         // no action needed
       },
-      [&](bacnet::service::who_is s, bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+      [&](bacnet::service::who_is s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         std::cout << "received who_is" << std::endl;
         //no response needed, done automatically in the service-layer
       },
-      [&](bacnet::service::reinitialize_device s, bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+      [&](bacnet::service::reinitialize_device s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         std::cout << "received reinit" << std::endl;
         //xxx test password and state
         // send answer with OK or Error
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
          */
 
       },
-      [&](bacnet::service::read_property_request s, bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+      [&](bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         std::cout << "received read_property" << std::endl;
         //xxx handle request
         // send answer with OK or Error

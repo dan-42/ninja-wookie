@@ -19,7 +19,7 @@
 namespace bacnet { namespace transport {
 
 
-typedef std::function<bacnet::error_code (boost::asio::ip::udp::endpoint,  ::bacnet::binary_data) > from_application_callback;
+typedef std::function<bacnet::error (boost::asio::ip::udp::endpoint,  ::bacnet::binary_data) > from_application_callback;
 
 /**
  * simple mockup for testing the stack without the need of a real IP-connection
@@ -61,7 +61,7 @@ public:
           throw std::runtime_error("transport::ip_v4_mockup : its not a ip endpoint");
         }
         auto ip_receiver = receiver.ip().to_system_endpoint();
-        bacnet::error_code ec = from_application_callback_(ip_receiver, data);
+        bacnet::error ec = from_application_callback_(ip_receiver, data);
         handler(ec);
       });
     }
@@ -77,7 +77,7 @@ public:
     /**
      * mockup used to send somthing to the application_layer
      */
-    void send_to_application(const bacnet::error_code &ec, const boost::asio::ip::udp::endpoint &ep ,const ::bacnet::binary_data& data) {
+    void send_to_application(const bacnet::error &ec, const boost::asio::ip::udp::endpoint &ep ,const ::bacnet::binary_data& data) {
       auto ip_ep = ::bacnet::common::protocol::mac::address_ip::from_native(ep);
       ::bacnet::common::protocol::mac::address bacnet_ep(ip_ep);
 
@@ -91,7 +91,7 @@ public:
     /**
      * mockup used to send somthing to the application_layer
      */
-    void send_to_application(const bacnet::error_code &ec, const ::bacnet::common::protocol::mac::address &ep, const ::bacnet::binary_data& data) {
+    void send_to_application(const bacnet::error &ec, const ::bacnet::common::protocol::mac::address &ep, const ::bacnet::binary_data& data) {
       io_service_.post([=]() {
         auto send_ec = ec;
         auto send_ep = ep;

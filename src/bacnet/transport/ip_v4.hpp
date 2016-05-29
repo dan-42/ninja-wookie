@@ -51,7 +51,7 @@ public:
     }
     auto ip_receiver = receiver.ip().to_system_endpoint();
     socket_.async_send_to(boost::asio::buffer(data, data.size()), ip_receiver, [this, handler]( const boost::system::error_code& ec,  std::size_t bytes_transferred) {
-      handler(bacnet::error_code(ec));
+      handler(bacnet::error(ec));
     });
   }
 
@@ -73,7 +73,7 @@ private:
   void handle_receive_from(const boost::system::error_code& ec,  std::size_t bytes_transferred) {
 
     bacnet::common::protocol::mac::address sender(bacnet::common::protocol::mac::address_ip::from_native(sender_endpoint_));
-    bacnet::error_code send_ec(ec);
+    bacnet::error send_ec(ec);
     if(!ec) {
       /* copy from input buffer to binary_data
        * this should be the only copy

@@ -40,8 +40,8 @@ BOOST_AUTO_TEST_SUITE( test_error_code_simple )
       std::cout << "boost_ec_succsess: "            <<  boost_ec_succsess << std::endl;
       std::cout << "boost_ec_operation_canceled: "  << boost_ec_operation_canceled << std::endl;
 
-      bacnet::error_code bacnet_ec_success{boost_ec_succsess};
-      bacnet::error_code bacnet_ec_from_boost_error{boost_ec_operation_canceled};
+      bacnet::error bacnet_ec_success{boost_ec_succsess};
+      bacnet::error bacnet_ec_from_boost_error{boost_ec_operation_canceled};
 
 
       BOOST_TEST(!bacnet_ec_success);
@@ -50,12 +50,12 @@ BOOST_AUTO_TEST_SUITE( test_error_code_simple )
       std::cout << "bacnet_ec_from_boost_error: " << bacnet_ec_from_boost_error << std::endl;
 
 
-      bacnet::error_code bacnet_ec_known_error(bacnet::error::error_code::abort_apdu_too_long, bacnet::error::error_class::communication);
+      bacnet::error bacnet_ec_known_error(bacnet::err::error_code::abort_apdu_too_long, bacnet::err::error_class::communication);
       BOOST_TEST(bacnet_ec_known_error);
       std::cout << "bacnet_ec_known_error: " << bacnet_ec_known_error << std::endl;
 
 
-      bacnet::error_code bacnet_ec_unknown_error(1337, 42);
+      bacnet::error bacnet_ec_unknown_error(1337, 42);
       BOOST_TEST(bacnet_ec_unknown_error);
       std::cout << "bacnet_ec_unknown_error: " << bacnet_ec_unknown_error << std::endl;
 

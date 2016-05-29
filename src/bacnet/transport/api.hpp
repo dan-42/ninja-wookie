@@ -9,9 +9,9 @@
 
 #include <functional>
 
-#include <bacnet/error/error.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/mac/address.hpp>
+#include <bacnet/error/error.hpp>
 
 
 /**
@@ -26,7 +26,7 @@
  */
 namespace bacnet { namespace transport {
 
-    typedef std::function<void(bacnet::error_code&&, bacnet::common::protocol::mac::address&&, bacnet::binary_data&&)> receive_callback;
+    typedef std::function<void(bacnet::error&&, bacnet::common::protocol::mac::address&&, bacnet::binary_data&&)> receive_callback;
 
     namespace config {
       static const constexpr char*  DEFAULT_LISTENING_ADDRESS{"0.0.0.0"};

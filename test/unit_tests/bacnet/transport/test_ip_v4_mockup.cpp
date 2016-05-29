@@ -45,8 +45,8 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
 
 
 
-  receive_callback receive_callback_= [&data_to_send](bacnet::error_code ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data &&data){
-    bacnet::error_code expected(boost::system::errc::argument_list_too_long, boost::system::generic_category());
+  receive_callback receive_callback_= [&data_to_send](bacnet::error ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data &&data){
+    bacnet::error expected(boost::system::errc::argument_list_too_long, boost::system::generic_category());
 
     BOOST_ASSERT_MSG(ec == expected, "ERROR_CODE WRONG");
     ::bacnet::common::protocol::mac::address expected_adr(::bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1"));
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
 
   };
   from_application_callback async_send_from_stack_callback_ = [&data_to_send](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data){
-    auto ec = bacnet::error_code(boost::system::errc::success);
+    auto ec = bacnet::error(boost::system::errc::success);
 
     BOOST_ASSERT_MSG(data_to_send.size() == data.size(), "SEND DATA IS NOT THE SAME length");
     for(std::size_t idx = 0; idx < data.size(); ++idx) {
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_SUITE( test_transport_ipv4_mockup )
   transport.register_receive_callback(receive_callback_);
   transport.set_from_application_callback(async_send_from_stack_callback_);
 
-  transport.async_send(data_to_send, receiver, [](const bacnet::error_code& ec){
-    bacnet::error_code success = bacnet::error_code(boost::system::errc::success);
+  transport.async_send(data_to_send, receiver, [](const bacnet::error& ec){
+    bacnet::error success = bacnet::error(boost::system::errc::success);
     BOOST_TEST(ec == success, "SEND WAS NOT SUCCESSFULL");
   });
 

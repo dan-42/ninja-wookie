@@ -24,23 +24,23 @@
 #include <cstdint>
 
 #include <functional>
-#include <bacnet/error/error.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/common/protocol/meta_information.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
+#include <bacnet/error/error.hpp>
 
 
 namespace bacnet { namespace apdu {
    /* called when new requests are incomming    */
-  typedef  std::function<void (frame::unconfirmed_request, bacnet::error_code, bacnet::common::protocol::meta_information)> received_unconfirmed_callback_t;
-  typedef  std::function<void (frame::confirmed_request  , bacnet::error_code, bacnet::common::protocol::meta_information)> received_confirmed_callback_t;
+  typedef  std::function<void (frame::unconfirmed_request, bacnet::error, bacnet::common::protocol::meta_information)> received_unconfirmed_callback_t;
+  typedef  std::function<void (frame::confirmed_request  , bacnet::error, bacnet::common::protocol::meta_information)> received_confirmed_callback_t;
 
 
   /* called after sending a request to somewhere */
-  typedef std::function< void (const  bacnet::error_code&,
+  typedef std::function< void (const  bacnet::error&,
                                       frame::possible_confirmed_respons,
                                       bacnet::common::protocol::meta_information )> confirmed_request_handler_type;
-  typedef std::function< void (const bacnet::error_code&)>                   unconfirmed_request_handler_type;
+  typedef std::function< void (const bacnet::error&)>                   unconfirmed_request_handler_type;
 
 
 }}

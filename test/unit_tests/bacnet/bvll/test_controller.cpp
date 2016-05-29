@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( test_send_unicast ) {
   bacnet::common::protocol::mac::address_ip address  = bacnet::common::protocol::mac::address_ip::from_string("192.168.10.1", 0xBAC0);
 
   controller<decltype(transport)> controller_(ios, transport);
-  controller_.async_send(data_to_send, address, [](const bacnet::error_code &ec) {
+  controller_.async_send(data_to_send, address, [](const bacnet::error &ec) {
 
   });
 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( test_send_broadcast ) {
   transport.set_from_application_callback(from_application_callback_);
 
   controller<decltype(transport)> controller_(ios, transport);
-  controller_.async_send_broadcast(data_to_send, [](const bacnet::error_code &ec) {
+  controller_.async_send_broadcast(data_to_send, [](const bacnet::error &ec) {
   });
 
 

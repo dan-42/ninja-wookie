@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
-    service_controller.async_receive([&](const bacnet::service::i_am &service, const bacnet::error_code &ec, const bacnet::common::protocol::meta_information &mi){
+    service_controller.async_receive([&](const bacnet::service::i_am &service, const bacnet::error &ec, const bacnet::common::protocol::meta_information &mi){
     	//std::cout << service << std::endl;
     });
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
     bacnet::service::service::who_is wi;
 
     service_controller.async_send(wi, [&]
-                 (const bacnet::error_code &ec){
+                 (const bacnet::error &ec){
                     std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
                  }
     );

@@ -32,7 +32,6 @@
 #include <boost/asio/steady_timer.hpp>
 
 #include <bacnet/service/api.hpp>
-#include <bacnet/error/error.hpp>
 #include <bacnet/service/detail/callback_manager.hpp>
 #include <bacnet/service/detail/device_manager.hpp>
 #include <bacnet/service/detail/inbound_router.hpp>
@@ -43,6 +42,7 @@
 #include <bacnet/common/configuration.hpp>
 
 #include <bacnet/apdu/api.hpp>
+#include <bacnet/error/error.hpp>
 #include <bacnet/error/error.hpp>
 
 /**
@@ -80,11 +80,11 @@ struct invoke_handler_ {
   static constexpr bool expect_response = false;
 
   template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error_code ec, bacnet::service::confirmed::response&& response ) {
+  static inline void invoke(Handler &&handler, bacnet::error ec, bacnet::service::confirmed::response&& response ) {
       handler(std::move(ec));
   }
   template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error_code ec) {
+  static inline void invoke(Handler &&handler, bacnet::error ec) {
     handler(std::move(ec));
   }
 };
@@ -95,11 +95,11 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
   static constexpr bool expect_response = true;
 
   template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error_code ec, bacnet::service::confirmed::response&& response ) {
+  static inline void invoke(Handler &&handler, bacnet::error ec, bacnet::service::confirmed::response&& response ) {
       handler(std::move(ec), std::move(response));
   }
   template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error_code ec) {
+  static inline void invoke(Handler &&handler, bacnet::error ec) {
     handler(std::move(ec), bacnet::service::confirmed::response{});
   }
 
@@ -129,13 +129,13 @@ public:
 
   void start() {
     lower_layer_.register_callbacks(
-        [this](bacnet::apdu::frame::unconfirmed_request request,  bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+        [this](bacnet::apdu::frame::unconfirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
             inbound_router_.meta_information(std::move(mi));
             auto f = bacnet::service::service::detail::parse(request);
             f.apply_visitor(inbound_router_);
             //parse and visitor for unconfirmed
           },
-        [this](bacnet::apdu::frame::confirmed_request request,  bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+        [this](bacnet::apdu::frame::confirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
             inbound_router_.meta_information(std::move(mi));
             auto f = bacnet::service::service::detail::parse(request);
             f.apply_visitor(inbound_router_);
@@ -153,7 +153,7 @@ public:
                                     bacnet::common::segmentation(bacnet::common::segmentation::segment::both),\
                                     ApduSize::size_in_bytes
                                     };
-      callback_manager_.add_who_is_service_callback([this](bacnet::service::who_is service, bacnet::error_code ec, bacnet::common::protocol::meta_information mi){
+      callback_manager_.add_who_is_service_callback([this](bacnet::service::who_is service, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         if(!ec)
           if(  (     !service.device_instance_range_low_limit
                   && !service.device_instance_range_high_limit
@@ -162,10 +162,10 @@ public:
                (     this->config_.device_object_id >= service.device_instance_range_low_limit.value()
                   && this->config_.device_object_id <= service.device_instance_range_high_limit.value()
                )) {
-            this->async_send(this->i_am_message_, [](const bacnet::error_code& ec){});
+            this->async_send(this->i_am_message_, [](const bacnet::error& ec){});
         }
       });
-      async_send(i_am_message_, [](const bacnet::error_code& ec){});
+      async_send(i_am_message_, [](const bacnet::error& ec){});
     }
   }
 
@@ -203,7 +203,7 @@ public:
 
     auto data =  bacnet::service::service::detail::generate_confirmed(std::move(service));
     lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
-                                                                       ( const bacnet::error_code& ec,
+                                                                       ( const bacnet::error& ec,
                                                                                bacnet::apdu::frame::possible_confirmed_respons frame,
                                                                                bacnet::common::protocol::meta_information mi) {
 
@@ -236,14 +236,14 @@ public:
        */
      auto callback_idx =  callback_manager_.set_i_am_service_callback(
                                  [handler, service, device_object_identifier, this]
-                                      (bacnet::service::i_am i_am, bacnet::error_code ec, bacnet::common::protocol::meta_information mi) {
+                                      (bacnet::service::i_am i_am, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
                                         if(i_am.i_am_device_identifier == device_object_identifier) {
                                           async_send(mi.address, service, handler);
                                         }
                                        });
 
      bacnet::service::service::who_is wi(device_object_identifier.instance_number());
-     async_send(wi, [](bacnet::error_code ec) {  });
+     async_send(wi, [](bacnet::error ec) {  });
 
 
       timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
