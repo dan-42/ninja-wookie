@@ -29,7 +29,8 @@
 namespace bacnet { namespace stack {
 
  enum stack_t{
-   ip_v4,
+   ip_v4_server,
+   ip_v4_client,
    ip_v6,
    mstp
  };
@@ -53,7 +54,7 @@ struct factory { };
 
 
 template<>
-struct factory<ip_v4> {
+struct factory<ip_v4_server> {
   factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port) :
              transporter(ios, {ip, port} ),
              bvll_controller(ios, transporter),
@@ -84,6 +85,45 @@ private:
 };
 
 
+template<>
+struct factory<ip_v4_client> {
+  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port) :
+             config(bacnet::config{bacnet::common::segmentation{},
+                                   bacnet::configuration::max_segments_accepted::segments_more_then_64,
+                                   1337,    // vendor_id
+                                   1,       // device_object_id
+                                   1,       // network_number
+                                   false,   // send_i_am_frames
+                                   false}), //is_server
+             transporter(ios, {ip, port} ),
+             bvll_controller(ios, transporter),
+             npdu_controller(bvll_controller),
+             apdu_controller(ios, npdu_controller),
+             service_controller(ios, apdu_controller, config) {
+  }
+
+  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port, bacnet::config c) :
+               config(c),
+               transporter(ios, {ip, port} ),
+               bvll_controller(ios, transporter),
+               npdu_controller(bvll_controller),
+               apdu_controller(ios, npdu_controller),
+               service_controller(ios, apdu_controller, config) {
+    }
+
+  detail::ip_v4::service_controller_t & controller() {
+    return service_controller;
+  }
+
+private:
+    bacnet::config                       config{};
+    detail::ip_v4::transporter_t         transporter;
+    detail::ip_v4::bvll_controller_t     bvll_controller;
+    detail::ip_v4::npdu_controller_t     npdu_controller;
+    detail::ip_v4::apdu_controller_t     apdu_controller;
+    detail::ip_v4::service_controller_t  service_controller;
+
+};
 
 }}
 

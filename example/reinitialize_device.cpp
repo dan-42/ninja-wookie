@@ -23,9 +23,9 @@
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
+#include <boost/program_options.hpp>
 
 int main(int argc, char *argv[]) {
-
 
   try {
     uint16_t    doi{1};
@@ -34,46 +34,28 @@ int main(int argc, char *argv[]) {
     uint16_t    port{0xBAC0};
     std::string ip{"0.0.0.0"};
 
+    namespace po = boost::program_options;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help", "sending BACnet reinitialize device: e.g.  -doi 2  -state 0  -pw 123456")
+        ("ip",    po::value<std::string>(&ip)      ->default_value("0.0.0.0"), "listining ip")
+        ("port",  po::value<uint16_t>(&port)       ->default_value(0xBAC0),    "listening port")
+        ("doi",   po::value<uint16_t>(&doi)        ->default_value(1),         "device object identifier")
+        ("state", po::value<uint16_t>(&state)      ->default_value(0),         "state: coldstart(0)\n  warmstart(1)\n  startbackup(2)\n  endbackup(3)\n  startrestore(4)\n  endrestore(5)\n  abortrestore(6)\n")
+        ("pw",    po::value<std::string>(&password)->default_value(""),        "passowrd")
+    ;
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
 
-    if(argc == 3 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
+    if (vm.count("help")) {
+        std::cout << desc << std::endl<< std::endl;
+        return 1;
     }
-    else if(argc == 4 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
-      password  = std::string{argv[3]};
-    }
-    else if(argc == 5 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
-      password  = std::string{argv[3]};
-      port      = (uint16_t)std::stoi(argv[4]);
-    }
-    else if(argc == 6 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
-      password  = std::string{argv[3]};
-      port      = (uint16_t)std::stoi(argv[4]);
-      ip        = std::string{argv[5]};
-    }
-    else {
-      std::cout
-      << "error wrong parameters" << std::endl
-      << "usage: " << std::endl
-      << "\t" << argv[0] << " [doi] [state] " << std::endl
-      << "\t" << argv[0] << " [doi] [state] [password]" << std::endl
-      << "\t" << argv[0] << " [doi] [state] [password] [port]" << std::endl
-      << "\t" << argv[0] << " [doi] [state] [password] [port] [ip_address]" << std::endl
-      << std::endl
-      << "example:" << std::endl
-      << "\t" << argv[0] << " 1 \"12345\" 47808 \"0.0.0.0\" " << std::endl
-      << std::endl;
 
-      return 1;
-    }
     std::cout
                 << "sending reinitialize_device to "
+                << std::endl
                 << " doi: "     << doi
                 << " state: "   << state
                 << " with password: "   << password
@@ -81,19 +63,13 @@ int main(int argc, char *argv[]) {
                 << std::endl;
 
 
-
-
     boost::asio::io_service io_service;
-    bacnet::config config;
-    config.send_i_am_frames = false;
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
+    bacnet::stack::factory<bacnet::stack::ip_v4_client> factory{io_service, ip, port};
     auto &service_controller = factory.controller();
 
     bacnet::type::object_identifier device_id{bacnet::object_type::device, doi};
     bacnet::service::service::reinitialize_device reinitd{state, password};
-
     service_controller.start();
-
 
     service_controller.async_send(device_id, reinitd, [&io_service](const bacnet::error &ec ) {
                                                           if(!ec) {
@@ -106,13 +82,11 @@ int main(int argc, char *argv[]) {
                                                        }
     );
 
-
     io_service.run();
   }
   catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";
     throw e;
   }
-
   return 0;
 }

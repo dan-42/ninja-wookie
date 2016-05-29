@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     boost::asio::io_service io_service;
     bacnet::config config;
     config.send_i_am_frames = false;
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
+    bacnet::stack::factory<bacnet::stack::ip_v4_server> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
     bacnet::type::object_identifier device_id{bacnet::object_type::device, 2};

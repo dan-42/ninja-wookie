@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     config.network_number = 1;
     config.send_i_am_frames = true;
 
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
+    bacnet::stack::factory<bacnet::stack::ip_v4_server> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
 

@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     boost::asio::io_service io_service;
     bacnet::config config;
     config.send_i_am_frames = false;
-    bacnet::stack::factory<bacnet::stack::ip_v4> factory{io_service, ip, port, config};
+    bacnet::stack::factory<bacnet::stack::ip_v4_server> factory{io_service, ip, port, config};
     auto &service_controller = factory.controller();
 
     service_controller.async_receive([&](const bacnet::service::i_am &service, const bacnet::error &ec, const bacnet::common::protocol::meta_information &mi){
