@@ -96,9 +96,14 @@ int main(int argc, char *argv[]) {
 
 
     service_controller.async_send(device_id, reinitd, [&io_service](const bacnet::error &ec ) {
-                                                           std::cout << "async_send::reinitialize_device::result: " << ec <<  std::endl;
-                                                           io_service.stop();
+                                                          if(!ec) {
+                                                            std::cout << "device answered successful" <<  std::endl;
                                                           }
+                                                          else {
+                                                            std::cout << "error occurred: " << ec <<  std::endl;
+                                                          }
+                                                          io_service.stop();
+                                                       }
     );
 
 

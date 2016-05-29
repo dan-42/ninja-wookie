@@ -91,7 +91,6 @@ public:
   }
 
   void operator()(frame::reject response) {
-    std::cout << "apdu::detail::inbound_router reject" << std::endl;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       bacnet::error ec = bacnet::make_reject_reason(response.reject_reason);
@@ -100,7 +99,6 @@ public:
   }
 
   void operator()(frame::abort response) {
-    std::cout << "apdu::detail::inbound_router abort" << std::endl;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       bacnet::error ec = bacnet::make_abort_reason(response.abort_reason);
