@@ -37,12 +37,12 @@ int main(int argc, char *argv[]) {
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help", "sending BACnet reinitialize device: e.g.  -doi 2  -state 0  -pw 123456")
-        ("ip",    po::value<std::string>(&ip)      ->default_value("0.0.0.0"), "listining ip")
+        ("help", "sending BACnet reinitialize device: e.g.  \n-doi 2  -state 0  -pw 123456")
+        ("ip",    po::value<std::string>(&ip)      ->default_value("0.0.0.0"), "listening ip")
         ("port",  po::value<uint16_t>(&port)       ->default_value(0xBAC0),    "listening port")
         ("doi",   po::value<uint16_t>(&doi)        ->default_value(1),         "device object identifier")
         ("state", po::value<uint16_t>(&state)      ->default_value(0),         "state: coldstart(0)\n  warmstart(1)\n  startbackup(2)\n  endbackup(3)\n  startrestore(4)\n  endrestore(5)\n  abortrestore(6)\n")
-        ("pw",    po::value<std::string>(&password)->default_value(""),        "passowrd")
+        ("pw",    po::value<std::string>(&password)->default_value(""),        "password")
     ;
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);

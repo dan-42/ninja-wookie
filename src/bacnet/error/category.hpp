@@ -29,6 +29,10 @@ namespace bacnet {
         return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code);
       }
 
+      static inline std::string to_string(int e_code, int e_class) {
+    	  return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code);
+      }
+
     };
     inline const boost::system::error_category & bacnet_error_category() noexcept  {
       static const error_category bacnet_category_const;
