@@ -19,165 +19,59 @@
 #include <bacnet/type/enumerated.hpp>
 #include <bacnet/type/object_identifier.hpp>
 namespace bacnet {
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////// simple bacnet error
-    struct error_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::error"; }
-      std::string message(int ev) const { return err::error_code::to_string(ev); }
-
-      static inline std::string message(int e_code, int e_class) {
-        return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code);
-      }
-
-      static inline std::string to_string(int e_code, int e_class) {
-    	  return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code);
-      }
-
-    };
-    inline const boost::system::error_category & bacnet_error_category() noexcept  {
-      static const error_category bacnet_category_const;
-      return bacnet_category_const;
-    }
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet error on list changes
-    struct  change_list_error_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::change_list_error"; }
-      std::string message(int ev) const { return err::error_code::to_string(ev); }
+namespace err {
 
-      static inline std::string message(int e_code, int e_class, uint32_t first_failed_element_number) {
-        return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code) + "::element(" + std::to_string(first_failed_element_number) + ")";
-      }
-
-    };
-    inline const boost::system::error_category & bacnet_change_list_error_category() noexcept  {
-      static const change_list_error_category change_list_error_category_const;
-      return change_list_error_category_const;
-    }
+  namespace system {    static inline std::string message(int i)  {
+      return "system::" + boost::system::system_category().message(i);
+  }}
 
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet error on object changes
-    struct  create_object_error_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::create_object_error"; }
-      std::string message(int ev) const { return err::error_code::to_string(ev); }
-
-      static inline std::string message(int e_code, int e_class, uint32_t first_failed_element_number) {
-        return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code) + "::element(" + std::to_string(first_failed_element_number) + ")";
-      }
-
-    };
-    inline const boost::system::error_category & bacnet_create_object_error_category() noexcept  {
-      static const create_object_error_category create_object_error_category_const;
-      return create_object_error_category_const;
-    }
+  namespace generic {   static inline std::string message(int i) {
+    return "generic::" + boost::system::generic_category().message(i);
+  }}
 
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet error on object changes
-    ///xxx create this type object_property_reference
-    struct object_property_reference{
-      bacnet::type::object_identifier object_identifier;
-      bacnet::type::enumerated        property_identifier;
-      boost::optional<uint32_t>       property_array_index;
-    };
-    struct  write_property_multiple_error_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::create_object_error"; }
-      std::string message(int ev) const { return err::error_code::to_string(ev); }
-
-      static inline std::string message(int e_code, int e_class, object_property_reference first_failed_write_attempt) {
-        return     err::error_class::to_string(e_class)
-          + "::" + err::error_code::to_string(e_code)
-          + "::" + std::to_string(first_failed_write_attempt.object_identifier.to_native());
-      }
-
-    };
-    inline const boost::system::error_category & bacnet_write_property_multiple_error_category() noexcept  {
-      static const write_property_multiple_error_category write_property_multiple_error_category_const;
-      return write_property_multiple_error_category_const;
-    }
+  namespace abort {   static inline std::string message(int code)  {
+    return "bacnet::abort::" + error_code::to_string(code) ;
+  }}
 
 
+  namespace reject {    static inline std::string message(int code)  {
+    return "bacnet::reject::" + error_code::to_string(code) ;
+  }}
+
+  namespace error {    static inline std::string message(int code, int class_)  {
+      return "bacnet::error::" + error_class::to_string(class_) + "::" + error_code::to_string(code) ;
+  }}
+
+  namespace change_list {   static inline std::string message(int code, int class_)  {
+    return "bacnet::change_list::" + error_class::to_string(class_) + "::" + error_code::to_string(code) ;
+  }}
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet error on object changes
-    ///xxx create this type confirmed_private_transfer_error_t
-    struct  confirmed_private_transfer_error_t {
-      uint16_t vendor_id;
-      uint32_t service_number;
-      bacnet::binary_data parameter;
-    };
-    struct  confirmed_private_transfer_error_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::confirmed_private_transfer_error"; }
-      std::string message(int ev) const { return err::error_code::to_string(ev); }
-
-      static inline std::string message(int e_code, int e_class, confirmed_private_transfer_error_t confirmed_private_transfer_error_) {
-        return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code) + ":: xxx to do";
-      }
-
-    };
-    inline const boost::system::error_category & bacnet_confirmed_private_transfer_error_category() noexcept  {
-      static const confirmed_private_transfer_error_category confirmed_private_transfer_error_category_const;
-      return confirmed_private_transfer_error_category_const;
-    }
+  namespace create_object {    static inline std::string message(int code, int class_)  {
+    return "bacnet::create_object::" + error_class::to_string(class_) + "::" + error_code::to_string(code) ;
+  }}
 
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet error vt_close_error
-    struct  vt_close_error {
-        std::vector<uint8_t> list_Of_vt_session_identifiers;
-    };
-    struct  vt_close_error_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::vt_close_error"; }
-      std::string message(int ev) const { return err::error_code::to_string(ev); }
-
-      static inline std::string message(int e_code, int e_class, confirmed_private_transfer_error_t confirmed_private_transfer_error_) {
-        return err::error_class::to_string(e_class) + "::" + err::error_code::to_string(e_code) + ":: xxx to do";
-      }
-
-    };
-    inline const boost::system::error_category & bacnet_vt_close_error_category() noexcept  {
-      static const vt_close_error_category vt_close_error_category_const;
-      return vt_close_error_category_const;
-    }
+  namespace write_property_multiple {    static inline std::string message(int code, int class_)  {
+    return "bacnet::write_property_multiple::" + error_class::to_string(class_) + "::" + error_code::to_string(code) ;
+  }}
 
 
+  namespace confirmed_private_transfer {    static inline std::string message(int code, int class_)  {
+    return "bacnet::confirmed_private_transfer::" + error_class::to_string(class_) + "::" + error_code::to_string(code) ;
+  }}
 
 
+  namespace vt_close {    static inline std::string message(int code, int class_)  {
+    return "bacnet::vt_close::" + error_class::to_string(class_) + "::" + error_code::to_string(code) ;
+  }}
+}
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet reject_category
-    struct  reject_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::reject"; }
-      inline std::string message(int ev) const {
-        return err::reject_reason::to_string(ev) ;
-      }
-    };
-    inline const boost::system::error_category & bacnet_reject_category() noexcept  {
-      static const reject_category reject_category_const;
-      return reject_category_const;
-    }
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////  bacnet abort_category
-    struct  abort_category :   public boost::system::error_category   {
-      const char *name() const noexcept { return "bacnet::abort"; }
-      inline std::string message(int ev) const {
-        return err::abort_reason::to_string(ev) ;
-      }
-    };
-    inline const boost::system::error_category & bacnet_abort_category() noexcept  {
-      static const abort_category abort_category_const;
-      return abort_category_const;
-    }
 
 }
 

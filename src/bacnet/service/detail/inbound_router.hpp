@@ -37,7 +37,7 @@ namespace bacnet { namespace service { namespace detail {
 
     template<typename Service>
     inline void operator()(Service service) {
-      bacnet::error ec{error::errc::success, error::get_error_category()};
+      bacnet::error ec;
       callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
     }
 
@@ -61,7 +61,7 @@ inline void inbound_router::operator()<service::i_am>(service::i_am service) {
                                 service.vendor_id);
   //device_manager_.print_device_list();
 
-  bacnet::error ec{error::errc::success, error::get_error_category()};
+  bacnet::error ec;
   callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
 }
 

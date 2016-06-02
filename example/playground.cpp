@@ -36,41 +36,6 @@
 #include <boost/fusion/include/mpl.hpp>
 
 #include <boost/system/error_code.hpp>
-namespace test_error {
-
-struct error {
-
-	std::string message() {
-		if(category == &bacnet::bacnet_error_category() ) {
-		  return bacnet::error_category::message(value, error_class);
-		}
-
-
-		return "";
-	}
-	boost::system::error_category&  cat();
-
-	int value{0};
-	const boost::system::error_category* category;
-
-	boost::optional<uint32_t> 											error_class;
-	boost::optional<uint32_t> 											first_failed_element_number;
-	boost::optional<bacnet::type::object_property_reference> 			first_failed_write_attempt;
-	boost::optional<bacnet::type::confirmed_private_transfer_error> 	confirmed_private_transfer_error;
-	boost::optional<std::vector<uint8_t> >								list_of_vt_session_identifiers;
-};
-
-}
-BOOST_FUSION_ADAPT_STRUCT(
-    test_error::error,
-	category,
-	value,
-	error_class,
-	first_failed_element_number,
-	first_failed_write_attempt,
-	confirmed_private_transfer_error,
-	list_of_vt_session_identifiers
-);
 
 namespace bacnet { namespace id {
 

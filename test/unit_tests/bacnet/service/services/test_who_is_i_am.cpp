@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
      */
     service_controller.async_receive([&](bacnet::service::who_is service, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
 
-      bacnet::error expected_ec{bacnet::service::error::errc::success, bacnet::service::error::get_error_category()};
+      bacnet::error expected_ec;
       BOOST_ASSERT_MSG(ec == expected_ec, " Error code is wrong ");
 
       boost::asio::ip::udp::endpoint expected_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
@@ -243,8 +243,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
     boost::asio::ip::udp::endpoint expected_ep(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
 
-    auto ec_succsess = boost::system::errc::make_error_code(boost::system::errc::success);
-
+    bacnet::error ec_succsess;
     /*
      * actual test function
      */

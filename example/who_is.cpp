@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 
     service_controller.async_send(wi, [&]
                  (const bacnet::error &ec){
-                    std::cout << "async_send::who_is " << ec.category().name() << " " << ec.message() <<  std::endl;
+                    std::cout << "async_send::who_is " <<  ec <<  std::endl;
                  }
     );
 

@@ -45,6 +45,8 @@
 #include <bacnet/error/error_code.hpp>
 #include <bacnet/error/category.hpp>
 
+#include <bacnet/type/object_property_reference.hpp>
+#include <bacnet/type/confirmed_private_transfer_error.hpp>
 /**
  * bacnet::error  combines all kind of error messages in one class. it also can transform boost::system::error_co* into bacnet::error.
  *
@@ -99,131 +101,174 @@
  */
 namespace bacnet {
 
+namespace err  {
+//categories
+enum class cat {
+  system,
+  generic,
 
-    class error {
-      public:
+  error,
+  abort,
+  reject,
 
-
-      error() noexcept : category_(&boost::system::system_category()) {}
-
-      error(const bacnet::error& ec) noexcept :
-                value_(ec.value()), e_class_(ec.error_class()), category_(&ec.category()) {}
-
-      error(bacnet::error&& ec) noexcept :
-                value_(ec.value()),  e_class_(ec.error_class()),category_(&ec.category()) {}
-
-      error(const boost::system::error_code& ec) noexcept :
-                value_(ec.value()), category_(&ec.category()) {}
-      error(boost::system::error_code&& ec) noexcept :
-                value_(ec.value()), category_(&ec.category()) {}
-
-      template <class ErrorCodeEnum>
-      error(ErrorCodeEnum e,  typename boost::enable_if<boost::system::is_error_code_enum<ErrorCodeEnum> >::type* = 0) noexcept  :
-                value_(e), category_(&boost::system::generic_category() ) {}
-
-      template <class ErrorCodeEnum>
-      error(ErrorCodeEnum e,  typename boost::enable_if<boost::system::is_error_condition_enum<ErrorCodeEnum> >::type* = 0) noexcept  :
-                value_(e), category_(&boost::system::generic_category() ) {}
+  change_list,
+  create_object,
+  write_property_multiple,
+  confirmed_private_transfer,
+  vt_close
+};
 
 
-      error( int val, const boost::system::error_category & cat ) noexcept :
-                value_(val), category_(&cat) {}
-      error( int e_code, int e_class, const boost::system::error_category & cat ) noexcept :
-                value_(e_code), e_class_(e_class), category_(&cat) {}
-      error( int e_code, int e_class) noexcept :
-                value_(e_code), e_class_(e_class), category_(&bacnet_error_category()) {}
-
-
-
-      int code() const  noexcept {
-        return value_;
-      }
-      int value() const  noexcept {
-        return value_;
-      }
-      int error_class() const  noexcept {
-        return e_class_;
-      }
-      const boost::system::error_category& category() const noexcept {
-        return *category_;
-      }
-
-
-      std::string message() const  {
-        if(category_ == &bacnet_error_category() ) {
-          return error_category::message(code(), error_class());
-        }
-        else {
-          return category_->message(code());
-        }
-      }
-
-
-      BOOST_EXPLICIT_OPERATOR_BOOL()
-
-      bool operator!() const  noexcept { // true if no error
-        if(    (category_ == &bacnet_error_category() &&  value_ == err::error_code::success)
-            || (category_ != &bacnet_error_category() &&  value_ == 0)  ) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      }
-
-
-      inline friend bool operator==( const error & lhs, const error & rhs ) noexcept {
-        return lhs.category_ == rhs.category_
-            && lhs.value_    == rhs.value_
-            && lhs.e_class_  == rhs.e_class_;
-      }
-
-      inline friend bool operator<( const error & lhs, const error & rhs ) noexcept {
-        return    lhs.category_ < rhs.category_
-              || (lhs.category_ == rhs.category_ && lhs.e_class_ < rhs.e_class_)
-              || (lhs.category_ == rhs.category_ && lhs.e_class_ == rhs.e_class_ && lhs.value_ < rhs.value_);
-      }
-
-    private:
-      int                                   value_{0};
-      int                                   e_class_{0};
-      const boost::system::error_category * category_;
-
-    };
-
-
-
-
-
-    //  non-member functions  ------------------------------------------------//
-    inline bool operator!=( const error & lhs, const error & rhs ) noexcept {
-      return !(lhs == rhs);
+namespace detail {
+  inline  err::cat cat_from_boost_system(const boost::system::error_category & c) {
+      if(&c == &boost::system::system_category())  { return err::cat::system;  }
+      return err::cat::generic;
     }
+  } //detail
+} //err
 
-    template <class charT, class traits>
-    inline std::basic_ostream<charT,traits>& operator<< (std::basic_ostream<charT,traits>& os, error ec) {
-      os << ec.category().name() << ':' << ec.message();
-      return os;
+
+class error {
+public:
+
+  /// CONSTRUCTOR
+  error()                                                                                                                noexcept  {}
+  error(int v)                                                                                                           noexcept :
+      value(v) {}
+  error(err::cat c, int v)                                                                                               noexcept :
+      category(c), value(v) {}
+  error(err::cat c, int v, int class_)                                                                                   noexcept :
+      category(c), value(v), error_class(class_) {}
+  error( int v, int class_)                                                                                              noexcept :
+        category(err::cat::error), value(v), error_class(class_) {}
+  error(err::cat c, int v, int class_, uint32_t first_failed_element_number_)                                            noexcept :
+      category(c), value(v), error_class(class_), first_failed_element_number(first_failed_element_number_) {}
+  error(err::cat c, int v, int class_, bacnet::type::object_property_reference first_failed_write_attempt_)              noexcept :
+      category(c), value(v), error_class(class_), first_failed_write_attempt(first_failed_write_attempt_) {}
+  error(err::cat c, int v, int class_, bacnet::type::confirmed_private_transfer_error confirmed_private_transfer_error_) noexcept :
+      category(c), value(v), error_class(class_), confirmed_private_transfer_error(confirmed_private_transfer_error_) {}
+  error(err::cat c, int v, int class_, std::vector<uint8_t> list_of_vt_session_identifiers_)                             noexcept :
+      category(c), value(v), error_class(class_), list_of_vt_session_identifiers(list_of_vt_session_identifiers_) {}
+
+  /// CONSTRUCTOR FOR BOOST_SYSTEM
+  template <class ErrorCodeEnum>
+  error(ErrorCodeEnum e,  typename boost::enable_if<boost::system::is_error_code_enum<ErrorCodeEnum> >::type* = 0) noexcept      : category(err::cat::generic ), value(e) {}
+
+  template <class ErrorCodeEnum>
+  error(ErrorCodeEnum e,  typename boost::enable_if<boost::system::is_error_condition_enum<ErrorCodeEnum> >::type* = 0) noexcept : category(err::cat::generic ), value(e) {}
+
+
+  template <class ErrorCodeEnum>
+  error(ErrorCodeEnum e, const boost::system::error_category& c,  typename boost::enable_if<boost::system::is_error_code_enum<ErrorCodeEnum> >::type* = 0) noexcept      :
+      category(err::detail::cat_from_boost_system( c ) ), value(e) {}
+
+  template <class ErrorCodeEnum>
+  error(ErrorCodeEnum e, const boost::system::error_category& c,  typename boost::enable_if<boost::system::is_error_condition_enum<ErrorCodeEnum> >::type* = 0) noexcept :
+      category(err::detail::cat_from_boost_system( c ) ), value(e) {}
+
+
+  error(const boost::system::error_code& ec)  noexcept :  category(err::detail::cat_from_boost_system( ec.category() ) ), value(ec.value()) {}
+  error(boost::system::error_code&& ec)       noexcept :  category(err::detail::cat_from_boost_system( ec.category() ) ), value(ec.value()) {}
+
+
+
+
+  /// OPERATORS
+  BOOST_EXPLICIT_OPERATOR_BOOL()
+  inline bool operator!() const  noexcept { // true if no error
+    if(    (category == err::cat::error    &&  value == bacnet::err::error_code::success)
+        || (category != err::cat::system   &&  value == 0)
+        || (category != err::cat::generic  &&  value == 0) ) {
+      return true;
     }
-
-    inline std::size_t hash_value( const error & ec ) {
-      return static_cast<std::size_t>(ec.code()) + static_cast<std::size_t>(ec.error_class()) + reinterpret_cast<std::size_t>(&ec.category());
+    else {
+      return false;
     }
+  }
 
-    inline error make_error( int c, int e ) noexcept {
-       return error( e, c, bacnet::bacnet_error_category() );
-    }
+  inline friend bool operator==( const error & lhs, const error & rhs ) noexcept {
+    return lhs.category       == rhs.category
+        && lhs.value          == rhs.value
+        && lhs.error_class    == rhs.error_class;
+  }
 
-    inline error make_reject_reason( err::reject_reason::reject_reason_type reason ) noexcept {
-       return error( reason, 0, bacnet::bacnet_reject_category() );
-    }
+  inline friend bool operator<( const error & lhs, const error & rhs ) noexcept {
+    return    lhs.category < rhs.category
+          || (lhs.category == rhs.category && lhs.error_class < rhs.error_class)
+          || (lhs.category == rhs.category && lhs.error_class == rhs.error_class && lhs.value < rhs.value);
+  }
 
-    inline error make_abort_reason( err::abort_reason::abort_reason_type reason ) noexcept {
-       return error( reason, 0, bacnet::bacnet_abort_category() );
-    }
+  /// OUTPUTS
+  inline std::string message() const {
+    if(category == err::cat::system                      ) {   return err::system::message(value);                             }
+    if(category == err::cat::generic                     ) {   return err::generic::message(value);                            }
+    if(category == err::cat::abort                       ) {   return err::abort::message(value);                              }
+    if(category == err::cat::reject                      ) {   return err::reject::message(value);                             }
+    if(category == err::cat::error                       ) {   return err::error::message(value, error_class.get_value_or(0)); }
+    if(category == err::cat::change_list                 ) {   return err::change_list::message(value, error_class.get_value_or(0)); }
+    if(category == err::cat::create_object               ) {   return err::create_object::message(value, error_class.get_value_or(0)); }
+    if(category == err::cat::write_property_multiple     ) {   return err::write_property_multiple::message(value, error_class.get_value_or(0)); }
+    if(category == err::cat::confirmed_private_transfer  ) {   return err::confirmed_private_transfer::message(value, error_class.get_value_or(0)); }
+    if(category == err::cat::vt_close                    ) {   return err::vt_close::message(value, error_class.get_value_or(0)); }
+    return "";
+  }
+
+//private:
+  /// MEMBER
+  err::cat category{err::cat::generic};
+  int value{0};
+
+  boost::optional<uint32_t>                                       error_class;
+  boost::optional<uint32_t>                                       first_failed_element_number;
+  boost::optional<bacnet::type::object_property_reference>        first_failed_write_attempt;
+  boost::optional<bacnet::type::confirmed_private_transfer_error> confirmed_private_transfer_error;
+  boost::optional<std::vector<uint8_t> >                          list_of_vt_session_identifiers;
+};
+
+} //bacnet
+
+BOOST_FUSION_ADAPT_STRUCT( bacnet::error,
+  category,
+  value,
+  error_class,
+  first_failed_element_number,
+  first_failed_write_attempt,
+  confirmed_private_transfer_error,
+  list_of_vt_session_identifiers
+);
+
+namespace bacnet {
+
+  //  non-member functions  ------------------------------------------------//
+  inline bool operator!=( const error & lhs, const error & rhs ) noexcept {
+    return !(lhs == rhs);
+  }
+
+  template <class charT, class traits>
+  inline std::basic_ostream<charT,traits>& operator<< (std::basic_ostream<charT,traits>& os, error ec) {
+    os << ec.message();
+    return os;
+  }
+
+  static inline std::size_t hash_value( const error & ec ) {
+    //  return static_cast<std::size_t>(ec.) + static_cast<std::size_t>(ec.error_class()) + reinterpret_cast<std::size_t>(&ec.category());
+    return 0;
+  }
+
+  static inline error make_error( int c, int e ) noexcept {
+     return error(err::cat::error, e, c);
+  }
+
+  static inline error make_reject_reason( err::reject_reason::reject_reason_type reason ) noexcept {
+     return error(err::cat::reject, reason );
+  }
+
+  static inline error make_abort_reason( err::abort_reason::abort_reason_type reason ) noexcept {
+     return error(err::cat::abort, reason);
+  }
 
 
-} // namespace bacnet
+} // bacnet
 
 
 
