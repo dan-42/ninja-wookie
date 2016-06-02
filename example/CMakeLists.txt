@@ -26,6 +26,12 @@ include_directories (${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
 
+
+add_executable(pg_run_time_mapping pg_run_time_mapping.cpp)
+target_link_libraries(pg_run_time_mapping wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+set_target_properties(pg_run_time_mapping PROPERTIES DEBUG_POSTFIX "d")
+install(TARGETS pg_run_time_mapping DESTINATION bin)
+
 add_executable(playground playground.cpp)
 target_link_libraries(playground wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 set_target_properties(playground PROPERTIES DEBUG_POSTFIX "d")
