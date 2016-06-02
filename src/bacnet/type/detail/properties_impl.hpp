@@ -32,10 +32,14 @@ namespace bacnet { namespace type { namespace property {
 
   template<typename T>  struct is_special_property : std::false_type { };
 
+  template<typename T>  struct is_property : std::false_type { };
+
 
 // must be implemented for each
 
-  template<typename T>  struct name { const std::string value{""}; };
+  template<typename T>  struct name {
+    static constexpr const char* const value = "undefined_name";
+  };
 
 
 
@@ -53,6 +57,9 @@ using integral_constant_ = std::integral_constant<bacnet::type::property_type, T
 #define WOOKIE_BACNET_IS_SPECIAL_PROPERTY 0
 
 
+
+#define WOOKIE_CREATE_TRAIT_IS_PROP_TRUE_TYPE(property_name) \
+    template<> struct is_property<property_name> : std::true_type { };
 
 #define WOOKIE_CREATE_TRAIT_IS_STD_PROP_TRUE_TYPE(property_name) \
     template<> struct is_standard_property<property_name> : std::true_type { };
@@ -100,7 +107,7 @@ using integral_constant_ = std::integral_constant<bacnet::type::property_type, T
 #define WOOKIE_DEFINE_BACNET_PROPERTY(property_name, property_id, is_standard, is_normal) \
     WOOKIE_DEFINE_BACNET_PROPERTY_SIMPLE_1(property_name, property_id)           \
                                                                                \
-                                                                               \
+    WOOKIE_CREATE_TRAIT_IS_PROP_TRUE_TYPE(property_name)                       \
     BOOST_PP_IF(is_standard,                                                   \
        WOOKIE_CREATE_TRAIT_IS_STD_PROP_TRUE_TYPE(property_name) ,              \
        WOOKIE_CREATE_TRAIT_IS_STD_PROP_FALSE_TYPE(property_name)               \
