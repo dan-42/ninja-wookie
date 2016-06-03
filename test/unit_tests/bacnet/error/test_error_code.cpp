@@ -23,6 +23,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <iostream>
+#include <pre/json/from_json.hpp>
+#include <pre/json/to_json.hpp>
 #include <bacnet/error/error.hpp>
 
 
@@ -65,6 +67,14 @@ BOOST_AUTO_TEST_SUITE( test_error_code_simple )
       BOOST_TEST(boost_ec_operation_canceled == bacnet_ec_from_boost_error);
 
       BOOST_TEST(boost_ec_operation_canceled != bacnet_ec_success);
+
+      auto bacnet_ec_success_json = pre::json::to_json(bacnet_ec_success);
+      auto bacnet_ec_success_from_json = pre::json::from_json<bacnet::error>(bacnet_ec_success_json);
+
+      std::cout << "bacnet_ec_success_json: " << bacnet_ec_success_json.dump(2) << std::endl;
+      std::cout << "bacnet_ec_success_from_json: " << bacnet_ec_success_from_json << std::endl;
+
+      BOOST_TEST(bacnet_ec_success == bacnet_ec_success);
 
   }
 

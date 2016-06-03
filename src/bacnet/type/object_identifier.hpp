@@ -171,13 +171,14 @@ namespace bacnet { namespace type {
     }
 
 
+    uint32_t object_type_;
+    uint32_t instance_number_;
 
   private:
 
     static constexpr uint32_t object_type_shift_offset = 22;
 
-    uint32_t object_type_;
-    uint32_t instance_number_;
+
 
 
   };
@@ -191,9 +192,10 @@ static inline std::ostream& operator<<(std::ostream& os, const object_identifier
 }}
 
 
-BOOST_FUSION_ADAPT_ADT(
+BOOST_FUSION_ADAPT_STRUCT(
     bacnet::type::object_identifier,
-    (obj.to_native(), obj.from_native(val))
+    object_type_,
+    instance_number_
 );
 
 

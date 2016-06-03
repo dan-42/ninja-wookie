@@ -24,7 +24,7 @@ namespace bacnet { namespace type {
 	  object_property_reference() = default;
 
 	  type::object_identifier 	object_identifier;
-	  type::enumerated			propetry_identifier;
+	  type::enumerated			    propetry_identifier;
 	  boost::optional<uint32_t> array_index;
   };
 
