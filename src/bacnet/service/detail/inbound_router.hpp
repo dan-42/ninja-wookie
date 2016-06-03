@@ -60,7 +60,6 @@ inline void inbound_router::operator()<service::i_am>(service::i_am service) {
                                 service.segmentation_supported,
                                 service.vendor_id);
   //device_manager_.print_device_list();
-
   bacnet::error ec;
   callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
 }

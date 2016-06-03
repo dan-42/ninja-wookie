@@ -10,7 +10,7 @@
 
 # TODO - next setps
  -  [ ]  apdu controller add timeout handling for confirmed services 
- - [ ] service controller manage handel hasking for doi 
+ - [x] service controller manage handel hasking for doi 
  - [x] error handling ! 
   - [x] make enumerated grammar parse generate from/to enumerated type 
   - [x] add print function for enumerated 

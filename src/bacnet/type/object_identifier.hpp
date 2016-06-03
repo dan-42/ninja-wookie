@@ -99,80 +99,71 @@ namespace bacnet { namespace type {
     static constexpr uint32_t  min_object_type      = 0x00400000;
     static constexpr uint32_t  max_object_type      = 0xFFC00000;
 
-    object_identifier() : object_type_(0), instance_number_(0) {
+    object_identifier() : object_type(0), instance_number(0) {
 
     }
-    object_identifier(const uint32_t &in) : object_type_(bacnet::object_type::device), instance_number_(in) {
+    object_identifier(const uint32_t &in) : object_type(bacnet::object_type::device), instance_number(in) {
 
     }
-    object_identifier(const uint32_t &type, const uint32_t &in) : object_type_(type), instance_number_(in) {
+    object_identifier(const uint32_t &type, const uint32_t &in) : object_type(type), instance_number(in) {
 
     }
 
-    object_identifier(const object_identifier& other) : object_type_(other.object_type_),
-                                                        instance_number_(other.instance_number_)   {
+    object_identifier(const object_identifier& other) : object_type(other.object_type),
+                                                        instance_number(other.instance_number)   {
 
     }
-    object_identifier(object_identifier&& other)  : object_type_(other.object_type_),
-                                                    instance_number_(other.instance_number_)   {
+    object_identifier(object_identifier&& other)  : object_type(other.object_type),
+                                                    instance_number(other.instance_number)   {
     }
 
     object_identifier& operator=(object_identifier&& other) {
-      object_type_ = other.object_type_;
-      instance_number_ = other.instance_number_;
+      object_type = other.object_type;
+      instance_number = other.instance_number;
       return *this;
     }
     object_identifier& operator=(const object_identifier& other) {
-      object_type_ = other.object_type_;
-      instance_number_ = other.instance_number_;
+      object_type = other.object_type;
+      instance_number = other.instance_number;
       return *this;
     }
 
 
-    inline void object_typ(uint32_t const& ot)  {
-      object_type_ = ot;
-    }
-
-    inline uint32_t object_typ() const  {
-      return object_type_;
-    }
-
-    inline void instance_number(uint32_t const& in)  {
-      instance_number_ = in;
-    }
-
-    inline uint32_t instance_number() const  {
-      return instance_number_;
-    }
 
 
     inline void from_native(uint32_t const& object_type_and_instance_number){
-      instance_number_  = object_type_and_instance_number & max_instance_number;
-      object_type_      = (object_type_and_instance_number & max_object_type) >> object_type_shift_offset;
+      instance_number  = object_type_and_instance_number & max_instance_number;
+      object_type      = (object_type_and_instance_number & max_object_type) >> object_type_shift_offset;
     }
 
     inline uint32_t to_native() const {
-      return (object_type_ << object_type_shift_offset) | instance_number_;
+      return (object_type << object_type_shift_offset) | instance_number;
+    }
+
+    static inline object_identifier make_object_identifier(uint32_t const& object_type_and_instance_number) {
+      object_identifier tmp{};
+      tmp.from_native(object_type_and_instance_number);
+      return tmp;
     }
 
     friend constexpr bool operator==(const object_identifier& a1, const object_identifier& a2) {
-      return (a1.object_type_ == a2.object_type_ && a1.instance_number_ == a2.instance_number_) ? true : false;
+      return (a1.object_type == a2.object_type && a1.instance_number == a2.instance_number) ? true : false;
     }
 
     friend constexpr bool operator!=(const object_identifier& a1, const object_identifier& a2) {
       return !(a1 == a2);
     }
     friend constexpr bool operator<(const object_identifier& a1, const object_identifier& a2) {
-      return (a1.object_type_ < a2.object_type_) ? true : (
-          (a1.instance_number_ < a2.instance_number_) ? true : false );
+      return (a1.object_type < a2.object_type) ? true : (
+          (a1.instance_number < a2.instance_number) ? true : false );
     }
     friend constexpr bool operator>=(const object_identifier& a1, const object_identifier& a2){
       return !(a1 < a2);
     }
 
 
-    uint32_t object_type_;
-    uint32_t instance_number_;
+    uint32_t object_type;
+    uint32_t instance_number;
 
   private:
 
@@ -184,8 +175,8 @@ namespace bacnet { namespace type {
   };
 
 static inline std::ostream& operator<<(std::ostream& os, const object_identifier &oi) {
-  os << " type: "     << std::dec << oi.object_typ()
-     << " instance: " << std::dec << oi.instance_number();
+  os << " type: "     << std::dec << oi.object_type
+     << " instance: " << std::dec << oi.instance_number;
   return os;
 }
 
@@ -194,8 +185,8 @@ static inline std::ostream& operator<<(std::ostream& os, const object_identifier
 
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::type::object_identifier,
-    object_type_,
-    instance_number_
+    object_type,
+    instance_number
 );
 
 

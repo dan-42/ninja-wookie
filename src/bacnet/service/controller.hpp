@@ -31,6 +31,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/asio/steady_timer.hpp>
 
+#include <pre/json/to_json.hpp>
+
 #include <bacnet/service/api.hpp>
 #include <bacnet/service/detail/callback_manager.hpp>
 #include <bacnet/service/detail/device_manager.hpp>
@@ -110,7 +112,7 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
 
 namespace bacnet { namespace service {
 
-    static const std::chrono::milliseconds time_wait_for_i_am_answer{500};
+    static const std::chrono::milliseconds time_wait_for_i_am_answer{2000};
 
 template<typename UnderlyingLayer, typename ApduSize>
 class controller {
@@ -121,7 +123,6 @@ public:
   controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer, bacnet::config config):
                 io_service_(io_service),
                 lower_layer_(lower_layer),
-                timeout_timer_(io_service_),
                 inbound_router_(callback_manager_, device_manager_),
                 device_object_identifier_(bacnet::object_type::device, config.device_object_id),
                 config_(config) {
@@ -222,48 +223,13 @@ public:
 
   template<typename Service, typename Handler>
   void async_send(bacnet::type::object_identifier device_object_identifier, Service service, Handler handler) {
-    using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
-
     /* lookup doi */
     auto endpoints = device_manager_.get_endpoint(device_object_identifier);
     if(endpoints.size() == 1) {
       async_send(endpoints.front(), service, handler);
-      return;
     }
     else {
-      /**
-       * here we have 0 or more the 1 doi, so we send a new who_is
-       */
-     auto callback_idx =  callback_manager_.set_i_am_service_callback(
-                                 [handler, service, device_object_identifier, this]
-                                      (bacnet::service::i_am i_am, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
-                                        if(i_am.i_am_device_identifier == device_object_identifier) {
-                                          async_send(mi.address, service, handler);
-                                        }
-                                       });
-
-     bacnet::service::service::who_is wi(device_object_identifier.instance_number());
-     async_send(wi, [](bacnet::error ec) {  });
-
-
-      timeout_timer_.expires_from_now(time_wait_for_i_am_answer);
-      timeout_timer_.async_wait(
-                        [handler,callback_idx,  this]
-                             (boost::system::error_code ec) {
-                                    callback_manager_.clear_i_am_service_callback(callback_idx);
-
-                                    if(!ec) {
-                                        /*no op*/
-                                    }
-                                    else if(ec == boost::asio::error::operation_aborted) {
-                                      invoker::invoke(handler, ec);
-                                    }
-                                    else {
-                                      std::cout << "no device with doi found  " << std::endl;
-                                      //todo set special error_code on error
-                                      invoker::invoke(handler, ec);
-                                    }
-                              });
+      find_device_and_execute(device_object_identifier, service, handler);
     }
   }
 
@@ -276,15 +242,73 @@ public:
 private:
 
 
-    boost::asio::io_service& io_service_;
-    UnderlyingLayer &lower_layer_;
-    boost::asio::steady_timer timeout_timer_;
-    bacnet::service::detail::device_manager device_manager_;
-    bacnet::service::detail::callback_manager callback_manager_;
-    bacnet::service::detail::inbound_router inbound_router_;
-    bacnet::type::object_identifier device_object_identifier_;
-    bacnet::config config_;
-    service::i_am i_am_message_;
+  struct pending_request {
+    typedef std::function<void(boost::asio::steady_timer &timer, bool& is_active)> callback_t;
+
+    boost::asio::steady_timer timer;
+    callback_t callback;
+    bool is_active{true};
+
+    pending_request(boost::asio::io_service& ios, callback_t cbf) :
+      timer(ios), callback(cbf) {
+      callback(timer, is_active);
+    }
+    virtual ~pending_request() { }
+  };
+
+  inline void maintain_list_of_device_search_requests() {
+    auto new_end = std::remove_if(list_of_device_search_requests.begin(), list_of_device_search_requests.end(),
+                                  [](std::shared_ptr<pending_request> r) {
+                                      return ( (r == nullptr)   ||   (!r->is_active) );
+                                  });
+    list_of_device_search_requests.erase(new_end, list_of_device_search_requests.end());
+  }
+
+  template<typename Service, typename Handler>
+  void find_device_and_execute(bacnet::type::object_identifier device_object_identifier, Service service, Handler handler) {
+    using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
+
+    maintain_list_of_device_search_requests();
+
+    list_of_device_search_requests.emplace_back(std::make_shared<pending_request>(io_service_,
+              [&](boost::asio::steady_timer &timer,  bool& is_active) {
+                   auto callback_idx =  callback_manager_.set_i_am_service_callback(
+                                               [handler, service, device_object_identifier, this, &timer]
+                                                    (bacnet::service::i_am i_am, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
+                                                      if(i_am.i_am_device_identifier == device_object_identifier) {
+                                                        timer.cancel();
+                                                        async_send(mi.address, service, handler);
+                                                      }
+                                                     });
+                   timer.expires_from_now(time_wait_for_i_am_answer);
+                   timer.async_wait(
+                                       [handler, callback_idx,  this, &is_active]
+                                           (boost::system::error_code ec) {
+                                                  this->callback_manager_.clear_i_am_service_callback(callback_idx);
+                                                  if(ec == boost::asio::error::operation_aborted) { /*no op*/  }
+                                                  else if(!ec) {
+                                                    auto e = bacnet::make_error(bacnet::err::error_class::communication, bacnet::err::error_code::bad_destination_device_id);
+                                                    invoker::invoke(handler, e);
+                                                  }
+                                                  else {
+                                                    invoker::invoke(handler, ec);
+                                                  }
+                                                  is_active = false;
+                                            });
+                   bacnet::service::service::who_is wi(device_object_identifier.instance_number);
+                   async_send(wi, [](bacnet::error ec) {  });
+                }));
+  }
+
+  std::list< std::shared_ptr<pending_request> > list_of_device_search_requests;
+  boost::asio::io_service& io_service_;
+  UnderlyingLayer &lower_layer_;
+  bacnet::service::detail::device_manager device_manager_;
+  bacnet::service::detail::callback_manager callback_manager_;
+  bacnet::service::detail::inbound_router inbound_router_;
+  bacnet::type::object_identifier device_object_identifier_;
+  bacnet::config config_;
+  service::i_am i_am_message_;
 };
 
 }}

@@ -74,7 +74,7 @@ public:
     os << "device_manager: device_list" << std::endl;
     for(auto& device: devices) {
 
-      os << formatter_device % device.second.device_object_identifier.instance_number()
+      os << formatter_device % device.second.device_object_identifier.instance_number
                    % device.second.endpoint.address().to_string()
                    % device.second.endpoint.network()
                    % device.second.vendor_id

@@ -78,36 +78,41 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
     auto from_application_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
 
       if(state == test_state::who_is) {
-        BOOST_ASSERT_MSG(test::utils::compare_binary_data(who_is_2_request, data), "SEND DATA IS NOT THE SAME as who_is_2_request");
-        BOOST_ASSERT_MSG(broadcast_endpoint == ep, "ENDPOINT is not the expected broadcast_endpoint ");
+        std::cout << "data ";  bacnet::print(data);
+        std::cout << "expt ";  bacnet::print(who_is_2_request);
+
+        BOOST_TEST(test::utils::compare_binary_data(who_is_2_request, data), "SEND DATA IS NOT THE SAME as who_is_2_request");
+        BOOST_TEST(broadcast_endpoint == ep, "ENDPOINT is not the expected broadcast_endpoint ");
         state = test_state::reinitialize_device;
         transport_mockup.send_to_application(ec_succsess, unicast_endpoint_device, i_am_answer);
       }
       else if(state == test_state::reinitialize_device) {
-        BOOST_ASSERT_MSG(test::utils::compare_binary_data(reinitialize_request, data), "SEND DATA IS NOT THE SAME as reinitialize_request");
-        BOOST_ASSERT_MSG(unicast_endpoint_device == ep, "ENDPOINT is not the expected unicast_endpoint_device ");
+        std::cout << "data ";  bacnet::print(data);
+        std::cout << "expt ";  bacnet::print(reinitialize_request);
+        BOOST_TEST(test::utils::compare_binary_data(reinitialize_request, data), "SEND DATA IS NOT THE SAME as reinitialize_request");
+        BOOST_TEST(unicast_endpoint_device == ep, "ENDPOINT is not the expected unicast_endpoint_device ");
         transport_mockup.send_to_application(ec_succsess, unicast_endpoint_device, reinitialize_device_ack);
       }
       return ec_succsess;
     };
 
     transport_mockup.set_from_application_callback(from_application_callback_);
-    transport_mockup.register_receive_callback([](bacnet::error ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
-    });
 
     /**   *    */
     typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-    bacnet::config config{}; //default config
+    bacnet::config config{};
+    config.send_i_am_frames = false;
     bvll::controller<decltype(transport_mockup)> bvll_controller_(ios, transport_mockup);
     npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
     bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
     bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
+    service_controller.start();
 
-
-    bacnet::service::reinitialize_device reinitialize_device_{bacnet::service::reinitialized_state_of_device::coldstart, ""};
+    bacnet::service::reinitialize_device reinitialize_device_{bacnet::service::reinitialized_state_of_device::coldstart};
     service_controller.async_send(device_doi, reinitialize_device_, []
                  (const bacnet::error &ec){
                     std::cout << "async_send::reinitialize_device " << ec <<  std::endl;
+                    BOOST_TEST( !ec, "Expected successful");
                  }
     );
 
@@ -135,37 +140,40 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
      */
     auto from_application_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
 
+      std::cout << "from_application_callback_ data: -> ";  bacnet::print(data);
       if(state == test_state::who_is) {
-        BOOST_ASSERT_MSG(test::utils::compare_binary_data(who_is_2_request, data), "SEND DATA IS NOT THE SAME as who_is_2_request");
-        BOOST_ASSERT_MSG(broadcast_endpoint == ep, "ENDPOINT is not the expected broadcast_endpoint ");
+        BOOST_TEST(test::utils::compare_binary_data(who_is_2_request, data), "SEND DATA IS NOT THE SAME as who_is_2_request");
+        BOOST_TEST(broadcast_endpoint == ep, "ENDPOINT is not the expected broadcast_endpoint ");
         state = test_state::reinitialize_device;
+        std::cout << "from_application_callback_ data: <- ";  bacnet::print(i_am_answer);
         transport_mockup.send_to_application(ec_succsess, unicast_endpoint_device, i_am_answer);
       }
       else if(state == test_state::reinitialize_device) {
-        BOOST_ASSERT_MSG(test::utils::compare_binary_data(reinitialize_request, data), "SEND DATA IS NOT THE SAME as reinitialize_request");
-        BOOST_ASSERT_MSG(unicast_endpoint_device == ep, "ENDPOINT is not the expected unicast_endpoint_device ");
+        BOOST_TEST(test::utils::compare_binary_data(reinitialize_request, data), "SEND DATA IS NOT THE SAME as reinitialize_request");
+        BOOST_TEST(unicast_endpoint_device == ep, "ENDPOINT is not the expected unicast_endpoint_device ");
+        std::cout << "from_application_callback_ data: <- ";  bacnet::print(reinitialize_device_ack);
         transport_mockup.send_to_application(ec_succsess, unicast_endpoint_device, reinitialize_device_ack);
       }
       return ec_succsess;
     };
 
     transport_mockup.set_from_application_callback(from_application_callback_);
-    transport_mockup.register_receive_callback([](bacnet::error ec, bacnet::common::protocol::mac::address adr, bacnet::binary_data data) {
-    });
 
     /**   *    */
     typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-    bacnet::config config{}; //default config
+    bacnet::config config{};
+    config.send_i_am_frames = false;
     bvll::controller<decltype(transport_mockup)> bvll_controller_(ios, transport_mockup);
     npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
     bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
     bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
+    service_controller.start();
 
-
-    bacnet::service::reinitialize_device reinitialize_device_{bacnet::service::reinitialized_state_of_device::coldstart, ""};
+    bacnet::service::reinitialize_device reinitialize_device_{bacnet::service::reinitialized_state_of_device::coldstart};
     service_controller.async_send(device_doi, reinitialize_device_, []
                  (const bacnet::error &ec){
                     std::cout << "async_send::reinitialize_device " << ec <<  std::endl;
+                    BOOST_TEST( !ec , "Expected successful");
                  }
     );
 

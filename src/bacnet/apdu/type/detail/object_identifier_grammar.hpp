@@ -53,7 +53,7 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
 
     rule<Iterator, object_identifier()> start_rule;
     rule<Iterator >                     tag_validation_rule;
-    rule<Iterator, uint32_t()>          value_rule;
+    rule<Iterator, object_identifier()> value_rule;
 
    tag_grammar<Iterator> tag_grammar_;
 
@@ -78,7 +78,7 @@ private:
                   >> value_rule ;
 
       tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&object_identifier_grammar::check_tag, this, _1) == true ];
-      value_rule  = big_dword;
+      value_rule  = big_dword[ _val = boost::phoenix::bind(&bacnet::type::object_identifier::make_object_identifier, _1) ];
       start_rule.name("start_rule");
       tag_validation_rule.name("tag_validation_rule");
       value_rule.name("value_rule");
