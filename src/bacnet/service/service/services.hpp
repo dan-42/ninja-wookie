@@ -23,7 +23,7 @@
 #define NINJA_WOOKIE_SERVICES_HPP
 
 
-#include <bacnet/service/service/error_response.hpp>
+
 #include <cstdint>
 
 #include <boost/variant.hpp>
@@ -134,8 +134,6 @@ namespace bacnet { namespace service { namespace service {
   typedef boost::mpl::vector<
                                 who_is,  
                                 i_am,
-  
-                                error_response,
 
                                 read_property_request,
                                 read_property_ack,
