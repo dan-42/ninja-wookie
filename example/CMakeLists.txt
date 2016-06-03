@@ -37,12 +37,16 @@ target_link_libraries(playground wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pt
 set_target_properties(playground PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS playground DESTINATION bin)
 
+add_executable(read_property read_property.cpp)
+target_link_libraries(read_property wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+set_target_properties(read_property PROPERTIES DEBUG_POSTFIX "d")
+install(TARGETS read_property DESTINATION bin)
+
+
 add_executable(reinitialize_device reinitialize_device.cpp)
 target_link_libraries(reinitialize_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 set_target_properties(reinitialize_device PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS reinitialize_device DESTINATION bin)
-
-
 
 add_executable(who_is who_is.cpp)
 target_link_libraries(who_is wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)

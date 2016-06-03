@@ -92,7 +92,7 @@ struct invoke_handler_ {
 };
 
 template<class Service>
-struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_response<Service>::value  >::type> {
+struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_response<typename std::decay<Service>::type >::value  >::type> {
 
   static constexpr bool expect_response = true;
 
@@ -205,7 +205,7 @@ public:
     auto data =  bacnet::service::service::detail::generate_confirmed(std::move(service));
     lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
                                                                        ( const bacnet::error& ec,
-                                                                               bacnet::apdu::frame::possible_confirmed_respons frame,
+                                                                               bacnet::apdu::frame::complex_ack frame,
                                                                                bacnet::common::protocol::meta_information mi) {
 
 
@@ -214,6 +214,12 @@ public:
                                       }
                                       else {
                                         inbound_router_.meta_information(std::move(mi));
+                                        std::cout << "complex_ack: ";
+                                        bacnet::print(frame.service_ack_data);
+                                        std::cout << std::endl;
+                                        invoker::invoke(handler, ec);
+                                      //  auto f = bacnet::service::service::detail::parse(frame);
+                                        //f.apply_visitor(inbound_router_);
                                         //xxx frame must be service
                                         //frame.apply_visitor(inbound_router_);
                                       }

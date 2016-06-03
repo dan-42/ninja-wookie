@@ -34,18 +34,18 @@ namespace bacnet { namespace service { namespace service {
 
     read_property_request() = default;
 
-    read_property_request(bacnet::type::object_identifier oi, uint16_t pi) :  object_identifier(oi),
+    read_property_request(bacnet::type::object_identifier oi, uint32_t pi) :  object_identifier(oi),
                                                                         property_identifier(pi) {
     }
 
-    read_property_request(bacnet::type::object_identifier oi, uint16_t pi, uint32_t array_index) :
+    read_property_request(bacnet::type::object_identifier oi, uint32_t pi, uint32_t array_index) :
                                                                         object_identifier(oi),
                                                                         property_identifier(pi),
                                                                         property_array_index(array_index) {
     }
 
-    bacnet::type::object_identifier object_identifier{};
-    uint16_t                          property_identifier {0};
+    bacnet::type::object_identifier   object_identifier{};
+    uint32_t                          property_identifier {0};
     boost::optional<uint32_t>         property_array_index;
   };
 
@@ -80,6 +80,8 @@ namespace bacnet { namespace service { namespace service {
     
     template<> struct is_request<read_property_request> :    boost::mpl::true_ {};    
     
+    template<> struct has_complex_response<read_property_request> :    boost::mpl::true_ {};
+
 }}}
 
 #endif //NINJA_WOOKIE_BACNET_SERVICE_SERCICE_READ_PROPERTY_REQUEST_HPP

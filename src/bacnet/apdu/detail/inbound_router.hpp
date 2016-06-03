@@ -69,7 +69,7 @@ public:
     bacnet::error success;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
-      handler(success, response, meta_information_);
+      handler(success, frame::complex_ack{}, meta_information_);
     }
   }
 
@@ -86,7 +86,7 @@ public:
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       bacnet::error ec(response.error_.error_code.value, response.error_.error_class.value);
-      handler(ec, response, meta_information_);
+      handler(ec, frame::complex_ack{}, meta_information_);
     }
   }
 
@@ -94,7 +94,7 @@ public:
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       bacnet::error ec = bacnet::make_reject_reason(response.reject_reason);
-      handler(ec, response, meta_information_);
+      handler(ec, frame::complex_ack{}, meta_information_);
     }
   }
 
@@ -102,7 +102,7 @@ public:
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
       bacnet::error ec = bacnet::make_abort_reason(response.abort_reason);
-      handler(ec, response, meta_information_);
+      handler(ec, frame::complex_ack{}, meta_information_);
     }
   }
 

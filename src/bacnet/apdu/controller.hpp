@@ -136,7 +136,7 @@ struct controller {
     underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const bacnet::error& ec) {
             if(ec) {
               this->request_manager_.purge_invoke_id(adr, invoke_id);
-              handler(ec, frame::possible_confirmed_respons(), bacnet::common::protocol::meta_information());
+              handler(ec, frame::complex_ack(), bacnet::common::protocol::meta_information());
             }
             else {
               this->request_manager_.store_handler(adr, invoke_id, handler);

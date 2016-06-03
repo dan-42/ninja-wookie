@@ -19,13 +19,14 @@
  */
 
 #include <bacnet/stack/factory.hpp>
+#include <bacnet/type/properties.hpp>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
+#include <boost/program_options.hpp>
 
 int main(int argc, char *argv[]) {
-
 
   try {
     uint16_t    doi{1};
@@ -33,80 +34,87 @@ int main(int argc, char *argv[]) {
     std::string password{};
     uint16_t    port{0xBAC0};
     std::string ip{"0.0.0.0"};
+    uint32_t    object_instance{2};
+    std::string object_type_str{""};
+    uint32_t      object_type{bacnet::object_type::device};
+    uint32_t      property{bacnet::type::property::object_name::value};
+    boost::optional<uint32_t>      index;
 
+    namespace po = boost::program_options;
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help", "sending BACnet reinitialize device: e.g.  \n-doi 2  -state 0  -pw 123456")
+        ("ip",    po::value<std::string>(&ip)      ->default_value("0.0.0.0"), "listening ip")
+        ("port",  po::value<uint16_t>(&port)       ->default_value(0xBAC0),    "listening port")
+        ("doi",   po::value<uint16_t>(&doi)                               ,    "device object identifier")
+        ("pw",    po::value<std::string>(&password)->default_value(""),        "password")
+        ("state", po::value<uint16_t>(&state)                         ,         "state:   coldstart(0)\n  "
+                                                                                      "  warmstart(1)\n"
+                                                                                      "  startbackup(2)\n"
+                                                                                      "  endbackup(3)\n"
+                                                                                      "  startrestore(4)\n"
+                                                                                      "  endrestore(5)\n"
+                                                                                      "  abortrestore(6)\n")
 
-    if(argc == 3 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
+    ;
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+/*
+    if (vm.count("help") || vm.count("doi") == 0 || vm.count("state") == 0) {
+        std::cout << desc << std::endl<< std::endl;
+        return 1;
     }
-    else if(argc == 4 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
-      password  = std::string{argv[3]};
-    }
-    else if(argc == 5 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
-      password  = std::string{argv[3]};
-      port      = (uint16_t)std::stoi(argv[4]);
-    }
-    else if(argc == 6 ) {
-      doi       = (uint16_t)std::stoi(argv[1]);
-      state     = (uint16_t)std::stoi(argv[2]);
-      password  = std::string{argv[3]};
-      port      = (uint16_t)std::stoi(argv[4]);
-      ip        = std::string{argv[5]};
-    }
-    else {
-      std::cout
-      << "error wrong parameters" << std::endl
-      << "usage: " << std::endl
-      << "\t" << argv[0] << " [doi] [state] " << std::endl
-      << "\t" << argv[0] << " [doi] [state] [password]" << std::endl
-      << "\t" << argv[0] << " [doi] [state] [password] [port]" << std::endl
-      << "\t" << argv[0] << " [doi] [state] [password] [port] [ip_address]" << std::endl
-      << std::endl
-      << "example:" << std::endl
-      << "\t" << argv[0] << " 1 \"12345\" 47808 \"0.0.0.0\" " << std::endl
-      << std::endl;
-
-      return 1;
-    }
-
-
+*/
     std::cout
-    << "sending reinitialize_device to "
-    << " doi: "     << doi
-    << " state: "   << state
-    << " with password: "   << password
-    << " on " << ip << ":"  << port
-    << std::endl;
+                << "reading property "
+                << std::endl
+                << " doi: "     << doi
+                << " object_type: "   << object_type
+                << " object_instance: "   << object_instance
+                << " property: "   << property
+                << " index: "  ;
+                    if(index)
+                      std::cout << index.get() ;
+                    else
+                      std::cout <<  "none";
+
+    std::cout   << " on " << ip << ":"  << port
+                << std::endl;
+
 
     boost::asio::io_service io_service;
-    bacnet::config config;
-    config.send_i_am_frames = false;
-    bacnet::stack::factory<bacnet::stack::ip_v4_server> factory{io_service, ip, port, config};
+    bacnet::stack::factory<bacnet::stack::ip_v4_client> factory{io_service, ip, port};
     auto &service_controller = factory.controller();
 
-    bacnet::type::object_identifier device_id{bacnet::object_type::device, 2};
-    bacnet::service::service::reinitialize_device reinitd{state, password};
+    bacnet::type::object_identifier device_id{bacnet::object_type::device, doi};
+    bacnet::type::object_identifier object_id{object_type, object_instance};
+    bacnet::service::service::read_property_request request;
+    if(index) {
+      request = bacnet::service::service::read_property_request{object_id, property, index.get()};
+    }
+    else {
+      request = bacnet::service::service::read_property_request{object_id, property};
+    }
 
     service_controller.start();
 
-
-    service_controller.async_send(device_id, reinitd, [&]
-                 (const bacnet::error &ec, bacnet::service::possible_service_response response){
-                    std::cout << "async_send::reinitialize_device " << ec <<  std::endl;
-                  }
+    service_controller.async_send(device_id, request, [&io_service](const bacnet::error &ec,  bacnet::service::confirmed::response response) {
+                                                          if(ec) {
+                                                            std::cout << "error occurred: " << ec <<  std::endl;
+                                                          }
+                                                          else {
+                                                            std::cout << "response: " << pre::json::to_json(response).dump(2) <<  std::endl;
+                                                          }
+                                                          io_service.stop();
+                                                       }
     );
-
 
     io_service.run();
   }
   catch (const std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";
-    throw;
+    throw e;
   }
-
   return 0;
 }

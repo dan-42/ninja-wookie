@@ -38,7 +38,7 @@ namespace bacnet { namespace apdu {
 
   /* called after sending a request to somewhere */
   typedef std::function< void (const  bacnet::error&,
-                                      frame::possible_confirmed_respons,
+                                      frame::complex_ack,
                                       bacnet::common::protocol::meta_information )> confirmed_request_handler_type;
   typedef std::function< void (const bacnet::error&)>                   unconfirmed_request_handler_type;
 

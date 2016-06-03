@@ -19,8 +19,9 @@
   - [x] add error-test with reinitialize device test 
   - [x] improve example reinitialize device with printing error or success 
  - [ ] add information to the README.md 
- - [ ] example script as client, sending reinit, write properties, and others in
-    sequence if successful 
+ - [ ] read_property-service
+ - [ ] read_property client  example
+ - [ ] example script as client, sending reinit, write properties, and others in  sequence if successful 
  - [ ] simple bacnet-browser:
  		-  send who-is,
  		-  try to read all properties of each device

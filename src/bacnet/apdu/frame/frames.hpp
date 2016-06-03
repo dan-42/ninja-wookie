@@ -50,17 +50,17 @@ typedef boost::variant<
     reject
     > possible_frame;
 
-
+/*
 typedef boost::variant<
-    complex_ack,
+    complex_ack
 
-    simple_ack,
+    //simple_ack
 
-    error,
-    abort,
-    reject
-    > possible_confirmed_respons;
-
+    //error,
+    //abort,
+    //reject
+    > complex_ack;
+*/
 }}}
 
 
