@@ -42,27 +42,35 @@ using namespace bacnet::service::service;
   template<typename Iterator>
   struct unconfirmed_service_grammar : grammar<Iterator, service::unconfirmed::service()> {
     rule<Iterator, unconfirmed::service()>   start_rule;
-    who_is_grammar<Iterator>                          who_is_grammar_;
-    i_am_grammar<Iterator>                            i_am_grammar_;
-    reinitialize_device_grammar<Iterator>             reinitialize_device_grammar_;
+    who_is_grammar<Iterator>                 who_is_grammar_;
+    i_am_grammar<Iterator>                   i_am_grammar_;
+    reinitialize_device_grammar<Iterator>    reinitialize_device_grammar_;
     unconfirmed_service_grammar() : unconfirmed_service_grammar::base_type(start_rule) {
-      start_rule  =
-                     who_is_grammar_
+      start_rule  =  who_is_grammar_
                   |  i_am_grammar_
                   ;
     }
   };
 
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed::service()> {
-    rule<Iterator, confirmed::service()>   start_rule;
+  struct confirmed_request_grammar : grammar<Iterator, confirmed::request()> {
+    rule<Iterator, confirmed::request()>        start_rule;
+    read_property_request_grammar<Iterator>     read_property_request_grammar_;
+    reinitialize_device_grammar<Iterator>       reinitialize_device_grammar_;
+    confirmed_request_grammar() : confirmed_request_grammar::base_type(start_rule) {
+      start_rule  =  reinitialize_device_grammar_
+                  |  read_property_request_grammar_
+                  ;
+    }
+  };
 
-    read_property_request_grammar<Iterator>                 read_property_grammar_;
-    reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
-    confirmed_service_grammar() : confirmed_service_grammar::base_type(start_rule) {
-      start_rule  =
-                     reinitialize_device_grammar_
-                  |  read_property_grammar_
+  template<typename Iterator>
+  struct confirmed_response_grammar : grammar<Iterator, confirmed::response()> {
+    rule<Iterator, confirmed::response()>   start_rule;
+    read_property_ack_grammar<Iterator>     read_property_ack_grammar_;
+    confirmed_response_grammar() : confirmed_response_grammar::base_type(start_rule) {
+      start_rule  =  read_property_ack_grammar_
+                  |  eps
                   ;
     }
   };
@@ -79,33 +87,39 @@ using namespace bacnet::service;
 
   template<typename Iterator>
   struct unconfirmed_service_grammar : grammar<Iterator, unconfirmed::service()> {
-    rule<Iterator,  unconfirmed::service()>  start_rule;
-    who_is_grammar<Iterator>                          who_is_grammar_;
-    i_am_grammar<Iterator>                            i_am_grammar_;
-    reinitialize_device_grammar<Iterator>             reinitialize_device_grammar_;
+    rule<Iterator,  unconfirmed::service()>     start_rule;
+    who_is_grammar<Iterator>                    who_is_grammar_;
+    i_am_grammar<Iterator>                      i_am_grammar_;
     unconfirmed_service_grammar() : unconfirmed_service_grammar::base_type(start_rule) {
-
-      start_rule  =
-                     who_is_grammar_
+      start_rule  =  who_is_grammar_
                   |  i_am_grammar_
                   ;
     }
   };
+
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed::service()> {
-    rule<Iterator,  confirmed::service()>    start_rule;
-    read_property_request_grammar<Iterator>         read_property_request_grammar_;
-    read_property_ack_grammar<Iterator>             read_property_ack_grammar_;
-    reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
-    confirmed_service_grammar() : confirmed_service_grammar::base_type(start_rule) {
-      start_rule =
-                    reinitialize_device_grammar_
+  struct confirmed_request_grammar : grammar<Iterator, confirmed::request()> {
+    rule<Iterator,  confirmed::request()>       start_rule;
+    read_property_request_grammar<Iterator>     read_property_request_grammar_;
+    reinitialize_device_grammar<Iterator>       reinitialize_device_grammar_;
+    confirmed_request_grammar() : confirmed_request_grammar::base_type(start_rule) {
+      start_rule =  reinitialize_device_grammar_
                  |  read_property_request_grammar_
-                 |  read_property_ack_grammar_
                  ;
     }
   };
 
+  template<typename Iterator>
+  struct confirmed_response_grammar : grammar<Iterator, confirmed::response()> {
+    rule<Iterator,  confirmed::response()>          start_rule;
+    read_property_ack_grammar<Iterator>             read_property_ack_grammar_;
+
+    confirmed_response_grammar() : confirmed_response_grammar::base_type(start_rule) {
+      start_rule =  read_property_ack_grammar_
+                 |  eps
+                 ;
+    }
+  };
 
 }}}}}
 
@@ -129,14 +143,30 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     }
     return parsed;
   }
-  confirmed::service parse_confirmed(bacnet::binary_data& binary_data) {
-    confirmed::service parsed{};
+  confirmed::request parse_confirmed_request(bacnet::binary_data& binary_data) {
+    confirmed::request parsed{};
     auto start = binary_data.begin();
     auto end = binary_data.end();
-    bacnet::service::service::detail::parser::confirmed_service_grammar<bacnet::parse_iterator> grammar;
+    bacnet::service::service::detail::parser::confirmed_request_grammar<bacnet::parse_iterator> grammar;
     auto success = boost::spirit::qi::parse(start, end, grammar, parsed);
     return parsed;
   }
+
+  confirmed::response parse_confirmed_response(bacnet::binary_data& binary_data) {
+    confirmed::response parsed{};
+    auto start = binary_data.begin();
+    auto end = binary_data.end();
+    bacnet::service::service::detail::parser::confirmed_response_grammar<bacnet::parse_iterator> grammar;
+    auto success = boost::spirit::qi::parse(start, end, grammar, parsed);
+    return parsed;
+  }
+
+
+
+
+
+
+
 
 
   bacnet::binary_data generate_unconfirmed(const unconfirmed::service &service) {
@@ -145,19 +175,31 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     bacnet::service::service::detail::generator::unconfirmed_service_grammar<bacnet::generate_iterator> grammar;
     auto success = boost::spirit::karma::generate(sink, grammar, service);
     if(success) {
-     return data;
+      return data;
     }
     else {
      return bacnet::binary_data{};
     }
   }
-  bacnet::binary_data generate_confirmed(const confirmed::service &service) {
+  bacnet::binary_data generate_confirmed_request(const confirmed::request &service) {
     bacnet::binary_data data;
     bacnet::generate_iterator sink(data);
-    bacnet::service::service::detail::generator::confirmed_service_grammar<bacnet::generate_iterator> grammar;
+    bacnet::service::service::detail::generator::confirmed_request_grammar<bacnet::generate_iterator> grammar;
     auto success = boost::spirit::karma::generate(sink, grammar, service);
     if(success) {
-    return data;
+      return data;
+    }
+    else {
+      return bacnet::binary_data{};
+    }
+  }
+  bacnet::binary_data generate_confirmed_response(const confirmed::response &service) {
+    bacnet::binary_data data;
+    bacnet::generate_iterator sink(data);
+    bacnet::service::service::detail::generator::confirmed_response_grammar<bacnet::generate_iterator> grammar;
+    auto success = boost::spirit::karma::generate(sink, grammar, service);
+    if(success) {
+      return data;
     }
     else {
       return bacnet::binary_data{};

@@ -59,18 +59,6 @@
  */
 
 
-namespace bacnet { namespace service { namespace service { namespace detail {
-  using namespace bacnet::service;
-  static inline unconfirmed::service parse(bacnet::apdu::frame::unconfirmed_request frame) {
-    return parse_unconfirmed(frame.service_data);
-  }
-  static inline confirmed::service parse(bacnet::apdu::frame::confirmed_request frame) {
-    return parse_confirmed(frame.service_data);      
-  }
-
-
-}}}}
-
 
 namespace bacnet { namespace service { namespace detail {
 
@@ -81,8 +69,8 @@ struct invoke_handler_ {
 
   static constexpr bool expect_complex_response = false;
 
-  template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error ec, bacnet::service::confirmed::response&& response ) {
+  template<typename Handler, typename T>
+  static inline void invoke(Handler &&handler, bacnet::error ec, T response ) {
       handler(std::move(ec));
   }
   template<typename Handler>
@@ -91,11 +79,11 @@ struct invoke_handler_ {
   }
 };
 
+
 template<class Service>
 struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_response<typename std::decay<Service>::type >::value  >::type> {
 
   static constexpr bool expect_complex_response = true;
-
 
   template<typename Handler>
   static inline void invoke(Handler &&handler, bacnet::error ec ) {
@@ -108,14 +96,11 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
 
   template<typename Handler, typename T>
   static inline void invoke(Handler &&handler, bacnet::error ec, T response ) {
-
-    typedef pre::lambda::function_traits<Handler> callback_traits;
+    typedef pre::lambda::function_traits<typename std::decay<Handler>::type > callback_traits;
     typedef typename callback_traits::template arg<1> arg_1_t;
     typedef typename std::decay<arg_1_t>::type service_response_type;
-
     auto ff = boost::get<service_response_type>(response);
-    handler(std::move(ec), std::move(response));
-
+    handler(ec, ff);
   }
 
 };
@@ -145,15 +130,13 @@ public:
     lower_layer_.register_callbacks(
         [this](bacnet::apdu::frame::unconfirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
             inbound_router_.meta_information(std::move(mi));
-            auto f = bacnet::service::service::detail::parse(request);
+            auto f = bacnet::service::service::detail::parse_unconfirmed(request.service_data);
             f.apply_visitor(inbound_router_);
-            //parse and visitor for unconfirmed
           },
         [this](bacnet::apdu::frame::confirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
             inbound_router_.meta_information(std::move(mi));
-            auto f = bacnet::service::service::detail::parse(request);
+            auto f = bacnet::service::service::detail::parse_confirmed_request(request.service_data);
             f.apply_visitor(inbound_router_);
-            //parse and visitor for confirmed
           }
     );
 
@@ -215,19 +198,22 @@ public:
   void async_send(bacnet::common::protocol::mac::address address, Service&& service, Handler handler) {
     using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
 
-    auto data =  bacnet::service::service::detail::generate_confirmed(std::move(service));
+    auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
     lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
                                                                        ( const bacnet::error& ec,
                                                                                bacnet::apdu::frame::complex_ack frame,
                                                                                bacnet::common::protocol::meta_information mi) {
-
-                                      if(!invoker::expect_complex_response) {
-                                        invoker::invoke(handler, ec);
+                                      if(invoker::expect_complex_response) {
+                                        if(ec) {
+                                          invoker::invoke(handler, ec);
+                                        }
+                                        else {
+                                          auto f = bacnet::service::service::detail::parse_confirmed_response(frame.service_ack_data);
+                                          invoker::invoke(handler, ec, f);
+                                        }
                                       }
                                       else {
                                         invoker::invoke(handler, ec);
-                                        //auto f = bacnet::service::service::detail::parse_confirmed(frame.service_ack_data);
-                                        //invoker::invoke(handler, ec, f);
                                       }
                                     });
   }
