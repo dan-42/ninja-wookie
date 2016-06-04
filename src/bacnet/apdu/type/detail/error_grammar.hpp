@@ -41,6 +41,7 @@ using namespace boost::phoenix;
 
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
+using boost::spirit::qi::_pass;
 using boost::phoenix::bind;
 
 
@@ -83,13 +84,11 @@ private:
       error_rule  =  enumeration_grammar_
                   >> enumeration_grammar_;
 
-      open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_open_tag, this, _1) == true ];
-      close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_close_tag, this, _1) == true ];
+      open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_open_tag,  this, _1, _pass) ];
+      close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_close_tag, this, _1, _pass) ];
 
-
+      /*
      start_rule.name("start_rule");
-
-     /*
            debug(start_rule);
            debug(tag_rule);
            debug(tag_lower_rule);
@@ -97,28 +96,29 @@ private:
      //*/
     }
 
-    bool check_open_tag(tag& t) {
+
+    void check_open_tag(tag& t, bool& pass) {
       if(   t.is_opening_tag()
          && t.is_context_tag() == is_expecting_context_tag_
          && t.number()         == tag_number_expected_ ) {
-        return true;
+        pass = true;
       }
       else {
-        return false;
+        pass = false;
       }
     }
 
-    bool check_close_tag(tag& t) {
 
-          if(   t.is_closing_tag()
-             && t.is_context_tag() == is_expecting_context_tag_
-             && t.number()         == tag_number_expected_ ) {
-            return true;
-          }
-          else {
-            return false;
-          }
-        }
+    void check_close_tag(tag& t, bool& pass) {
+      if(   t.is_closing_tag()
+         && t.is_context_tag() == is_expecting_context_tag_
+         && t.number()         == tag_number_expected_ ) {
+        pass = true;
+      }
+      else {
+        pass = false;
+      }
+    }
     uint8_t tag_number_expected_{0};
     bool is_expecting_context_tag_{false};
 };

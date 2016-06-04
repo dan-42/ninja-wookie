@@ -37,8 +37,8 @@ struct sequence_of {
 };
 
 
-//typedef boost::variant<
-typedef boost::make_recursive_variant<
+typedef boost::variant<
+//typedef boost::make_recursive_variant<
     null,
     boolean,
     unsigned_integer,
@@ -47,13 +47,13 @@ typedef boost::make_recursive_variant<
     double,
     octet_string,
     character_string,
-    bit_string,
+    //bit_string,
     enumerated,
     date,
     time,
-    object_identifier,
+    object_identifier
 
-    sequence_of<boost::recursive_variant_ >
+ //   sequence_of<boost::recursive_variant_ >
 
                         > possible_type;
 

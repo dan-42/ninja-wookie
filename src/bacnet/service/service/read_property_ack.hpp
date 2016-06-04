@@ -25,6 +25,7 @@
 #include <boost/optional.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/type/object_identifier.hpp>
+#include <bacnet/type/types.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 #include <bacnet/service/service/traits.hpp>
@@ -35,23 +36,23 @@ namespace bacnet { namespace service { namespace service {
 
     read_property_ack() = default;
 
-    read_property_ack(bacnet::type::object_identifier oi, uint16_t pi, bacnet::binary_data d) :
+    read_property_ack(bacnet::type::object_identifier oi, uint16_t pi, bacnet::type::possible_type d) :
                                                                         object_identifier(oi),
                                                                         property_identifier(pi),
-                                                                        raw_data(std::move(d)) {
+                                                                        property_value(std::move(d)) {
     }
 
-    read_property_ack(bacnet::type::object_identifier oi, uint16_t pi, uint32_t array_index, bacnet::binary_data d) :
+    read_property_ack(bacnet::type::object_identifier oi, uint16_t pi, uint32_t array_index, bacnet::type::possible_type d) :
                                                                         object_identifier(oi),
                                                                         property_identifier(pi),
                                                                         property_array_index(array_index),
-                                                                        raw_data(std::move(d)){
+                                                                        property_value(std::move(d)){
     }
 
     bacnet::type::object_identifier object_identifier{};
     uint16_t                          property_identifier {0};
     boost::optional<uint32_t>         property_array_index;
-    bacnet::binary_data               raw_data;
+    bacnet::type::possible_type       property_value;
   };
 
 }}}
@@ -61,7 +62,7 @@ BOOST_FUSION_ADAPT_STRUCT(
   object_identifier,
   property_identifier,
   property_array_index,
-  raw_data
+  property_value
 );
 
 

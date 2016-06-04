@@ -7,9 +7,12 @@
 
 #ifndef NINJA_WOOKIE_BACNET_TYPE_OCTET_STRING_HPP
 #define NINJA_WOOKIE_BACNET_TYPE_OCTET_STRING_HPP
+
+#include <bacnet/detail/common/types.hpp>
+
 namespace bacnet { namespace type {
 
-typedef std::vector<uint8_t> octet_string;
+typedef bacnet::binary_data octet_string;
 
 }}
 

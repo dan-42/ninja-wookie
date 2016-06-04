@@ -40,6 +40,7 @@ using namespace boost::phoenix;
 
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
+using boost::spirit::qi::_pass;
 using boost::phoenix::bind;
 
 using bacnet::apdu::type::tag;
@@ -73,24 +74,26 @@ private:
     inline void setup() {
       start_rule  =  tag_validation_rule;
 
-      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&null_grammar::check_tag, this, _1) == true ];
-      start_rule.name("start_rule");
-      tag_validation_rule.name("tag_validation_rule");
+      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&null_grammar::check_tag, this, _1, _pass) ];
       //
       /*
+      start_rule.name("start_rule");
+      tag_validation_rule.name("tag_validation_rule");
       debug(start_rule);
       debug(tag_validation_rule);
       //*/
     }
 
-    bool check_tag(tag& t) {
+
+
+    void check_tag(tag& t, bool& pass) {
       if(   t.is_context_tag()    == is_expecting_context_tag_
          && t.number()            == tag_number_expected_
          && t.length_value_type() == 0) {
-        return true;
+        pass = true;
       }
       else {
-        return false;
+        pass = false;
       }
     }
 

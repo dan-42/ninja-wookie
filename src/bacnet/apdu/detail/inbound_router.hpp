@@ -66,18 +66,17 @@ public:
   //// responses to requests
 
   void operator()(frame::simple_ack response) {
-    bacnet::error success;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
+      bacnet::error success;
       handler(success, frame::complex_ack{}, meta_information_);
     }
   }
 
   void operator()(frame::complex_ack response) {
-    std::cout << "apdu::detail::inbound_router complex_ack" << std::endl;
-    bacnet::error ec;
     auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
     if(handler) {
+      bacnet::error ec;
       handler(ec, response, meta_information_);
     }
   }

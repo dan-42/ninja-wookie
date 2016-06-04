@@ -29,6 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/type/octet_string.hpp>
 #include <bacnet/detail/common/types.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -78,14 +79,13 @@ private:
                         >> eps( boost::phoenix::bind(&octet_string_grammar::is_as_expected, this) == true );
     tag_rule            = tag_grammar_[_val = boost::phoenix::bind(&octet_string_grammar::extract_tag, this, _1)] ;
 
+    //
+    /*
     start_rule.           name("start_rule");
     tag_validation_rule.  name("tag_validation_rule");
     tag_rule.             name("tag_rule");
     value_rule.           name("value_rule");
 
-
-    //
-    /*
     debug(start_rule);
     debug(tag_validation_rule);
     debug(tag_rule);

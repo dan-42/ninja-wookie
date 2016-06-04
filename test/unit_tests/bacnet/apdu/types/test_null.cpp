@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE( test_case_context_tag ) {
 
   auto start = generated.begin();
   auto end = generated.end();
-  bacnet::apdu::type::detail::parser::null_grammar<decltype(start)> grammar_parse;
+  bacnet::apdu::type::detail::parser::null_grammar<decltype(start)> grammar_parse(3);
   auto success_parsing = boost::spirit::qi::parse(start, end, grammar_parse, parsed);
   BOOST_TEST(success_parsing, " failed parsing data");
 

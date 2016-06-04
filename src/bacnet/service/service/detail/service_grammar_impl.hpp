@@ -116,7 +116,6 @@ using namespace bacnet::service;
 
     confirmed_response_grammar() : confirmed_response_grammar::base_type(start_rule) {
       start_rule =  read_property_ack_grammar_
-                 |  eps
                  ;
     }
   };

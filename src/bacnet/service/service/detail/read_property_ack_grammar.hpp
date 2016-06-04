@@ -26,6 +26,7 @@
 #include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
 #include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/possible_type_grammar.hpp>
 #include <bacnet/service/service/read_property_ack.hpp>
 
 
@@ -42,14 +43,15 @@ using namespace bacnet::apdu::type::detail::parser;
 template<typename Iterator>
 struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack()> {
   rule<Iterator, service::read_property_ack()>      start_rule;
-  rule<Iterator, object_identifier()>           object_identifier_rule;
-  rule<Iterator, uint32_t()>                    property_identifier_rule;
-  rule<Iterator, boost::optional<uint32_t>()>   property_array_index_rule;
-  rule<Iterator, bacnet::binary_data()>         binary_data_rule;
+  rule<Iterator, object_identifier()>               object_identifier_rule;
+  rule<Iterator, uint32_t()>                        property_identifier_rule;
+  rule<Iterator, boost::optional<uint32_t>()>       property_array_index_rule;
+  rule<Iterator, bacnet::type::possible_type()>     possible_type_grammar_rule;
 
   object_identifier_grammar<Iterator>      tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
   unsigned_integer_grammar<Iterator>       tag_2_rule_{2};
+  possible_type_grammar<Iterator>          tag_3_rule_{3};
 
   read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule) {
 
@@ -57,11 +59,28 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
                                         >> object_identifier_rule
                                         >> property_identifier_rule
                                         >> property_array_index_rule
-                                        >> binary_data_rule;
+                                        >> possible_type_grammar_rule
+                                        ;
+
     object_identifier_rule              =  tag_0_rule_;
     property_identifier_rule            =  tag_1_rule_;
     property_array_index_rule           = -tag_2_rule_;
-    binary_data_rule                    = repeat[byte_];
+    possible_type_grammar_rule          =  tag_3_rule_;
+
+    //
+    /*
+    start_rule.name("start_rule");
+    object_identifier_rule.name("object_identifier_rule");
+    property_identifier_rule.name("property_identifier_rule");
+    property_array_index_rule.name("property_array_index_rule");
+    possible_type_grammar_rule.name("possible_type_grammar_rule");
+
+    debug(start_rule);
+    debug(object_identifier_rule);
+    debug(property_identifier_rule);
+    debug(property_array_index_rule);
+    debug(possible_type_grammar_rule);
+    // */
   }
 };
 
@@ -94,11 +113,12 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
                                         << object_identifier_rule
                                         << property_identifier_rule
                                         << property_array_index_rule
-                                        << binary_data_rule;
+                                        ;
+
     object_identifier_rule              =  tag_0_rule_;
     property_identifier_rule            =  tag_1_rule_;
     property_array_index_rule           = -tag_2_rule_;
-    binary_data_rule                    = repeat[byte_];
+
   }
 };
 

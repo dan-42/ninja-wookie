@@ -21,6 +21,7 @@
 #include <bacnet/service/service/detail/service_grammar.hpp>
 #include <bacnet/service/service/detail/service_grammar_impl.hpp>
 
+#include <pre/json/to_json.hpp>
 
 bacnet::service::service::unconfirmed::service bacnet::service::service::detail::parse_unconfirmed(bacnet::binary_data& binary_data) {
   bacnet::service::service::unconfirmed::service parsed{};
