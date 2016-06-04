@@ -16,10 +16,11 @@
 namespace bacnet { namespace service { namespace detail {
 
 typedef boost::fusion::map<
-    boost::fusion::pair<service::who_is,              callback_service_who_is_t>,
-    boost::fusion::pair<service::i_am,                callback_service_i_am_t  >,
-    boost::fusion::pair<service::reinitialize_device, callback_service_reinitialize_device_t >,
-    boost::fusion::pair<service::read_property_request,       callback_service_read_property_t >
+    boost::fusion::pair<service::who_is,                      callback_service_who_is_t>,
+    boost::fusion::pair<service::i_am,                        callback_service_i_am_t  >,
+    boost::fusion::pair<service::reinitialize_device,         callback_service_reinitialize_device_t >,
+    boost::fusion::pair<service::read_property_request,       callback_service_read_property_t >,
+    boost::fusion::pair<service::read_property_ack,           callback_service_ack_property_t >
 > callback_map_type;
 
       using namespace bacnet::service;

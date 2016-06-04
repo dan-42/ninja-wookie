@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 
     service_controller.start();
 
-    service_controller.async_send(device_id, request, [&io_service](const bacnet::error &ec,  bacnet::service::confirmed::response response) {
+    service_controller.async_send(device_id, request, [&io_service](const bacnet::error &ec,  bacnet::service::service::read_property_ack response) {
                                                           if(ec) {
                                                             std::cout << "error occurred: " << ec <<  std::endl;
                                                           }

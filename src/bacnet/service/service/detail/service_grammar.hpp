@@ -92,8 +92,8 @@ using namespace bacnet::service;
     }
   };
   template<typename Iterator>
-  struct confirmed_service_grammar : grammar<Iterator, confirmed::request()> {
-    rule<Iterator,  confirmed::request()>    start_rule;
+  struct confirmed_service_grammar : grammar<Iterator, confirmed::service()> {
+    rule<Iterator,  confirmed::service()>    start_rule;
     read_property_request_grammar<Iterator>         read_property_request_grammar_;
     read_property_ack_grammar<Iterator>             read_property_ack_grammar_;
     reinitialize_device_grammar<Iterator>           reinitialize_device_grammar_;
@@ -101,7 +101,7 @@ using namespace bacnet::service;
       start_rule =
                     reinitialize_device_grammar_
                  |  read_property_request_grammar_
-                 //|  read_property_ack_grammar_
+                 |  read_property_ack_grammar_
                  ;
     }
   };
@@ -129,8 +129,8 @@ namespace bacnet { namespace service { namespace service { namespace detail {
     }
     return parsed;
   }
-  confirmed::request parse_confirmed(bacnet::binary_data& binary_data) {
-    confirmed::request parsed{};
+  confirmed::service parse_confirmed(bacnet::binary_data& binary_data) {
+    confirmed::service parsed{};
     auto start = binary_data.begin();
     auto end = binary_data.end();
     bacnet::service::service::detail::parser::confirmed_service_grammar<bacnet::parse_iterator> grammar;
