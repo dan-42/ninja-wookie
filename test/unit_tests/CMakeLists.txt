@@ -43,7 +43,8 @@ function(add_new_test test_name file_path)
 
     set_target_properties(${executable_name} PROPERTIES DEBUG_POSTFIX "d")
 
-    add_test (NAME ${executable_name} COMMAND ${executable_name})
+    #add_test (NAME ${executable_name} COMMAND ${executable_name})
+    add_test (NAME ${executable_name} COMMAND $<TARGET_FILE:${executable_name}>)
 
 endfunction(add_new_test)
 

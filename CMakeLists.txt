@@ -22,12 +22,8 @@ HunterGate(
 #SET (CMAKE_RANLIB  "/home/dan/bin/ranlib")
 
 
-####
-# Set variables:
-#   * PROJECT_NAME
-#   * PROJECT_VERSION
 project(wookie VERSION 0.0.1)
-
+enable_testing()
 add_subdirectory(src)
 add_subdirectory(example)
 add_subdirectory(test)

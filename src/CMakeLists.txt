@@ -33,6 +33,7 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -std=c++14 
                     -Wall 
                     -Werror
+                    -fPIC
                   #  -Wpedantic
                     # needed for boost library
                     -Wno-unused-function 

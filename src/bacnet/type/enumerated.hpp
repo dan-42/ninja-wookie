@@ -22,6 +22,8 @@
 #define NINJA_WOOKIE_BACNET_TYPE_ENUMERATED_HPP
 
 #include <cstdint>
+#include <sstream>
+
 #include <boost/fusion/include/adapt_struct.hpp>
 
 
@@ -178,22 +180,4 @@ inline std::string enumerated::to_string<device_status> () {
 
 }}
 
-
-/*
-void test() {
-  using namespace bacnet::type;
-
-  //value from network
-  enumerated my_device_status{3};
-
-  //from the context it is known that it is the device_status
-  my_device_status.type = enumerated::e::device_status;
-
-  std::cout <<  my_device_status.to_string<device_status>();
-  //prints device_status:download_in_progress(3)
-
-
-
-}
-*/
 #endif //NINJA_WOOKIE_BACNET_TYPE_ENUMERATED_HPP
