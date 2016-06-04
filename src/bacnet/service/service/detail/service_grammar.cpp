@@ -22,11 +22,6 @@
 #include <bacnet/service/service/detail/service_grammar_impl.hpp>
 
 
-//using namespace bacnet::service::service::detail;
-
-//namespace bacnet { namespace service { namespace service { namespace detail {
-
-
 bacnet::service::service::unconfirmed::service bacnet::service::service::detail::parse_unconfirmed(bacnet::binary_data& binary_data) {
   bacnet::service::service::unconfirmed::service parsed{};
   auto start = binary_data.begin();
@@ -56,7 +51,7 @@ bacnet::service::service::confirmed::response bacnet::service::service::detail::
   return parsed;
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
 
 
 bacnet::binary_data bacnet::service::service::detail::generate_unconfirmed(const bacnet::service::service::unconfirmed::service &service) {
