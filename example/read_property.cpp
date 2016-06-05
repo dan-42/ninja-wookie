@@ -27,35 +27,27 @@
 #include <boost/program_options.hpp>
 
 int main(int argc, char *argv[]) {
-
+  namespace prop = bacnet::type::property;
   try {
-    uint16_t    doi{1};
-    uint16_t    state{0};
-    std::string password{};
     uint16_t    port{0xBAC0};
     std::string ip{"0.0.0.0"};
-    uint32_t    object_instance{2};
-    std::string object_type_str{""};
-    uint32_t      object_type{bacnet::object_type::device};
-    uint32_t      property{bacnet::type::property::object_name::value};
-    boost::optional<uint32_t>      index;
+
+    uint16_t                    doi;
+    uint32_t                    object_instance;
+    uint32_t                    object_type;
+    uint32_t                    property;
+    boost::optional<uint32_t>   index;
 
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help", "sending BACnet reinitialize device: e.g.  \n-doi 2  -state 0  -pw 123456")
-        ("ip",    po::value<std::string>(&ip)      ->default_value("0.0.0.0"), "listening ip")
-        ("port",  po::value<uint16_t>(&port)       ->default_value(0xBAC0),    "listening port")
-        ("doi",   po::value<uint16_t>(&doi)                               ,    "device object identifier")
-        ("pw",    po::value<std::string>(&password)->default_value(""),        "password")
-        ("state", po::value<uint16_t>(&state)                         ,         "state:   coldstart(0)\n  "
-                                                                                      "  warmstart(1)\n"
-                                                                                      "  startbackup(2)\n"
-                                                                                      "  endbackup(3)\n"
-                                                                                      "  startrestore(4)\n"
-                                                                                      "  endrestore(5)\n"
-                                                                                      "  abortrestore(6)\n")
-
+        ("help",                "sending BACnet read property: e.g.  \n")
+        ("ip",                  po::value<std::string>(&ip)             ->default_value("0.0.0.0"),                     "listening ip")
+        ("port",                po::value<uint16_t>(&port)              ->default_value(0xBAC0),                        "listening port")
+        ("doi",                 po::value<uint16_t>(&doi)               ->default_value(2),                             "device object identifier")
+        ("object_instance",     po::value<uint32_t>(&object_instance)   ->default_value(2),                             "object_instance")
+        ("object_type",         po::value<uint32_t>(&object_type)       ->default_value(bacnet::object_type::device),   "object_type")
+        ("property",            po::value<uint32_t>(&property)          ->default_value(prop::object_name::value),      "property")
     ;
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -66,13 +58,15 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 */
+
+
     std::cout
                 << "reading property "
                 << std::endl
-                << " doi: "     << doi
-                << " object_type: "   << object_type
+                << " doi: "               << doi
+                << " object_type: "       << object_type
                 << " object_instance: "   << object_instance
-                << " property: "   << property
+                << " property: "          << property
                 << " index: "  ;
                     if(index)
                       std::cout << index.get() ;

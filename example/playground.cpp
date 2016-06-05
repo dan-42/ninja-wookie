@@ -148,7 +148,7 @@ using namespace bacnet::type;
 
 
 
-    inline void write_prop_impl(bacnet::type::property::alarm_value, boost::optional<uint16_t> index, type::possible_type data) {
+    inline void write_prop_impl(bacnet::type::property::alarm_value, boost::optional<uint16_t> index, type::possible_primitive_type data) {
         std::cout << "analog_input:: write_prop_impl" << std::endl;
     }
 

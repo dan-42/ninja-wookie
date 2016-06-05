@@ -103,20 +103,23 @@ private:
                     >> close_tag_rule
                     ;
 
-      value_rule  =  null_grammar_
-                  |  boolean_grammar_
-                  |  unsigned_integer_grammar_
-                  |  signed_integer_grammar_
-                  |  real_grammar_
-                  |  double_presision_grammar_
-                  |  octet_string_grammar_
-                  |  character_string_grammar_
-            //      |  bit_string_grammar_
-                  |  enumeration_grammar_
-                  |  date_grammar_
-                  |  time_grammar_
-                  |  object_identifier_grammar_
-               //   |  repeat[value_rule]
+      value_rule  =
+                  (
+                       null_grammar_
+                    |  boolean_grammar_
+                    |  unsigned_integer_grammar_
+                    |  signed_integer_grammar_
+                    |  real_grammar_
+                    |  double_presision_grammar_
+                    |  octet_string_grammar_
+                    |  character_string_grammar_
+                    |  bit_string_grammar_
+                    |  enumeration_grammar_
+                    |  date_grammar_
+                    |  time_grammar_
+                    |  object_identifier_grammar_
+                  )
+                    %  value_rule
                   ;
 
       open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];

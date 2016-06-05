@@ -14,8 +14,6 @@
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
-using bacnet::apdu::type::application_tag;
-
 struct constructed_type {
   uint8_t   tag_number_expected_{0};
   bool      is_expecting_context_tag_{false};

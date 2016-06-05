@@ -8,12 +8,14 @@
 #ifndef NINJA_WOOKIE_BACNET_TYPE_TYPES_HPP_
 #define NINJA_WOOKIE_BACNET_TYPE_TYPES_HPP_
 
+#include <boost/fusion/include/adapt_struct.hpp>
+
 #include <bacnet/type/null.hpp>
 #include <bacnet/type/boolean.hpp>
 #include <bacnet/type/unsigned_integer.hpp>
 #include <bacnet/type/signed_integer.hpp>
 #include <bacnet/type/real.hpp>
-
+//#include <bacnet/type/double_presision.hpp>
 #include <bacnet/type/octet_string.hpp>
 #include <bacnet/type/character_string.hpp>
 #include <bacnet/type/bit_string.hpp>
@@ -31,11 +33,12 @@ namespace bacnet { namespace type {
  * and is the underlying type of BACnetList and BACnetArray
  *
  */
+/*
 template<typename T>
 struct sequence_of {
   std::vector<T> value;
 };
-
+*/
 
 typedef boost::variant<
 //typedef boost::make_recursive_variant<
@@ -47,30 +50,42 @@ typedef boost::variant<
     double,
     octet_string,
     character_string,
-    //bit_string,
+    bit_string,
     enumerated,
     date,
     time,
     object_identifier
 
+
+
  //   sequence_of<boost::recursive_variant_ >
 
-                        > possible_type;
+                        > possible_primitive_type;
 
 
 struct sequence {
-  std::vector<possible_type> value;
+  std::vector<possible_primitive_type> value;
 };
 
 
 struct choice {
-  possible_type value;
+  possible_primitive_type value;
 };
 
 
+typedef boost::variant <
+                          possible_primitive_type,
+                          boost::recursive_wrapper<sequence>
+    > possible_type;
 
 
 }}
+
+BOOST_FUSION_ADAPT_STRUCT(
+  bacnet::type::sequence,
+  value
+);
+
 
 
 #endif /* SRC_BACNET_TYPE_TYPES_HPP_ */

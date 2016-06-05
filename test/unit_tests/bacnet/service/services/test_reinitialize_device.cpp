@@ -45,11 +45,11 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
   auto who_is_2_request           = bacnet::make_binary<bacnet::hex_string>("81 0b 00 10 01 20 ff ff 00 ff 10 08  09 02  19 02");
   auto i_am_answer                = bacnet::make_binary<bacnet::hex_string>("81 0b 00 19 01 20 ff ff 00 ff 10 00 c4 02 00 00 02 22 05 c4 91 03 22 01 04");
   // id 0  pw 12345
-  auto reinitialize_request_pw_12345 = bacnet::make_binary<bacnet::hex_string>("81 0a 00 14 01 00 00 50 03 14 09 00 1d 06 00 31 32 33 34 35");
-  auto reinitialize_request          = bacnet::make_binary<bacnet::hex_string>("81 0a 00 0c 01 00 00 50 00 14 09 00 ");
-  auto reinitialize_device_ack       = bacnet::make_binary<bacnet::hex_string>("81 0a 00 09 01 00 20 50 14");
+  auto reinitialize_request_pw_12345 = bacnet::make_binary<bacnet::hex_string>("81 0a 00 14 01 00 00 05 03 14 09 00 1d 06 00 31 32 33 34 35");
+  auto reinitialize_request          = bacnet::make_binary<bacnet::hex_string>("81 0a 00 0c 01 00 00 05 00 14 09 00 ");
+  auto reinitialize_device_ack       = bacnet::make_binary<bacnet::hex_string>("81 0a 00 09 01 00 20 05 14");
   //class security  nr password_failure
-  auto reinitialize_device_error  = bacnet::make_binary<bacnet::hex_string>("81 0a 00 0d 01 00 50 03 14 91 04 91 1a 00 00 00");
+  auto reinitialize_device_error  = bacnet::make_binary<bacnet::hex_string>("81 0a 00 0d 01 00 05 03 14 91 04 91 1a 00 00 00");
 
   boost::asio::ip::udp::endpoint broadcast_endpoint(boost::asio::ip::address_v4::from_string("255.255.255.255"), 0xBAC0);
   boost::asio::ip::udp::endpoint unicast_endpoint_device(boost::asio::ip::address_v4::from_string("192.168.10.1"), 0xBAC0);

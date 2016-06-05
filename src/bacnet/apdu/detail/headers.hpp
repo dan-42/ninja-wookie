@@ -96,14 +96,15 @@ struct pdu_type_and_control_information_t {
 
 
 struct  segmentation_t {
-  uint8_t unused_                : 1;
-  uint8_t max_segments_          : 3;
   uint8_t max_accepted_apdu_     : 4;
+  uint8_t max_segments_          : 3;
+  uint8_t unused_                : 1;
 
 
-  segmentation_t() : unused_(0),
+  segmentation_t() :
+                   max_accepted_apdu_(0),
                    max_segments_(0),
-                   max_accepted_apdu_(0)  {
+                   unused_(0) {
   }
 
   uint8_t max_segments() {

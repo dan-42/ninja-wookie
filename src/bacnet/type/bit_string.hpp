@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/container/vector.hpp>
+#include <pre/json/traits/is_container.hpp>
 #include <bacnet/apdu/type/tag.hpp>
 
 
@@ -46,6 +47,11 @@ static inline std::ostream& operator<<(std::ostream& os, const bacnet::type::bit
   }
   return os;
 }
+
+
+namespace pre { namespace json { namespace traits {
+  template <> struct is_container< bacnet::type::bit_string > : std::true_type { };
+}}}
 
 
 
