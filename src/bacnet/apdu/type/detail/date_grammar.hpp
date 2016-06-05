@@ -104,12 +104,12 @@ struct date_grammar : grammar<Iterator, date()> {
   tag_grammar<Iterator>       tag_grammar_;
 
   date_grammar()             : date_grammar::base_type(start_rule),
-                               tag_(application_tag::date, size) {
+                               tag_(application_tag::date, 4) {
     setup();
   }
 
   date_grammar(uint8_t tag)  : date_grammar::base_type(start_rule),
-                               tag_(tag, true, size) {
+                               tag_(tag, true, 4) {
     setup();
   }
 
@@ -133,7 +133,7 @@ private:
   tag get_tag() {
      return tag_;
   }
-  static const constexpr uint32_t size{4};
+  //static const constexpr uint32_t size{4};
   tag tag_;
 };
 

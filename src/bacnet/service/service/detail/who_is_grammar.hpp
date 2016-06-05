@@ -58,7 +58,7 @@ struct who_is_grammar : grammar<Iterator, service::who_is()> {
 
   who_is_grammar() : who_is_grammar::base_type(start_rule) {
 
-    start_rule        =  byte_(service_choice<service::who_is>::value)
+    start_rule        =  byte_(service::detail::service_choice<service::who_is>::value)
                       >> low_limit_rule
                       >> height_limit_rule;
 

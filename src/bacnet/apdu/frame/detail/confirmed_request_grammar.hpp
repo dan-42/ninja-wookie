@@ -83,7 +83,6 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
                            >> invoke_id_rule
                            >> sequence_number_rule
                            >> proposed_window_size_rule
-                      //     >> service_choice_rule
                            >> service_data_rule;
 
 
@@ -107,8 +106,9 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
 
     pdu_type_check_rule       = (eps(boost::phoenix::bind(&pdu_type_and_control_information_t::pdu_type, ref(pdu_header_)) == pdu_type::confirmed_request) );
 
-
-    confirmed_request_rule.name("confirmed_request_rule");
+    //
+    /*
+    confirmed_request_rule.name("confirmed_request_rule_start_rule");
     pdu_header_rule.name("pdu_header_rule");
     segmentation_rule.name("segmentation_rule");
     invoke_id_rule.name("invoke_id_rule");
@@ -117,18 +117,16 @@ struct confirmed_request_grammar : grammar<Iterator, confirmed_request() >{
     service_choice_rule.name("service_choice_rule");
     service_data_rule.name("service_data_rule");
     pdu_type_check_rule.name("pdu_type_check_rule");
-
-    /*
-       debug(confirmed_request_rule);
-       debug(pdu_header_rule);
-       debug(segmentation_rule);
-       debug(invoke_id_rule);
-       debug(sequence_number_rule);
-       debug(proposed_window_size_rule);
-       debug(service_choice_rule);
-       debug(service_data_rule);
-       debug(pdu_type_check_rule);
-     */
+    debug(confirmed_request_rule);
+    debug(pdu_header_rule);
+    debug(segmentation_rule);
+    debug(invoke_id_rule);
+    debug(sequence_number_rule);
+    debug(proposed_window_size_rule);
+    debug(service_choice_rule);
+    debug(service_data_rule);
+    debug(pdu_type_check_rule);
+    // */
   }
 
 

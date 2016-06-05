@@ -28,7 +28,7 @@
 
 int main(int argc, char *argv[]) {
   namespace prop = bacnet::type::property;
-  try {
+
     uint16_t    port{0xBAC0};
     std::string ip{"0.0.0.0"};
 
@@ -105,10 +105,6 @@ int main(int argc, char *argv[]) {
     );
 
     io_service.run();
-  }
-  catch (const std::exception &e) {
-    std::cerr << "Exception: " << e.what() << "\n";
-    throw e;
-  }
+
   return 0;
 }

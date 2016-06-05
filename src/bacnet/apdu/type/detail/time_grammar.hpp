@@ -103,12 +103,12 @@ struct time_grammar : grammar<Iterator, time()> {
   tag_grammar<Iterator>       tag_grammar_;
 
   time_grammar()             : time_grammar::base_type(start_rule),
-                               tag_(application_tag::time, size) {
+                               tag_(application_tag::time, 4) {
     setup();
   }
 
   time_grammar(uint8_t tag)  : time_grammar::base_type(start_rule),
-                               tag_(tag, true, size) {
+                               tag_(tag, true, 4) {
     setup();
   }
 
@@ -132,7 +132,7 @@ private:
   tag get_tag() {
      return tag_;
   }
-  static const constexpr uint32_t size{4};
+  //static constexpr uint32_t size{4};
   tag tag_;
 };
 

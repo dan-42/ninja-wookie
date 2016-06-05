@@ -33,15 +33,10 @@ namespace bacnet { namespace type {
  * and is the underlying type of BACnetList and BACnetArray
  *
  */
-/*
-template<typename T>
-struct sequence_of {
-  std::vector<T> value;
-};
-*/
 
-typedef boost::variant<
-//typedef boost::make_recursive_variant<
+
+//typedef boost::variant<
+typedef boost::make_recursive_variant<
     null,
     boolean,
     unsigned_integer,
@@ -54,23 +49,23 @@ typedef boost::variant<
     enumerated,
     date,
     time,
-    object_identifier
+    object_identifier,
 
 
 
- //   sequence_of<boost::recursive_variant_ >
+    std::vector<boost::recursive_variant_ >
 
-                        > possible_primitive_type;
+                        //> possible_primitive_type;
+>::type possible_type;
 
 
+/*
 struct sequence {
   std::vector<possible_primitive_type> value;
 };
 
 
-struct choice {
-  possible_primitive_type value;
-};
+
 
 
 typedef boost::variant <
@@ -79,13 +74,33 @@ typedef boost::variant <
     > possible_type;
 
 
+
+
+
+
+
+
+struct choice {
+  possible_primitive_type value;
+};
+*/
+
 }}
+
+
+
+
+
+
+
+
+/*
 
 BOOST_FUSION_ADAPT_STRUCT(
   bacnet::type::sequence,
   value
 );
-
+*/
 
 
 #endif /* SRC_BACNET_TYPE_TYPES_HPP_ */

@@ -85,8 +85,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   struct unused{};
 
   template<typename Service>
-  struct service_choice {
-    static constexpr uint8_t value = 0xFF;
+  struct service_choice : std::integral_constant<uint8_t, 0xFF> {
     typedef unused type;
   };
 

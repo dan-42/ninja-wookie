@@ -49,6 +49,15 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
     list (APPEND WOOKIE_COMPILE_FLAGS  
                     -g
                     -gdwarf-2)
+                    
+     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections ")       
+
+        list(APPEND WOOKIE_COMPILE_FLAGS                     
+                -ffunction-sections
+                -fdata-sections                             
+        )
+    endif()
     
 ELSE()
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -115,7 +124,7 @@ add_library(wookie ${SOURCES_BACNET_CPP} ${SOURCES_UTIL_CPP} )
 #   * Debug:   -DWOOKIE_DEBUG=1
 #   * Release: -DWOOKIE_DEBUG=0
 #   * other:   -DWOOKIE_DEBUG=0
-target_compile_definitions(wookie PUBLIC "WOOKIE_DEBUG=$<CONFIG:Debug>")
+#target_compile_definitions(wookie PUBLIC "WOOKIE_DEBUG=$<CONFIG:Debug>")
 add_definitions(${WOOKIE_COMPILE_FLAGS})
 
 # Generate:

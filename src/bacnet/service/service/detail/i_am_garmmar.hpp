@@ -68,7 +68,7 @@ struct i_am_grammar : grammar<Iterator, service::i_am()> {
   i_am_grammar() : i_am_grammar::base_type(start_rule) {
 
     start_rule                    =
-                                    byte_(service_choice<service::i_am>::value)
+                                    byte_(service::detail::service_choice<service::i_am>::value)
                                   >> object_identifier_rule
                                   >> max_apdu_length_accepted_rule
                                   >> segmentation_supported_rule
@@ -129,7 +129,7 @@ struct i_am_grammar : grammar<Iterator, service::i_am()> {
   i_am_grammar() : i_am_grammar::base_type(start_rule) {
 
     start_rule                    =
-                                     byte_(service_choice<service::i_am>::value)
+                                     byte_(service::detail::service_choice<service::i_am>::value)
                                   << object_identifier_rule
                                   << max_apdu_length_accepted_rule
                                   << segmentation_supported_rule

@@ -27,6 +27,10 @@
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/qi.hpp>
 
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
 
 #include <bacnet/type/types.hpp>
 
@@ -44,21 +48,32 @@
 #include <bacnet/apdu/type/detail/time_grammar.hpp>
 #include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
 
+#include <bacnet/apdu/type/detail/constructed_type.hpp>
+
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
+
+namespace fusion = boost::fusion;
+namespace phoenix = boost::phoenix;
+
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace bacnet::type;
 using namespace bacnet::apdu::type::detail::parser;
+using phoenix::at_c;
+using phoenix::push_back;
 
 template<typename Iterator>
-struct possible_type_grammar : grammar<Iterator, possible_type()> {
+struct possible_type_grammar : grammar<Iterator, possible_type()>, constructed_type {
 
 
     rule<Iterator, possible_type()>           start_rule;
     rule<Iterator, possible_type()>           context_rule;
+    rule<Iterator, possible_type()>           primitive_type_rule;
+  //  rule<Iterator, sequence()>                constructed_type_rule;
     rule<Iterator, possible_type()>           value_rule;
+
 
     rule<Iterator>                            open_tag_rule;
     rule<Iterator>                            close_tag_rule;
@@ -85,87 +100,66 @@ struct possible_type_grammar : grammar<Iterator, possible_type()> {
     }
 
     possible_type_grammar(uint8_t tag) :  possible_type_grammar::base_type(start_rule),
-                                          tag_number_expected_(tag),
-                                          is_expecting_context_tag_(true) {
+                                          constructed_type(tag) {
       setup();
     }
 
 private:
 
     inline void setup() {
-      start_rule    = context_rule
-                    | value_rule
-                    ;
+      start_rule            = context_rule
+                            | value_rule
+                            ;
 
 
-      context_rule  =  open_tag_rule
-                    >> value_rule
-                    >> close_tag_rule
-                    ;
+      context_rule          =  open_tag_rule
+                            >> value_rule
+                            >> close_tag_rule
+                            ;
 
-      value_rule  =
-                  (
-                       null_grammar_
-                    |  boolean_grammar_
-                    |  unsigned_integer_grammar_
-                    |  signed_integer_grammar_
-                    |  real_grammar_
-                    |  double_presision_grammar_
-                    |  octet_string_grammar_
-                    |  character_string_grammar_
-                    |  bit_string_grammar_
-                    |  enumeration_grammar_
-                    |  date_grammar_
-                    |  time_grammar_
-                    |  object_identifier_grammar_
-                  )
-                    %  value_rule
-                  ;
+      value_rule            %=  *primitive_type_rule
+                            ;
+/*
+      value_rule            = constructed_type_rule
+                            | primitive_type_rule
+                            ;
+
+      constructed_type_rule = *primitive_type_rule;
+*/
+      primitive_type_rule   =  null_grammar_
+                            |  boolean_grammar_
+                            |  unsigned_integer_grammar_
+                            |  signed_integer_grammar_
+                            |  real_grammar_
+                            |  double_presision_grammar_
+                            |  octet_string_grammar_
+                            |  character_string_grammar_
+                            |  bit_string_grammar_
+                            |  enumeration_grammar_
+                            |  date_grammar_
+                            |  time_grammar_
+                            |  object_identifier_grammar_
+                            ;
 
       open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
       close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
 
-      //
-      /*
+      //      /*
       start_rule.name("start_rule");
       context_rule.name("context_rule");
       value_rule.name("value_rule");
+      primitive_type_rule.name("primitive_type_rule");
       open_tag_rule.name("open_tag_rule");
       close_tag_rule.name("close_tag_rule");
 
       debug(start_rule);
       debug(context_rule);
-      debug(value_rule);
+     // debug(value_rule);
+      debug(primitive_type_rule);
       debug(open_tag_rule);
       debug(close_tag_rule);
       // */
-
     }
-    void check_open_tag(tag& t, bool& pass) {
-     if(   t.is_opening_tag()
-        && t.is_context_tag() == is_expecting_context_tag_
-        && t.number()         == tag_number_expected_ ) {
-       pass = true;
-     }
-     else {
-       pass = false;
-     }
-   }
-
-   void check_close_tag(tag& t, bool& pass) {
-     if(   t.is_closing_tag()
-        && t.is_context_tag() == is_expecting_context_tag_
-        && t.number()         == tag_number_expected_ ) {
-       pass = true;
-     }
-     else {
-       pass = false;
-     }
-   }
-
-   uint8_t tag_number_expected_{0};
-   bool is_expecting_context_tag_{false};
-
 };
 
 }}}}}

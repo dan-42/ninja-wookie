@@ -6,12 +6,6 @@
 
 
 
-
-
-
-
-
-
 namespace bacnet { namespace service { namespace service {
     
     template  <typename T> struct is_confirmed :    boost::mpl::false_ {};

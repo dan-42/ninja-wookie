@@ -59,16 +59,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 namespace bacnet { namespace service { namespace service { namespace detail {
 
-  using namespace bacnet::service::service;
-
   template<>
-  struct service_choice<who_is> {
-    static constexpr  uint8_t value = 8;
-    typedef who_is type;
+  struct service_choice<bacnet::service::service::who_is> : std::integral_constant<uint8_t, uncomfirmed_service::who_is> {
+    typedef bacnet::service::service::who_is type;
   };
 
   template<>
-  struct is_broadcast_service<who_is> : std::true_type {
+  struct is_broadcast_service<bacnet::service::service::who_is> : std::true_type {
   };
 
 }}}}

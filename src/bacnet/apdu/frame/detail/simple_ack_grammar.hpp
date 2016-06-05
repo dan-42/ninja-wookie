@@ -80,20 +80,17 @@ struct simple_ack_grammar : grammar<Iterator, simple_ack() >{
                               >>  eps(boost::phoenix::bind(&pdu_type_and_control_information_t::is_segmented_response_accepted, ref(pdu_header_))  == false)
                               >>  eps(boost::phoenix::bind(&pdu_type_and_control_information_t::is_send_by_server, ref(pdu_header_))               == false)
                               );
-
-
+    /*
     simple_ack_rule.name("service_ack_choice_rule");
     pdu_header_rule.name("pdu_header_rule");
     original_invoke_id_rule.name("original_invoke_id_rule");
     service_ack_choice_rule.name("service_ack_choice_rule");
     pdu_type_check_rule.name("pdu_type_check_rule");
-
-    /*
-       debug(simple_ack_rule);
-       debug(pdu_header_rule);
-       debug(original_invoke_id_rule);
-       debug(service_ack_choice_rule);
-       debug(pdu_type_check_rule);
+    debug(simple_ack_rule);
+    debug(pdu_header_rule);
+    debug(original_invoke_id_rule);
+    debug(service_ack_choice_rule);
+    debug(pdu_type_check_rule);
      */
   }
 

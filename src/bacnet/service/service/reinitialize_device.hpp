@@ -78,8 +78,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service::service;
 
   template<>
-  struct service_choice<reinitialize_device> {
-    static constexpr  uint8_t value = 20;
+  struct service_choice<reinitialize_device> : std::integral_constant<uint8_t, comfirmed_service::reinitialize_device> {
     typedef reinitialize_device type;
   };
 

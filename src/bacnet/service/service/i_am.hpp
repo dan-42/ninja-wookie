@@ -68,8 +68,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service::service;
 
   template<>
-  struct service_choice<i_am> {
-    static constexpr uint8_t value = 0x00;
+  struct service_choice<i_am> : std::integral_constant<uint8_t, uncomfirmed_service::i_am> {
     typedef i_am type;
   };
 

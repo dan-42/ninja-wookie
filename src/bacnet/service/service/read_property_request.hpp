@@ -65,8 +65,7 @@ namespace bacnet { namespace service { namespace service { namespace detail {
   using namespace bacnet::service::service;
 
   template<>
-  struct service_choice<read_property_request> {
-    static constexpr  uint8_t value = 12;
+  struct service_choice<read_property_request> : std::integral_constant<uint8_t, comfirmed_service::read_property> {
     typedef read_property_request type;
   };
 
