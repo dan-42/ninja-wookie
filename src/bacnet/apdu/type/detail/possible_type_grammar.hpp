@@ -137,6 +137,7 @@ private:
                             |  date_grammar_
                             |  time_grammar_
                             |  object_identifier_grammar_
+                          //  |  value_rule
                             ;
 
       open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
