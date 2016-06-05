@@ -29,6 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/date.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -41,7 +42,7 @@ using bacnet::apdu::type::tag;
 using bacnet::type::date;
 
 template<typename Iterator>
-struct date_grammar : grammar<Iterator, date()> {
+struct date_grammar : grammar<Iterator, date()>, primitive_type {
 
 
   rule<Iterator, date()>      start_rule;
@@ -52,19 +53,18 @@ struct date_grammar : grammar<Iterator, date()> {
 
 
   date_grammar()            : date_grammar::base_type(start_rule),
-                              tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::date)),
-                              is_expecting_context_tag_(false)  {
+                              primitive_type(application_tag::date) {
     setup();
   }
   date_grammar(uint8_t tag) : date_grammar::base_type(start_rule),
-                              tag_number_expected_(tag),
-                              is_expecting_context_tag_(true) {
+                              primitive_type(tag) {
     setup();
   }
 
 private:
 
   void setup() {
+    length_value_type_  = 4;
     start_rule          =  tag_validation_rule
                         >> value_rule ;
     value_rule          =  byte_
@@ -72,42 +72,16 @@ private:
                         >> byte_
                         >> byte_;
 
-    tag_validation_rule =  tag_rule
-                        >> eps( boost::phoenix::bind(&date_grammar::is_as_expected, this) == true );
-    tag_rule            = tag_grammar_[boost::phoenix::bind(&date_grammar::extract_tag, this, _1)] ;
-
+    tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&date_grammar::check_tag, this, _1, _pass) ];
+    /*
     start_rule.           name("start_rule");
     tag_validation_rule.  name("tag_validation_rule");
-    tag_rule.             name("tag_rule");
     value_rule.           name("value_rule");
-    /*
     debug(start_rule);
     debug(tag_validation_rule);
-    debug(tag_rule);
     debug(value_rule);
     // */
   }
-
-
-  bool extract_tag(tag& t) {
-   tag_ = t;
-   return true;
-  }
-
-  bool is_as_expected() {
-    if(   tag_.is_context_tag_     == is_expecting_context_tag_
-       && tag_.number()            == tag_number_expected_
-       && tag_.length_value_type() == expected_size_) {
-     return true;
-    }
-    else {
-      return false;
-    }
-  }
-  static const constexpr uint32_t expected_size_{4};
-  tag tag_;
-  uint8_t tag_number_expected_{0};
-  bool is_expecting_context_tag_{false};
 
 };
 

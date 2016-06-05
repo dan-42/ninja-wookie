@@ -29,6 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/octet_string.hpp>
 #include <bacnet/detail/common/types.hpp>
 
@@ -41,29 +42,21 @@ using namespace boost::phoenix;
 using bacnet::apdu::type::tag;
 
 template<typename Iterator>
-struct octet_string_grammar : grammar<Iterator, bacnet::binary_data()> {
-
+struct octet_string_grammar : grammar<Iterator, bacnet::binary_data()>, primitive_type {
 
   rule<Iterator, bacnet::binary_data()>   start_rule;
   rule<Iterator >                         tag_validation_rule;
-  rule<Iterator, tag()>                   tag_rule;
   rule<Iterator, bacnet::binary_data()>   value_rule;
 
   tag_grammar<Iterator>     tag_grammar_;
 
-
-
   octet_string_grammar()            : octet_string_grammar::base_type(start_rule),
-                                      tag_(application_tag::octet_string),
-                                      tag_number_expected_(tag_.number()),
-                                      is_expecting_context_tag_(tag_.is_context_tag_)  {
+                                      primitive_type(application_tag::octet_string) {
     setup();
   }
 
   octet_string_grammar(uint8_t tag) : octet_string_grammar::base_type(start_rule),
-                                      tag_(tag, true),
-                                      tag_number_expected_(tag_.number()),
-                                      is_expecting_context_tag_(tag_.is_context_tag_) {
+                                      primitive_type(tag) {
     setup();
   }
 
@@ -74,11 +67,8 @@ private:
     start_rule          =  tag_validation_rule
                         >> value_rule ;
 
-    value_rule          =  repeat(ref(size_))[byte_];
-    tag_validation_rule =  omit[tag_rule]
-                        >> eps( boost::phoenix::bind(&octet_string_grammar::is_as_expected, this) == true );
-    tag_rule            = tag_grammar_[_val = boost::phoenix::bind(&octet_string_grammar::extract_tag, this, _1)] ;
-
+    value_rule          =  repeat(ref(length_value_type_))[byte_];
+    tag_validation_rule  = omit[tag_grammar_[ boost::phoenix::bind(&octet_string_grammar::extract_size_and_check_tag, this, _1, _pass) ] ];
     //
     /*
     start_rule.           name("start_rule");
@@ -92,28 +82,6 @@ private:
     debug(value_rule);
     // */
   }
-
-
-  tag& extract_tag(tag& t) {
-   tag_  = t;
-   size_ = t.length_value_type();
-   return t;
-  }
-
-  bool is_as_expected() {
-    if(   tag_.is_context_tag_     == is_expecting_context_tag_
-       && tag_.number()            == tag_number_expected_ ) {
-     return true;
-    }
-    else {
-      return false;
-    }
-  }
-  uint32_t size_{0};
-  tag tag_;
-  uint8_t tag_number_expected_{0};
-  bool is_expecting_context_tag_{false};
-
 };
 
 }}}}}

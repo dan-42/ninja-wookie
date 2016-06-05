@@ -31,6 +31,7 @@
 
 
 #include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
+#include <bacnet/apdu/type/detail/constructed_type.hpp>
 #include <bacnet/type/error.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -46,7 +47,7 @@ using boost::phoenix::bind;
 
 
 template<typename Iterator>
-struct error_grammar : grammar<Iterator, bacnet::type::error()> {
+struct error_grammar : grammar<Iterator, bacnet::type::error()>, constructed_type {
 
 
     rule<Iterator, bacnet::type::error()>  start_rule;
@@ -58,15 +59,14 @@ struct error_grammar : grammar<Iterator, bacnet::type::error()> {
     rule<Iterator>                         close_tag_rule;
 
     enumeration_grammar<Iterator>          enumeration_grammar_;
-   tag_grammar<Iterator> tag_grammar_;
+    tag_grammar<Iterator>                  tag_grammar_;
 
    error_grammar() :  error_grammar::base_type(start_rule) {
       setup();
     }
 
    error_grammar(uint8_t tag) : error_grammar::base_type(start_rule),
-                                tag_number_expected_(tag),
-                                is_expecting_context_tag_(true) {
+                                constructed_type(tag) {
      setup();
    }
 
@@ -86,7 +86,6 @@ private:
 
       open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_open_tag,  this, _1, _pass) ];
       close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&error_grammar::check_close_tag, this, _1, _pass) ];
-
       /*
      start_rule.name("start_rule");
            debug(start_rule);
@@ -95,32 +94,6 @@ private:
            debug(value_rule);
      //*/
     }
-
-
-    void check_open_tag(tag& t, bool& pass) {
-      if(   t.is_opening_tag()
-         && t.is_context_tag() == is_expecting_context_tag_
-         && t.number()         == tag_number_expected_ ) {
-        pass = true;
-      }
-      else {
-        pass = false;
-      }
-    }
-
-
-    void check_close_tag(tag& t, bool& pass) {
-      if(   t.is_closing_tag()
-         && t.is_context_tag() == is_expecting_context_tag_
-         && t.number()         == tag_number_expected_ ) {
-        pass = true;
-      }
-      else {
-        pass = false;
-      }
-    }
-    uint8_t tag_number_expected_{0};
-    bool is_expecting_context_tag_{false};
 };
 
 }}}}}

@@ -30,6 +30,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/object_identifier.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -48,7 +49,7 @@ using bacnet::type::object_identifier;
 
 
 template<typename Iterator>
-struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
+struct object_identifier_grammar : grammar<Iterator, object_identifier()>, primitive_type {
 
 
     rule<Iterator, object_identifier()> start_rule;
@@ -58,53 +59,35 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
    tag_grammar<Iterator> tag_grammar_;
 
     object_identifier_grammar() :  object_identifier_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::unsigned_integer)),
-                                                                  is_expecting_context_tag_(false) {
+                                   primitive_type(application_tag::bacnet_object_identifier) {
       setup();
     }
 
     object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(tag),
-                                                                  is_expecting_context_tag_(true) {
+                                              primitive_type(tag) {
       setup();
     }
 
 private:
 
     inline void setup() {
+      length_value_type_ = 4;
+
       start_rule  =  tag_validation_rule
                   >> value_rule ;
 
-      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&object_identifier_grammar::check_tag, this, _1) == true ];
+      tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&object_identifier_grammar::check_tag, this, _1, _pass) ];
       value_rule  = big_dword[ _val = boost::phoenix::bind(&bacnet::type::object_identifier::make_object_identifier, _1) ];
+      //
+      /*
       start_rule.name("start_rule");
       tag_validation_rule.name("tag_validation_rule");
       value_rule.name("value_rule");
-      //
-      /*
       debug(start_rule);
       debug(tag_validation_rule);
       debug(value_rule);
       //*/
     }
-
-    bool check_tag(tag& t) {
-      if(   t.is_context_tag()    == is_expecting_context_tag_
-         && t.number()            == tag_number_expected_
-         && t.length_value_type() == 4) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
-
-    tag tag_;
-    uint32_t size_{0};
-    uint8_t tag_number_expected_{0};
-    bool is_expecting_context_tag_{false};
 };
 
 }}}}}

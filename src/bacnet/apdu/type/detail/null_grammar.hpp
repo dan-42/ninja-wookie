@@ -29,6 +29,7 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
 #include <bacnet/type/null.hpp>
 
@@ -49,8 +50,7 @@ using bacnet::type::null;
 
 
 template<typename Iterator>
-struct null_grammar : grammar<Iterator, null()> {
-
+struct null_grammar : grammar<Iterator, null()>, primitive_type {
 
     rule<Iterator, null()>              start_rule;
     rule<Iterator >                     tag_validation_rule;
@@ -58,22 +58,19 @@ struct null_grammar : grammar<Iterator, null()> {
    tag_grammar<Iterator> tag_grammar_;
 
     null_grammar() :            null_grammar::base_type(start_rule),
-                                tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::null)),
-                                is_expecting_context_tag_(false) {
+                                primitive_type(application_tag::null) {
       setup();
     }
 
     null_grammar(uint8_t tag) : null_grammar::base_type(start_rule),
-                                tag_number_expected_(tag),
-                                is_expecting_context_tag_(true) {
+                                primitive_type(tag) {
       setup();
     }
 
 private:
 
     inline void setup() {
-      start_rule  =  tag_validation_rule;
-
+      start_rule          =  tag_validation_rule;
       tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&null_grammar::check_tag, this, _1, _pass) ];
       //
       /*
@@ -83,23 +80,6 @@ private:
       debug(tag_validation_rule);
       //*/
     }
-
-
-
-    void check_tag(tag& t, bool& pass) {
-      if(   t.is_context_tag()    == is_expecting_context_tag_
-         && t.number()            == tag_number_expected_
-         && t.length_value_type() == 0) {
-        pass = true;
-      }
-      else {
-        pass = false;
-      }
-    }
-
-    tag tag_;
-    uint8_t tag_number_expected_{0};
-    bool is_expecting_context_tag_{false};
 };
 
 }}}}}

@@ -28,12 +28,10 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <util/boost/spirit/detail/bit_field_grammar.hpp>
-#include <bacnet/apdu/detail/boost/uint24_parser.hpp>
-#include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
 #include <bacnet/type/character_string.hpp>
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -51,12 +49,11 @@ using bacnet::type::character_string;
 using bacnet::type::string_encoding_type;
 
 template<typename Iterator>
-struct character_string_grammar : grammar<Iterator, character_string()> {
+struct character_string_grammar : grammar<Iterator, character_string()>, primitive_type {
 
 
   rule<Iterator, character_string()>                    start_rule;
   rule<Iterator >                                       tag_validation_rule;
-  rule<Iterator, tag()>                                 tag_rule;
   rule<Iterator, character_string()>                    value_rule;
   rule<Iterator, string_encoding_type()>                encoding_rule;
   rule<Iterator, std::string()>                         string_rule;
@@ -64,18 +61,12 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
   tag_grammar<Iterator> tag_grammar_;
 
   character_string_grammar() : character_string_grammar::base_type(start_rule),
-                              tag_(application_tag::character_string),
-                              size_(0),
-                              tag_number_expected_(tag_.number()),
-                              is_expecting_context_tag_(tag_.is_context_tag_)  {
+                                primitive_type(application_tag::character_string) {
     setup();
   }
 
   character_string_grammar(uint8_t tag) : character_string_grammar::base_type(start_rule),
-                                          tag_(tag, true),
-                                          size_(0),
-                                          tag_number_expected_(tag_.number()),
-                                          is_expecting_context_tag_(tag_.is_context_tag_) {
+                                          primitive_type(tag) {
     setup();
   }
 
@@ -86,72 +77,33 @@ private:
     start_rule  =  tag_validation_rule
                 >> value_rule ;
 
-
     value_rule  =  encoding_rule
                 >> string_rule ;
 
-
-
-    tag_validation_rule = omit[tag_rule] >> eps( boost::phoenix::bind(&character_string_grammar::is_as_expected, this) == true );
-
-    tag_rule = tag_grammar_[_val = boost::phoenix::bind(&character_string_grammar::set_size, this, _1)] ;
-
+    tag_validation_rule  = omit[tag_grammar_[ boost::phoenix::bind(&character_string_grammar::extract_size_and_check_tag, this, _1, _pass, -1) ] ];
 
     encoding_rule =  byte_[ _val = boost::phoenix::bind(&character_string_grammar::to_encoding_type, this, _1)];
 
-    string_rule  = repeat(ref(size_))[byte_];
-
-
-    start_rule.           name("start_rule");
-    tag_validation_rule.  name("tag_validation_rule");
-    tag_rule.             name("tag_rule");
-    value_rule.           name("value_rule");
-    encoding_rule.        name("encoding_rule");
-    string_rule.          name("string_rule");
-
+    string_rule  = repeat(ref(length_value_type_ ))[byte_];
 
     //
     /*
+    start_rule.           name("start_rule");
+    tag_validation_rule.  name("tag_validation_rule");
+    value_rule.           name("value_rule");
+    encoding_rule.        name("encoding_rule");
+    string_rule.          name("string_rule");
     debug(start_rule);
     debug(tag_validation_rule);
-    debug(tag_rule);
     debug(value_rule);
     debug(encoding_rule);
     debug(string_rule);
     // */
   }
-
   string_encoding_type to_encoding_type(const uint8_t& underlying_value) {
     string_encoding_type enum_value = static_cast<string_encoding_type>(underlying_value);
     return enum_value;
   }
-
-
-  /**
-   * using separate size value, as  accessing complex type
-   * does somehow not work here with spirit
-   */
-  tag& set_size(tag& t) {
-   tag_ = t;
-   size_ = t.length_value_type() -1;
-   return t;
-  }
-
-  bool is_as_expected() {
-    if(   tag_.is_context_tag_ == is_expecting_context_tag_
-       && tag_.number()  == tag_number_expected_ ) {
-     return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  tag tag_;
-  uint32_t size_{0};
-  uint8_t tag_number_expected_{0};
-  bool is_expecting_context_tag_{false};
-
 };
 
 }}}}}

@@ -33,6 +33,7 @@
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/enumerated.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -54,7 +55,7 @@ using bacnet::type::enumerated;
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, enumerated()> {
+struct enumeration_grammar : grammar<Iterator, enumerated()>, primitive_type {
 
 
     rule<Iterator, enumerated()>          start_rule;
@@ -65,59 +66,39 @@ struct enumeration_grammar : grammar<Iterator, enumerated()> {
    tag_grammar<Iterator> tag_grammar_;
 
    enumeration_grammar() :  enumeration_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::enumerated)),
-                                                                  is_expecting_context_tag_(false) {
+                             primitive_type(application_tag::enumerated) {
       setup();
     }
 
    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule),
-                                                                  size_(0),
-                                                                  tag_number_expected_(tag),
-                                                                  is_expecting_context_tag_(true) {
+                                       primitive_type(tag) {
       setup();
     }
 
 private:
 
     inline void setup() {
-      start_rule  =  tag_validation_rule
-                  >> value_rule ;
+      start_rule          =  tag_validation_rule
+                          >> value_rule ;
 
-           tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::check_tag, this, _1) == true ];
+      tag_validation_rule = omit[tag_grammar_[ boost::phoenix::bind(&enumeration_grammar::extract_size_and_check_tag, this, _1, _pass) ] ];
 
-           type_rule   = eps[ _val = enumerated::e::undefined ];
+      type_rule           = eps[ _val = enumerated::e::undefined ];
 
-           value_rule  = eps(boost::phoenix::ref(size_) == (uint32_t)1) >> byte_
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)2) >> big_word
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)3) >> big_24word
-                       | eps(boost::phoenix::ref(size_) == (uint32_t)4) >> big_dword;
-
-
-           start_rule.name("start_rule");
-           value_rule.name("value_rule");
-
-     /*
-           debug(start_rule);
-           debug(tag_rule);
-           debug(tag_lower_rule);
-           debug(value_rule);
-     //*/
+      value_rule          = eps(boost::phoenix::ref(length_value_type_) == (uint32_t)1) >> byte_
+                          | eps(boost::phoenix::ref(length_value_type_) == (uint32_t)2) >> big_word
+                          | eps(boost::phoenix::ref(length_value_type_) == (uint32_t)3) >> big_24word
+                          | eps(boost::phoenix::ref(length_value_type_) == (uint32_t)4) >> big_dword
+                          ;
+      /*
+      start_rule.name("start_rule");
+      value_rule.name("value_rule");
+      debug(start_rule);
+      debug(tag_rule);
+      debug(tag_lower_rule);
+      debug(value_rule);
+      //*/
     }
-
-    bool check_tag(tag& t) {
-      size_ = t.length_value_type();
-      if(   t.is_context_tag() == is_expecting_context_tag_
-         && t.number()         == tag_number_expected_ ) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
-    uint32_t size_{0};
-    uint8_t tag_number_expected_{0};
-    bool is_expecting_context_tag_{false};
 };
 
 }}}}}

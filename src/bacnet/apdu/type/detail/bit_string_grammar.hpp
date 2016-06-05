@@ -29,6 +29,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/bit_string.hpp>
 #include <bacnet/detail/common/types.hpp>
 
@@ -42,7 +43,7 @@ using bacnet::apdu::type::tag;
 using bacnet::type::bit_string;
 
 template<typename Iterator>
-struct bit_string_grammar : grammar<Iterator, bit_string()> {
+struct bit_string_grammar : grammar<Iterator, bit_string()> , primitive_type{
 
   rule<Iterator, bit_string()>   start_rule;
   rule<Iterator>                 tag_rule;
@@ -54,42 +55,37 @@ struct bit_string_grammar : grammar<Iterator, bit_string()> {
 
 
   bit_string_grammar()            : bit_string_grammar::base_type(start_rule),
-                                    tag_(application_tag::bit_string),
-                                    tag_number_expected_(tag_.number()),
-                                    is_expecting_context_tag_(tag_.is_context_tag())  {
+                                    primitive_type(application_tag::bit_string) {
     setup();
   }
 
   bit_string_grammar(uint8_t tag) : bit_string_grammar::base_type(start_rule),
-                                    tag_(tag, true),
-                                    tag_number_expected_(tag_.number()),
-                                    is_expecting_context_tag_(tag_.is_context_tag()) {
+                                    primitive_type(tag) {
     setup();
   }
 
 private:
 
   void setup() {
-    start_rule              =  tag_rule
-                            >> tag_validation_rule
+    start_rule              = tag_validation_rule
                             >> unused_bits_rule
                             >> value_rule ;
 
-    tag_rule                =  tag_grammar_[ boost::phoenix::bind(&bit_string_grammar::extract_tag,                  this, _1)] ;
-    tag_validation_rule     =  eps(          boost::phoenix::bind(&bit_string_grammar::is_as_expected,               this) == true );
-    unused_bits_rule        =  byte_[        boost::phoenix::bind(&bit_string_grammar::extract_num_of_expected_bits, this, _1)];
-    value_rule              =  repeat(ref(num_of_bytes_))[extract_bit_string_rule]
-                            >> attr(ref(bit_string_));
-    extract_bit_string_rule =  byte_[boost::phoenix::bind(&bit_string_grammar::extract_bit_string,                   this, _1)];
+    tag_validation_rule     =  omit[tag_grammar_[ boost::phoenix::bind(&bit_string_grammar::extract_size_and_check_tag,   this, _1, _pass) ] ];
 
+    unused_bits_rule        =  byte_[             boost::phoenix::bind(&bit_string_grammar::extract_num_of_expected_bits, this, _1) ];
+
+    value_rule              =  repeat(ref(length_value_type_))[extract_bit_string_rule]
+                            >> attr(ref(bit_string_));
+
+    extract_bit_string_rule =  byte_[             boost::phoenix::bind(&bit_string_grammar::extract_bit_string,           this, _1)];
+    //
+    /*
     start_rule.             name("start_rule");
-    tag_rule.               name("tag_rule");
     tag_validation_rule.    name("tag_validation_rule");
     unused_bits_rule.       name("unused_bits_rule");
     value_rule.             name("value_rule");
     extract_bit_string_rule.name("first_bytes_rule");
-    //
-    /*
     debug(start_rule);
     debug(tag_validation_rule);
     debug(tag_rule);
@@ -111,34 +107,14 @@ private:
     return true;
   }
 
-  bool extract_num_of_expected_bits(const uint8_t &num_of_unused_bits) {
-    expected_bits_ = (num_of_bytes_ * 8) - num_of_unused_bits;
-    return true;
+  void extract_num_of_expected_bits(const uint8_t &num_of_unused_bits) {
+    bit_string_.clear();
+    --length_value_type_;
+    expected_bits_ = ((length_value_type_) * 8) - num_of_unused_bits;
   }
 
-  bool extract_tag(tag& t) {
-   tag_           = t;
-   num_of_bytes_  = t.length_value_type() - 1;
-   bit_string_.clear();
-   return true;
-  }
-
-  bool is_as_expected() {
-    if(   tag_.is_context_tag()    == is_expecting_context_tag_
-       && tag_.number()            == tag_number_expected_ ) {
-     return true;
-    }
-    else {
-      return false;
-    }
-  }
-  tag        tag_;
   bit_string bit_string_;
-  uint8_t    tag_number_expected_;
-  bool       is_expecting_context_tag_;
-  uint32_t   num_of_bytes_{0};
   uint32_t   expected_bits_{0};
-
 };
 
 }}}}}

@@ -29,12 +29,8 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <bacnet/apdu/detail/boost/uint24_parser.hpp>
-#include <bacnet/apdu/detail/boost/uint24_generator.hpp>
-
-
-
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive_type.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -51,27 +47,22 @@ using bacnet::apdu::type::application_tag;
 
 
 template<typename Iterator>
-struct boolean_grammar : grammar<Iterator, bool()> {
+struct boolean_grammar : grammar<Iterator, bool()>, primitive_type {
 
 
     rule<Iterator, bool()>          start_rule;
-    rule<Iterator, tag()>           tag_rule;
     rule<Iterator >                 tag_validation_rule;
     rule<Iterator, bool()>          value_rule;
 
    tag_grammar<Iterator> tag_grammar_;
 
     boolean_grammar() :  boolean_grammar::base_type(start_rule),
-                                                                  value_(0),
-                                                                  tag_number_expected_(static_cast<decltype(tag_number_expected_)>(application_tag::boolean)),
-                                                                  is_expecting_context_tag_(false) {
+                         primitive_type(application_tag::boolean) {
       setup();
     }
 
     boolean_grammar(uint8_t tag) : boolean_grammar::base_type(start_rule),
-                                                                  value_(0),
-                                                                  tag_number_expected_(tag),
-                                                                  is_expecting_context_tag_(true) {
+                                   primitive_type(tag) {
       setup();
     }
 
@@ -81,52 +72,23 @@ private:
       start_rule           =  tag_validation_rule
                            >> value_rule ;
 
-      tag_rule             = tag_grammar_[ _val = boost::phoenix::bind(&boolean_grammar::set_size, this, _1)] ;
-
-
-      tag_validation_rule  = omit[tag_rule] >> eps( boost::phoenix::bind(&boolean_grammar::is_as_expected, this) == true );
+      tag_validation_rule  = omit[tag_grammar_[ boost::phoenix::bind(&boolean_grammar::extract_size_and_check_tag, this, _1, _pass) ]];
 
       value_rule           = ( eps(boost::phoenix::ref(is_expecting_context_tag_) == true)
                                >> byte_
                              )
-                           | attr(boost::phoenix::ref(value_))
+                           | attr(boost::phoenix::ref(length_value_type_))
                            ;
-
+      //
+      /*
       start_rule.name("start_rule");
-      tag_rule.name("tag_rule");
       value_rule.name("value_rule");
       tag_validation_rule.name("tag_validation_rule");
-
-     //
-      /*
-       debug(start_rule);
-       debug(tag_rule);
-       debug(value_rule);
-       debug(tag_validation_rule);
-     // */
+      debug(start_rule);
+      debug(value_rule);
+      debug(tag_validation_rule);
+      // */
     }
-
-
-    tag& set_size(tag& t) {
-      tag_ = t;
-      value_ = (t.length_value_type() != 0);
-      return t;
-    }
-
-    bool is_as_expected() {
-      if(   tag_.is_context_tag_ == is_expecting_context_tag_
-         && tag_.number()  == tag_number_expected_ ) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
-
-    tag tag_;
-    bool value_{0};
-    uint8_t tag_number_expected_{0};
-    bool is_expecting_context_tag_{false};
 };
 
 }}}}}
