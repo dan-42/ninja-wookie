@@ -145,7 +145,7 @@ private:
       tag_rule = eps[boost::phoenix::bind(&unsigned_integer_grammar::extract_size, this, _val)]  << tag_grammar_[_1 = ref(tag_)];
       //tag_rule = tag_grammar_[_1 = ref(tag_)];
 
-      value_rule  = eps(ref(size_) == 1) << byte_
+      value_rule  =   eps(ref(size_) == 1) << byte_
                     | eps(ref(size_) == 2) << big_word
                     | eps(ref(size_) == 3) << big_24word
                     | eps(ref(size_) == 4) << big_dword;

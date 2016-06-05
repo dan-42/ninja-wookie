@@ -103,14 +103,12 @@ struct null_grammar : grammar<Iterator, null()> {
 
     tag_grammar<Iterator> tag_grammar_;
 
-    static const constexpr uint32_t size = 0;
-
     null_grammar() :            null_grammar::base_type(start_rule),
-                                tag_(application_tag::null, size) {
+                                tag_(application_tag::null, 0) {
       setup();
     }
     null_grammar(uint8_t tag) : null_grammar::base_type(start_rule),
-                                tag_(tag, true, size) {
+                                tag_(tag, true, 0) {
       setup();
     }
 

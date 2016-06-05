@@ -105,12 +105,12 @@ struct real_grammar : grammar<Iterator, float()> {
   tag_grammar<Iterator> tag_grammar_;
 
   real_grammar()             : real_grammar::base_type(start_rule),
-                                tag_(application_tag::real, size) {
+                                tag_(application_tag::real, 4) {
     setup();
   }
 
   real_grammar(uint8_t tag)  : real_grammar::base_type(start_rule),
-                                tag_(tag, true, size) {
+                                tag_(tag, true, 4) {
     setup();
   }
 
@@ -134,11 +134,10 @@ private:
     // */
   }
 
-  tag get_tag() {//(const float &/*value*/) {
+  tag get_tag() {
      return tag_;
   }
 
-  static const constexpr uint32_t size{4};
   tag tag_;
 };
 

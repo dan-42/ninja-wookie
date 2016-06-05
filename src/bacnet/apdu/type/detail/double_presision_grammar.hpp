@@ -102,12 +102,12 @@ struct double_presision_grammar : grammar<Iterator, double()> {
   tag_grammar<Iterator> tag_grammar_;
 
   double_presision_grammar()             : double_presision_grammar::base_type(start_rule),
-                                tag_(application_tag::double_presision, size) {
+                                tag_(application_tag::double_presision, 8) {
     setup();
   }
 
   double_presision_grammar(uint8_t tag)  : double_presision_grammar::base_type(start_rule),
-                                tag_(tag, true, size) {
+                                tag_(tag, true, 8) {
     setup();
   }
 
@@ -131,11 +131,9 @@ private:
     // */
   }
 
-  tag get_tag() {//(const double &/*value*/) {
+  tag get_tag() {
      return tag_;
   }
-
-  static const constexpr uint32_t size{8};
   tag tag_;
 };
 

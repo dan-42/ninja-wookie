@@ -133,7 +133,6 @@ private:
   tag get_tag() {
      return tag_;
   }
-  //static const constexpr uint32_t size{4};
   tag tag_;
 };
 

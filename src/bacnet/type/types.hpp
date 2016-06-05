@@ -23,7 +23,7 @@
 #include <bacnet/type/date.hpp>
 #include <bacnet/type/time.hpp>
 #include <bacnet/type/object_identifier.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 
 namespace bacnet { namespace type {
 
@@ -34,9 +34,9 @@ namespace bacnet { namespace type {
  *
  */
 
+struct sequence;
 
-//typedef boost::variant<
-typedef boost::make_recursive_variant<
+typedef boost::variant<
     null,
     boolean,
     unsigned_integer,
@@ -51,12 +51,16 @@ typedef boost::make_recursive_variant<
     time,
     object_identifier,
 
+    boost::recursive_wrapper<sequence>
 
+                        > possible_type;
 
-    std::vector<boost::recursive_variant_ >
+struct sequence {
+    std::vector<possible_type> values;
+    unused_t unused;
+};
 
-                        //> possible_primitive_type;
->::type possible_type;
+//>::type possible_type;
 
 
 /*
@@ -94,13 +98,14 @@ struct choice {
 
 
 
-/*
+
 
 BOOST_FUSION_ADAPT_STRUCT(
   bacnet::type::sequence,
-  value
+  values,
+  unused
 );
-*/
+
 
 
 #endif /* SRC_BACNET_TYPE_TYPES_HPP_ */

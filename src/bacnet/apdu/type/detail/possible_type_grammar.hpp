@@ -31,7 +31,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
-
+#include <util/boost/spirit/unused_type.hpp>
 #include <bacnet/type/types.hpp>
 
 #include <bacnet/apdu/type/detail/null_grammar.hpp>
@@ -71,7 +71,7 @@ struct possible_type_grammar : grammar<Iterator, possible_type()>, constructed_t
     rule<Iterator, possible_type()>           start_rule;
     rule<Iterator, possible_type()>           context_rule;
     rule<Iterator, possible_type()>           primitive_type_rule;
-  //  rule<Iterator, sequence()>                constructed_type_rule;
+    rule<Iterator, sequence()>                constructed_type_rule;
     rule<Iterator, possible_type()>           value_rule;
 
 
@@ -94,7 +94,7 @@ struct possible_type_grammar : grammar<Iterator, possible_type()>, constructed_t
     time_grammar<Iterator>                    time_grammar_;
     object_identifier_grammar<Iterator>       object_identifier_grammar_;
 
-
+    unused_grammar<Iterator> unused_grammar_;
     possible_type_grammar() :  possible_type_grammar::base_type(start_rule) {
       setup();
     }
@@ -117,15 +117,13 @@ private:
                             >> close_tag_rule
                             ;
 
-      value_rule            %=  *primitive_type_rule
-                            ;
-/*
       value_rule            = constructed_type_rule
                             | primitive_type_rule
                             ;
 
-      constructed_type_rule = *primitive_type_rule;
-*/
+      constructed_type_rule =  repeat(2, inf)[ primitive_type_rule ]
+                            >> unused_grammar_;
+
       primitive_type_rule   =  null_grammar_
                             |  boolean_grammar_
                             |  unsigned_integer_grammar_
@@ -144,17 +142,19 @@ private:
       open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
       close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
 
-      //      /*
-      start_rule.name("start_rule");
-      context_rule.name("context_rule");
-      value_rule.name("value_rule");
-      primitive_type_rule.name("primitive_type_rule");
-      open_tag_rule.name("open_tag_rule");
-      close_tag_rule.name("close_tag_rule");
-
+      //
+      /*
+      start_rule            .name("start_rule");
+      context_rule          .name("context_rule");
+      value_rule            .name("value_rule");
+      constructed_type_rule .name("constructed_type_rule");
+      primitive_type_rule   .name("primitive_type_rule");
+      open_tag_rule         .name("open_tag_rule");
+      close_tag_rule        .name("close_tag_rule");
       debug(start_rule);
       debug(context_rule);
-     // debug(value_rule);
+      debug(value_rule);
+      debug(constructed_type_rule);
       debug(primitive_type_rule);
       debug(open_tag_rule);
       debug(close_tag_rule);

@@ -67,7 +67,8 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     property_array_index_rule           = -tag_2_rule_;
     possible_type_grammar_rule          =  tag_3_rule_;
 
-    //    /*
+    //
+    /*
     start_rule.name("read_property_ack_grammar_start_rule");
     object_identifier_rule.name("object_identifier_rule");
     property_identifier_rule.name("property_identifier_rule");
