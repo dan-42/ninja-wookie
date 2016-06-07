@@ -14,6 +14,9 @@
 #include <iomanip>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/home/support/unused.hpp>
+#include <boost/spirit/home/support/attributes.hpp>
+
+
 namespace bacnet { namespace detail { namespace common {
 
 /**
@@ -81,11 +84,44 @@ using detail::common::parse_iterator;
   }
 
 
-  static inline void print(binary_data &data) {
+  inline void print(binary_data &data) {
     for(auto &c : data)
       std::cout << " 0x" << std::setfill('0') << std::setw(2) << std::hex << (int)c;
     std::cout << std::endl;
   }
+
 }
+
+namespace boost { namespace spirit { namespace traits {
+
+
+
+    template <>
+    struct token_printer_debug<bacnet::binary_data> {
+        template<typename Out>
+        static void print(Out& o, bacnet::binary_data const& val) {
+          for(auto &c : val)
+            o << " 0x" << std::setfill('0') << std::setw(2) << std::hex << (int)c;
+        }
+    };
+
+    template <>
+    struct token_printer_debug<uint8_t> {
+        template<typename Out>
+        static void print(Out& o, uint8_t const& val) {
+            o << " 0x" << std::setfill('0') << std::setw(2) << std::hex << (int)val;
+        }
+    };
+
+    template <>
+    struct token_printer_debug<std::string> {
+        template<typename Out>
+        static void print(Out& o, std::string const& val) {
+          for(auto &c : val)
+            o << " 0x" << std::setfill('0') << std::setw(2) << std::hex << (int)c;
+        }
+    };
+
+}}}
 
 #endif /* SRC_BACNET_TYPES_HPP_ */

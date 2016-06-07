@@ -80,7 +80,7 @@ private:
       value_rule  = big_dword[ _val = boost::phoenix::bind(&bacnet::type::object_identifier::make_object_identifier, _1) ];
       //
       /*
-      start_rule.name("start_rule");
+      start_rule.name("object_identifier_grammar_start_rule");
       tag_validation_rule.name("tag_validation_rule");
       value_rule.name("value_rule");
       debug(start_rule);

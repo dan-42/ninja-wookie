@@ -147,7 +147,20 @@ struct simple_tag {
 
     inline void length_value_type(uint8_t v) { length_value_type_ = v; }
 
+    inline uint8_t to_binary() const {
+      uint8_t data{0x00};
+      uint8_t tmp{0x00};
 
+      data = number_ << 4;
+
+      tmp = is_context_tag() ?  0x01  :  0x00;
+      data |= tmp << 3;
+
+      tmp   = length_value_type();
+      data |= tmp;
+
+      return data;
+    }
 
 };
 

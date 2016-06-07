@@ -13,5 +13,7 @@ add_new_test("apdu-types-date"                      "./test_date.cpp")
 add_new_test("apdu-types-time"                      "./test_time.cpp")
 add_new_test("apdu-types-enumerated"                "./test_enumerated.cpp")
 
+add_new_test("apdu-types-unknown-data"              "./test_unknown_data.cpp")
+
 ## constructed types out of primitives
 add_new_test("apdu-types-error"                     "./test_error.cpp")

@@ -23,16 +23,11 @@
 #include <bacnet/type/date.hpp>
 #include <bacnet/type/time.hpp>
 #include <bacnet/type/object_identifier.hpp>
+#include <bacnet/type/unknown_data.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 
 namespace bacnet { namespace type {
 
-
-/**
- * Sequence Of, means all types must be the same
- * and is the underlying type of BACnetList and BACnetArray
- *
- */
 
 struct sequence;
 
@@ -51,8 +46,10 @@ typedef boost::variant<
     time,
     object_identifier,
 
-    boost::recursive_wrapper<sequence>
+    boost::recursive_wrapper<sequence>,
 
+
+    unknown_data
                         > possible_type;
 
 struct sequence {
@@ -60,44 +57,7 @@ struct sequence {
     unused_t unused;
 };
 
-//>::type possible_type;
-
-
-/*
-struct sequence {
-  std::vector<possible_primitive_type> value;
-};
-
-
-
-
-
-typedef boost::variant <
-                          possible_primitive_type,
-                          boost::recursive_wrapper<sequence>
-    > possible_type;
-
-
-
-
-
-
-
-
-struct choice {
-  possible_primitive_type value;
-};
-*/
-
 }}
-
-
-
-
-
-
-
-
 
 
 BOOST_FUSION_ADAPT_STRUCT(
