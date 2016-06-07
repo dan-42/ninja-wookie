@@ -124,8 +124,8 @@ private:
                             >> close_tag_rule
                             ;
 
-      value_rule            = primitive_type_rule
-                            | constructed_type_rule
+      value_rule            = constructed_type_rule
+                            | primitive_type_rule
                             ;
 
       constructed_type_rule =  repeat(2, inf)[ primitive_type_rule ]

@@ -15,5 +15,9 @@ add_new_test("apdu-types-enumerated"                "./test_enumerated.cpp")
 
 add_new_test("apdu-types-unknown-data"              "./test_unknown_data.cpp")
 
+add_new_test("apdu-types-possible-type"             "./test_possible_type.cpp")
+
+
+
 ## constructed types out of primitives
 add_new_test("apdu-types-error"                     "./test_error.cpp")

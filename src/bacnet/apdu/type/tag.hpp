@@ -104,25 +104,28 @@ struct tag {
                                                       && length_value_type_ != opening_tag_indication
                                                       && length_value_type_ != closing_tag_indication); }
 
+
+    template<typename Out>
+    friend inline Out& operator<<(Out& os, const bacnet::apdu::type::tag &tag_) {
+
+      os  << " number: "            << std::dec << (uint32_t) tag_.number()
+          << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
+          << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
+
+      return os;
+    }
 };
 
 
 }}}
 
-static inline std::ostream& operator<<(std::ostream& os, const bacnet::apdu::type::tag &tag_) {
 
-  os  << " number: "            << std::dec << (uint32_t) tag_.number()
-      << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
-      << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
-
-  return os;
-}
 
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::apdu::type::tag,
     number_,
     is_context_tag_,
     length_value_type_
-)
+);
 
 #endif //NINJA_WOOKIE_TAG_HPP
