@@ -24,6 +24,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/detail/real_grammar.hpp>
+#include <bacnet/apdu/type/detail/error_grammar.hpp>
 #include <bacnet/apdu/type/detail/unknown_data_grammar.hpp>
 
 
@@ -44,14 +45,37 @@ BOOST_AUTO_TEST_SUITE( apdu_type_unknwon_data )
 BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
-    bacnet::type::unknown_data unknown_data_parsed;
-    bacnet::binary_data generated;
-    float to_generate;
+
 
 
 
     {
-      to_generate  = 0.0f;
+      bacnet::type::unknown_data unknown_data_parsed;
+      bacnet::binary_data generated;
+      float to_generate  = 42.23f;
+      std::back_insert_iterator <bacnet::binary_data> sink(generated);
+
+      bacnet::apdu::type::detail::generator::real_grammar<decltype(sink)> grammar_gen(2);
+      auto success_generating = boost::spirit::karma::generate(sink, grammar_gen, to_generate );
+      BOOST_TEST(success_generating, " failed to generate data");
+      std::cout << "to_generate " <<  std::dec <<  to_generate << " :   "<< std::endl;
+      bacnet::print(generated);
+
+      auto start = generated.begin();
+      auto end = generated.end();
+      bacnet::apdu::type::detail::parser::unknown_data_grammar<decltype(start)> grammar_parse;
+      auto success_parsing = boost::spirit::qi::parse(start, end, grammar_parse, unknown_data_parsed);
+      std::cout << "unknown_data_parsed " << std::dec <<  unknown_data_parsed << std::endl;
+
+      BOOST_TEST(success_parsing, " failed parsing data");
+
+      BOOST_TEST(to_generate == to_generate, " failed generated and parsed ar not the same");
+    }
+
+    {
+      bacnet::type::unknown_data unknown_data_parsed;
+      bacnet::binary_data generated;
+      float to_generate  = 42.23f;
       std::back_insert_iterator <bacnet::binary_data> sink(generated);
 
       bacnet::apdu::type::detail::generator::real_grammar<decltype(sink)> grammar_gen(2);

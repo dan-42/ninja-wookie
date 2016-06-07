@@ -29,6 +29,8 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
+#include <bacnet/detail/common/types.hpp>
+#include <bacnet/apdu/type/detail/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/constructed_type.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/unknown_data.hpp>
@@ -84,12 +86,12 @@ private:
                         ;
 
       primitive_rule    =  eps(    boost::phoenix::bind(&tag::is_primitive_context_tag,  ref(open_tag_)) == true)
-                        >> attr(   boost::phoenix::bind(&tag::number,                    open_tag_))
+                        >> attr(   ref(open_tag_.number_))
                         >> fixed_data_rule
                         ;
 
       context_rule      =  eps(    boost::phoenix::bind(&tag::is_opening_tag,            ref(open_tag_)) == true)
-                        >> attr(   boost::phoenix::bind(&tag::number,                    open_tag_))
+                        >> attr(   ref(open_tag_.number_))
                         >> unknown_data_rule
                         >> close_tag_rule
                         ;
@@ -120,7 +122,7 @@ private:
     }
 
     inline void extract_tag(tag& t, bool& pass) {
-      std::cerr << "extract_tag(): " << t << std::endl;
+      std::cout << "extract_tag(): " << t << std::endl;
       if(t.is_context_tag()) {
         pass                = true;
         open_tag_           = t;
