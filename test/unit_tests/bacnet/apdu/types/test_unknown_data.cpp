@@ -22,10 +22,11 @@
 #define BOOST_TEST_MODULE test ninja wookie bacnet apdu types unknwon data
 #include <boost/test/included/unit_test.hpp>
 
+#include <pre/json/to_json.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/detail/real_grammar.hpp>
 #include <bacnet/apdu/type/detail/error_grammar.hpp>
-#include <bacnet/apdu/type/detail/unknown_data_grammar.hpp>
+#include <bacnet/apdu/type/detail/unsupported_type_grammar.hpp>
 
 
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {
@@ -48,9 +49,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
 
-
+  std::cout << "-----------------------------------------------------------" << std::endl;
     {
-      bacnet::type::unknown_data unknown_data_parsed;
+      bacnet::type::unsupported_type unknown_data_parsed;
       bacnet::binary_data generated;
       float to_generate  = 42.23f;
       std::back_insert_iterator <bacnet::binary_data> sink(generated);
@@ -63,17 +64,17 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
       auto start = generated.begin();
       auto end = generated.end();
-      bacnet::apdu::type::detail::parser::unknown_data_grammar<decltype(start)> grammar_parse;
+      bacnet::apdu::type::detail::parser::unsupported_type_grammar<decltype(start)> grammar_parse;
       auto success_parsing = boost::spirit::qi::parse(start, end, grammar_parse, unknown_data_parsed);
-      std::cout << "unknown_data_parsed " << std::dec <<  unknown_data_parsed << std::endl;
+      std::cout << "unknown_data_parsed " << std::dec <<  pre::json::to_json(unknown_data_parsed).dump(2) << std::endl;
 
       BOOST_TEST(success_parsing, " failed parsing data");
 
       BOOST_TEST(to_generate == to_generate, " failed generated and parsed ar not the same");
     }
-
+    std::cout << "-----------------------------------------------------------" << std::endl;
     {
-      bacnet::type::unknown_data unknown_data_parsed;
+      bacnet::type::unsupported_type unknown_data_parsed;
       bacnet::binary_data generated;
       float to_generate  = 42.23f;
       std::back_insert_iterator <bacnet::binary_data> sink(generated);
@@ -86,19 +87,62 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
       auto start = generated.begin();
       auto end = generated.end();
-      bacnet::apdu::type::detail::parser::unknown_data_grammar<decltype(start)> grammar_parse;
+      bacnet::apdu::type::detail::parser::unsupported_type_grammar<decltype(start)> grammar_parse;
       auto success_parsing = boost::spirit::qi::parse(start, end, grammar_parse, unknown_data_parsed);
-      std::cout << "unknown_data_parsed " << std::dec <<  unknown_data_parsed << std::endl;
+      std::cout << "unknown_data_parsed " << std::dec <<  pre::json::to_json(unknown_data_parsed).dump(2)  << std::endl;
 
       BOOST_TEST(success_parsing, " failed parsing data");
 
       BOOST_TEST(to_generate == to_generate, " failed generated and parsed ar not the same");
     }
 
-
+    std::cout << "-----------------------------------------------------------" << std::endl;
 
 }
 
+
+BOOST_AUTO_TEST_CASE( test_case12) {
+
+      /**
+       * device 658  object object device prop active_cov_subscriptions
+       * 7 subscriptions all context tagged and nested -.-
+       */
+      auto generated = bacnet::make_binary<bacnet::hex_string>("0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c");
+      /*
+0e                    //open_tag
+  0e                    //open_tag
+    1e                    //open_tag
+      21                    //simple_tag
+        01                    //value
+      6506                  //simple_tag
+        0a0f90e4bac0          //value
+    1f                    //closing_tag
+  0f                    //closing_tag
+  1a                    //simple_tag
+    1260                  //value
+0f                    //closing_tag
+1e                    //open_tag
+  0c                    //simple_tag
+    61000000              //value
+  19                    //simple_tag
+    55                    //value
+1f                    //closing_tag
+29                    //simple_tag
+  01                    //value
+3b                    //simple_tag
+  013e0c                //value
+
+       */
+          //"0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0040000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0000000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000119551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c00c0000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0140000019551f29013b013e0d");
+      bacnet::type::unsupported_type unknown_data_parsed;
+      auto start = generated.begin();
+      auto end = generated.end();
+      bacnet::apdu::type::detail::parser::unsupported_type_grammar<decltype(start)> grammar_parse;
+      auto success_parsing = boost::spirit::qi::parse(start, end, grammar_parse, unknown_data_parsed);
+      std::cout << "unknown_data_parsed " << std::dec <<  pre::json::to_json(unknown_data_parsed).dump(2) << std::endl;
+
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

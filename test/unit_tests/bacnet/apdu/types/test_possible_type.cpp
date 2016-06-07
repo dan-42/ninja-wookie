@@ -26,7 +26,7 @@
 #include <bacnet/apdu/type/detail/possible_type_grammar.hpp>
 #include <bacnet/apdu/type/detail/real_grammar.hpp>
 #include <bacnet/apdu/type/detail/error_grammar.hpp>
-#include <bacnet/apdu/type/detail/unknown_data_grammar.hpp>
+#include <bacnet/apdu/type/detail/unsupported_type_grammar.hpp>
 
 
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {
@@ -72,6 +72,11 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
       bacnet::print(generated);
 
 
+      /**
+       * read_prop device 658  object object device prop active_cov_subscriptions
+       * 7 subscriptions all context tagged and nested -.-
+       */
+     // auto generated = bacnet::make_binary<bacnet::hex_string>("0c0200029219983e0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0040000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0000000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000119551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c00c0000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0140000019551f29013b013e0d3f");
 
 
       auto start = generated.begin();
@@ -87,6 +92,27 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     }
 
 
+    {
+
+
+        /**
+         * read_prop device 658  object object device prop active_cov_subscriptions
+         * 7 subscriptions all context tagged and nested -.-
+         */
+        auto generated = bacnet::make_binary<bacnet::hex_string>("0c0200029219983e0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0040000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0000000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000119551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c00c0000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0140000019551f29013b013e0d3f");
+
+
+        auto start = generated.begin();
+        auto end = generated.end();
+        bacnet::type::possible_type unknown_data_parsed;
+        bacnet::apdu::type::detail::parser::possible_type_grammar<decltype(start)> grammar_parse;
+        auto success = boost::spirit::qi::parse(start, end, grammar_parse, unknown_data_parsed);
+        std::cout << "unknown_data_parsed " << std::dec <<  pre::json::to_json(unknown_data_parsed).dump(2) << std::endl;
+
+        BOOST_TEST(success, " failed parsing data");
+
+
+      }
 
 
 

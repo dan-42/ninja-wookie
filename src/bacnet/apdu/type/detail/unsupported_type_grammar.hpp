@@ -33,7 +33,7 @@
 #include <bacnet/apdu/type/detail/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/constructed_type.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
-#include <bacnet/type/unknown_data.hpp>
+#include <bacnet/type/unsupported_type.hpp>
 #include <boost/fusion/include/out.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
@@ -47,24 +47,57 @@ using boost::spirit::qi::_1;
 using boost::spirit::qi::_pass;
 using boost::phoenix::bind;
 
+/**
+ * EXAMPLE
+ * device 658  object object device prop active_cov_subscriptions
+ * 7 subscriptions all context tagged and nested -.-
+ *
+    auto generated = bacnet::make_binary<bacnet::hex_string>("0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c");
+
+0e                    //open_tag
+  0e                    //open_tag
+    1e                    //open_tag
+      21                    //simple_tag
+        01                    //value
+      6506                  //simple_tag
+        0a0f90e4bac0          //value
+    1f                    //closing_tag
+  0f                    //closing_tag
+  1a                    //simple_tag
+    1260                  //value
+0f                    //closing_tag
+1e                    //open_tag
+  0c                    //simple_tag
+    61000000              //value
+  19                    //simple_tag
+    55                    //value
+1f                    //closing_tag
+29                    //simple_tag
+  01                    //value
+3b                    //simple_tag
+  013e0c                //value
+
+
+*/
+
+
 
 template<typename Iterator>
-struct unknown_data_grammar : grammar<Iterator, bacnet::type::unknown_data()> {
+struct unsupported_type_grammar : grammar<Iterator, bacnet::type::unsupported_type()> {
 
 
-    rule<Iterator, bacnet::type::unknown_data()>  start_rule;
+    rule<Iterator, bacnet::type::unsupported_type()>  start_rule;
 
-    rule<Iterator, bacnet::type::unknown_data()>  context_rule;
-    rule<Iterator, bacnet::type::unknown_data()>  primitive_rule;
-    rule<Iterator, bacnet::binary_data()>         unknown_data_rule;
-    rule<Iterator, bacnet::binary_data()>         fixed_data_rule;
+    rule<Iterator, bacnet::type::unsupported_type()>  context_rule;
+    rule<Iterator, bacnet::type::unsupported_type()>  primitive_rule;
+    rule<Iterator, bacnet::binary_data()>             fixed_data_rule;
 
 
     rule<Iterator>                         open_tag_rule;
-    rule<Iterator>                         close_tag_rule;
+    rule<Iterator, void(uint8_t)>          close_tag_rule;
     tag_grammar<Iterator>                  tag_grammar_;
 
-    unknown_data_grammar() :  unknown_data_grammar::base_type(start_rule) {
+    unsupported_type_grammar() :  unsupported_type_grammar::base_type(start_rule) {
       setup();
     }
 
@@ -72,50 +105,46 @@ struct unknown_data_grammar : grammar<Iterator, bacnet::type::unknown_data()> {
 private:
 
     inline void setup() {
-      /*
-      start_rule        =  open_tag_rule
-                        >>
-                          (    primitive_rule
-                            |  context_rule
-                          )
-                        ;
-*/
 
-      start_rule        =  open_tag_rule
+      start_rule        = primitive_rule
+                        |  context_rule
+                        ;
+
+
+      /*start_rule        =  open_tag_rule
                         >> primitive_rule
                         ;
+      */
 
-      primitive_rule    =  eps(    boost::phoenix::bind(&tag::is_primitive_context_tag,  ref(open_tag_)) == true)
+      primitive_rule    =  open_tag_rule
+                        >> eps(    boost::phoenix::bind(&tag::is_primitive_context_tag,  ref(open_tag_)) == true)
                         >> attr(   ref(open_tag_.number_))
                         >> fixed_data_rule
                         ;
 
-      context_rule      =  eps(    boost::phoenix::bind(&tag::is_opening_tag,            ref(open_tag_)) == true)
+      context_rule      =  open_tag_rule
+                        >> eps(    boost::phoenix::bind(&tag::is_opening_tag,            ref(open_tag_)) == true)
                         >> attr(   ref(open_tag_.number_))
-                        >> unknown_data_rule
-                        >> close_tag_rule
+                        >> start_rule
+                        >> close_tag_rule(ref(closing_tag_matcher))
                         ;
 
       fixed_data_rule   = repeat( ref(open_tag_.length_value_type_) )[byte_];
 
-      unknown_data_rule = *(byte_  -byte_( ref( closing_tag_matcher) )  );
 
-
-      open_tag_rule    = tag_grammar_[ boost::phoenix::bind(&unknown_data_grammar::extract_tag,  this, _1, _pass) ];
-      close_tag_rule   = tag_grammar_[ boost::phoenix::bind(&unknown_data_grammar::check_close_tag, this, _1, _pass) ];
+      open_tag_rule    = tag_grammar_[ boost::phoenix::bind(&unsupported_type_grammar::extract_tag,  this, _1, _pass) ];
+      close_tag_rule   = byte_(_r1);//tag_grammar_[ boost::phoenix::bind(&unsupported_type_grammar::check_close_tag, this, _1, _pass) ];
       ///*
       start_rule        .name("unknown_data_grammar_start_rule");
       primitive_rule    .name("unknown_data_grammar_primitive_rule");
       context_rule      .name("unknown_data_grammar_context_rule");
       fixed_data_rule   .name("unknown_data_grammar_fixed_data_rule");
-      unknown_data_rule .name("unknown_data_grammar_unknown_data_rule");
       open_tag_rule     .name("unknown_data_grammar_open_tag_rule");
       close_tag_rule    .name("unknown_data_grammar_close_tag_rule");
       debug(start_rule);
       debug(start_rule);
       debug(context_rule);
       debug(fixed_data_rule);
-      debug(unknown_data_rule);
       debug(open_tag_rule);
       debug(close_tag_rule);
      //*/
@@ -128,7 +157,7 @@ private:
         open_tag_           = t;
         close_tag_          = t;
         close_tag_.length_value_type_  = tag::closing_tag_indication;
-        simple_tag st{t};
+        simple_tag st{close_tag_};
         closing_tag_matcher = st.to_binary();
         std::cerr << "extract_tag(): closing_tag_matcher:" << std::hex << (int)closing_tag_matcher << std::endl;
       }
@@ -140,7 +169,8 @@ private:
     inline void check_close_tag(tag& t, bool& pass) {
       if(    t.is_closing_tag()
           && t.is_context_tag()
-          && t.number() == open_tag_.number() ) {
+          //&& t.number() == open_tag_.number()
+          ) {
         pass = true;
       }
       else {

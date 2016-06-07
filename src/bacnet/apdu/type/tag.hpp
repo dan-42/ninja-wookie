@@ -44,9 +44,9 @@ enum class  application_tag : uint8_t {
     date                     = 10,
     time                     = 11,
     bacnet_object_identifier = 12,
-  reserved_13              = 13,
-  reserved_14              = 14,
-  reserved_15              = 15
+    reserved_13              = 13,
+    reserved_14              = 14,
+    reserved_15              = 15
 };
 
 

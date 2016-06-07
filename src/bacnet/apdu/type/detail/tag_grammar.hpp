@@ -107,7 +107,7 @@ namespace bacnet { namespace apdu {  namespace type {
 struct simple_tag {
 
     static constexpr uint8_t extended_tag_number_indication   = 0b1111;
-    static constexpr uint8_t extended_length_value_0_byte_min = 0b101; //stored in tag
+    static constexpr uint8_t extended_length_value_0_byte_min = 0b0101; //stored in tag
 
 
     uint8_t length_value_type_         : 3;
@@ -151,12 +151,13 @@ struct simple_tag {
       uint8_t data{0x00};
       uint8_t tmp{0x00};
 
-      data = number_ << 4;
+      tmp   = number_ & 0x0F;
+      data  = tmp << 4;
 
-      tmp = is_context_tag() ?  0x01  :  0x00;
+      tmp   = is_context_tag() ?  0x01  :  0x00;
       data |= tmp << 3;
 
-      tmp   = length_value_type();
+      tmp   = length_value_type() & 0x07;
       data |= tmp;
 
       return data;

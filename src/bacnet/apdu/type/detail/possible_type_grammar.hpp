@@ -52,7 +52,7 @@
 #include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
 
 #include <bacnet/apdu/type/detail/constructed_type.hpp>
-#include <bacnet/apdu/type/detail/unknown_data_grammar.hpp>
+#include <bacnet/apdu/type/detail/unsupported_type_grammar.hpp>
 
 
 
@@ -99,7 +99,7 @@ struct possible_type_grammar : grammar<Iterator, possible_type()>, constructed_t
     time_grammar<Iterator>                    time_grammar_;
     object_identifier_grammar<Iterator>       object_identifier_grammar_;
 
-    unknown_data_grammar<Iterator>            unknown_data_grammar_;
+    unsupported_type_grammar<Iterator>            unknown_data_grammar_;
 
     unused_grammar<Iterator> unused_grammar_;
     possible_type_grammar() :  possible_type_grammar::base_type(start_rule) {

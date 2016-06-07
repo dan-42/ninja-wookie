@@ -23,7 +23,7 @@
 #include <bacnet/type/date.hpp>
 #include <bacnet/type/time.hpp>
 #include <bacnet/type/object_identifier.hpp>
-#include <bacnet/type/unknown_data.hpp>
+#include <bacnet/type/unsupported_type.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 
 namespace bacnet { namespace type {
@@ -49,7 +49,7 @@ typedef boost::variant<
     boost::recursive_wrapper<sequence>,
 
 
-    unknown_data
+    unsupported_type
                         > possible_type;
 
 struct sequence {
