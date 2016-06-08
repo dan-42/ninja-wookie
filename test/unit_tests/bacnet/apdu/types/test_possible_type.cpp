@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
 
-
+  std::cout << "-----------------------------------------------------------" << std::endl;
     {
 
       bacnet::binary_data generated;
@@ -90,17 +90,28 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
       //BOOST_TEST(to_generate_real == to_generate_real, " failed generated and parsed ar not the same");
     }
-
+    std::cout << "-----------------------------------------------------------" << std::endl;
 
     {
 
 
-        /**
-         * read_prop device 658  object object device prop active_cov_subscriptions
-         * 7 subscriptions all context tagged and nested -.-
-         */
-        auto generated = bacnet::make_binary<bacnet::hex_string>("0c0200029219983e0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0040000019551f29013b013e0c0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0000000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0100000119551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c00c0000019551f29013b013e0d0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c0140000019551f29013b013e0d3f");
+      /**
+       * device 658  object object device prop active_cov_subscriptions
+       * 7 subscriptions all context tagged and nested -.-
+       */
+      auto generated = bacnet::make_binary<bacnet::hex_string>("0e1e210165060a0f90e4bac01f0f");
+/*
 
+  0e                    //open_tag
+    1e                    //open_tag
+      21                    //simple_tag
+        01                    //value
+      6506                  //simple_tag
+        0a0f90e4bac0          //value
+    1f                    //closing_tag
+  0f                    //closing_tag
+
+  */
 
         auto start = generated.begin();
         auto end = generated.end();
@@ -114,7 +125,55 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
       }
 
+    std::cout << "-----------------------------------------------------------" << std::endl;
 
+
+
+
+    {
+
+
+         /**
+          * device 658  object object device prop active_cov_subscriptions
+          * 7 subscriptions all context tagged and nested -.-
+          */
+         auto generated = bacnet::make_binary<bacnet::hex_string>("0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c");
+ /*
+  0e                    //open_tag
+   0e                    //open_tag
+     1e                    //open_tag
+       21                    //simple_tag
+         01                    //value
+       6506                  //simple_tag
+         0a0f90e4bac0          //value
+     1f                    //closing_tag
+   0f                    //closing_tag
+   1a                    //simple_tag
+     1260                  //value
+  0f                    //closing_tag
+  1e                    //open_tag
+   0c                    //simple_tag
+     61000000              //value
+   19                    //simple_tag
+     55                    //value
+  1f                    //closing_tag
+  29                    //simple_tag
+   01                    //value
+  3b                    //simple_tag
+   013e0c                //value
+   */
+
+           auto start = generated.begin();
+           auto end = generated.end();
+           bacnet::type::possible_type unknown_data_parsed;
+           bacnet::apdu::type::detail::parser::possible_type_grammar<decltype(start)> grammar_parse;
+           auto success = boost::spirit::qi::parse(start, end, grammar_parse, unknown_data_parsed);
+           std::cout << "unknown_data_parsed " << std::dec <<  pre::json::to_json(unknown_data_parsed).dump(2) << std::endl;
+
+           BOOST_TEST(success, " failed parsing data");
+
+
+         }
 
 }
 

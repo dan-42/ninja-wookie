@@ -22,7 +22,7 @@ namespace bacnet { namespace type {
 
     template<typename Out>
     inline friend Out& operator<<(Out& os, const unsupported_type& v) {
-        os << "context_tag:" << v.tag_number << ";    value: " ;
+        os << "context_tag:" << (int)v.tag_number << ";    value: " ;
         for(auto &c : v.value) {
            os << std::setfill('0') << std::setw(2) << std::hex << (int)c;
         }

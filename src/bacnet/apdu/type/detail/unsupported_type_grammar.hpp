@@ -47,52 +47,18 @@ using boost::spirit::qi::_1;
 using boost::spirit::qi::_pass;
 using boost::phoenix::bind;
 
-/**
- * EXAMPLE
- * device 658  object object device prop active_cov_subscriptions
- * 7 subscriptions all context tagged and nested -.-
- *
-    auto generated = bacnet::make_binary<bacnet::hex_string>("0e0e1e210165060a0f90e4bac01f0f1a12600f1e0c6100000019551f29013b013e0c");
-
-0e                    //open_tag
-  0e                    //open_tag
-    1e                    //open_tag
-      21                    //simple_tag
-        01                    //value
-      6506                  //simple_tag
-        0a0f90e4bac0          //value
-    1f                    //closing_tag
-  0f                    //closing_tag
-  1a                    //simple_tag
-    1260                  //value
-0f                    //closing_tag
-1e                    //open_tag
-  0c                    //simple_tag
-    61000000              //value
-  19                    //simple_tag
-    55                    //value
-1f                    //closing_tag
-29                    //simple_tag
-  01                    //value
-3b                    //simple_tag
-  013e0c                //value
-
-
-*/
-
-
 
 template<typename Iterator>
 struct unsupported_type_grammar : grammar<Iterator, bacnet::type::unsupported_type()> {
 
-
     rule<Iterator, bacnet::type::unsupported_type()>  start_rule;
-    rule<Iterator, uint32_t()>                        tag_number_rule;
+    rule<Iterator>                                    tag_rule;
+    rule<Iterator, uint8_t()>                         tag_number_rule;
     rule<Iterator, bacnet::binary_data()>             data_rule;
-    //rule<Iterator, std::string()>                     data_rule;
     tag_grammar<Iterator>                             tag_grammar_;
 
-    uint32_t data_length_{0};
+    uint32_t    data_length_{0};
+    uint8_t     tag_number_{0};
 
     unsupported_type_grammar() :  unsupported_type_grammar::base_type(start_rule) {
       setup();
@@ -102,14 +68,17 @@ private:
     uint_parser<uint8_t, 16, 2, 2> hex8;
     inline void setup() {
 
-      start_rule        =  tag_number_rule
-                        >> data_rule
-                         ;
+      start_rule       =   tag_rule
+                       >>  tag_number_rule
+                       >>  data_rule
+                        ;
 
-      tag_number_rule   = tag_grammar_[ _val = boost::phoenix::bind(&unsupported_type_grammar::extract_tag, this,  _1, _pass) ];
+      tag_rule          =  tag_grammar_[ boost::phoenix::bind(&unsupported_type_grammar::extract_tag, this,  _1, _pass) ]
+                        ;
+
+      tag_number_rule   = attr( ref(tag_number_));
 
       data_rule         = repeat( ref(data_length_) )[byte_];
-      //data_rule         = repeat( ref(data_length_) )[hex8];
 
       //
       /*
@@ -122,17 +91,15 @@ private:
      // */
     }
 
-    inline uint32_t extract_tag(tag& t, bool pass) {
-      //std::cout << "extract_tag(): " << t << std::endl;
-      if( t.is_primitive_context_tag() ) {
-        pass                = true;
+    inline void extract_tag(const tag& t, bool& pass) {
+      if(t.is_primitive_context_tag() ) {
+        pass         = true;
         data_length_ = t.length_value_type();
-        return t.number();
+        tag_number_  = t.number();
       }
       else {
         pass = false;
       }
-      return 0;
     }
 };
 

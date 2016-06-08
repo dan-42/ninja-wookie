@@ -63,8 +63,8 @@ possible_type;
 
 
 struct constructed_type {
-   uint32_t tag_number{0};
-   possible_type value;
+   uint8_t tag_number{0};
+   std::vector< possible_type> value ;
  };
 
 
