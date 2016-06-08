@@ -98,8 +98,8 @@ struct tag {
 
     inline void length_value_type(uint32_t v) { length_value_type_ = v; }
 
-    inline bool is_opening_tag() { return (is_context_tag_ && length_value_type_ == opening_tag_indication); }
-    inline bool is_closing_tag() { return (is_context_tag_ && length_value_type_ == closing_tag_indication); }
+    inline bool is_opening_tag() const { return (is_context_tag_ && length_value_type_ == opening_tag_indication); }
+    inline bool is_closing_tag() const { return (is_context_tag_ && length_value_type_ == closing_tag_indication); }
     inline bool is_primitive_context_tag() { return (    is_context_tag_
                                                       && length_value_type_ != opening_tag_indication
                                                       && length_value_type_ != closing_tag_indication); }

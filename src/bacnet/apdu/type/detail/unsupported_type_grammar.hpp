@@ -87,103 +87,53 @@ struct unsupported_type_grammar : grammar<Iterator, bacnet::type::unsupported_ty
 
 
     rule<Iterator, bacnet::type::unsupported_type()>  start_rule;
+    rule<Iterator, uint32_t()>                        tag_number_rule;
+    rule<Iterator, bacnet::binary_data()>             data_rule;
+    //rule<Iterator, std::string()>                     data_rule;
+    tag_grammar<Iterator>                             tag_grammar_;
 
-    rule<Iterator, bacnet::type::unsupported_type()>  context_rule;
-    rule<Iterator, bacnet::type::unsupported_type()>  primitive_rule;
-    rule<Iterator, bacnet::binary_data()>             fixed_data_rule;
-
-
-    rule<Iterator>                         open_tag_rule;
-    rule<Iterator, void(uint8_t)>          close_tag_rule;
-    tag_grammar<Iterator>                  tag_grammar_;
+    uint32_t data_length_{0};
 
     unsupported_type_grammar() :  unsupported_type_grammar::base_type(start_rule) {
       setup();
     }
 
-
 private:
-
+    uint_parser<uint8_t, 16, 2, 2> hex8;
     inline void setup() {
 
-      start_rule        = primitive_rule
-                        |  context_rule
-                        ;
+      start_rule        =  tag_number_rule
+                        >> data_rule
+                         ;
 
+      tag_number_rule   = tag_grammar_[ _val = boost::phoenix::bind(&unsupported_type_grammar::extract_tag, this,  _1, _pass) ];
 
-      /*start_rule        =  open_tag_rule
-                        >> primitive_rule
-                        ;
-      */
+      data_rule         = repeat( ref(data_length_) )[byte_];
+      //data_rule         = repeat( ref(data_length_) )[hex8];
 
-      primitive_rule    =  open_tag_rule
-                        >> eps(    boost::phoenix::bind(&tag::is_primitive_context_tag,  ref(open_tag_)) == true)
-                        >> attr(   ref(open_tag_.number_))
-                        >> fixed_data_rule
-                        ;
-
-      context_rule      =  open_tag_rule
-                        >> eps(    boost::phoenix::bind(&tag::is_opening_tag,            ref(open_tag_)) == true)
-                        >> attr(   ref(open_tag_.number_))
-                        >> start_rule
-                        >> close_tag_rule(ref(closing_tag_matcher))
-                        ;
-
-      fixed_data_rule   = repeat( ref(open_tag_.length_value_type_) )[byte_];
-
-
-      open_tag_rule    = tag_grammar_[ boost::phoenix::bind(&unsupported_type_grammar::extract_tag,  this, _1, _pass) ];
-      close_tag_rule   = byte_(_r1);//tag_grammar_[ boost::phoenix::bind(&unsupported_type_grammar::check_close_tag, this, _1, _pass) ];
-      ///*
+      //
+      /*
       start_rule        .name("unknown_data_grammar_start_rule");
-      primitive_rule    .name("unknown_data_grammar_primitive_rule");
-      context_rule      .name("unknown_data_grammar_context_rule");
-      fixed_data_rule   .name("unknown_data_grammar_fixed_data_rule");
-      open_tag_rule     .name("unknown_data_grammar_open_tag_rule");
-      close_tag_rule    .name("unknown_data_grammar_close_tag_rule");
+      data_rule         .name("data_rule");
+      tag_number_rule   .name("tag_number_rule");
       debug(start_rule);
-      debug(start_rule);
-      debug(context_rule);
-      debug(fixed_data_rule);
-      debug(open_tag_rule);
-      debug(close_tag_rule);
-     //*/
+      debug(data_rule);
+      debug(tag_number_rule);
+     // */
     }
 
-    inline void extract_tag(tag& t, bool& pass) {
-      std::cout << "extract_tag(): " << t << std::endl;
-      if(t.is_context_tag()) {
+    inline uint32_t extract_tag(tag& t, bool pass) {
+      //std::cout << "extract_tag(): " << t << std::endl;
+      if( t.is_primitive_context_tag() ) {
         pass                = true;
-        open_tag_           = t;
-        close_tag_          = t;
-        close_tag_.length_value_type_  = tag::closing_tag_indication;
-        simple_tag st{close_tag_};
-        closing_tag_matcher = st.to_binary();
-        std::cerr << "extract_tag(): closing_tag_matcher:" << std::hex << (int)closing_tag_matcher << std::endl;
+        data_length_ = t.length_value_type();
+        return t.number();
       }
       else {
         pass = false;
       }
+      return 0;
     }
-
-    inline void check_close_tag(tag& t, bool& pass) {
-      if(    t.is_closing_tag()
-          && t.is_context_tag()
-          //&& t.number() == open_tag_.number()
-          ) {
-        pass = true;
-      }
-      else {
-        pass = false;
-      }
-    }
-
-    tag open_tag_;
-    tag close_tag_;
-    uint8_t closing_tag_matcher{0x00};
-
-
-
 };
 
 }}}}}

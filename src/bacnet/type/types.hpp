@@ -29,9 +29,14 @@
 namespace bacnet { namespace type {
 
 
-struct sequence;
 
-typedef boost::variant<
+
+
+struct constructed_type;
+
+//typedef boost::variant<
+typedef boost::make_recursive_variant<
+
     null,
     boolean,
     unsigned_integer,
@@ -46,25 +51,32 @@ typedef boost::variant<
     time,
     object_identifier,
 
-    boost::recursive_wrapper<sequence>,
+    unsupported_type,
+
+    //boost::recursive_variant_,
+    boost::recursive_wrapper< constructed_type >,
+    std::vector< boost::recursive_variant_>
 
 
-    unsupported_type
-                        > possible_type;
+    >::type
+possible_type;
 
-struct sequence {
-    std::vector<possible_type> values;
-    unused_t unused;
-};
+
+struct constructed_type {
+   uint32_t tag_number{0};
+   possible_type value;
+ };
+
 
 }}
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-  bacnet::type::sequence,
-  values,
-  unused
+  bacnet::type::constructed_type,
+  tag_number,
+  value
 );
+
 
 
 

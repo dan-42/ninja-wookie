@@ -13,20 +13,21 @@
 #include <bacnet/detail/common/types.hpp>
 
 
-
-
 namespace bacnet { namespace type {
 
-  struct unsupported_type;
-
-  typedef boost::variant<
-          bacnet::binary_data,
-          boost::recursive_wrapper< unsupported_type >
-      > unknown_data_t;
-
   struct unsupported_type {
-    uint32_t context_tag{0};
-    unknown_data_t value;
+    uint32_t tag_number{0};
+    bacnet::binary_data value;
+    //std::string value;
+
+    template<typename Out>
+    inline friend Out& operator<<(Out& os, const unsupported_type& v) {
+        os << "context_tag:" << v.tag_number << ";    value: " ;
+        for(auto &c : v.value) {
+           os << std::setfill('0') << std::setw(2) << std::hex << (int)c;
+        }
+        return os;
+      }
   };
 
 }}
@@ -35,23 +36,12 @@ namespace bacnet { namespace type {
 
 BOOST_FUSION_ADAPT_STRUCT(
   bacnet::type::unsupported_type,
-  context_tag,
+  tag_number,
   value
 );
 
 
 
-namespace bacnet { namespace type {
-
-  static std::ostream& operator<<(std::ostream& os, const unsupported_type& v) {
-    os << "context_tag:" << v.context_tag << ";    value: " ;//<< v.value << "; ";
- //   for(auto &c : v.value) {
- //      os << std::setfill('0') << std::setw(2) << std::hex << (int)c;
- //   }
-    return os;
-  }
-
-}}
 
 
 #endif /* NINJA_WOOKIE_BACNET_TYPE_UNKNOWN_DATA_HPP */

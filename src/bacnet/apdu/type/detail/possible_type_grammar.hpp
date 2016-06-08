@@ -69,20 +69,29 @@ using namespace bacnet::apdu::type::detail::parser;
 using phoenix::at_c;
 using phoenix::push_back;
 
+/* */
+
 template<typename Iterator>
-struct possible_type_grammar : grammar<Iterator, possible_type()>, constructed_type {
+struct possible_type_grammar : grammar<Iterator, possible_type(), locals<tag> >, constructed_type {
 
-
-    rule<Iterator, possible_type()>           start_rule;
+    typedef std::vector<possible_type>            sequence;
+    rule<Iterator, possible_type(), locals<tag>>  start_rule;
     rule<Iterator, possible_type()>           context_rule;
+
+
     rule<Iterator, possible_type()>           primitive_type_rule;
-    rule<Iterator, sequence()>                constructed_type_rule;
+    rule<Iterator, sequence()>                sequence_rule;
+    rule<Iterator, bacnet::type::constructed_type()>        constructed_type_rule;
     rule<Iterator, possible_type()>           value_rule;
 
 
     rule<Iterator>                            open_tag_rule;
     rule<Iterator>                            close_tag_rule;
     tag_grammar<Iterator>                     tag_grammar_;
+
+
+    rule<Iterator, tag()>                       nested_open_tag_rule;
+    rule<Iterator, void(tag)>                 nested_close_tag_rule;
 
 
     null_grammar<Iterator>                    null_grammar_;
@@ -99,7 +108,7 @@ struct possible_type_grammar : grammar<Iterator, possible_type()>, constructed_t
     time_grammar<Iterator>                    time_grammar_;
     object_identifier_grammar<Iterator>       object_identifier_grammar_;
 
-    unsupported_type_grammar<Iterator>            unknown_data_grammar_;
+    unsupported_type_grammar<Iterator>        unsupported_type_grammar_;
 
     unused_grammar<Iterator> unused_grammar_;
     possible_type_grammar() :  possible_type_grammar::base_type(start_rule) {
@@ -118,18 +127,26 @@ private:
                             | value_rule
                             ;
 
-
       context_rule          =  open_tag_rule
                             >> value_rule
                             >> close_tag_rule
                             ;
 
-      value_rule            = constructed_type_rule
+
+
+
+      value_rule            = sequence_rule
+                            | constructed_type_rule
                             | primitive_type_rule
                             ;
 
-      constructed_type_rule =  repeat(2, inf)[ primitive_type_rule ]
-                            >> unused_grammar_;
+      sequence_rule         =  repeat(2, inf)[ primitive_type_rule ]
+                            ;
+
+      constructed_type_rule &= nested_open_tag_rule[ _a = _1]
+                            > value_rule
+                            > nested_close_tag_rule(_a)
+                            ;
 
       primitive_type_rule   =  null_grammar_
                             |  boolean_grammar_
@@ -147,29 +164,47 @@ private:
                           //  |  value_rule
 
                             // must always be last
-                            | unknown_data_grammar_
+                            | unsupported_type_grammar_
                             ;
 
       open_tag_rule   = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
       close_tag_rule  = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
 
-      //      /*
+      nested_open_tag_rule  = tag_grammar_;
+      nested_close_tag_rule = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_nested_tag, this, _r1, _1, _pass) ];
+
+      //
+      /*
       start_rule            .name("possible_type_grammar_start_rule");
       context_rule          .name("possible_type_grammar_context_rule");
       value_rule            .name("possible_type_grammar_value_rule");
-      constructed_type_rule .name("possible_type_grammar_constructed_type_rule");
+      sequence_rule .name("possible_type_grammar_constructed_type_rule");
       primitive_type_rule   .name("possible_type_grammar_primitive_type_rule");
       open_tag_rule         .name("possible_type_grammar_open_tag_rule");
       close_tag_rule        .name("possible_type_grammar_close_tag_rule");
       debug(start_rule);
       debug(context_rule);
       debug(value_rule);
-      debug(constructed_type_rule);
+      debug(sequence_rule);
       debug(primitive_type_rule);
       debug(open_tag_rule);
       debug(close_tag_rule);
       // */
     }
+
+    inline void check_nested_tag(const tag& open, const tag& close, bool& pass) {
+      if(     open.is_opening_tag()
+          &&  open.is_context_tag()
+          &&  close.is_closing_tag()
+          &&  close.is_context_tag()
+          &&  open.number() == close.number()  ) {
+        pass = true;
+      }
+      else {
+        pass = false;
+      }
+    }
+
 };
 
 }}}}}
