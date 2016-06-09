@@ -29,7 +29,12 @@
 #include <bacnet/apdu/type/detail/possible_type_grammar.hpp>
 #include <bacnet/service/service/read_property_ack.hpp>
 
-
+/*
+ * notes
+ * http://stackoverflow.com/questions/23763233/boost-spirit-using-local-variables
+ * http://stackoverflow.com/questions/12653407/runtime-value-to-type-mapping
+ * http://gpfault.net/posts/mapping-types-to-values.txt.html
+ */
 
 namespace bacnet { namespace service { namespace service { namespace detail { namespace parser {
 
@@ -46,7 +51,7 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
   rule<Iterator, object_identifier()>               object_identifier_rule;
   rule<Iterator, uint32_t()>                        property_identifier_rule;
   rule<Iterator, boost::optional<uint32_t>()>       property_array_index_rule;
-  rule<Iterator, bacnet::type::possible_type()>     possible_type_grammar_rule;
+  rule<Iterator, bacnet::type::possible_type(object_identifier, uint32_t, boost::optional<uint32_t>)>     possible_type_grammar_rule;
 
   object_identifier_grammar<Iterator>      tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
@@ -55,17 +60,19 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
 
   read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule) {
 
-    start_rule                          =  byte_(service_choice<service::read_property_ack>::value)
-                                        >> object_identifier_rule
-                                        >> property_identifier_rule
-                                        >> property_array_index_rule
-                                        >> possible_type_grammar_rule
+    start_rule                          %=  byte_(service_choice<service::read_property_ack>::value)
+                                        >> object_identifier_rule[ _a = _val]
+                                        >> property_identifier_rule[ _b = _val]
+                                        >> property_array_index_rule[ _c = _val]
+                                        >> possible_type_grammar_rule(_a, _b, _c)
                                         ;
 
     object_identifier_rule              =  tag_0_rule_;
     property_identifier_rule            =  tag_1_rule_;
     property_array_index_rule           = -tag_2_rule_;
-    possible_type_grammar_rule          =  tag_3_rule_;
+    //possible_type_grammar_rule          =  tag_3_rule_;
+
+    possible_type_grammar_rule          =  tag_3_rule_(_r1, _r2, _r3);
 
     //
     /*
