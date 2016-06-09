@@ -82,12 +82,12 @@ using phoenix::push_back;
 /* */
 
 template<typename Iterator>
-struct possible_type_grammar : grammar<Iterator, possible_type(), locals<object_identifier, uint32_t, boost::optional<uint32_t> > > {
+struct possible_type_grammar : grammar<Iterator, possible_type() > {
 
     typedef std::vector<possible_type>            sequence;
     typedef bacnet::type::constructed_type        constructed;
 
-    rule<Iterator, possible_type(), locals<object_identifier, uint32_t, boost::optional<uint32_t> > >  start_rule;
+    rule<Iterator, possible_type() >  start_rule;
 
 
     rule<Iterator, possible_type()>                   primitive_rule;
