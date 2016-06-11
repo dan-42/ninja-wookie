@@ -162,18 +162,10 @@ private:
       nested_open_tag_rule  = tag_grammar_[ _val = boost::phoenix::bind(&possible_type_grammar::is_context_open_tag, this, _1, _pass) ];
       nested_close_tag_rule = tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_nested_tag, this, _r1, _1, _pass) ];
 
-
-
-                            /**
-                             * here we have :
-                             * _r1 = object_identifier
-                             * _r2 = property
-                             * _r3 = optional<index>
-                             */
       start_rule           %= sequence_rule
                             ;
 
-      sequence_rule       %= *value_rule;
+      sequence_rule        %= *value_rule;
 
 
 
@@ -183,11 +175,8 @@ private:
                             ;
 
 
-
-
-
-
-      //      /*
+      //
+      /*
       start_rule            .name("possible_type_grammar_start_rule");
       value_rule            .name("possible_type_grammar_value_rule");
       constructed_rule      .name("possible_type_grammar_constructed_type_rule");

@@ -401,6 +401,7 @@ WOOKIE_DEFINE_BACNET_PROPERTIES(
 
 }}}
 
+/*
 void test() {
 
   using namespace bacnet::type;
@@ -412,7 +413,7 @@ void test() {
   auto is_speciial_property = property::is_special_property < property::all>::value;
 
 }
-
+*/
 
 
 #endif /* NINJA_WOOKIE_BACNET_TYPE_PROPERTIE_HPP_ */
