@@ -32,7 +32,7 @@
 #include <bacnet/apdu/detail/boost/uint24_parser.hpp>
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
 
-#include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {

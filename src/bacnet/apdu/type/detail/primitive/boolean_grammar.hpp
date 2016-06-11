@@ -29,7 +29,7 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {

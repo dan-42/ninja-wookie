@@ -30,7 +30,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 
-#include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/enumeration_grammar.hpp>
 #include <bacnet/apdu/type/detail/constructed_type.hpp>
 #include <bacnet/type/error.hpp>
 

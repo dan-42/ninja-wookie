@@ -23,7 +23,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/detail/octet_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/octet_string_grammar.hpp>
 
 
 

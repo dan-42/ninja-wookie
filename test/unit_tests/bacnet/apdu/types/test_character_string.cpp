@@ -24,7 +24,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/type/character_string.hpp>
-#include <bacnet/apdu/type/detail/character_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/character_string_grammar.hpp>
 
 
 bool is_equal(const bacnet::type::character_string& a, const bacnet::type::character_string& b) {

@@ -24,7 +24,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/type/null.hpp>
-#include <bacnet/apdu/type/detail/null_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/null_grammar.hpp>
 
 
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {

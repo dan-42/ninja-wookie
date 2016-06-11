@@ -23,7 +23,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/detail/boolean_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/boolean_grammar.hpp>
 
 
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {

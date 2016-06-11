@@ -27,7 +27,7 @@
 #include <bacnet/detail/common/types.hpp>
 
 #include <bacnet/apdu/frame/error.hpp>
-#include <bacnet/apdu/type/detail/error_grammar.hpp>
+#include <bacnet/apdu/type/detail/constructed/error_grammar.hpp>
 #include <bacnet/apdu/detail/pdu_type.hpp>
 
 

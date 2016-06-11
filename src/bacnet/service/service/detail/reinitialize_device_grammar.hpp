@@ -63,8 +63,8 @@ Service ACK Choice=20 (ReinitializeDevice)
 
 #include <bacnet/apdu/type/tag.hpp>
 #include <bacnet/type/character_string.hpp>
-#include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
-#include <bacnet/apdu/type/detail/character_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/enumeration_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/character_string_grammar.hpp>
 
 
 namespace bacnet { namespace service { namespace service { namespace detail { namespace parser {

@@ -24,7 +24,7 @@
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/service/service/who_is.hpp>
 
-#include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsigned_integer_grammar.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace detail {
 

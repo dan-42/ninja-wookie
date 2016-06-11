@@ -24,7 +24,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/type/bit_string.hpp>
-#include <bacnet/apdu/type/detail/bit_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/bit_string_grammar.hpp>
 
 
 bool is_equal(const bacnet::type::bit_string& a, const bacnet::type::bit_string& b) {

@@ -24,7 +24,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/type/time.hpp>
-#include <bacnet/apdu/type/detail/time_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/time_grammar.hpp>
 
 
 bool is_equal(const bacnet::type::time& a, const bacnet::type::time& b) {

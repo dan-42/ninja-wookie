@@ -24,9 +24,9 @@
 #include <pre/json/to_json.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/detail/possible_type_grammar.hpp>
-#include <bacnet/apdu/type/detail/real_grammar.hpp>
-#include <bacnet/apdu/type/detail/error_grammar.hpp>
-#include <bacnet/apdu/type/detail/unsupported_type_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/real_grammar.hpp>
+#include <bacnet/apdu/type/detail/constructed/error_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsupported_type_grammar.hpp>
 
 
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {

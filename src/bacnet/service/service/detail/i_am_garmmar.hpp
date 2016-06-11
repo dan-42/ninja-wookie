@@ -25,9 +25,9 @@
 #include <bacnet/service/service/i_am.hpp>
 
 
-#include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
-#include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
-#include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/enumeration_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/object_identifier_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsigned_integer_grammar.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace detail {
 

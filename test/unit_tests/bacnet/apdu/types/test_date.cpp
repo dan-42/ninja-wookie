@@ -24,7 +24,7 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/type/date.hpp>
-#include <bacnet/apdu/type/detail/date_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/date_grammar.hpp>
 
 
 bool is_equal(const bacnet::type::date& a, const bacnet::type::date& b) {

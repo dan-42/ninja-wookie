@@ -24,7 +24,7 @@
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/apdu/type/detail/helper.hpp>
+#include <bacnet/apdu/type/detail/util/helper.hpp>
 
 
 namespace bacnet { namespace apdu {  namespace type {

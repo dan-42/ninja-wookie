@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_DETAIL_date_GRAMMAR_HPP
-#define NINJA_WOOKIE_BACNET_APDU_TYPE_DETAIL_date_GRAMMAR_HPP
+#ifndef NINJA_WOOKIE_BACNET_APDU_TYPE_DETAIL_double_presision_GRAMMAR_HPP
+#define NINJA_WOOKIE_BACNET_APDU_TYPE_DETAIL_double_presision_GRAMMAR_HPP
 
 
 #include <boost/spirit/include/karma.hpp>
@@ -28,9 +28,8 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
-#include <bacnet/type/date.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -39,50 +38,50 @@ using namespace boost::spirit::qi;
 using namespace boost::phoenix;
 
 using bacnet::apdu::type::tag;
-using bacnet::type::date;
 
 template<typename Iterator>
-struct date_grammar : grammar<Iterator, date()>, primitive_type {
+struct double_presision_grammar : grammar<Iterator, double()>, primitive_type {
 
 
-  rule<Iterator, date()>      start_rule;
-  rule<Iterator>              tag_validation_rule;
-  rule<Iterator>              tag_rule;
-  rule<Iterator, date()>      value_rule;
-  tag_grammar<Iterator>       tag_grammar_;
+  rule<Iterator, double()>   start_rule;
+  rule<Iterator >            tag_validation_rule;
+  rule<Iterator, double()>   value_rule;
+
+  tag_grammar<Iterator>     tag_grammar_;
 
 
-  date_grammar()            : date_grammar::base_type(start_rule),
-                              primitive_type(application_tag::date) {
+  double_presision_grammar() : double_presision_grammar::base_type(start_rule),
+                              primitive_type(application_tag::double_presision) {
     setup();
   }
-  date_grammar(uint8_t tag) : date_grammar::base_type(start_rule),
-                              primitive_type(tag) {
+
+  double_presision_grammar(uint8_t tag) : double_presision_grammar::base_type(start_rule),
+                                          primitive_type(tag) {
     setup();
   }
 
 private:
 
   void setup() {
-    length_value_type_  = 4;
+    length_value_type_  = 8;
+
     start_rule          =  tag_validation_rule
                         >> value_rule ;
-    value_rule          =  byte_
-                        >> byte_
-                        >> byte_
-                        >> byte_;
 
-    tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&date_grammar::check_tag, this, _1, _pass) ];
+    value_rule          =  big_bin_double;
+    tag_validation_rule = tag_grammar_[ boost::phoenix::bind(&double_presision_grammar::check_tag, this, _1, _pass) ];
+
+    //
     /*
     start_rule.           name("start_rule");
     tag_validation_rule.  name("tag_validation_rule");
     value_rule.           name("value_rule");
     debug(start_rule);
     debug(tag_validation_rule);
+    debug(tag_rule);
     debug(value_rule);
     // */
   }
-
 };
 
 }}}}}
@@ -93,23 +92,22 @@ using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
 using bacnet::apdu::type::tag;
-using bacnet::type::date;
 
 template<typename Iterator>
-struct date_grammar : grammar<Iterator, date()> {
+struct double_presision_grammar : grammar<Iterator, double()> {
 
-  rule<Iterator, date()>      start_rule;
-  rule<Iterator>              tag_rule;
-  rule<Iterator, date()>      value_rule;
-  tag_grammar<Iterator>       tag_grammar_;
+  rule<Iterator, double()>                    start_rule;
+  rule<Iterator>                              tag_rule;
+  rule<Iterator, double()>                    value_rule;
+  tag_grammar<Iterator> tag_grammar_;
 
-  date_grammar()             : date_grammar::base_type(start_rule),
-                               tag_(application_tag::date, 4) {
+  double_presision_grammar()             : double_presision_grammar::base_type(start_rule),
+                                tag_(application_tag::double_presision, 8) {
     setup();
   }
 
-  date_grammar(uint8_t tag)  : date_grammar::base_type(start_rule),
-                               tag_(tag, true, 4) {
+  double_presision_grammar(uint8_t tag)  : double_presision_grammar::base_type(start_rule),
+                                tag_(tag, true, 8) {
     setup();
   }
 
@@ -118,16 +116,19 @@ private:
   void setup() {
     start_rule    =  tag_rule
                   << value_rule;
-    tag_rule      =  tag_grammar_[ _1 = boost::phoenix::bind(&date_grammar::get_tag, this)];
-    value_rule    =  byte_
-                  << byte_
-                  << byte_
-                  << byte_;
 
+    tag_rule      =  tag_grammar_[ _1 = boost::phoenix::bind(&double_presision_grammar::get_tag, this)];
+    value_rule    =  big_bin_double;
 
-    start_rule.   name("start_rule");
-    tag_rule.     name("tag_rule");
-    value_rule.   name("value_rule");
+    start_rule.name("start_rule");
+    tag_rule.name("tag_rule");
+    value_rule.name("value_rule");
+    //
+    /*
+    debug(start_rule);
+    debug(tag_rule);
+    debug(value_rule);
+    // */
   }
 
   tag get_tag() {
@@ -138,4 +139,4 @@ private:
 
 }}}}}
 
-#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_DETAIL_date_grammar_HPP
+#endif //NINJA_WOOKIE_BACNET_APDU_TYPE_DETAIL_double_presision_grammar_HPP

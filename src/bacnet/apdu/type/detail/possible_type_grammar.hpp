@@ -37,23 +37,22 @@
 #include <bacnet/type/types.hpp>
 #include <bacnet/detail/common/types.hpp>
 
-#include <bacnet/apdu/type/detail/null_grammar.hpp>
-#include <bacnet/apdu/type/detail/boolean_grammar.hpp>
-#include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
-#include <bacnet/apdu/type/detail/signed_integer_grammar.hpp>
-#include <bacnet/apdu/type/detail/real_grammar.hpp>
-#include <bacnet/apdu/type/detail/double_presision_grammar.hpp>
-#include <bacnet/apdu/type/detail/octet_string_grammar.hpp>
-#include <bacnet/apdu/type/detail/character_string_grammar.hpp>
-#include <bacnet/apdu/type/detail/bit_string_grammar.hpp>
-#include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
-#include <bacnet/apdu/type/detail/date_grammar.hpp>
-#include <bacnet/apdu/type/detail/time_grammar.hpp>
-#include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/null_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/boolean_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/signed_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/real_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/double_presision_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/octet_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/character_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/bit_string_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/enumeration_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/date_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/time_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/object_identifier_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsupported_type_grammar.hpp>
 
 #include <bacnet/apdu/type/detail/constructed_type.hpp>
-#include <bacnet/apdu/type/detail/unsupported_type_grammar.hpp>
-
 
 namespace boost { namespace spirit { namespace traits {
 
@@ -68,29 +67,24 @@ namespace boost { namespace spirit { namespace traits {
 }}}
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
-namespace fusion = boost::fusion;
-namespace phoenix = boost::phoenix;
-
-
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
-using namespace bacnet::type;
-using namespace bacnet::apdu::type::detail::parser;
-
+namespace phoenix = boost::phoenix;
+namespace type = bacnet::type;
 
 
 template<typename Iterator>
-struct possible_type_grammar : grammar<Iterator, possible_type() > , constructed_type{
+struct possible_type_grammar : grammar<Iterator, type::possible_type() > , constructed_type{
 
-    typedef std::vector<possible_type>                sequence;
+    typedef std::vector<type::possible_type>          sequence;
     typedef bacnet::type::constructed_type            constructed;
 
-    rule<Iterator, possible_type() >                  start_rule;
-    rule<Iterator, possible_type() >                  context_rule;
+    rule<Iterator, type::possible_type() >            start_rule;
+    rule<Iterator, type::possible_type() >            context_rule;
     rule<Iterator, sequence()>                        sequence_rule;
-    rule<Iterator, possible_type()>                   value_rule;
+    rule<Iterator, type::possible_type()>             value_rule;
     rule<Iterator, constructed(),  locals<uint8_t>>   constructed_rule;
-    rule<Iterator, possible_type()>                   primitive_rule;
+    rule<Iterator, type::possible_type()>             primitive_rule;
 
     rule<Iterator, uint8_t()>                         nested_open_tag_rule;
     rule<Iterator, void(uint8_t)>                     nested_close_tag_rule;
@@ -132,7 +126,7 @@ private:
                              ;
 
       context_rule          %=  open_tag_rule
-                            >>  sequence_rule
+                            >> (value_rule | sequence_rule)
                             >>  close_tag_rule
                             ;
 
@@ -143,8 +137,8 @@ private:
                              ;
 
       constructed_rule      %=  nested_open_tag_rule[ _a = _1]
-                             > *value_rule
-                             >  nested_close_tag_rule(_a)
+                            >> *value_rule
+                            >>  nested_close_tag_rule(_a)
                              ;
 
       primitive_rule         =  null_grammar_
@@ -164,11 +158,11 @@ private:
                              |  unsupported_type_grammar_
                              ;
 
-      nested_open_tag_rule   =  tag_grammar_[ _val =  boost::phoenix::bind(&possible_type_grammar::is_context_open_tag, this, _1, _pass) ];
-      nested_close_tag_rule  =  tag_grammar_[         boost::phoenix::bind(&possible_type_grammar::check_nested_tag,    this, _r1, _1, _pass) ];
+      nested_open_tag_rule   =  tag_grammar_[ _val =  phoenix::bind(&possible_type_grammar::is_context_open_tag, this, _1,      _pass) ];
+      nested_close_tag_rule  =  tag_grammar_[         phoenix::bind(&possible_type_grammar::check_nested_tag,    this, _r1, _1, _pass) ];
 
-      open_tag_rule          =  tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
-      close_tag_rule         =  tag_grammar_[ boost::phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
+      open_tag_rule          =  tag_grammar_[ phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
+      close_tag_rule         =  tag_grammar_[ phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
 
       //
       /*

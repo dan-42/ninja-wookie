@@ -23,7 +23,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/detail/enumeration_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/enumeration_grammar.hpp>
 #include <bacnet/type/enumerated.hpp>
 
 bool is_equal(const  bacnet::type::enumerated &a, const bacnet::type::enumerated& b) {

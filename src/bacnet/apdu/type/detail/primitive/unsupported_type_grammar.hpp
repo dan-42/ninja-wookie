@@ -30,7 +30,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 
 #include <bacnet/detail/common/types.hpp>
-#include <bacnet/apdu/type/detail/tag_grammar.hpp>
+#include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/constructed_type.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/unsupported_type.hpp>

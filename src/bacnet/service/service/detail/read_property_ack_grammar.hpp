@@ -25,42 +25,36 @@
 #include <boost/optional/optional_io.hpp>
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/tag.hpp>
-#include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
-#include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/object_identifier_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsigned_integer_grammar.hpp>
 #include <bacnet/apdu/type/detail/possible_type_grammar.hpp>
+#include <bacnet/apdu/type/detail/constructed_type.hpp>
 #include <bacnet/service/service/read_property_ack.hpp>
 #include <bacnet/type/properties.hpp>
 #include <bacnet/type/object_identifier.hpp>
-
-/*
- * notes
- * http://stackoverflow.com/questions/23763233/boost-spirit-using-local-variables
- * http://stackoverflow.com/questions/12653407/runtime-value-to-type-mapping
- * http://gpfault.net/posts/mapping-types-to-values.txt.html
- */
+#include <bacnet/object/mapping.hpp>
 
 namespace bacnet { namespace service { namespace service { namespace detail { namespace parser {
-//
-/*
 
-typedef uint32_t                                                         property_t;
+namespace type = bacnet::type;
+typedef uint32_t                                                          property_t;
 typedef uint32_t                                                          objct_t;
-typedef boost::spirit::qi::rule<bacnet::parse_iterator, possible_type()> rule_t;
+typedef boost::spirit::qi::rule<bacnet::parse_iterator, type::possible_type()>  rule_t;
 
 struct property_grammar {
     virtual ~property_grammar() {}
-    virtual rule_t& rule() = 0;
+    virtual rule_t* rule() = 0;
 };
 
 template <typename T>
 struct property_grammar_impl: public property_grammar {
 public:
   property_grammar_impl() : t_(){
-    rule_ = t_;
+    rule_ %= t_;
   }
 
-  virtual rule_t& rule() {
-    return rule_;
+  virtual rule_t* rule() final {
+    return &rule_;
   }
 
 private:
@@ -68,73 +62,83 @@ private:
   T t_;
 };
 
+
+typedef std::unique_ptr<property_grammar> property_grammar_ptr;
+
 template <typename T>
-std::unique_ptr<property_grammar> make_property_grammar() {
-    return std::unique_ptr<property_grammar>(new property_grammar_impl<T>());
+property_grammar_ptr make_property_grammar() {
+    return property_grammar_ptr(new property_grammar_impl<T>());
 }
 
+using property_grammar_map = std::map<mapping::type, property_grammar_ptr>;
 
-using maker = std::unique_ptr<property_grammar> (&)();
-using property_grammar_map = std::map<property_t, maker>;
-using object_property_map = std::map<objct_t, property_grammar_map>;
 
-rule_t& select(const object_identifier& o_id, const property_t p)  {
-    auto o = o_id.object_type;
 
-    namespace prop = bacnet::type::property;
-    namespace obj = bacnet::object_type;
 
-    static property_grammar_impl<possible_type_grammar<bacnet::parse_iterator>> default_grammar;
-    //static object_property_map opject_m;
+template<typename Iterator>
+rule_t* select(const object_identifier& r1,const uint32_t& p, const boost::optional<uint32_t>& r3) {
+
+    namespace prop    = bacnet::type::property;
+    namespace obj     = bacnet::object_type;
+    namespace grammar = bacnet::apdu::type::detail::parser;
+
+    static property_grammar_ptr default_rule;
+    if(default_rule == nullptr) {
+      default_rule = make_property_grammar<grammar::possible_type_grammar<Iterator> >();
+    }
+
     static property_grammar_map map;
 
     if (map.empty()) {
-      map.insert(std::make_pair(77, make_property_grammar<character_string_grammar<bacnet::parse_iterator>>));
-      map.insert(std::make_pair(76, make_property_grammar<character_string_grammar<bacnet::parse_iterator>>));
-    //  opject_m.insert(std::make_pair(obj::device, std::move(map)));
+        // primitive types
+        map.insert(  std::make_pair( mapping::type::application_tagged_type,           make_property_grammar<grammar::possible_type_grammar<Iterator>>()             ));
+        map.insert(  std::make_pair( mapping::type::null,                              make_property_grammar<grammar::null_grammar<Iterator>>()                      ));
+        map.insert(  std::make_pair( mapping::type::boolean,                           make_property_grammar<grammar::boolean_grammar<Iterator>>()                   ));
+        map.insert(  std::make_pair( mapping::type::unsigned_integer,                  make_property_grammar<grammar::unsigned_integer_grammar<Iterator>>()          ));
+        map.insert(  std::make_pair( mapping::type::signed_integer,                    make_property_grammar<grammar::signed_integer_grammar<Iterator>>()            ));
+        map.insert(  std::make_pair( mapping::type::real,                              make_property_grammar<grammar::real_grammar<Iterator>>()                      ));
+        map.insert(  std::make_pair( mapping::type::double_pressision,                 make_property_grammar<grammar::double_presision_grammar<Iterator>>()          ));
+        map.insert(  std::make_pair( mapping::type::octet_string,                      make_property_grammar<grammar::octet_string_grammar<Iterator>>()              ));
+        map.insert(  std::make_pair( mapping::type::character_string,                  make_property_grammar<grammar::character_string_grammar<Iterator>>()          ));
+        map.insert(  std::make_pair( mapping::type::bit_string,                        make_property_grammar<grammar::bit_string_grammar<Iterator>>()                ));
+        map.insert(  std::make_pair( mapping::type::enumerated,                        make_property_grammar<grammar::enumeration_grammar<Iterator>>()               ));
+        map.insert(  std::make_pair( mapping::type::date,                              make_property_grammar<grammar::date_grammar<Iterator>>()                      ));
+        map.insert(  std::make_pair( mapping::type::time,                              make_property_grammar<grammar::time_grammar<Iterator>>()                      ));
+        map.insert(  std::make_pair( mapping::type::object_identifier,                 make_property_grammar<grammar::object_identifier_grammar<Iterator>>()         ));
+        //special / constructed types
+//      map.insert(  std::make_pair( mapping::type::error,                             make_property_grammar<grammar::error_grammar<Iterator>>()                     ));
+//      map.insert(  std::make_pair( mapping::type::date_time,                         make_property_grammar<grammar::date_time_grammar<Iterator>>()                 ));
     }
 
-    auto it_obj = opject_m.find(o);
-    if (it_obj == opject_m.end() || it_obj->second.empty()) {
-      return default_grammar.rule();
-    }
+    auto t = mapping::select(r1.object_type, p);
 
-    property_grammar_map &prop_m  = it_obj->second;
-    auto it_prop = prop_m.find(p);
-    if (it_prop == prop_m.end() || it_prop->second == nullptr) {
-      return default_grammar.rule();
+    auto it_obj = map.find(t);
+    if (it_obj == map.end()  || it_obj->second == nullptr) {
+      std::cout << "using default grammar for objt_t " << r1.object_type << "  and prop " << p << std::endl;
+      return default_rule->rule();
     }
-    return (*it_prop->second)()->rule();
+    std::cout << "using mapped grammar for objt_t " << r1.object_type << "  and prop " << p << std::endl;
+    return (it_obj->second)->rule();
+
  }
 
 //*/
-typedef boost::spirit::qi::rule<bacnet::parse_iterator, possible_type()>                           any_rule_t;
-
-inline any_rule_t* select(const object_identifier& r1,const uint32_t& r2, const boost::optional<uint32_t>& r3) {
-    std::cout << "r1 " << r1 << std::endl;
-    std::cout << "r2 " << r2 << std::endl;
-    std::cout << "r3 " << r3.value_or(0) << std::endl;
-    static possible_type_grammar<bacnet::parse_iterator>                                   tag_3_rule_{3};
-    static any_rule_t rule;
-
-    rule %= tag_3_rule_;
 
 
-    return &rule;
 
-  }
+
+
 
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 
-using namespace bacnet::apdu::type;
 using namespace bacnet::apdu::type::detail::parser;
 
 template<typename Iterator>
-struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack() , locals<object_identifier, uint32_t, boost::optional<uint32_t> > > {
+struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack() , locals<object_identifier, uint32_t, boost::optional<uint32_t> > >, constructed_type {
 
-  typedef rule<Iterator, possible_type()>                           any_rule_t;
+  typedef rule<Iterator, type::possible_type()>                     any_rule_t;
 
   rule<Iterator, service::read_property_ack(),
                  locals<object_identifier,
@@ -145,21 +149,22 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
   rule<Iterator, uint32_t()>                                        property_identifier_rule;
   rule<Iterator, boost::optional<uint32_t>()>                       property_array_index_rule;
   rule<Iterator, bacnet::type::possible_type(
-                                              object_identifier,
-                                              uint32_t,
-                                              boost::optional<uint32_t>
-                                            ),
-                                            locals< any_rule_t*> >  possible_type_grammar_rule;
+                            object_identifier,
+                            uint32_t,
+                            boost::optional<uint32_t>
+                          ),
+                          locals< any_rule_t*> >                    possible_type_grammar_rule;
 
   rule<Iterator>                                                    select_rule;
-  any_rule_t                                                        any_rule;
+  rule<Iterator>                                                    open_tag_3_rule;
+  rule<Iterator>                                                    close_tag_3_rule;
 
   object_identifier_grammar<Iterator>                               tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>                                tag_1_rule_{1};
   unsigned_integer_grammar<Iterator>                                tag_2_rule_{2};
-  possible_type_grammar<Iterator>                                   tag_3_rule_{3};
+  tag_grammar<Iterator>                                             tag_grammar_;
 
-  read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule) {
+  read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule), constructed_type(3) {
 
     start_rule                          %=  byte_(service_choice<service::read_property_ack>::value)
                                         >>  object_identifier_rule   [ _a = _1]
@@ -172,45 +177,34 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     property_identifier_rule            =   tag_1_rule_;
     property_array_index_rule           =  -tag_2_rule_;
 
-  //possible_type_grammar_rule          %=  (select_rule[_a = boost::phoenix::bind(&read_property_ack_grammar::select_grammr, this, _r1, _r2, _r3)]
-    possible_type_grammar_rule          %=  (select_rule[_a = boost::phoenix::bind(&select, _r1, _r2, _r3)]
-                                        >>  qi::lazy(*_a));
+    possible_type_grammar_rule          %=  open_tag_3_rule
+                                        >>  (
+                                              select_rule[_a = boost::phoenix::bind(&select<Iterator>, _r1, _r2, _r3)]
+                                        >>    qi::lazy(*_a)
+                                            )
+                                        >>  close_tag_3_rule
+                                        ;
 
-    any_rule                            %=  tag_3_rule_;
+    select_rule                         =   eps;
 
-    select_rule                          =  eps;
+    open_tag_3_rule                     =  tag_grammar_[ boost::phoenix::bind(&read_property_ack_grammar::check_open_tag,  this, _1, _pass) ];
+    close_tag_3_rule                    =  tag_grammar_[ boost::phoenix::bind(&read_property_ack_grammar::check_close_tag, this, _1, _pass) ];
 
-
-
-    //    /*
-    start_rule.name("read_property_ack_grammar_start_rule");
-    object_identifier_rule.name("object_identifier_rule");
-    property_identifier_rule.name("property_identifier_rule");
-    property_array_index_rule.name("property_array_index_rule");
-    possible_type_grammar_rule.name("possible_type_grammar_rule");
-    select_rule.name("select_rule");
-    any_rule.name("any_rule");
-    select_rule.name("select_rule");
-
+    //
+    /*
+    start_rule                  .name("read_property_ack_grammar_start_rule");
+    object_identifier_rule      .name("object_identifier_rule");
+    property_identifier_rule    .name("property_identifier_rule");
+    property_array_index_rule   .name("property_array_index_rule");
+    possible_type_grammar_rule  .name("possible_type_grammar_rule");
+    select_rule                 .name("select_rule");
     debug(start_rule);
     debug(object_identifier_rule);
     debug(property_identifier_rule);
     debug(property_array_index_rule);
     debug(possible_type_grammar_rule);
     debug(select_rule);
-    debug(any_rule);
-    debug(select_rule);
     // */
-  }
-
-  inline any_rule_t* select_grammr(const object_identifier& r1,const uint32_t& r2, const boost::optional<uint32_t>& r3) {
-    /*std::cout << "r1 " << r1 << std::endl;
-    std::cout << "r2 " << r2 << std::endl;
-    std::cout << "r3 " << r3.value_or(0) << std::endl;
-    return &any_rule;*/
-
-    return select(r1, r2,r3);
-
   }
 
 };

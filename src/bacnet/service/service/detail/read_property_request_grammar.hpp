@@ -24,8 +24,8 @@
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/apdu/type/tag.hpp>
-#include <bacnet/apdu/type/detail/object_identifier_grammar.hpp>
-#include <bacnet/apdu/type/detail/unsigned_integer_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/object_identifier_grammar.hpp>
+#include <bacnet/apdu/type/detail/primitive/unsigned_integer_grammar.hpp>
 #include <bacnet/service/service/read_property_request.hpp>
 
 
