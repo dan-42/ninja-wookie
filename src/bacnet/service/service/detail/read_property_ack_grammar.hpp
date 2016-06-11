@@ -107,11 +107,23 @@ rule_t& select(const object_identifier& o_id, const property_t p)  {
     return (*it_prop->second)()->rule();
  }
 
-
-
-
-
 //*/
+typedef boost::spirit::qi::rule<bacnet::parse_iterator, possible_type()>                           any_rule_t;
+
+inline any_rule_t* select(const object_identifier& r1,const uint32_t& r2, const boost::optional<uint32_t>& r3) {
+    std::cout << "r1 " << r1 << std::endl;
+    std::cout << "r2 " << r2 << std::endl;
+    std::cout << "r3 " << r3.value_or(0) << std::endl;
+    static possible_type_grammar<bacnet::parse_iterator>                                   tag_3_rule_{3};
+    static any_rule_t rule;
+
+    rule %= tag_3_rule_;
+
+
+    return &rule;
+
+  }
+
 
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
@@ -122,53 +134,51 @@ using namespace bacnet::apdu::type::detail::parser;
 template<typename Iterator>
 struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack() , locals<object_identifier, uint32_t, boost::optional<uint32_t> > > {
 
+  typedef rule<Iterator, possible_type()>                           any_rule_t;
 
+  rule<Iterator, service::read_property_ack(),
+                 locals<object_identifier,
+                       uint32_t,
+                       boost::optional<uint32_t> >>                 start_rule;
 
-  typedef rule<Iterator, possible_type()>       any_rule_t;
-  any_rule_t any_rule;
+  rule<Iterator, object_identifier()>                               object_identifier_rule;
+  rule<Iterator, uint32_t()>                                        property_identifier_rule;
+  rule<Iterator, boost::optional<uint32_t>()>                       property_array_index_rule;
+  rule<Iterator, bacnet::type::possible_type(
+                                              object_identifier,
+                                              uint32_t,
+                                              boost::optional<uint32_t>
+                                            ),
+                                            locals< any_rule_t*> >  possible_type_grammar_rule;
 
+  rule<Iterator>                                                    select_rule;
+  any_rule_t                                                        any_rule;
 
-  rule<Iterator, service::read_property_ack(), locals<object_identifier, uint32_t, boost::optional<uint32_t> >>      start_rule;
-
-  rule<Iterator, object_identifier()>               object_identifier_rule;
-  rule<Iterator, uint32_t()>                        property_identifier_rule;
-  rule<Iterator, boost::optional<uint32_t>()>       property_array_index_rule;
-  rule<Iterator, bacnet::type::possible_type(object_identifier, uint32_t, boost::optional<uint32_t>),
-                  locals< any_rule_t*> >            possible_type_grammar_rule;
-
-  rule<Iterator>     select_rule;
-
-  object_identifier_grammar<Iterator>      tag_0_rule_{0};
-  unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
-  unsigned_integer_grammar<Iterator>       tag_2_rule_{2};
-  possible_type_grammar<Iterator>          tag_3_rule_{3};
+  object_identifier_grammar<Iterator>                               tag_0_rule_{0};
+  unsigned_integer_grammar<Iterator>                                tag_1_rule_{1};
+  unsigned_integer_grammar<Iterator>                                tag_2_rule_{2};
+  possible_type_grammar<Iterator>                                   tag_3_rule_{3};
 
   read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule) {
 
     start_rule                          %=  byte_(service_choice<service::read_property_ack>::value)
-                                        >> object_identifier_rule   [ _a = _1]
-                                        >> property_identifier_rule [ _b = _1]
-                                        >> property_array_index_rule[ _c = _1]
+                                        >>  object_identifier_rule   [ _a = _1]
+                                        >>  property_identifier_rule [ _b = _1]
+                                        >>  property_array_index_rule[ _c = _1]
                                         >>  possible_type_grammar_rule(_a, _b, _c  )
                                         ;
 
-    object_identifier_rule              =  tag_0_rule_;
-    property_identifier_rule            =  tag_1_rule_;
-    property_array_index_rule           = -tag_2_rule_;
+    object_identifier_rule              =   tag_0_rule_;
+    property_identifier_rule            =   tag_1_rule_;
+    property_array_index_rule           =  -tag_2_rule_;
 
-                                 /**
-                                 * here we have :
-                                 * _r1 = object_identifier
-                                 * _r2 = property
-                                 * _r3 = optional<index>
-                                 */
-    possible_type_grammar_rule          %=  (select_rule[_a = boost::phoenix::bind(&read_property_ack_grammar::select, this, _r1, _r2, _r3)]
-                                        >> qi::lazy(*_a));
-    //tag_3_rule_[_val = boost::phoenix::bind(&select _1, _r1, _r2, _r3)];
+  //possible_type_grammar_rule          %=  (select_rule[_a = boost::phoenix::bind(&read_property_ack_grammar::select_grammr, this, _r1, _r2, _r3)]
+    possible_type_grammar_rule          %=  (select_rule[_a = boost::phoenix::bind(&select, _r1, _r2, _r3)]
+                                        >>  qi::lazy(*_a));
 
-    any_rule                            %= tag_3_rule_;
+    any_rule                            %=  tag_3_rule_;
 
-    select_rule = eps;
+    select_rule                          =  eps;
 
 
 
@@ -193,14 +203,16 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     // */
   }
 
-  inline any_rule_t* select(const object_identifier& r1,const uint32_t& r2, const boost::optional<uint32_t>& r3) {
-    std::cout << "r1 " << r1 << std::endl;
+  inline any_rule_t* select_grammr(const object_identifier& r1,const uint32_t& r2, const boost::optional<uint32_t>& r3) {
+    /*std::cout << "r1 " << r1 << std::endl;
     std::cout << "r2 " << r2 << std::endl;
     std::cout << "r3 " << r3.value_or(0) << std::endl;
+    return &any_rule;*/
 
-    return &any_rule;
+    return select(r1, r2,r3);
 
   }
+
 };
 
 
