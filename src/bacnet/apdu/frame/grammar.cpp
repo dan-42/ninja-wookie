@@ -40,9 +40,10 @@ bacnet::binary_data generator::generate(const possible_frame &f){
     result = boost::spirit::karma::generate(sink, generator, f);
   }
   catch (std::exception &e) {
-    std::cerr << "exception: frames.hpp parse(Container &i, possible_bvll_frame &v) " << e.what() << std::endl;
+    std::cerr << "exception: frames.hpp generate( possible_bvll_frame &v) " << e.what() << std::endl;
   }
   if(!result){
+    std::cerr << "error: generating frames.hpp generate(possible_bvll_frame &v) "  << std::endl;
     return bacnet::binary_data();
   }
   return binary_frame;

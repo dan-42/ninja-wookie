@@ -236,9 +236,8 @@ public:
   }
   template<typename Service, typename Handler>
   void async_send_response(Service service, bacnet::common::protocol::meta_information mi, Handler handler) {
-
-        auto data =  bacnet::service::service::detail::generate_confirmed_response(std::move(service));
-        lower_layer_.async_send_confirmed_response(std::move(data), mi, handler);
+    auto data =  bacnet::service::service::detail::generate_confirmed_response(std::move(service));
+    lower_layer_.async_send_confirmed_response(std::move(data), mi, handler);
   }
 
   template<typename Handler>

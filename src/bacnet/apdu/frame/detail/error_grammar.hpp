@@ -177,13 +177,14 @@ struct error_grammar : grammar<Iterator, error() >{
     error_choice_rule.name("error_choice_rule");
     pdu_type_check_rule.name("pdu_type_check_rule");
 
+//
     /*
        debug(error_rule);
        debug(pdu_header_rule);
        debug(original_invoke_id_rule);
-       debug(service_ack_choice_rule);
+       debug(error_choice_rule);
        debug(pdu_type_check_rule);
-     */
+//     */
   }
 
 

@@ -171,9 +171,9 @@ struct controller {
   void async_send_confirmed_response(bacnet::error error, bacnet::common::protocol::meta_information meta_info, unconfirmed_response_handler_type handler) {
     bacnet::common::protocol::mac::endpoint ep{meta_info.address};
     bacnet::binary_data data;
-
     if(error.category == bacnet::err::cat::error) {
       frame::error                    frame;
+      frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::error;
       frame.original_invoke_id      = meta_info.invoke_id;
       frame.error_choice            = meta_info.service_choice;
       frame.error_                  = bacnet::type::error(error);
@@ -182,6 +182,7 @@ struct controller {
     }
     else if(error.category == bacnet::err::cat::abort) {
       frame::abort                  frame;
+      frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::abort;
       frame.original_invoke_id      = meta_info.invoke_id;
       frame.abort_reason            = static_cast<uint8_t>(error.value);
       data                          = frame::generator::generate(frame);
@@ -189,8 +190,17 @@ struct controller {
     }
     else if(error.category == bacnet::err::cat::reject) {
       frame::reject                   frame;
+      frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::reject;
       frame.original_invoke_id      = meta_info.invoke_id;
       frame.reject_reason           = static_cast<uint8_t>(error.value);
+      data                          = frame::generator::generate(frame);
+      underlying_controller_.async_send_unicast(ep, std::move(data), handler);
+    }
+    else if(!error) {
+      frame::simple_ack                   frame;
+      frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::simple_ack;
+      frame.original_invoke_id      = meta_info.invoke_id;
+      frame.service_ack_choice      = meta_info.service_choice;
       data                          = frame::generator::generate(frame);
       underlying_controller_.async_send_unicast(ep, std::move(data), handler);
     }

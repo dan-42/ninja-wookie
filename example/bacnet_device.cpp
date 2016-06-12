@@ -19,6 +19,7 @@
  */
 
 #include <bacnet/stack/factory.hpp>
+#include <bacnet/type/properties.hpp>
 #include <exception>
 #include <iostream>
 #include <string>
@@ -80,14 +81,18 @@ int main(int argc, char *argv[]) {
         if(    s.password
             && s.password.get().value == "12345"
             && s.reinitialize_state_of_device.value == 3            ) {
-          std::cout << "received reinit  success" << std::endl;
+          std::cout << "received reinit  success invoked_id " << (int)mi.invoke_id << "  " << mi.address.to_string() << std::endl;
           auto success = bacnet::make_success();
-          service_controller.async_send_response(success, mi, [](bacnet::error e){});
+          service_controller.async_send_response(success, mi, [](bacnet::error e){
+            std::cout << "received reinit  response "  << e << std::endl;
+          });
         }
         else {
-          std::cout << "received reinit  error" << std::endl;
+          std::cout << "received reinit  error "  << mi.address.to_string() << std::endl;
           auto error = bacnet::make_error(bacnet::err::error_code::password_failure, bacnet::err::error_class::device);
-          service_controller.async_send_response(error, mi, [](bacnet::error e){});
+          service_controller.async_send_response(error, mi, [](bacnet::error e){
+            std::cout << "received reinit  response "  << e << std::endl;
+          });
         }
       },
       [&](bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
@@ -97,14 +102,22 @@ int main(int argc, char *argv[]) {
            * look up object property and so on
            * the return value or return error
            */
-        if(ec ) {
-          auto error = bacnet::make_error(bacnet::err::error_code::unknown_object, bacnet::err::error_class::object);
-          service_controller.async_send_response(error, mi, [](bacnet::error e){});
+        if(    s.object_identifier.object_type      == bacnet::object_type::device
+            && s.object_identifier.instance_number  == doi
+            && s.property_identifier                == bacnet::type::property::object_name::value ) {
+
+          bacnet::type::character_string name;
+          name.value = "awesome ninja-wookie :-) ";
+          bacnet::service::read_property_ack ack{s, name};
+          service_controller.async_send_response(ack, mi, [](bacnet::error e){
+            std::cout << "received reinit  response "  << e << std::endl;
+          });
         }
         else {
-          bacnet::type::object_identifier doi;
-          bacnet::service::read_property_ack ack{s, doi};
-          service_controller.async_send_response(ack, mi, [](bacnet::error e){});
+          auto error = bacnet::make_error(bacnet::err::error_code::unknown_object, bacnet::err::error_class::object);
+          service_controller.async_send_response(error, mi, [](bacnet::error e){
+            std::cout << "received reinit  response "  << e << std::endl;
+          });
         }
       }
     );

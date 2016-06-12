@@ -225,14 +225,15 @@ using namespace bacnet::apdu::type::detail::generator;
 template<typename Iterator>
 struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack()> {
   rule<Iterator, service::read_property_ack()>      start_rule;
-  rule<Iterator, object_identifier()>           object_identifier_rule;
-  rule<Iterator, uint32_t()>                    property_identifier_rule;
-  rule<Iterator, boost::optional<uint32_t>()>   property_array_index_rule;
-  rule<Iterator, bacnet::binary_data()>         binary_data_rule;
+  rule<Iterator, object_identifier()>               object_identifier_rule;
+  rule<Iterator, uint32_t()>                        property_identifier_rule;
+  rule<Iterator, boost::optional<uint32_t>()>       property_array_index_rule;
+  rule<Iterator, bacnet::binary_data()>             binary_data_rule;
 
   object_identifier_grammar<Iterator>      tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
   unsigned_integer_grammar<Iterator>       tag_2_rule_{2};
+  //unsigned_integer_grammar<Iterator>       tag_3_rule_{3};
 
   read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule) {
 
