@@ -255,6 +255,9 @@ namespace bacnet {
     return 0;
   }
 
+  static inline error make_success( ) noexcept {
+    return error{};
+  }
   static inline error make_error( int c, int e ) noexcept {
      return error(err::cat::error, e, c);
   }

@@ -37,7 +37,6 @@ BOOST_FUSION_DEFINE_STRUCT(
         (uint8_t, invoke_id)
         (uint8_t, sequence_number)
         (uint8_t, proposed_window_size)
-       // (uint8_t, service_choice)
         (bacnet::binary_data, service_data)
 )
 

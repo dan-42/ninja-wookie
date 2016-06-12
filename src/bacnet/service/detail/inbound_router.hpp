@@ -38,6 +38,7 @@ namespace bacnet { namespace service { namespace detail {
     template<typename Service>
     inline void operator()(Service service) {
       bacnet::error ec;
+      meta_information_.service_choice = bacnet::service::service::detail::service_choice<Service>::value;
       callback_manager_.invoke(std::move(service), ec, std::move(meta_information_));
     }
 

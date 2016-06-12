@@ -37,6 +37,7 @@ struct meta_information {
   bacnet::npdu::address npdu_source;
   uint16_t vendor_id;
   uint8_t invoke_id;
+  uint8_t service_choice;
 };
 
 }}}

@@ -76,38 +76,36 @@ int main(int argc, char *argv[]) {
         //no response needed, done automatically in the service-layer
       },
       [&](bacnet::service::reinitialize_device s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
-        std::cout << "received reinit" << std::endl;
-        //xxx test password and state
-        // send answer with OK or Error
 
-        /*
-         error
-         bacnet::service::error error(class, reason)
-         service_controller.response(mi, error);
-
-
-         success simple
-         bacnet::service::ack ack(s) //automatically choose service-choice by template specialization
-         service_controller.response(mi, ack);
-         */
-
+        if(    s.password
+            && s.password.get().value == "12345"
+            && s.reinitialize_state_of_device.value == 3            ) {
+          std::cout << "received reinit  success" << std::endl;
+          auto success = bacnet::make_success();
+          service_controller.async_send_response(success, mi, [](bacnet::error e){});
+        }
+        else {
+          std::cout << "received reinit  error" << std::endl;
+          auto error = bacnet::make_error(bacnet::err::error_code::password_failure, bacnet::err::error_class::device);
+          service_controller.async_send_response(error, mi, [](bacnet::error e){});
+        }
       },
       [&](bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         std::cout << "received read_property" << std::endl;
-        //xxx handle request
-        // send answer with OK or Error
-
-        /*
-        error
-        bacnet::service::error error(class, reason)
-        service_controller.response(mi, error);
-
-
-        success simple
-        bacnet::service::ack ack(s) //automatically choose service-choice by template specialization
-        service_controller.response(mi, ack);
-        */
-
+          /**
+           * application-link:
+           * look up object property and so on
+           * the return value or return error
+           */
+        if(ec ) {
+          auto error = bacnet::make_error(bacnet::err::error_code::unknown_object, bacnet::err::error_class::object);
+          service_controller.async_send_response(error, mi, [](bacnet::error e){});
+        }
+        else {
+          bacnet::type::object_identifier doi;
+          bacnet::service::read_property_ack ack{s, doi};
+          service_controller.async_send_response(ack, mi, [](bacnet::error e){});
+        }
       }
     );
 

@@ -40,7 +40,8 @@ namespace bacnet { namespace apdu {
   typedef std::function< void (const  bacnet::error&,
                                       frame::complex_ack,
                                       bacnet::common::protocol::meta_information )> confirmed_request_handler_type;
-  typedef std::function< void (const bacnet::error&)>                   unconfirmed_request_handler_type;
+  typedef std::function< void (const bacnet::error&)>                               unconfirmed_request_handler_type;
+  typedef std::function< void (const bacnet::error&)>                               unconfirmed_response_handler_type;
 
 
 }}

@@ -45,7 +45,7 @@
 
 #include <bacnet/apdu/api.hpp>
 #include <bacnet/error/error.hpp>
-#include <bacnet/error/error.hpp>
+
 
 /**
  * SCOPE OF THIS LAYER
@@ -234,7 +234,17 @@ public:
   void async_receive(Callbacks... callbacks) {
     callback_manager_.set_service_callbacks(callbacks...);
   }
+  template<typename Service, typename Handler>
+  void async_send_response(Service service, bacnet::common::protocol::meta_information mi, Handler handler) {
 
+        auto data =  bacnet::service::service::detail::generate_confirmed_response(std::move(service));
+        lower_layer_.async_send_confirmed_response(std::move(data), mi, handler);
+  }
+
+  template<typename Handler>
+  void async_send_response(bacnet::error error, bacnet::common::protocol::meta_information mi, Handler handler) {
+    lower_layer_.async_send_confirmed_response(error, mi, handler);
+  }
 
 private:
 
@@ -307,6 +317,8 @@ private:
   bacnet::config config_;
   service::i_am i_am_message_;
 };
+
+
 
 }}
 

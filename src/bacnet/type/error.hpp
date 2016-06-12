@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <bacnet/type/enumerated.hpp>
+#include <bacnet/error/error.hpp>
 
 namespace bacnet { namespace type {
 
@@ -23,6 +24,11 @@ struct error {
   }
 
   error(enumerated e_class, enumerated e_code) : error_class(std::move(e_class) ), error_code(std::move(e_code)) {
+
+  }
+
+  error(bacnet::error bacnet_error) : error_class(enum_class_type,  bacnet_error.error_class.get_value_or(0)),
+                                      error_code(enum_code_type,    bacnet_error.value) {
 
   }
 

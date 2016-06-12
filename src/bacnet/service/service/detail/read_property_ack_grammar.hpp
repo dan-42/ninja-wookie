@@ -180,7 +180,9 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     possible_type_grammar_rule          %=  open_tag_3_rule
                                         >>  (
                                               select_rule[_a = boost::phoenix::bind(&select<Iterator>, _r1, _r2, _r3)]
-                                        >>    qi::lazy(*_a)
+                                        >>   (   (*qi::lazy(*_a))
+                                              |   qi::lazy(*_a)
+                                             )
                                             )
                                         >>  close_tag_3_rule
                                         ;

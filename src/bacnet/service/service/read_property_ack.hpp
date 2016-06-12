@@ -49,6 +49,13 @@ namespace bacnet { namespace service { namespace service {
                                                                         property_value(std::move(d)){
     }
 
+    read_property_ack(read_property_request request, bacnet::type::possible_type d) :
+                                                                        object_identifier(request.object_identifier),
+                                                                        property_identifier(request.property_identifier),
+                                                                        property_array_index(request.property_array_index),
+                                                                        property_value(std::move(d)){
+    }
+
     bacnet::type::object_identifier object_identifier{};
     uint16_t                          property_identifier {0};
     boost::optional<uint32_t>         property_array_index;

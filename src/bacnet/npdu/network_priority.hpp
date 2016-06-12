@@ -28,10 +28,10 @@ namespace bacnet { namespace  npdu {
 
 
 enum class network_priority_t : uint8_t {
-  normal_message             = 0b00000000,
-  urgent_message             = 0b00000001,
-  critical_equipment_message = 0b00000010,
-  life_safety_message        = 0b00000011
+  normal_message             = 0x00,
+  urgent_message             = 0x01,
+  critical_equipment_message = 0x02,
+  life_safety_message        = 0x03
 };
 
 }}

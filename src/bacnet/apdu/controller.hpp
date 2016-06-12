@@ -152,6 +152,54 @@ struct controller {
     f.apply_visitor(inbound_router_);
   }
 
+  void async_send_confirmed_response(bacnet::binary_data payload, bacnet::common::protocol::meta_information meta_info, unconfirmed_response_handler_type handler) {
+        bacnet::common::protocol::mac::endpoint ep{meta_info.address};
+
+       frame::complex_ack                                  frame;
+       bacnet::apdu::detail::header::segmentation_t        seg;
+       seg.max_accepted_apdu_                            = ApduSize::size_as_enum;
+       frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::complex_ack;
+       frame.original_invoke_id                          = meta_info.invoke_id;
+       frame.sequence_number                             = 0;
+       frame.proposed_window_size                        = 1;
+       frame.service_ack_data                            = payload;
+
+       auto data                                         = frame::generator::generate(frame);
+       underlying_controller_.async_send_unicast(ep, std::move(data), handler);
+  }
+
+  void async_send_confirmed_response(bacnet::error error, bacnet::common::protocol::meta_information meta_info, unconfirmed_response_handler_type handler) {
+    bacnet::common::protocol::mac::endpoint ep{meta_info.address};
+    bacnet::binary_data data;
+
+    if(error.category == bacnet::err::cat::error) {
+      frame::error                    frame;
+      frame.original_invoke_id      = meta_info.invoke_id;
+      frame.error_choice            = meta_info.service_choice;
+      frame.error_                  = bacnet::type::error(error);
+      data                          = frame::generator::generate(frame);
+      underlying_controller_.async_send_unicast(ep, std::move(data), handler);
+    }
+    else if(error.category == bacnet::err::cat::abort) {
+      frame::abort                  frame;
+      frame.original_invoke_id      = meta_info.invoke_id;
+      frame.abort_reason            = static_cast<uint8_t>(error.value);
+      data                          = frame::generator::generate(frame);
+      underlying_controller_.async_send_unicast(ep, std::move(data), handler);
+    }
+    else if(error.category == bacnet::err::cat::reject) {
+      frame::reject                   frame;
+      frame.original_invoke_id      = meta_info.invoke_id;
+      frame.reject_reason           = static_cast<uint8_t>(error.value);
+      data                          = frame::generator::generate(frame);
+      underlying_controller_.async_send_unicast(ep, std::move(data), handler);
+    }
+    else {
+      bacnet::error e(boost::system::errc::bad_message);
+      handler(e);
+    }
+  }
+
 private:
 
 
