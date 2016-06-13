@@ -216,11 +216,8 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
 
 namespace bacnet { namespace service { namespace service { namespace detail {  namespace generator {
 
-
-using namespace boost::spirit;
+namespace type = bacnet::type;
 using namespace boost::spirit::karma;
-using namespace bacnet::apdu::type;
-using namespace bacnet::apdu::type::detail::generator;
 
 template<typename Iterator>
 struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack()> {
@@ -228,12 +225,13 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
   rule<Iterator, object_identifier()>               object_identifier_rule;
   rule<Iterator, uint32_t()>                        property_identifier_rule;
   rule<Iterator, boost::optional<uint32_t>()>       property_array_index_rule;
+  rule<Iterator, type::possible_type()>             property_value_rule;
   rule<Iterator, bacnet::binary_data()>             binary_data_rule;
 
   object_identifier_grammar<Iterator>      tag_0_rule_{0};
   unsigned_integer_grammar<Iterator>       tag_1_rule_{1};
   unsigned_integer_grammar<Iterator>       tag_2_rule_{2};
-  //unsigned_integer_grammar<Iterator>       tag_3_rule_{3};
+  possible_type_grammar<Iterator>          tag_3_rule_{3};
 
   read_property_ack_grammar() : read_property_ack_grammar::base_type(start_rule) {
 
@@ -241,11 +239,13 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
                                         << object_identifier_rule
                                         << property_identifier_rule
                                         << property_array_index_rule
+                                        << property_value_rule
                                         ;
 
     object_identifier_rule              =  tag_0_rule_;
     property_identifier_rule            =  tag_1_rule_;
     property_array_index_rule           = -tag_2_rule_;
+    property_value_rule                 =  tag_3_rule_;
 
   }
 };

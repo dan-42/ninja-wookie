@@ -207,81 +207,106 @@ private:
 };
 
 }}}}}
-/*
+
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace generator {
 
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
 
-using boost::spirit::karma::bit_field;
-using boost::spirit::karma::rule;
-using boost::spirit::karma::_1;
-using boost::phoenix::bind;
-
-using boost::spirit::repository::karma::big_24word;
-
-using bacnet::apdu::type::tag;
+namespace type =  bacnet::type;
 using bacnet::apdu::type::application_tag;
-using bacnet::type::enumerated;
+
 
 
 template<typename Iterator>
-struct enumeration_grammar : grammar<Iterator, enumerated()> {
+struct possible_type_grammar : grammar<Iterator, type::possible_type()> {
 
-    rule<Iterator, enumerated()>    start_rule;
-    rule<Iterator, enumerated()>    tag_rule;
-    rule<Iterator, enumerated::e()> type_rule;
-    rule<Iterator, enumerated()>    value_rule;
+  typedef std::vector<type::possible_type>          sequence;
 
-    tag_grammar<Iterator> tag_grammar_;
+  rule<Iterator, type::possible_type()>  start_rule;
+  rule<Iterator, type::possible_type()>  value_rule;
+  rule<Iterator, sequence()>             sequence_rule;
+  rule<Iterator>                         open_tag_rule;
+  rule<Iterator>                         close_tag_rule;
 
-    enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::enumerated) {
-      setup();
-    }
-    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag, true) {
-      setup();
-    }
+  tag_grammar<Iterator>                  tag_grammar_;
+
+  null_grammar<Iterator>                  null_grammar_;
+  boolean_grammar<Iterator>               boolean_grammar_;
+  unsigned_integer_grammar<Iterator>      unsigned_integer_grammar_;
+  signed_integer_grammar<Iterator>        signed_integer_grammar_;
+  real_grammar<Iterator>                  real_grammar_;
+  double_presision_grammar<Iterator>      double_presision_grammar_;
+  octet_string_grammar<Iterator>          octet_string_grammar_;
+  character_string_grammar<Iterator>      character_string_grammar_;
+  bit_string_grammar<Iterator>            bit_string_grammar_;
+  enumeration_grammar<Iterator>           enumeration_grammar_;
+  date_grammar<Iterator>                  date_grammar_;
+  time_grammar<Iterator>                  time_grammar_;
+  object_identifier_grammar<Iterator>     object_identifier_grammar_;
+
+
+
+
+
+
+
+  possible_type_grammar() : possible_type_grammar::base_type(start_rule), add_surrounding_tag_(false) {
+    setup();
+  }
+  possible_type_grammar(uint8_t tag_id) : possible_type_grammar::base_type(start_rule),
+                                  add_surrounding_tag_(true),
+                                  opening_tag_(tag_id, true, tag::opening_tag_indication),
+                                  closing_tag_(tag_id, true, tag::closing_tag_indication) {
+    setup();
+  }
 
 private:
 
     void setup () {
 
-      start_rule  = tag_rule[_1 = _val] << value_rule[_1 = _val];
-
-
-      tag_rule    =  eps[boost::phoenix::bind(&enumeration_grammar::extract_size, this, _val)]
-                  << tag_grammar_[_1 = ref(tag_)];
-
-
-      value_rule  = type_rule << (
-                        eps(ref(size_) == 1) << byte_
-                      | eps(ref(size_) == 2) << big_word
-                      | eps(ref(size_) == 3) << big_24word
-                      | eps(ref(size_) == 4) << big_dword
-                    )
+      start_rule  =  open_tag_rule
+                  << (value_rule )
+                  << close_tag_rule
                   ;
 
-      type_rule   = eps;
+      open_tag_rule  = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(opening_tag_)] | eps;
+      close_tag_rule = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(closing_tag_)] | eps;
+
+      sequence_rule = *value_rule;
+
+      value_rule  =  null_grammar_
+                  |  boolean_grammar_
+                  |  unsigned_integer_grammar_
+                  |  signed_integer_grammar_
+                  |  real_grammar_
+                  |  double_presision_grammar_
+                  |  octet_string_grammar_
+                  |  character_string_grammar_
+                  |  bit_string_grammar_
+                  |  enumeration_grammar_
+                  |  date_grammar_
+                  |  time_grammar_
+                  |  object_identifier_grammar_
+                  ;
 
       start_rule.name("start_rule");
-      tag_rule.name("tag_rule");
-      value_rule.name("value_rule");
 
-    }
-
-    bool extract_size(const enumerated &enumerated_value) {
-      size_ = bacnet::apdu::type::detail::length_helper(enumerated_value.value);
-      tag_.length_value_type(size_);
-      return true;
+      /*
+      debug(start_rule);
+      debug(value_rule);
+      debug(tag_rule);
+      */
     }
 
 
-    uint8_t size_;
-    tag tag_;
+    bool add_surrounding_tag_{false};
+    tag  opening_tag_;
+    tag  closing_tag_;
 };
 
 }}}}}
-*/
+
 
 #endif //NINJA_WOOKIE_ENUMERATION_GRAMMAR_HPP
