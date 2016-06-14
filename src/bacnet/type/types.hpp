@@ -36,6 +36,8 @@ struct constructed_type;
 
 //typedef boost::variant<
 typedef boost::make_recursive_variant<
+    //std::vector< boost::recursive_variant_>,
+    boost::recursive_wrapper< std::vector< boost::recursive_variant_ > >,
 
     null,
     boolean,
@@ -54,8 +56,8 @@ typedef boost::make_recursive_variant<
     unsupported_type,
 
     //boost::recursive_variant_,
-    boost::recursive_wrapper< constructed_type >,
-    std::vector< boost::recursive_variant_>
+    boost::recursive_wrapper< constructed_type >
+
 
 
     >::type

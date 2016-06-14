@@ -113,6 +113,21 @@ int main(int argc, char *argv[]) {
             std::cout << "received reinit  response "  << e << std::endl;
           });
         }
+        else if (    s.object_identifier.object_type      == bacnet::object_type::device
+            && s.object_identifier.instance_number  == doi
+            && s.property_identifier                == bacnet::type::property::object_list::value ) {
+
+          std::vector<bacnet::type::object_identifier> object_list;
+          object_list.push_back(s.object_identifier);
+
+          bacnet::type::possible_type payload{std::move(object_list)};
+
+          bacnet::service::read_property_ack ack{s, payload};
+            service_controller.async_send_response(ack, mi, [](bacnet::error e){
+              std::cout << "received reinit  response "  << e << std::endl;
+            });
+        }
+
         else {
           auto error = bacnet::make_error(bacnet::err::error_code::unknown_object, bacnet::err::error_class::object);
           service_controller.async_send_response(error, mi, [](bacnet::error e){

@@ -267,14 +267,14 @@ private:
     void setup () {
 
       start_rule  =  open_tag_rule
-                  << (value_rule )
+                  << value_rule
                   << close_tag_rule
                   ;
 
       open_tag_rule  = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(opening_tag_)] | eps;
       close_tag_rule = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(closing_tag_)] | eps;
 
-      sequence_rule = *value_rule;
+      sequence_rule  = repeat(2, inf)[value_rule];
 
       value_rule  =  null_grammar_
                   |  boolean_grammar_
@@ -289,6 +289,7 @@ private:
                   |  date_grammar_
                   |  time_grammar_
                   |  object_identifier_grammar_
+                  |  sequence_rule
                   ;
 
       start_rule.name("start_rule");
