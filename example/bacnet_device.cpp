@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
           std::vector<bacnet::type::object_identifier> object_list;
           object_list.push_back(s.object_identifier);
 
-          bacnet::type::possible_type payload{std::move(object_list)};
+          bacnet::type::possible_type payload = object_list;
 
           bacnet::service::read_property_ack ack{s, payload};
             service_controller.async_send_response(ack, mi, [](bacnet::error e){
