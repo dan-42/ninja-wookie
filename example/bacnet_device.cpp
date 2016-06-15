@@ -29,8 +29,9 @@ int main(int argc, char *argv[]) {
 
 
   try {
-    uint16_t    doi{1};
+    uint16_t    doi{2};
     uint16_t    port{0xBAC0};
+  //  std::string ip{"192.168.10.204"};
     std::string ip{"0.0.0.0"};
 
 
@@ -110,24 +111,24 @@ int main(int argc, char *argv[]) {
           name.value = "awesome ninja-wookie :-) ";
           bacnet::service::read_property_ack ack{s, name};
           service_controller.async_send_response(ack, mi, [](bacnet::error e){
-            std::cout << "received reinit  response "  << e << std::endl;
+            std::cout << "received read_property_request  response "  << e << std::endl;
           });
         }
-        else if (    s.object_identifier.object_type      == bacnet::object_type::device
+///*        else if (    s.object_identifier.object_type      == bacnet::object_type::device
             && s.object_identifier.instance_number  == doi
             && s.property_identifier                == bacnet::type::property::object_list::value ) {
 
-          std::vector<bacnet::type::object_identifier> object_list;
+          std::vector<bacnet::type::possible_type> object_list;
           object_list.push_back(s.object_identifier);
 
-          bacnet::type::possible_type payload = object_list;
+          std::cout << "received read_property_request  response "  << pre::json::to_json(object_list).dump(2) << std::endl;
 
-          bacnet::service::read_property_ack ack{s, payload};
+          bacnet::service::read_property_ack ack{s, object_list};
             service_controller.async_send_response(ack, mi, [](bacnet::error e){
               std::cout << "received reinit  response "  << e << std::endl;
             });
         }
-
+//*/
         else {
           auto error = bacnet::make_error(bacnet::err::error_code::unknown_object, bacnet::err::error_class::object);
           service_controller.async_send_response(error, mi, [](bacnet::error e){

@@ -37,11 +37,11 @@ struct sequence_type;
 
 //typedef boost::variant<
 typedef boost::make_recursive_variant<
-    //std::vector< boost::recursive_variant_>,
+    std::vector< boost::recursive_variant_>,
 
 //    boost::recursive_wrapper< std::vector< possible_type > >,
     boost::recursive_wrapper< constructed_type >,
-    boost::recursive_wrapper< sequence_type >,
+
 
     null,
     boolean,
