@@ -225,6 +225,7 @@ struct possible_type_grammar : grammar<Iterator, type::possible_type()> {
   typedef std::vector<type::possible_type>          sequence;
 
   rule<Iterator, type::possible_type()>  start_rule;
+  rule<Iterator, type::possible_type()>  start_rule_tagged;
   rule<Iterator, type::possible_type()>  value_rule;
   rule<Iterator, sequence()>             sequence_rule;
   rule<Iterator>                         open_tag_rule;
@@ -255,7 +256,7 @@ struct possible_type_grammar : grammar<Iterator, type::possible_type()> {
   possible_type_grammar() : possible_type_grammar::base_type(start_rule), add_surrounding_tag_(false) {
     setup();
   }
-  possible_type_grammar(uint8_t tag_id) : possible_type_grammar::base_type(start_rule),
+  possible_type_grammar(uint8_t tag_id) : possible_type_grammar::base_type(start_rule_tagged),
                                   add_surrounding_tag_(true),
                                   opening_tag_(tag_id, true, tag::opening_tag_indication),
                                   closing_tag_(tag_id, true, tag::closing_tag_indication) {
@@ -266,13 +267,16 @@ private:
 
     void setup () {
 
-      start_rule  =  open_tag_rule
-                  << value_rule
-                  << close_tag_rule
+      start_rule  %= value_rule
                   ;
 
-      open_tag_rule  = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(opening_tag_)] | eps;
-      close_tag_rule = eps(ref(add_surrounding_tag_) == true)  << tag_grammar_[_1 = ref(closing_tag_)] | eps;
+      start_rule_tagged =  open_tag_rule
+                        << value_rule
+                        << close_tag_rule
+                        ;
+
+      open_tag_rule  = tag_grammar_[_1 = ref(opening_tag_)];
+      close_tag_rule = tag_grammar_[_1 = ref(closing_tag_)];
 
       sequence_rule  = repeat(2, inf)[value_rule];
 
@@ -292,13 +296,22 @@ private:
                   |  sequence_rule
                   ;
 
-      start_rule.name("start_rule");
-
+      //
       /*
+      start_rule.name("start_rule");
+      start_rule_tagged.name("start_rule_tagged");
+      open_tag_rule.name("open_tag_rule");
+      close_tag_rule.name("close_tag_rule");
+      sequence_rule.name("sequence_rule");
+      value_rule.name("value_rule");
+
       debug(start_rule);
+      debug(start_rule_tagged);
+      debug(open_tag_rule);
+      debug(close_tag_rule);
+      debug(sequence_rule);
       debug(value_rule);
-      debug(tag_rule);
-      */
+      //*/
     }
 
 

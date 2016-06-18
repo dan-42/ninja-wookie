@@ -52,8 +52,8 @@ enum class  application_tag : uint8_t {
 
 struct tag {
 
-    static const constexpr uint32_t opening_tag_indication = 6;
-    static const constexpr uint32_t closing_tag_indication = 7;
+    static constexpr uint32_t opening_tag_indication = 6;
+    static constexpr uint32_t closing_tag_indication = 7;
 
     uint32_t length_value_type_;
     bool is_context_tag_;

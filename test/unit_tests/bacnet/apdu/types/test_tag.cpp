@@ -42,6 +42,15 @@ bool is_equal(const bacnet::apdu::type::tag& a, const bacnet::apdu::type::tag& b
   return true;
 }
 bool is_equal(const bacnet::binary_data& a, const bacnet::binary_data& b) {
+    std::cout << "is_equal() " << std::endl;
+    std::cout << "a: ";
+    bacnet::print(a);
+    std::cout <<  std::endl;
+
+    std::cout << "b: ";
+    bacnet::print(b);
+    std::cout <<  std::endl;
+
     if(a.size() != b.size()) {
         return false;
     }
@@ -254,16 +263,16 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
 
-    std::cout << "-----tag_extended_length----6-------------" << std::endl;
+    std::cout << "-----tag_extended_length----8-------------" << std::endl;
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
     tag_to_generate.is_context_tag(false);
     tag_to_generate.number(12);
-    tag_to_generate.length_value_type(6);
+    tag_to_generate.length_value_type(8);
 
     tag_generation_expected.push_back(0xc5);
-    tag_generation_expected.push_back(0x06);
+    tag_generation_expected.push_back(0x08);
 
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
 
