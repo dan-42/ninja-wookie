@@ -263,6 +263,38 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
 
+    std::cout << "-----tag_extended_length----6-------------" << std::endl;
+    tag_generation_expected.clear();
+    tag_to_generate = decltype(tag_to_generate){};
+
+    tag_to_generate.is_context_tag(false);
+    tag_to_generate.number(12);
+    tag_to_generate.length_value_type(6);
+    generated_tag = bacnet::apdu::type::generate(tag_to_generate);
+
+    tag_generation_expected.push_back(0xc5);
+    tag_generation_expected.push_back(0x06);
+
+    BOOST_TEST(is_equal(tag_generation_expected, generated_tag), "fail tag generation failed");
+    BOOST_TEST(bacnet::apdu::type::parse(generated_tag, tag_parsed), "fail parse simple tag");
+    BOOST_TEST(is_equal(tag_to_generate, tag_parsed), "failed parsed is not expected");
+
+    std::cout << "-----tag_extended_length----7-------------" << std::endl;
+    tag_generation_expected.clear();
+    tag_to_generate = decltype(tag_to_generate){};
+
+    tag_to_generate.is_context_tag(false);
+    tag_to_generate.number(12);
+    tag_to_generate.length_value_type(7);
+    generated_tag = bacnet::apdu::type::generate(tag_to_generate);
+
+    tag_generation_expected.push_back(0xc5);
+    tag_generation_expected.push_back(0x07);
+
+    BOOST_TEST(is_equal(tag_generation_expected, generated_tag), "fail tag generation failed");
+    BOOST_TEST(bacnet::apdu::type::parse(generated_tag, tag_parsed), "fail parse simple tag");
+    BOOST_TEST(is_equal(tag_to_generate, tag_parsed), "failed parsed is not expected");
+
     std::cout << "-----tag_extended_length----8-------------" << std::endl;
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
