@@ -107,7 +107,7 @@ struct double_presision_grammar : grammar<Iterator, double()> {
   }
 
   double_presision_grammar(uint8_t tag)  : double_presision_grammar::base_type(start_rule),
-                                tag_(tag, true, 8) {
+                                tag_(tag, 8) {
     setup();
   }
 

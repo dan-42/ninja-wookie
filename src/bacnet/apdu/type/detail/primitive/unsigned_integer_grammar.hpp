@@ -131,7 +131,7 @@ struct unsigned_integer_grammar : grammar<Iterator, uint32_t()> {
     unsigned_integer_grammar() : unsigned_integer_grammar::base_type(start_rule), tag_(application_tag::unsigned_integer) {
       setup();
     }
-    unsigned_integer_grammar(uint8_t tag) : unsigned_integer_grammar::base_type(start_rule), tag_(tag, true) {
+    unsigned_integer_grammar(uint8_t tag) : unsigned_integer_grammar::base_type(start_rule), tag_(tag) {
       setup();
     }
 

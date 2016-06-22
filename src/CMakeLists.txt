@@ -39,8 +39,7 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -Wno-unused-function 
                     -Wno-unused-local-typedefs 
                     -Wno-unused-variable 
-                    -Wno-unused-value 
-                    -Wno-placement-new
+                    -Wno-unused-value                   
                     -Wno-deprecated-declarations)
 
 
@@ -61,8 +60,8 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
     
 ELSE()
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections -flto")
-        #set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections ")
+        #set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections -flto")
+        set (CMAKE_EXE_LINKER_FLAGS " -Wl,--gc-sections ")
 
         list(APPEND WOOKIE_COMPILE_FLAGS
                 -fvisibility=hidden                

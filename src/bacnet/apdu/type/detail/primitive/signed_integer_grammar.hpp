@@ -129,7 +129,7 @@ struct signed_integer_grammar : grammar<Iterator, int32_t()> {
     signed_integer_grammar() : signed_integer_grammar::base_type(start_rule), tag_(application_tag::signed_integer) {
       setup();
     }
-    signed_integer_grammar(uint8_t tag) : signed_integer_grammar::base_type(start_rule), tag_(tag, true) {
+    signed_integer_grammar(uint8_t tag) : signed_integer_grammar::base_type(start_rule), tag_(tag) {
       setup();
     }
 

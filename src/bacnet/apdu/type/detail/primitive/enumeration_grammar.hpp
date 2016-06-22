@@ -134,7 +134,7 @@ struct enumeration_grammar : grammar<Iterator, enumerated()> {
     enumeration_grammar() : enumeration_grammar::base_type(start_rule), tag_(application_tag::enumerated) {
       setup();
     }
-    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag, true) {
+    enumeration_grammar(uint8_t tag) : enumeration_grammar::base_type(start_rule), tag_(tag) {
       setup();
     }
 

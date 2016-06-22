@@ -52,71 +52,111 @@ enum class  application_tag : uint8_t {
 
 struct tag {
 
-    static constexpr uint32_t opening_tag_indication = 6;
-    static constexpr uint32_t closing_tag_indication = 7;
+    enum class type : uint8_t {
+       application,
+       context,
+       opening,
+       closing
+    };
 
-    uint32_t length_value_type_;
-    bool is_context_tag_;
-    uint8_t number_;
+    uint32_t  length_value_type_{0};
+    uint8_t   number_{0};
+    type      type_{type::application};
 
+
+    //easy creation
     tag()                                             : length_value_type_(0),
-                                                        is_context_tag_(false),
-                                                        number_(0) {
+                                                        number_(0),
+                                                        type_{type::application}{
     }
 
+    //normal application tags
     tag(const application_tag &n)                     : length_value_type_(0),
-                                                        is_context_tag_(false),
-                                                        number_(static_cast<decltype(number_)>(n)) {
+                                                        number_(static_cast<decltype(number_)>(n)),
+                                                        type_{type::application} {
     }
 
-    tag(const application_tag &n, const uint32_t &v)  : length_value_type_(v),
-                                                        is_context_tag_(false),
-                                                        number_(static_cast<decltype(number_)>(n)) {
-    }
-    tag(const uint8_t &n, const bool &is_context)     : length_value_type_(0),
-                                                        is_context_tag_(is_context),
-                                                        number_(n) {
+  //normal application tags with fixed known length
+  tag(const application_tag &n, const uint32_t &length )
+                                                      : length_value_type_(length),
+                                                      number_(static_cast<decltype(number_)>(n)),
+                                                      type_{type::application} {
+  }
+
+    // normal constructed/context id
+    tag(const uint8_t &n              )              : length_value_type_(0),
+                                                       number_(n),
+                                                       type_(type::context)  {
     }
 
-    tag(const uint8_t &n, const bool &is_context, const uint32_t &v)
+    // normal constructed/context id
+    tag(const uint8_t &n, const uint32_t &length)    : length_value_type_(length),
+                                                     number_(n),
+                                                     type_(type::context)  {
+    }
+
+    //for open and closing tags
+    tag(const uint8_t &n, const type &t)              : length_value_type_(0),
+                                                        number_(n),
+                                                        type_(t)  {
+    }
+
+     //general purpose
+    tag(const uint8_t &n, const uint32_t &v, const type &t)
                                                       : length_value_type_(v),
-                                                        is_context_tag_(is_context),
-                                                        number_(n) {
+                                                        number_(n),
+                                                        type_(t){
     }
 
 
 
     inline uint8_t number() const { return number_; }
 
-    inline bool is_context_tag() const { return is_context_tag_; }
-
     inline uint32_t length_value_type() const { return length_value_type_; }
+
+    inline type tag_type() const { return type_; }
+
 
     inline void number(uint8_t v) { number_ = v; }
 
-    inline void is_context_tag(bool v) { is_context_tag_ = v; }
-
     inline void length_value_type(uint32_t v) { length_value_type_ = v; }
 
-    inline bool is_opening_tag() const { return (is_context_tag_ && length_value_type_ == opening_tag_indication); }
-    inline bool is_closing_tag() const { return (is_context_tag_ && length_value_type_ == closing_tag_indication); }
-    inline bool is_primitive_context_tag() const { return (       is_context_tag()
-                                                              && !is_opening_tag()
-                                                              && !is_closing_tag()
-                                                            );                        }
+    inline void tag_type(type t) { type_ = t; }
+
+
+    inline bool is_context_tag() const { return type_ == type::context; }
+
+    inline bool is_application_tag() const { return type_ == type::application; }
+
+    inline bool is_opening_tag() const { return type_ == type::opening; }
+
+    inline bool is_closing_tag() const { return type_ == type::closing; }
+
+
 
 
     template<typename Out>
     friend inline Out& operator<<(Out& os, const bacnet::apdu::type::tag &tag_) {
 
       os  << " number: "            << std::dec << (uint32_t) tag_.number()
-          << " is_context_tag: "    << std::dec << (uint32_t) tag_.is_context_tag()
-          << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type() ;
-
+          << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type()
+          << " type: " << tag_.type_;
       return os;
     }
 };
 
+
+template<typename Out>
+static inline Out& operator<<(Out& os, const bacnet::apdu::type::tag::type &t) {
+
+  if     (t == tag::type::application) os << "application ";
+  else if(t == tag::type::context)     os << "context ";
+  else if(t == tag::type::closing)     os << "closing ";
+  else if(t == tag::type::opening)     os << "closing ";
+  else                                 os << "unknown ";
+
+  return os;
+}
 
 }}}
 
@@ -125,8 +165,8 @@ struct tag {
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::apdu::type::tag,
     number_,
-    is_context_tag_,
-    length_value_type_
+    length_value_type_,
+    type_
 );
 
 #endif //NINJA_WOOKIE_TAG_HPP

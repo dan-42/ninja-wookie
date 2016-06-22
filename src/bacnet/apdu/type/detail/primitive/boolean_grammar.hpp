@@ -122,7 +122,7 @@ struct boolean_grammar : grammar<Iterator, bool()> {
       setup();
     }
     boolean_grammar(uint8_t tag)  : boolean_grammar::base_type(start_rule),
-                                    tag_(tag, true) {
+                                    tag_(tag) {
       setup();
     }
 

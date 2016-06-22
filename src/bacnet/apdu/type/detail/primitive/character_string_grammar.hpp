@@ -142,7 +142,7 @@ struct character_string_grammar : grammar<Iterator, character_string()> {
 
   character_string_grammar(uint8_t tag) : character_string_grammar::base_type(start_rule),
                                         size_(0),
-                                        tag_(tag, true) {
+                                        tag_(tag) {
     setup();
   }
 private:

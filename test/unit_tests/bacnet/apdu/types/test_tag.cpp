@@ -30,6 +30,9 @@
 
 
 bool is_equal(const bacnet::apdu::type::tag& a, const bacnet::apdu::type::tag& b) {
+  std::cout << "a: " << a << std::endl;
+  std::cout << "b: " << b << std::endl;
+
   if(a.is_context_tag() != b.is_context_tag()) {
     return false;
   }
@@ -126,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(4);
     tag_generation_expected.push_back(0xc4);
@@ -147,7 +150,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(15);
     tag_to_generate.length_value_type(4);
 
@@ -170,7 +173,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(16);
     tag_to_generate.length_value_type(4);
 
@@ -191,7 +194,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(17);
     tag_to_generate.length_value_type(4);
 
@@ -212,7 +215,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(254);
     tag_to_generate.length_value_type(4);
 
@@ -233,7 +236,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(4);
 
@@ -249,7 +252,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(5);
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
@@ -267,7 +270,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(6);
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
@@ -283,7 +286,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(7);
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
@@ -299,7 +302,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(8);
 
@@ -319,7 +322,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(253);
 
@@ -338,7 +341,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(254);
 
@@ -358,7 +361,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(255);
 
@@ -379,7 +382,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(65534);
 
@@ -400,7 +403,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(65535);
 
@@ -422,7 +425,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(65536);
 
@@ -443,7 +446,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(65537);
 
@@ -466,7 +469,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(4294967294);
 
@@ -489,7 +492,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(12);
     tag_to_generate.length_value_type(4294967295);
 
@@ -513,7 +516,7 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.is_context_tag(false);
+    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
     tag_to_generate.number(254);
     tag_to_generate.length_value_type(4294967295);
 

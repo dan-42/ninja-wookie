@@ -123,7 +123,7 @@ struct object_identifier_grammar : grammar<Iterator, object_identifier()> {
     object_identifier_grammar() : object_identifier_grammar::base_type(start_rule), tag_(application_tag::bacnet_object_identifier) {
       setup();
     }
-    object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule), tag_(tag, true) {
+    object_identifier_grammar(uint8_t tag) : object_identifier_grammar::base_type(start_rule), tag_(tag) {
       setup();
     }
 

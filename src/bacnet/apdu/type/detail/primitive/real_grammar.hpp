@@ -110,7 +110,7 @@ struct real_grammar : grammar<Iterator, float()> {
   }
 
   real_grammar(uint8_t tag)  : real_grammar::base_type(start_rule),
-                                tag_(tag, true, 4) {
+                                tag_(tag, 4) {
     setup();
   }
 

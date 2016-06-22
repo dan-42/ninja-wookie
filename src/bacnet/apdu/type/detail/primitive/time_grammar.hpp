@@ -108,7 +108,7 @@ struct time_grammar : grammar<Iterator, time()> {
   }
 
   time_grammar(uint8_t tag)  : time_grammar::base_type(start_rule),
-                               tag_(tag, true, 4) {
+                               tag_(tag, 4) {
     setup();
   }
 

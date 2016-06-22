@@ -145,7 +145,7 @@ struct bit_string_grammar : grammar<Iterator, bit_string()> {
   }
 
   bit_string_grammar(uint8_t tag)   : bit_string_grammar::base_type(start_rule),
-                                      tag_(tag, true) {
+                                      tag_(tag) {
     setup();
   }
 

@@ -108,7 +108,7 @@ struct null_grammar : grammar<Iterator, null()> {
       setup();
     }
     null_grammar(uint8_t tag) : null_grammar::base_type(start_rule),
-                                tag_(tag, true, 0) {
+                                tag_(tag, 0) {
       setup();
     }
 

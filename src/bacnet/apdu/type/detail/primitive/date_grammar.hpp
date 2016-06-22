@@ -109,7 +109,7 @@ struct date_grammar : grammar<Iterator, date()> {
   }
 
   date_grammar(uint8_t tag)  : date_grammar::base_type(start_rule),
-                               tag_(tag, true, 4) {
+                               tag_(tag, 4) {
     setup();
   }
 

@@ -106,11 +106,12 @@ namespace bacnet { namespace apdu {  namespace type {
 
 struct simple_tag {
 
-    static constexpr uint8_t extended_tag_number_indication   = 0b1111;
-    static constexpr uint8_t extended_length_value_0_byte_min = 0b101; //stored in tag
-    static constexpr uint8_t simple_length_max_value          = 0b100; //4
-    static constexpr uint8_t opening_tag_indication           = 0b110; //6
-    static constexpr uint8_t closing_tag_indication           = 0b111; //7
+    static const uint8_t extended_tag_number_indication           = 0x0F;
+    static const uint8_t extended_length_value_indication         = 0x05;
+    static const uint8_t opening_tag_indication                   = 0x06;
+    static const uint8_t closing_tag_indication                   = 0x07;
+    static const uint8_t extended_2_bytes_length_value_indication = 0xFE;
+    static const uint8_t extended_4_bytes_length_value_indication = 0xFF;
 
     uint8_t length_value_type_         : 3;
     uint8_t is_context_tag_            : 1; //also called: class in the standard
@@ -119,37 +120,68 @@ struct simple_tag {
     simple_tag() :   length_value_type_(0), is_context_tag_(0), number_(0) {
     }
 
-    simple_tag(const uint8_t &n) : length_value_type_(0), is_context_tag_(0), number_(n) {
-    }
-
-    simple_tag(const uint8_t &n, const bool &is_app) : length_value_type_(0), is_context_tag_(is_app), number_(n) {
-    }
-
     simple_tag(const uint8_t &n, const bool &is_app, const uint8_t &v) : length_value_type_(v), is_context_tag_(is_app), number_(n) {
     }
 
-    simple_tag(const tag& t) :   length_value_type_(t.length_value_type()), is_context_tag_(t.is_context_tag()), number_(t.number()) {
-      if(t.number() >= extended_tag_number_indication)
-        number_ = extended_tag_number_indication;
+    simple_tag(const tag& t) {
 
-      if(    t.length_value_type() >  simple_length_max_value
-          && t.length_value_type() != opening_tag_indication
-          && t.length_value_type() != closing_tag_indication ) {
-        length_value_type_ = extended_length_value_0_byte_min;
+      if(t.number() >= extended_tag_number_indication) {
+        number_ = extended_tag_number_indication;
+      }
+      else {
+        number_ = t.number();
+      }
+
+
+      if(t.is_application_tag()) {
+        is_context_tag_ = 0;
+      }
+      else {
+        is_context_tag_ = 1;
+      }
+
+
+      if(t.is_opening_tag()) {
+        length_value_type_ = opening_tag_indication;
+      }
+      else if(t.is_closing_tag()) {
+        length_value_type_ = closing_tag_indication;
+      }
+      else if(t.length_value_type() >= extended_length_value_indication) {
+        length_value_type_ = extended_length_value_indication;
+      }
+      else {
+        length_value_type_ = t.length_value_type();
       }
     }
 
+
+
     inline uint8_t number() const { return number_; }
-
     inline bool is_context_tag() const { return is_context_tag_ == 1; }
-
     inline uint8_t length_value_type() const { return length_value_type_; }
 
     inline void number(uint8_t v) { number_ = v; }
-
     inline void is_context_tag(bool v) { v ? is_context_tag_ = 0 : is_context_tag_ = 1; }
-
     inline void length_value_type(uint8_t v) { length_value_type_ = v; }
+
+    inline bool is_number_extended() const { return number_            == extended_tag_number_indication; }
+    inline bool is_length_extended() const { return length_value_type_ == extended_length_value_indication; }
+    inline bool is_opening_tag() const { return length_value_type_     == opening_tag_indication; }
+    inline bool is_closing_tag() const { return length_value_type_     == closing_tag_indication; }
+
+    inline tag::type tag_type() const {
+      if(is_context_tag()) {
+        if(is_opening_tag()) {
+          return tag::type::opening;
+        }
+        if(is_closing_tag()) {
+          return tag::type::closing;
+        }
+        return tag::type::context;
+      }
+      return tag::type::application;
+    }
 
     inline uint8_t to_binary() const {
       uint8_t data{0x00};
@@ -193,13 +225,12 @@ struct tag_grammar : grammar<Iterator, tag()> {
 
     rule<Iterator, tag()>               start_rule;
 
-    rule<Iterator, tag()>               tag_rule;
 
     rule<Iterator>                      simple_tag_rule;
 
     rule<Iterator, uint8_t()>           tag_number_rule;
-    rule<Iterator, bool()>              is_context_tag_rule;
     rule<Iterator, uint32_t()>          length_value_rule;
+    rule<Iterator, tag::type()>         tag_type_rule;
 
     rule<Iterator, uint32_t()>          extendet_length_value_rule;
 
@@ -207,39 +238,59 @@ struct tag_grammar : grammar<Iterator, tag()> {
 
     tag_grammar() : tag_grammar::base_type(start_rule) {
 
-      static const constexpr uint8_t extended_2_bytes_length_value_indication = 0b11111110;
-      static const constexpr uint8_t extended_4_bytes_length_value_indication = 0b11111111;
 
-      start_rule  = simple_tag_rule  >> tag_number_rule >>  is_context_tag_rule >> length_value_rule;
+
+      start_rule  =  simple_tag_rule
+                  >> tag_number_rule
+                  >> length_value_rule
+                  >> tag_type_rule
+                  ;
+
 
       simple_tag_rule = simple_tag_grammar[ref(simple_tag_) = _1];
 
-      tag_number_rule = (eps(boost::phoenix::bind(&simple_tag::number, ref(simple_tag_)) == 0b1111) >> byte_ )
-                      | attr(boost::phoenix::bind(&simple_tag::number, ref(simple_tag_)));
+      tag_number_rule = (  eps(boost::phoenix::bind(&simple_tag::is_number_extended, ref(simple_tag_)) == true)
+                        >> byte_
+                        )
+                      | attr( boost::phoenix::bind( &simple_tag::number, ref(simple_tag_)) )
+                      ;
 
-      is_context_tag_rule = attr(boost::phoenix::bind(&simple_tag::is_context_tag, ref(simple_tag_)));
+      length_value_rule = (
+                             eps(boost::phoenix::bind(&simple_tag::is_length_extended, ref(simple_tag_)) == true)
+                          >> extendet_length_value_rule
+                          )
+                        |  attr( boost::phoenix::bind( &simple_tag::length_value_type, ref(simple_tag_) ) )
+                        ;
 
-      length_value_rule = (eps(boost::phoenix::bind(&simple_tag::length_value_type, ref(simple_tag_)) == 0b101) >> extendet_length_value_rule)
-                        |  attr(boost::phoenix::bind(&simple_tag::length_value_type, ref(simple_tag_)));
+      extendet_length_value_rule = (
+                                       omit[byte_(simple_tag::extended_2_bytes_length_value_indication)]
+                                    >> big_word
+                                   )
 
+                                 | (
+                                       omit[byte_(simple_tag::extended_4_bytes_length_value_indication)]
+                                    >> big_dword
+                                   )
 
-      extendet_length_value_rule = (omit[byte_(254)] >> big_word)
-                                 | (omit[byte_(255)] >> big_dword)
-                                 | byte_;
+                                 | byte_
+                                 ;
+
+      tag_type_rule             = attr(boost::phoenix::bind(&simple_tag::tag_type, ref(simple_tag_)))
+                                ;
 
       //
       /*
       start_rule.name("start_rule");
       simple_tag_rule.name("simple_tag_rule");
       tag_number_rule.name("tag_number_rule");
-      is_context_tag_rule.name("is_context_tag_rule");
+      tag_type_rule.name("tag_type_rule");
       length_value_rule.name("length_value_rule");
       extendet_length_value_rule.name("extendet_length_value_rule");
 
       debug(start_rule);
       debug(simple_tag_rule);
       debug(tag_number_rule);
-      debug(is_context_tag_rule);
+      debug(tag_type_rule);
       debug(length_value_rule);
       debug(extendet_length_value_rule);
       //*/
@@ -247,45 +298,14 @@ struct tag_grammar : grammar<Iterator, tag()> {
     }
 private:
 
-
-
     void extract_value(const tag &tag_) {
       simple_tag_ = simple_tag(tag_);
-      tag_number_ = tag_.number();
-      tag_length_ = tag_.length_value_type();
-      is_context_tag_ = tag_.is_context_tag();
     }
 
     void get_simple_tag(simple_tag& st) {
       st = simple_tag_;
     }
 
-    bool is_extended_tag_number() {
-      static constexpr uint8_t extended_tag_number_indication = 0b1111;
-      return (tag_number_ >= extended_tag_number_indication);
-    }
-
-    bool is_length_extendend_by_1_byte() {
-      static constexpr uint32_t min_value = 5;
-      static constexpr uint32_t max_value = 253;
-      return (tag_length_ >= min_value && tag_length_ <= max_value);
-    }
-
-    bool is_length_extendend_by_2_byte() {
-      static constexpr uint32_t min_value = 254;
-      static constexpr uint32_t max_value = 65535;
-      return (tag_length_ >= min_value && tag_length_ <= max_value);
-    }
-
-    bool is_length_extendend_by_4_byte() {
-      static constexpr uint32_t min_value = 65536;
-      return (tag_length_ >= min_value );
-    }
-
-
-    uint8_t tag_number_ = 0;
-    uint32_t tag_length_ = 0;
-    bool is_context_tag_ = false;
     simple_tag simple_tag_;
 };
 
@@ -316,46 +336,45 @@ struct tag_grammar : grammar<Iterator, tag()> {
 
 
     rule<Iterator, tag()>               start_rule;
-
-    rule<Iterator, tag()>               tag_rule;
-
     rule<Iterator>                      simple_tag_rule;
-
-    rule<Iterator, uint8_t()>           tag_number_rule;
-    rule<Iterator, bool()>              is_context_tag_rule;
-    rule<Iterator, uint32_t()>          length_value_rule;
-
-    rule<Iterator, uint32_t()>          extendet_length_value_rule;
+    rule<Iterator>                      tag_number_rule;
+    rule<Iterator>                      length_value_rule;
+    rule<Iterator>                      extendet_length_value_rule;
 
     bit_field<Iterator, simple_tag> simple_tag_grammar;
 
     tag_grammar() : tag_grammar::base_type(start_rule) {
 
-      static const constexpr uint8_t extended_2_bytes_length_value_indication = 0b11111110; //254
-      static const constexpr uint8_t extended_4_bytes_length_value_indication = 0b11111111; //255
-
       start_rule =  eps[boost::phoenix::bind(&tag_grammar::extract_value, this, _val)]
-                 << tag_rule[_1 = _val]
+                 << simple_tag_rule
+                 << tag_number_rule
+                 << length_value_rule
                  ;
-
-      tag_rule  =  simple_tag_rule
-                << tag_number_rule
-                << is_context_tag_rule
-                << length_value_rule
-                ;
 
       simple_tag_rule = simple_tag_grammar[ _1 = ref(simple_tag_)];
 
-      is_context_tag_rule = eps;
 
-      tag_number_rule = eps( boost::phoenix::bind(&tag_grammar::is_extended_tag_number, this) == true) << byte_
-                      | eps;
+      tag_number_rule =     eps(   boost::phoenix::bind(&simple_tag::is_number_extended, ref(simple_tag_) ) == true)
+                         << byte_(ref(tag_.number_))
+                      |
+                      eps;
 
 
-      length_value_rule = ( eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_4_byte, this) == true) << byte_(extended_4_bytes_length_value_indication) << big_dword )
-                        | ( eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_2_byte, this) == true) << byte_(extended_2_bytes_length_value_indication) << big_word )
-                        | ( eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_1_byte, this) == true) << byte_ )
-                        |   eps
+      length_value_rule = (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_4_byte, this) == true)
+                            << byte_(simple_tag::extended_4_bytes_length_value_indication)
+                            << big_dword(ref(tag_.length_value_type_))
+                          )
+
+                        | (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_2_byte, this) == true)
+                            << byte_(simple_tag::extended_2_bytes_length_value_indication)
+                            << big_word(ref(tag_.length_value_type_))
+                          )
+
+                        | (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_1_byte, this) == true)
+                            << byte_(ref(tag_.length_value_type_))
+                          )
+
+                        |      eps
                         ;
 
 
@@ -381,40 +400,27 @@ private:
 
 
 
-    void extract_value(const tag &tag_) {
-      simple_tag_ = simple_tag(tag_);
-      tag_number_ = tag_.number();
-      tag_length_ = tag_.length_value_type();
-      is_context_tag_ = tag_.is_context_tag();
-    }
-
-    void get_simple_tag(simple_tag& st) {
-     st = simple_tag_;
-    }
-
-    bool is_extended_tag_number() {
-      return (tag_number_ >= simple_tag::extended_tag_number_indication);
+    void extract_value(const tag &t) {
+      simple_tag_ = simple_tag(t);
+      tag_ = t;
     }
 
     bool is_length_extendend_by_1_byte() {
-      return (simple_tag_.length_value_type() == simple_tag::extended_length_value_0_byte_min);
+      return (simple_tag_.length_value_type() == simple_tag::extended_length_value_indication);
     }
 
     bool is_length_extendend_by_2_byte() {
       static constexpr uint32_t min_value = 254;
       static constexpr uint32_t max_value = 65535;
-      return (tag_length_ >= min_value && tag_length_ <= max_value);
+      return (tag_.length_value_type_ >= min_value && tag_.length_value_type_ <= max_value);
     }
 
     bool is_length_extendend_by_4_byte() {
-      static constexpr uint32_t min_value = 65536;
-      return (tag_length_ >= min_value );
+      static constexpr uint32_t min_value = 65535;
+      return (tag_.length_value_type_ > min_value );
     }
 
-
-    uint8_t     tag_number_     = 0;
-    uint32_t    tag_length_     = 0;
-    bool        is_context_tag_ = false;
+    tag tag_;
     simple_tag  simple_tag_;
 };
 

@@ -109,7 +109,7 @@ struct octet_string_grammar : grammar<Iterator, bacnet::binary_data()> {
 
   octet_string_grammar(uint8_t tag)   : octet_string_grammar::base_type(start_rule),
                                         size_(0),
-                                        tag_(tag, true) {
+                                        tag_(tag) {
     setup();
   }
 

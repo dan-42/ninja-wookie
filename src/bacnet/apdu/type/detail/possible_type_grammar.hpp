@@ -258,8 +258,8 @@ struct possible_type_grammar : grammar<Iterator, type::possible_type()> {
   }
   possible_type_grammar(uint8_t tag_id) : possible_type_grammar::base_type(start_rule_tagged),
                                   add_surrounding_tag_(true),
-                                  opening_tag_(tag_id, true, tag::opening_tag_indication),
-                                  closing_tag_(tag_id, true, tag::closing_tag_indication) {
+                                  opening_tag_(tag_id, tag::type::opening),
+                                  closing_tag_(tag_id, tag::type::closing) {
     setup();
   }
 
