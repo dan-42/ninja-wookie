@@ -116,8 +116,9 @@ int main(int argc, char *argv[]) {
         }
 ///*
         else if (    s.object_identifier.object_type      == bacnet::object_type::device
-            && s.object_identifier.instance_number  == doi
-            && s.property_identifier                == bacnet::type::property::object_list::value ) {
+                  && s.object_identifier.instance_number  == doi
+                  && s.property_identifier                == bacnet::type::property::object_list::value ) {
+
 
           std::vector<bacnet::type::possible_type> object_list;
           object_list.push_back(s.object_identifier);
