@@ -126,7 +126,7 @@ private:
                              ;
 
       context_rule          %=  open_tag_rule
-                            >> (value_rule | sequence_rule)
+                            >>  value_rule
                             >>  close_tag_rule
                             ;
 
@@ -164,8 +164,7 @@ private:
       open_tag_rule          =  tag_grammar_[ phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
       close_tag_rule         =  tag_grammar_[ phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
 
-      //
-      /*
+      //      /*
       start_rule            .name("possible_type_grammar_start_rule");
       value_rule            .name("possible_type_grammar_value_rule");
       constructed_rule      .name("possible_type_grammar_constructed_type_rule");
@@ -185,7 +184,6 @@ private:
 
     inline void check_nested_tag(const uint8_t& open, const tag& close, bool& pass) {
       if(     close.is_closing_tag()
-          &&  close.is_context_tag()
           &&  open == close.number()  ) {
         pass = true;
       }
@@ -195,7 +193,7 @@ private:
     }
 
     inline uint8_t is_context_open_tag(const tag& t, bool& pass) {
-      if(t.is_context_tag() && t.is_opening_tag()) {
+      if(t.is_opening_tag()) {
         pass = true;
       }
       else {

@@ -192,8 +192,7 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     open_tag_3_rule                     =  tag_grammar_[ boost::phoenix::bind(&read_property_ack_grammar::check_open_tag,  this, _1, _pass) ];
     close_tag_3_rule                    =  tag_grammar_[ boost::phoenix::bind(&read_property_ack_grammar::check_close_tag, this, _1, _pass) ];
 
-    //
-    /*
+    //    /*
     start_rule                  .name("read_property_ack_grammar_start_rule");
     object_identifier_rule      .name("object_identifier_rule");
     property_identifier_rule    .name("property_identifier_rule");

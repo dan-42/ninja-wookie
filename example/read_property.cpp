@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
                                                             std::cout << "error occurred: " << ec <<  std::endl;
                                                           }
                                                           else {
-                                                     //       std::cout << "response: " << pre::json::to_json(response).dump(2) <<  std::endl;
+                                                            std::cout << "response: " << pre::json::to_json(response).dump(2) <<  std::endl;
                                                           }
                                                           io_service.stop();
                                                        }
