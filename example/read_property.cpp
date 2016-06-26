@@ -20,11 +20,13 @@
 
 #include <bacnet/stack/factory.hpp>
 #include <bacnet/type/properties.hpp>
+#include <bacnet/type/types.hpp>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/program_options.hpp>
+
 
 int main(int argc, char *argv[]) {
   namespace prop = bacnet::type::property;
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
         ("port",                po::value<uint16_t>(&port)              ->default_value(0xBAC0),                        "listening port")
         ("doi",                 po::value<uint16_t>(&doi)               ->default_value(2),                             "device object identifier")
         ("object_instance",     po::value<uint32_t>(&object_instance)   ->default_value(2),                             "object_instance")
-        ("object_type",         po::value<uint32_t>(&object_type)       ->default_value(bacnet::object_type::device),   "object_type")
+        ("object_type",         po::value<uint32_t>(&object_type)       ->default_value(bacnet::type::object_type::type{bacnet::type::object_type::device}),   "object_type")
         ("property",            po::value<uint32_t>(&property)          ->default_value(prop::object_name::value),      "property")
     ;
     po::variables_map vm;
@@ -81,7 +83,8 @@ int main(int argc, char *argv[]) {
     bacnet::stack::factory<bacnet::stack::ip_v4_client> factory{io_service, ip, port};
     auto &service_controller = factory.controller();
 
-    bacnet::type::object_identifier device_id{bacnet::object_type::device, doi};
+    //bacnet::type::object_identifier device_id{bacnet::type::object_type::type{bacnet::type::object_type::device}, doi};
+    bacnet::type::object_identifier device_id{bacnet::type::object_type::device, doi};
     bacnet::type::object_identifier object_id{object_type, object_instance};
     bacnet::service::service::read_property_request request;
     if(index) {

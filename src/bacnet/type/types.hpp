@@ -15,7 +15,7 @@
 #include <bacnet/type/unsigned_integer.hpp>
 #include <bacnet/type/signed_integer.hpp>
 #include <bacnet/type/real.hpp>
-//#include <bacnet/type/double_presision.hpp>
+// double
 #include <bacnet/type/octet_string.hpp>
 #include <bacnet/type/character_string.hpp>
 #include <bacnet/type/bit_string.hpp>
@@ -26,22 +26,25 @@
 #include <bacnet/type/unsupported_type.hpp>
 #include <util/boost/spirit/unused_type.hpp>
 
+// enumerated values
+#include <bacnet/type/device_status.hpp>
+#include <bacnet/type/object_type.hpp>
+#include <bacnet/type/property_identifier.hpp>
+#include <bacnet/type/restart_reason.hpp>
+#include <bacnet/type/segmentation.hpp>
+#include <bacnet/type/vt_class.hpp>
+#include <bacnet/type/backup_state.hpp>
+
 namespace bacnet { namespace type {
 
 
 
-
-
 struct constructed_type;
-struct sequence_type;
 
-//typedef boost::variant<
+
 typedef boost::make_recursive_variant<
     std::vector< boost::recursive_variant_>,
-
-//    boost::recursive_wrapper< std::vector< possible_type > >,
     boost::recursive_wrapper< constructed_type >,
-
 
     null,
     boolean,
@@ -62,10 +65,6 @@ typedef boost::make_recursive_variant<
 possible_type;
 
 
-struct sequence_type {
-   std::vector< possible_type> sequence ;
- };
-
 struct constructed_type {
    uint8_t tag_number{0};
    std::vector< possible_type> value ;
@@ -80,13 +79,6 @@ BOOST_FUSION_ADAPT_STRUCT(
   tag_number,
   value
 );
-
-BOOST_FUSION_ADAPT_STRUCT(
-  bacnet::type::sequence_type,
-  sequence
-
-);
-
 
 
 

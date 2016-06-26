@@ -51,10 +51,12 @@ struct broadcast_distribution_table_entry_grammar : grammar<Iterator, broadcast_
 
   broadcast_distribution_table_entry_grammar() : broadcast_distribution_table_entry_grammar::base_type(broadcast_distribution_table_entry_rule) {
 
-    broadcast_distribution_table_entry_rule = bacnet_ip_address_rule << broadcast_distribution_mask_rule;
+    broadcast_distribution_table_entry_rule  %=  bacnet_ip_address_rule
+                                             <<  broadcast_distribution_mask_rule
+                                             ;
 
-    bacnet_ip_address_rule = bacnet_ip_address_grammar_;
-    broadcast_distribution_mask_rule = big_word;
+    bacnet_ip_address_rule            =  bacnet_ip_address_grammar_;
+    broadcast_distribution_mask_rule  =  big_word;
 
     broadcast_distribution_table_entry_rule.name("broadcast_distribution_table_entry_rule");
     bacnet_ip_address_rule.name("bacnet_ip_address_rule");

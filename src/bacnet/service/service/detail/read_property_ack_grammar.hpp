@@ -77,9 +77,8 @@ using property_grammar_map = std::map<mapping::type, property_grammar_ptr>;
 
 template<typename Iterator>
 rule_t* select(const object_identifier& r1,const uint32_t& p, const boost::optional<uint32_t>& r3) {
-
+    using     obj     = bacnet::type::object_type;
     namespace prop    = bacnet::type::property;
-    namespace obj     = bacnet::object_type;
     namespace grammar = bacnet::apdu::type::detail::parser;
 
     static property_grammar_ptr default_rule;
@@ -194,7 +193,8 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     open_tag_3_rule                     =  tag_grammar_[ boost::phoenix::bind(&read_property_ack_grammar::check_open_tag,  this, _1, _pass) ];
     close_tag_3_rule                    =  tag_grammar_[ boost::phoenix::bind(&read_property_ack_grammar::check_close_tag, this, _1, _pass) ];
 
-    //    /*
+    //
+    /*
     start_rule                  .name("read_property_ack_grammar_start_rule");
     object_identifier_rule      .name("object_identifier_rule");
     property_identifier_rule    .name("property_identifier_rule");

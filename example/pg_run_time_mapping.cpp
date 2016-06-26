@@ -36,6 +36,7 @@
 #include <boost/fusion/include/mpl.hpp>
 
 
+#include <bacnet/type/types.hpp>
 
 
 

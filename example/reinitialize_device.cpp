@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     bacnet::stack::factory<bacnet::stack::ip_v4_client> factory{io_service, ip, port};
     auto &service_controller = factory.controller();
 
-    bacnet::type::object_identifier device_id{bacnet::object_type::device, doi};
+    bacnet::type::object_identifier device_id{bacnet::type::object_type::device, doi};
     bacnet::service::service::reinitialize_device reinitd{state, password};
     service_controller.start();
 

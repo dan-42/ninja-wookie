@@ -40,7 +40,9 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -Wno-unused-local-typedefs 
                     -Wno-unused-variable 
                     -Wno-unused-value                   
-                    -Wno-deprecated-declarations)
+                    -Wno-deprecated-declarations
+                    -Wno-placement-new # needed for gcc6 and boost 1.61 boost.function
+                    )
 
 
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)

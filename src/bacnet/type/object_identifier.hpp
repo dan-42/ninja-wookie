@@ -26,66 +26,7 @@
 #include <boost/fusion/adapted/adt/adapt_adt.hpp>
 #include <boost/fusion/include/adapt_adt.hpp>
 
-
-namespace bacnet {
-  namespace object_type {
-    static constexpr uint32_t analog_input      = 0;
-    static constexpr uint32_t analog_output     = 1;
-    static constexpr uint32_t analog_value = 2;
-    static constexpr uint32_t binary_input = 3;
-    static constexpr uint32_t binary_output = 4;
-    static constexpr uint32_t binary_value = 5;
-    static constexpr uint32_t calendar = 6;
-    static constexpr uint32_t command = 7;
-    static constexpr uint32_t device = 8;
-    static constexpr uint32_t event_enrollment = 9;
-    static constexpr uint32_t file = 10;
-    static constexpr uint32_t group = 11;
-    static constexpr uint32_t loop = 12;
-    static constexpr uint32_t multi_state_input = 13;
-    static constexpr uint32_t multi_state_output = 14;
-    static constexpr uint32_t notification_class = 15;
-    static constexpr uint32_t program = 16;
-    static constexpr uint32_t schedule = 17;
-    static constexpr uint32_t averaging = 18;
-    static constexpr uint32_t multi_state_value = 19;
-    static constexpr uint32_t trend_log = 20;
-    static constexpr uint32_t life_safety_point = 21;
-    static constexpr uint32_t life_safety_zone = 22;
-    static constexpr uint32_t accumulator = 23;
-    static constexpr uint32_t pulse_converter = 24;
-    static constexpr uint32_t event_log = 25;
-    static constexpr uint32_t global_group = 26;
-    static constexpr uint32_t trend_log_multiple = 27;
-    static constexpr uint32_t load_control = 28;
-    static constexpr uint32_t structured_view = 29;
-    static constexpr uint32_t access_door = 30;
-    static constexpr uint32_t unassigned_31 = 31;
-    static constexpr uint32_t access_credential = 32;
-    static constexpr uint32_t access_point = 33;
-    static constexpr uint32_t access_rights = 34;
-    static constexpr uint32_t access_user = 35;
-    static constexpr uint32_t access_zone = 36;
-    static constexpr uint32_t credential_data_input = 37;
-    static constexpr uint32_t network_security = 38;
-    static constexpr uint32_t bitstring_value = 39;
-    static constexpr uint32_t characterstring_value = 40;
-    static constexpr uint32_t date_pattern_value = 41;
-    static constexpr uint32_t date_value = 42;
-    static constexpr uint32_t datetime_pattern_value = 43;
-    static constexpr uint32_t datetime_value = 44;
-    static constexpr uint32_t integer_value = 45;
-    static constexpr uint32_t large_analog_value = 46;
-    static constexpr uint32_t octetstring_value = 47;
-    static constexpr uint32_t positive_integer_value = 48;
-    static constexpr uint32_t time_pattern_value = 49;
-    static constexpr uint32_t time_value = 50;
-    static constexpr uint32_t notification_forwarder = 51;
-    static constexpr uint32_t alert_enrollment = 52;
-    static constexpr uint32_t channel = 53;
-    static constexpr uint32_t lighting_output = 54;
-  }
-}
+#include <bacnet/type/object_type.hpp>
 
 
 namespace bacnet { namespace type {
@@ -102,10 +43,11 @@ namespace bacnet { namespace type {
     object_identifier() : object_type(0), instance_number(0) {
 
     }
-    object_identifier(const uint32_t &in) : object_type(bacnet::object_type::device), instance_number(in) {
+    object_identifier(const uint32_t &in) : object_type(bacnet::type::object_type::device), instance_number(in) {
 
     }
-    object_identifier(const uint32_t &type, const uint32_t &in) : object_type(type), instance_number(in) {
+
+    object_identifier(uint32_t type, uint32_t in) noexcept: object_type(std::move(type)), instance_number(std::move(in)) {
 
     }
 

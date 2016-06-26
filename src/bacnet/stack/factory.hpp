@@ -24,7 +24,7 @@
 #include <bacnet/apdu/controller.hpp>
 #include <bacnet/service/controller.hpp>
 #include <bacnet/common/configuration.hpp>
-
+#include <bacnet/type/types.hpp>
 
 namespace bacnet { namespace stack {
 

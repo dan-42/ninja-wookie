@@ -20,6 +20,7 @@
 
 namespace bacnet { namespace type {
   typedef uint32_t property_type;
+  static constexpr property_type max_standard_property_id = 512;
 }}
 
 namespace bacnet { namespace type { namespace property {
@@ -36,12 +37,9 @@ namespace bacnet { namespace type { namespace property {
 
 
 // must be implemented for each
-
   template<typename T>  struct name {
     static constexpr const char* const value = "undefined_name";
   };
-
-
 
 }}}
 
@@ -92,11 +90,11 @@ using integral_constant_ = std::integral_constant<bacnet::type::property_type, T
 
 #define my_args(id) int COMMA id
 
-//#define consttant_(id) typedef std::integral_constant< my_args(id)>
-#define consttant_(id) typedef integral_constant_< id >
+
+#define constant_(id) typedef integral_constant_< id >
 
 #define WOOKIE_DEFINE_BACNET_PROPERTY_SIMPLE_1(property_name, property_id)         \
-    consttant_(property_id)   property_name;                                    \
+    constant_(property_id)   property_name;                                    \
     template<>                                                                 \
     struct name<property_name> {                                               \
       static constexpr const char* const value = #property_name;               \
@@ -139,23 +137,6 @@ using integral_constant_ = std::integral_constant<bacnet::type::property_type, T
             BOOST_PP_CAT( NM_BACNET_FILLER_0 elems ,_END)                      \
 
 
-
-
-
-/*  typedef boost::mpl::vector<                                                \
-
-      BOOST_PP_SEQ_FOR_EACH(  EXTRACT_PROPERTY_NAME_WITH_COMMA,                \
-                              unused,                                          \
-                              BOOST_PP_SEQ_POP_BACK(property_seq)  )           \
-                                                                               \
-     BOOST_PP_TUPLE_ELEM(0,                                                    \
-       BOOST_PP_SEQ_ELEM(                                                      \
-         BOOST_PP_DEC(  BOOST_PP_SEQ_SIZE(  property_seq   ) )  ,              \
-         property_seq                                                          \
-       )                                                                       \
-     )                                                                         \
-  > supported_properties;
-*/
 
 
 

@@ -44,6 +44,7 @@
 #include <bacnet/common/configuration.hpp>
 
 #include <bacnet/apdu/api.hpp>
+#include <bacnet/type/types.hpp>
 #include <bacnet/error/error.hpp>
 
 
@@ -122,7 +123,7 @@ public:
                 io_service_(io_service),
                 lower_layer_(lower_layer),
                 inbound_router_(callback_manager_, device_manager_),
-                device_object_identifier_(bacnet::object_type::device, config.device_object_id),
+                device_object_identifier_(bacnet::type::object_type::device, config.device_object_id),
                 config_(config) {
   }
 
