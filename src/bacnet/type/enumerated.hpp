@@ -34,7 +34,7 @@
   - [x] BACnetList of BACnetVTClass //enumeration
   - [x] BACnetBackupState //enumerated
 
-  - [ ] BACnetServicesSupported  // bit-string
+  - [-] BACnetServicesSupported  // bit-string
   - [ ] BACnetObjectTypesSupported // bit-string
 
   - [ ] BACnetList of BACnetVTSession       // sequence
