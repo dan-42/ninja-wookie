@@ -42,6 +42,10 @@ target_link_libraries(read_property wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES}
 set_target_properties(read_property PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS read_property DESTINATION bin)
 
+add_executable(read_property_services_supported read_property_services_supported.cpp)
+target_link_libraries(read_property_services_supported wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+set_target_properties(read_property_services_supported PROPERTIES DEBUG_POSTFIX "d")
+install(TARGETS read_property_services_supported DESTINATION bin)
 
 add_executable(reinitialize_device reinitialize_device.cpp)
 target_link_libraries(reinitialize_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)

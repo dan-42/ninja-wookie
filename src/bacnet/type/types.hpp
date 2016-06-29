@@ -35,6 +35,10 @@
 #include <bacnet/type/vt_class.hpp>
 #include <bacnet/type/backup_state.hpp>
 
+
+// bit_string based types
+#include <bacnet/type/services_supported.hpp>
+
 namespace bacnet { namespace type {
 
 

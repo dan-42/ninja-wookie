@@ -161,20 +161,32 @@ private:
     value_rule        =  repeat(ref(num_of_bytes_))[pack_bit_rule];
     pack_bit_rule     =  byte_[_1 = boost::phoenix::bind(&bit_string_grammar::get_packed_bits, this)];
 
+    //
+    /*
     start_rule. name("start_rule");
     tag_rule.   name("tag_rule");
+    unused_bits_rule.name("unused_bits_rule");
+    pack_bit_rule.name("pack_bit_rule");
     value_rule. name("value_rule");
+    debug(start_rule);
+    debug(tag_rule);
+    debug(unused_bits_rule);
+    debug(pack_bit_rule);
+    debug(value_rule);
+    // */
+
+
   }
 
   uint8_t get_packed_bits() {
     uint8_t  packed_bits_{0};
     for(int idx = 7; idx >= 0; --idx ) {
-      uint8_t value = bit_string_[bit_index_] ? 1 : 0;
-      packed_bits_ |= value << idx;
-      bit_index_++;
       if(bit_index_ >= bit_string_.size()) {
         break;
       }
+      uint8_t value = bit_string_[bit_index_] ? 1 : 0;
+      packed_bits_ |= value << idx;
+      bit_index_++;
     }
     return packed_bits_;
   }

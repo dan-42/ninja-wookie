@@ -164,7 +164,8 @@ private:
       open_tag_rule          =  tag_grammar_[ phoenix::bind(&possible_type_grammar::check_open_tag,  this, _1, _pass) ];
       close_tag_rule         =  tag_grammar_[ phoenix::bind(&possible_type_grammar::check_close_tag, this, _1, _pass) ];
 
-      //      /*
+      //
+      /*
       start_rule            .name("possible_type_grammar_start_rule");
       value_rule            .name("possible_type_grammar_value_rule");
       constructed_rule      .name("possible_type_grammar_constructed_type_rule");
@@ -300,12 +301,15 @@ private:
                   ;
 
 
-      ///*
+      //
+      /*
+      start_untagged_rule.name("start_untagged_rule");
       start_tagged_rule.name("start_rule");
       open_tag_rule.name("open_tag_rule");
       close_tag_rule.name("close_tag_rule");
       sequence_rule.name("sequence_rule");
       value_rule.name("value_rule");
+      debug(start_untagged_rule);
       debug(start_tagged_rule);
       debug(open_tag_rule);
       debug(close_tag_rule);

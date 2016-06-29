@@ -18,7 +18,7 @@ namespace bacnet { namespace type {
  * \brief the values represent the index of the bit-string indicating the supported services
  */
 struct services_supported {
-  typedef boost::container::vector::size_type type;
+  typedef bit_string::size_type type;
 
   static constexpr type acknowledge_alarm                       =  0;
   static constexpr type confirmed_change_of_value_notification  =  1;
@@ -68,7 +68,7 @@ struct services_supported {
   static constexpr type revision_14_size                        = 40;
 
 
-  inline std::string services_supported::to_string(const bit_string &bs) const ;
+  inline std::string to_string(const bit_string &bs) const ;
 };
 
 static inline bit_string make_services_supported() {
@@ -76,11 +76,22 @@ static inline bit_string make_services_supported() {
   return bs;
 }
 
+static inline bit_string make_services_supported(const std::vector<bit_string::size_type>& supported) {
+  bit_string bs(services_supported::revision_14_size, false);
+
+  for(auto& s : supported) {
+    if(s < bs.size()) {
+      bs[s] = true;
+    }
+  }
+  return bs;
+}
+
 
 inline std::string services_supported::to_string(const bit_string &bs) const {
   std::stringstream os;
   os << "\"services_supported\" = {";
-  for(auto idx = 0; idx < bs.size(); ++idx) {
+  for(bit_string::size_type idx = 0; idx < bs.size(); ++idx) {
     if(bs[idx]) {
       os << "\"";
       switch(idx) {

@@ -149,6 +149,21 @@ int main(int argc, char *argv[]) {
 ///////////////////////////////////////////////////////////////////////////////
         else if (    s.object_identifier.object_type      == bacnet::type::object_type::device
                   && s.object_identifier.instance_number  == doi
+                  && s.property_identifier                == bacnet::type::property::protocol_services_supported::value ) {
+
+
+          static const auto supported_services  = bacnet::type::make_services_supported({
+                                                                              bacnet::type::services_supported::who_is,
+                                                                              bacnet::type::services_supported::i_am,
+                                                                              bacnet::type::services_supported::read_property,
+                                                                            });
+
+          bacnet::service::read_property_ack ack{s, supported_services};
+            service_controller.async_send_response(ack, mi, [](bacnet::error e){     });
+        }
+///////////////////////////////////////////////////////////////////////////////
+        else if (    s.object_identifier.object_type      == bacnet::type::object_type::device
+                  && s.object_identifier.instance_number  == doi
                   && s.property_identifier                == bacnet::type::property::system_status::value ) {
 
           auto status  = bacnet::type::make_device_status(bacnet::type::device_status::operational);
