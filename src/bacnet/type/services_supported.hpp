@@ -20,6 +20,11 @@ namespace bacnet { namespace type {
 struct services_supported {
   typedef bit_string::size_type type;
 
+
+  services_supported(bit_string bs) : value_(std::move(bs)) {
+  }
+
+
   static constexpr type acknowledge_alarm                       =  0;
   static constexpr type confirmed_change_of_value_notification  =  1;
   static constexpr type confirmed_event_notification            =  2;
@@ -68,7 +73,74 @@ struct services_supported {
   static constexpr type revision_14_size                        = 40;
 
 
-  inline std::string to_string(const bit_string &bs) const ;
+
+  inline std::string to_string() const {
+
+    std::stringstream os;
+      os << "\"services_supported\" = {";
+      for(bit_string::size_type idx = 0; idx < value_.size(); ++idx) {
+        if(value_[idx]) {
+          os << "\"";
+          switch(idx) {
+            case services_supported::acknowledge_alarm                            : os << "acknowledge_alarm";                        break;
+            case services_supported::confirmed_change_of_value_notification       : os << "confirmed_change_of_value_notification";   break;
+            case services_supported::confirmed_event_notification                 : os << "confirmed_event_notification";             break;
+            case services_supported::get_alarm_summary                            : os << "get_alarm_summary";                        break;
+            case services_supported::get_enrollment_summary                       : os << "get_enrollment_summary";                   break;
+            case services_supported::subscribe_change_of_value                    : os << "subscribe_change_of_value";                break;
+            case services_supported::atomic_read_file                             : os << "atomic_read_file";                         break;
+            case services_supported::atomic_write_file                            : os << "atomic_write_file";                        break;
+            case services_supported::add_list_element                             : os << "add_list_element";                         break;
+            case services_supported::remove_list_element                          : os << "remove_list_element";                      break;
+
+            case services_supported::create_object                                : os << "create_object";                            break;
+            case services_supported::delete_object                                : os << "delete_object";                            break;
+            case services_supported::read_property                                : os << "read_property";                            break;
+            case services_supported::read_property_conditional                    : os << "read_property_conditional";                break;
+            case services_supported::read_property_multiple                       : os << "read_property_multiple";                   break;
+            case services_supported::write_property                               : os << "write_property";                           break;
+            case services_supported::write_property_multiple                      : os << "write_property_multiple";                  break;
+            case services_supported::device_communication_control                 : os << "device_communication_control";             break;
+            case services_supported::confirmed_private_transfer                   : os << "confirmed_private_transfer";               break;
+            case services_supported::confirmed_text_message                       : os << "confirmed_text_message";                   break;
+
+            case services_supported::reinitialize_device                          : os << "reinitialize_device";                      break;
+            case services_supported::vt_open                                      : os << "vt_open";                                  break;
+            case services_supported::vt_close                                     : os << "vt_close";                                 break;
+            case services_supported::vt_data                                      : os << "vt_data";                                  break;
+            case services_supported::authenticate                                 : os << "authenticate";                             break;
+            case services_supported::request_key                                  : os << "request_key";                              break;
+            case services_supported::i_am                                         : os << "i_Am";                                     break;
+            case services_supported::i_have                                       : os << "i_have";                                   break;
+            case services_supported::unconfirmed_change_of_value_notification     : os << "unconfirmed_change_of_value_notification"; break;
+            case services_supported::unconfirmed_event_notification               : os << "unconfirmed_event_notification";           break;
+
+            case services_supported::unconfirmed_private_transfer                 : os << "unconfirmed_private_transfer";             break;
+            case services_supported::unconfirmed_text_message                     : os << "unconfirmed_text_message";                 break;
+            case services_supported::time_synchronization                         : os << "time_synchronization";                     break;
+            case services_supported::who_has                                      : os << "who_has";                                  break;
+            case services_supported::who_is                                       : os << "who_is";                                   break;
+            case services_supported::read_range                                   : os << "read_range";                               break;
+            case services_supported::utc_time_synchronization                     : os << "utc_time_synchronization";                 break;
+            case services_supported::life_safety_operation                        : os << "life_safety_operation";                    break;
+            case services_supported::subscribe_change_of_value_property           : os << "subscribe_change_of_value_property";       break;
+            case services_supported::get_event_information                        : os << "get_event_information";                    break;
+            case services_supported::write_group                                  : os << "write_group";                              break;
+
+            default                                                               : os << "unknown_service(" << idx << ")";           break;
+          }
+          os << "\",";
+        }
+      }
+      os << "}";
+      return os.str();
+  }
+
+  friend std::string to_string(const services_supported &ss)  {
+    return ss.to_string();
+  }
+private:
+  bit_string value_;
 };
 
 static inline bit_string make_services_supported() {
@@ -88,66 +160,9 @@ static inline bit_string make_services_supported(const std::vector<bit_string::s
 }
 
 
-inline std::string services_supported::to_string(const bit_string &bs) const {
-  std::stringstream os;
-  os << "\"services_supported\" = {";
-  for(bit_string::size_type idx = 0; idx < bs.size(); ++idx) {
-    if(bs[idx]) {
-      os << "\"";
-      switch(idx) {
-        case services_supported::acknowledge_alarm                            : os << "acknowledge_alarm";                        break;
-        case services_supported::confirmed_change_of_value_notification       : os << "confirmed_change_of_value_notification";   break;
-        case services_supported::confirmed_event_notification                 : os << "confirmed_event_notification";             break;
-        case services_supported::get_alarm_summary                            : os << "get_alarm_summary";                        break;
-        case services_supported::get_enrollment_summary                       : os << "get_enrollment_summary";                   break;
-        case services_supported::subscribe_change_of_value                    : os << "subscribe_change_of_value";                break;
-        case services_supported::atomic_read_file                             : os << "atomic_read_file";                         break;
-        case services_supported::atomic_write_file                            : os << "atomic_write_file";                        break;
-        case services_supported::add_list_element                             : os << "add_list_element";                         break;
-        case services_supported::remove_list_element                          : os << "remove_list_element";                      break;
 
-        case services_supported::create_object                                : os << "create_object";                            break;
-        case services_supported::delete_object                                : os << "delete_object";                            break;
-        case services_supported::read_property                                : os << "read_property";                            break;
-        case services_supported::read_property_conditional                    : os << "read_property_conditional";                break;
-        case services_supported::read_property_multiple                       : os << "read_property_multiple";                   break;
-        case services_supported::write_property                               : os << "write_property";                           break;
-        case services_supported::write_property_multiple                      : os << "write_property_multiple";                  break;
-        case services_supported::device_communication_control                 : os << "device_communication_control";             break;
-        case services_supported::confirmed_private_transfer                   : os << "confirmed_private_transfer";               break;
-        case services_supported::confirmed_text_message                       : os << "confirmed_text_message";                   break;
 
-        case services_supported::reinitialize_device                          : os << "reinitialize_device";                      break;
-        case services_supported::vt_open                                      : os << "vt_open";                                  break;
-        case services_supported::vt_close                                     : os << "vt_close";                                 break;
-        case services_supported::vt_data                                      : os << "vt_data";                                  break;
-        case services_supported::authenticate                                 : os << "authenticate";                             break;
-        case services_supported::request_key                                  : os << "request_key";                              break;
-        case services_supported::i_am                                         : os << "i_Am";                                     break;
-        case services_supported::i_have                                       : os << "i_have";                                   break;
-        case services_supported::unconfirmed_change_of_value_notification     : os << "unconfirmed_change_of_value_notification"; break;
-        case services_supported::unconfirmed_event_notification               : os << "unconfirmed_event_notification";           break;
 
-        case services_supported::unconfirmed_private_transfer                 : os << "unconfirmed_private_transfer";             break;
-        case services_supported::unconfirmed_text_message                     : os << "unconfirmed_text_message";                 break;
-        case services_supported::time_synchronization                         : os << "time_synchronization";                     break;
-        case services_supported::who_has                                      : os << "who_has";                                  break;
-        case services_supported::who_is                                       : os << "who_is";                                   break;
-        case services_supported::read_range                                   : os << "read_range";                               break;
-        case services_supported::utc_time_synchronization                     : os << "utc_time_synchronization";                 break;
-        case services_supported::life_safety_operation                        : os << "life_safety_operation";                    break;
-        case services_supported::subscribe_change_of_value_property           : os << "subscribe_change_of_value_property";       break;
-        case services_supported::get_event_information                        : os << "get_event_information";                    break;
-        case services_supported::write_group                                  : os << "write_group";                              break;
-
-        default                                                               : os << "unknown_service(" << idx << ")";           break;
-      }
-      os << "\",";
-    }
-  }
-  os << "}";
-  return os.str();
-}
 
 
 }}
