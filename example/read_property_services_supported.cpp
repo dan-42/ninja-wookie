@@ -88,8 +88,8 @@ int main(int argc, char *argv[]) {
                                                           }
                                                           else {
                                                             try {
-                                                              bacnet::type::services_supported t{boost::get<bacnet::type::bit_string>(response.property_value)};
-                                                              std::cout << "response: " << t.to_string() <<  std::endl;
+                                                              bacnet::type::services_supported ss{boost::get<bacnet::type::bit_string>(response.property_value)};
+                                                              std::cout << "response: " << ss <<  std::endl;
                                                             }
                                                             catch(...) {}
 

@@ -136,9 +136,12 @@ struct services_supported {
       return os.str();
   }
 
-  friend std::string to_string(const services_supported &ss)  {
-    return ss.to_string();
+  template<typename OStream>
+  friend OStream& operator<<(OStream& os, const services_supported& ss) {
+    os << ss.to_string();
+    return os;
   }
+
 private:
   bit_string value_;
 };
@@ -158,11 +161,6 @@ static inline bit_string make_services_supported(const std::vector<bit_string::s
   }
   return bs;
 }
-
-
-
-
-
 
 
 }}
