@@ -135,7 +135,13 @@ using namespace boost::spirit::qi;
 using namespace bacnet::apdu::type::detail::parser;
 
 template<typename Iterator>
-struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack() , locals<object_identifier, uint32_t, boost::optional<uint32_t> > >, constructed_type {
+struct read_property_ack_grammar : grammar< Iterator,
+                                            service::read_property_ack(),
+                                            locals< object_identifier,
+                                                    uint32_t,
+                                                    boost::optional<uint32_t>
+                                                  >
+                                          >, constructed_type {
 
   typedef rule<Iterator, type::possible_type()>                     any_rule_t;
 
@@ -179,11 +185,8 @@ struct read_property_ack_grammar : grammar<Iterator, service::read_property_ack(
     possible_type_grammar_rule          %=  open_tag_3_rule
                                         >>  (
                                               select_rule[_a = boost::phoenix::bind(&select<Iterator>, _r1, _r2, _r3)]
-                                        >>   (
-                                              //(*qi::lazy(*_a))
-                                             // |
-                                              qi::lazy(*_a)
-                                             )
+                                        >>    qi::lazy(*_a)
+
                                             )
                                         >>  close_tag_3_rule
                                         ;

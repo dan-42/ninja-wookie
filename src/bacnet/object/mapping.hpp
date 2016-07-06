@@ -61,6 +61,7 @@ static type select(uint32_t object_type_id, uint32_t property_id) {
              std::make_pair( bacnet::type::property::object_name::value,                type::character_string          ),
              std::make_pair( bacnet::type::property::object_type::value,                type::enumerated                ),
              std::make_pair( bacnet::type::property::property_list::value,              type::application_tagged_type   )
+            // std::make_pair( bacnet::type::property::protocol_services_supported::value,type::bit_string   )
                            }),
 
        std::make_pair(object_type::binary_input, property_type_map{

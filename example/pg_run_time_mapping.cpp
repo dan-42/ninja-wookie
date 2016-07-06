@@ -38,9 +38,6 @@
 
 #include <bacnet/type/types.hpp>
 
-
-
-
 typedef boost::mpl::range_c<bacnet::type::property_type, 0, 850> possible_numbers;
 
 struct value_printer {
@@ -63,3 +60,4 @@ int main(int argc, char** argv) {
   boost::mpl::for_each<possible_numbers>( value_printer(x) );
   return 0;
 }
+

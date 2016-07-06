@@ -90,8 +90,11 @@ int main(int argc, char *argv[]) {
                                                             try {
                                                               bacnet::type::services_supported ss{boost::get<bacnet::type::bit_string>(response.property_value)};
                                                               std::cout << "response: " << ss <<  std::endl;
+                                                     //         std::cout << "response: " << pre::json::to_json(response.property_value).dump(2) <<  std::endl;
                                                             }
-                                                            catch(...) {}
+                                                            catch(const std::exception &e) {
+                                                              std::cout << "exception: " << e.what() <<  std::endl;
+                                                            }
 
                                                           }
                                                           io_service.stop();

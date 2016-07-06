@@ -26,6 +26,8 @@ include_directories (${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
 
+include_directories (${CMAKE_CURRENT_SOURCE_DIR})
+
 
 add_executable(pg_run_time_mapping pg_run_time_mapping.cpp)
 target_link_libraries(pg_run_time_mapping wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)

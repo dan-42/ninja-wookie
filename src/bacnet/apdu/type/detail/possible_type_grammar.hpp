@@ -113,7 +113,7 @@ struct possible_type_grammar : grammar<Iterator, type::possible_type() > , const
       setup();
     }
 
-    possible_type_grammar(uint8_t tag) :  possible_type_grammar::base_type(start_rule), constructed_type(tag) {
+    possible_type_grammar(uint8_t tag) :  possible_type_grammar::base_type(context_rule), constructed_type(tag) {
       setup();
     }
 
@@ -121,7 +121,7 @@ private:
 
     inline void setup() {
 
-      start_rule            %=  context_rule
+      start_rule            %=  value_rule
                              |  sequence_rule
                              ;
 
