@@ -77,7 +77,7 @@ using property_grammar_map = std::map<mapping::type, property_grammar_ptr>;
 
 template<typename Iterator>
 rule_t* select(const object_identifier& r1,const uint32_t& p, const boost::optional<uint32_t>& r3) {
-    using     obj     = bacnet::type::object_type;
+   // using     obj     = bacnet::type::object_type;
     namespace prop    = bacnet::type::property;
     namespace grammar = bacnet::apdu::type::detail::parser;
 

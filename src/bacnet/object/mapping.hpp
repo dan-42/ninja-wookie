@@ -48,7 +48,7 @@ typedef std::map<uint32_t, type> property_type_map;
 typedef std::map<uint32_t, property_type_map> object_property_type_map;
 
 static type select(uint32_t object_type_id, uint32_t property_id) {
-   using bacnet::type::object_type;
+   using namespace bacnet::type;
 
    static object_property_type_map map;
    static type default_fallback_type{type::application_tagged_type};

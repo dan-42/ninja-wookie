@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
   //bacnet::type::property::supported_properties t;
 
-
+/*
   bacnet::object_ptr_list_t object_list;
 
   auto ai_ptr = std::make_shared<bacnet::analog_input>();
@@ -62,5 +62,5 @@ int main(int argc, char *argv[]) {
     o->write_prop(property_id, index, data);
     o->read_prop(property_id, index);
   }
-
+*/
 }

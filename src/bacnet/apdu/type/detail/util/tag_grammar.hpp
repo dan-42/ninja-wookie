@@ -104,14 +104,20 @@
 
 namespace bacnet { namespace apdu {  namespace type {
 
+namespace indication {
+
+  static const uint8_t extended_tag_number           = 0x0F;
+  static const uint8_t extended_length_value         = 0x05;
+  static const uint8_t opening_tag                   = 0x06;
+  static const uint8_t closing_tag                   = 0x07;
+  static const uint8_t extended_2_bytes_length_value = 0xFE;
+  static const uint8_t extended_4_bytes_length_value = 0xFF;
+
+}
+
 struct simple_tag {
 
-    static const uint8_t extended_tag_number_indication           = 0x0F;
-    static const uint8_t extended_length_value_indication         = 0x05;
-    static const uint8_t opening_tag_indication                   = 0x06;
-    static const uint8_t closing_tag_indication                   = 0x07;
-    static const uint8_t extended_2_bytes_length_value_indication = 0xFE;
-    static const uint8_t extended_4_bytes_length_value_indication = 0xFF;
+
 
     uint8_t length_value_type_         : 3;
     uint8_t is_context_tag_            : 1; //also called: class in the standard
@@ -125,8 +131,8 @@ struct simple_tag {
 
     simple_tag(const tag& t) {
 
-      if(t.number() >= extended_tag_number_indication) {
-        number_ = extended_tag_number_indication;
+      if(t.number() >= indication::extended_tag_number) {
+        number_ = indication::extended_tag_number;
       }
       else {
         number_ = t.number();
@@ -142,13 +148,13 @@ struct simple_tag {
 
 
       if(t.is_opening_tag()) {
-        length_value_type_ = opening_tag_indication;
+        length_value_type_ = indication::opening_tag;
       }
       else if(t.is_closing_tag()) {
-        length_value_type_ = closing_tag_indication;
+        length_value_type_ = indication::closing_tag;
       }
-      else if(t.length_value_type() >= extended_length_value_indication) {
-        length_value_type_ = extended_length_value_indication;
+      else if(t.length_value_type() >= indication::extended_length_value) {
+        length_value_type_ = indication::extended_length_value;
       }
       else {
         length_value_type_ = t.length_value_type();
@@ -165,10 +171,10 @@ struct simple_tag {
     inline void is_context_tag(bool v) { v ? is_context_tag_ = 0 : is_context_tag_ = 1; }
     inline void length_value_type(uint8_t v) { length_value_type_ = v; }
 
-    inline bool is_number_extended() const { return number_            == extended_tag_number_indication; }
-    inline bool is_length_extended() const { return length_value_type_ == extended_length_value_indication; }
-    inline bool is_opening_tag() const { return length_value_type_     == opening_tag_indication; }
-    inline bool is_closing_tag() const { return length_value_type_     == closing_tag_indication; }
+    inline bool is_number_extended() const { return number_            == indication::extended_tag_number; }
+    inline bool is_length_extended() const { return length_value_type_ == indication::extended_length_value; }
+    inline bool is_opening_tag() const { return length_value_type_     == indication::opening_tag; }
+    inline bool is_closing_tag() const { return length_value_type_     == indication::closing_tag; }
 
     inline tag::type tag_type() const {
       if(is_context_tag()) {
@@ -263,12 +269,12 @@ struct tag_grammar : grammar<Iterator, tag()> {
                         ;
 
       extendet_length_value_rule = (
-                                       omit[byte_(simple_tag::extended_2_bytes_length_value_indication)]
+                                       omit[byte_(indication::extended_2_bytes_length_value)]
                                     >> big_word
                                    )
 
                                  | (
-                                       omit[byte_(simple_tag::extended_4_bytes_length_value_indication)]
+                                       omit[byte_(indication::extended_4_bytes_length_value)]
                                     >> big_dword
                                    )
 
@@ -361,12 +367,12 @@ struct tag_grammar : grammar<Iterator, tag()> {
 
 
       length_value_rule = (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_4_byte, this) == true)
-                            << byte_(simple_tag::extended_4_bytes_length_value_indication)
+                            << byte_(indication::extended_4_bytes_length_value)
                             << big_dword(ref(tag_.length_value_type_))
                           )
 
                         | (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_2_byte, this) == true)
-                            << byte_(simple_tag::extended_2_bytes_length_value_indication)
+                            << byte_(indication::extended_2_bytes_length_value)
                             << big_word(ref(tag_.length_value_type_))
                           )
 
@@ -406,7 +412,7 @@ private:
     }
 
     bool is_length_extendend_by_1_byte() {
-      return (simple_tag_.length_value_type() == simple_tag::extended_length_value_indication);
+      return (simple_tag_.length_value_type() == indication::extended_length_value);
     }
 
     bool is_length_extendend_by_2_byte() {
