@@ -127,6 +127,8 @@ public:
                 config_(config) {
   }
 
+  inline bacnet::config config() const { return config_; }
+
   void start() {
     lower_layer_.register_callbacks(
         [this](bacnet::apdu::frame::unconfirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
