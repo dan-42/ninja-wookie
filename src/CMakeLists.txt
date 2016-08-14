@@ -88,16 +88,16 @@ ENDIF()
 
 
 hunter_add_package(Boost COMPONENTS system filesystem)
-set(BOOST_ALL_DYN_LINK         ON)
-set(Boost_USE_MULTITHREADED    ON)
-set(Boost_USE_STATIC_LIBS      OFF)
-set(Boost_USE_STATIC_RUNTIME   OFF)
+#set(BOOST_ALL_DYN_LINK         ON)
+#set(Boost_USE_MULTITHREADED    ON)
+#set(Boost_USE_STATIC_LIBS      OFF)
+#set(Boost_USE_STATIC_RUNTIME   OFF)
 
 find_package(Boost CONFIG REQUIRED system filesystem)
 #find_package(Boost 1.61 COMPONENTS system REQUIRED )
-link_directories (${Boost_LIBRARY_DIRS})
-include_directories (${Boost_INCLUDE_DIRS})
-add_definitions(-DBOOST_LOG_DYN_LINK)
+#link_directories (${Boost_LIBRARY_DIRS})
+#include_directories (${Boost_INCLUDE_DIRS})
+#add_definitions(-DBOOST_LOG_DYN_LINK)
 
 # pre
 hunter_add_package(lib-cpp-pre)

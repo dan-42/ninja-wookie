@@ -60,7 +60,7 @@ namespace bacnet { namespace type {
     struct life_safety_operation;
     struct logging_type;
     struct maintenance;
-    //struct object_type;
+    struct object_type;
     struct program_error;
     struct property_identifier;
     struct property_states;
@@ -106,7 +106,7 @@ struct enumerated {
     life_safety_operation,
     logging_type,
     maintenance,
-   // object_type,
+    object_type,
     program_error,
     property_identifier,
     property_states,
@@ -163,7 +163,7 @@ struct enumerated {
       case enumerated::e::life_safety_operation :               os << "life_safety_operation::"               << e.to_string<life_safety_operation>(); break;
       case enumerated::e::logging_type :                        os << "logging_type::"                        << e.to_string<logging_type>(); break;
       case enumerated::e::maintenance :                         os << "maintenance::"                         << e.to_string<maintenance>(); break;
- //     case enumerated::e::object_type :                         os << "object_type::"                         << e.to_string<object_type>(); break;
+      case enumerated::e::object_type :                         os << "object_type::"                         << e.to_string<object_type>(); break;
       case enumerated::e::program_error :                       os << "program_error::"                       << e.to_string<program_error>(); break;
       case enumerated::e::property_identifier :                 os << "property_identifier::"                 << e.to_string<property_identifier>(); break;
       case enumerated::e::property_states :                     os << "property_states::"                     << e.to_string<property_states>(); break;

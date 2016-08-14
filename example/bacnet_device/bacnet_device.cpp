@@ -25,7 +25,7 @@
 #include <string>
 #include <boost/asio.hpp>
 
-
+#include <bacnet_device/object/device.hpp>
 
 
 namespace bacnet {
@@ -86,90 +86,18 @@ struct device {
 		    	 }
 		    	 else {
 		    		 auto object_ptr = (*object_itr).second;
-		    		 object_ptr->read_prop();
+		    		 auto result =  object_ptr->read_prop(s.property_identifier, s.property_array_index);
+
+		    		 if(result) {
+		    		   service_controller_.async_send_response(result.error, mi, [](bacnet::error e){      });
+             }
+		    		 else {
+		    		   bacnet::service::read_property_ack ack{s, result.value};
+		    		   service_controller_.async_send_response(ack, mi, [](bacnet::error e){      });
+		    		 }
+
 		    	 }
 
-		        std::cout << "received read_property" << std::endl;
-		          /**
-		           * application-link:
-		           * look up object property and so on
-		           * the return value or return error
-		           */
-		        if(    s.object_identifier.object_type      == bacnet::type::object_type::device
-		            && s.object_identifier.instance_number  == service_controller_.config().device_object_id
-		            && s.property_identifier                == bacnet::type::property::object_name::value ) {
-
-		          bacnet::type::character_string name;
-		          name.value = "awesome ninja-wookie :-) ";
-		          bacnet::service::read_property_ack ack{s, name};
-		          service_controller_.async_send_response(ack, mi, [](bacnet::error e){      });
-		        }
-		///////////////////////////////////////////////////////////////////////////////
-		        else if (    s.object_identifier.object_type      == bacnet::type::object_type::device
-		                  && s.object_identifier.instance_number  == service_controller_.config().device_object_id
-		                  && s.property_identifier                == bacnet::type::property::object_list::value ) {
-
-
-		          std::vector<bacnet::type::possible_type> object_list;
-		          object_list.push_back(s.object_identifier);
-		          object_list.push_back(s.object_identifier);
-
-		          std::cout << "received read_property_request  response "  << pre::json::to_json(object_list).dump(2) << std::endl;
-
-		          bacnet::service::read_property_ack ack{s, object_list};
-		          service_controller_.async_send_response(ack, mi, [](bacnet::error e){      });
-		        }
-		///////////////////////////////////////////////////////////////////////////////
-		        else if (    s.object_identifier.object_type      == bacnet::type::object_type::device
-		                  && s.object_identifier.instance_number  == service_controller_.config().device_object_id
-		                  && s.property_identifier                == bacnet::type::property::property_list::value ) {
-
-		          std::vector<bacnet::type::possible_type> property_list;
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::object_name::value));
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::system_status::value));
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::vendor_name::value));
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::vendor_identifier::value));
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::model_name::value));
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::firmware_revision::value));
-		          property_list.push_back(bacnet::type::make_property_identifier(bacnet::type::property::application_software_version::value));
-
-		          std::cout << "received read_property_request  response "  << pre::json::to_json(property_list).dump(2) << std::endl;
-
-		          bacnet::service::read_property_ack ack{s, property_list};
-		          service_controller_.async_send_response(ack, mi, [](bacnet::error e){     });
-		        }
-		///////////////////////////////////////////////////////////////////////////////
-		        else if (    s.object_identifier.object_type      == bacnet::type::object_type::device
-		                  && s.object_identifier.instance_number  == service_controller_.config().device_object_id
-		                  && s.property_identifier                == bacnet::type::property::protocol_services_supported::value ) {
-
-
-		          static const auto supported_services  = bacnet::type::make_services_supported({
-		                                                                              bacnet::type::services_supported::who_is,
-		                                                                              bacnet::type::services_supported::i_am,
-		                                                                              bacnet::type::services_supported::read_property,
-		                                                                            });
-
-		          bacnet::service::read_property_ack ack{s, supported_services};
-		          service_controller_.async_send_response(ack, mi, [](bacnet::error e){     });
-		        }
-		///////////////////////////////////////////////////////////////////////////////
-		        else if (    s.object_identifier.object_type      == bacnet::type::object_type::device
-		                  && s.object_identifier.instance_number  == service_controller_.config().device_object_id
-		                  && s.property_identifier                == bacnet::type::property::system_status::value ) {
-
-		          auto status  = bacnet::type::make_device_status(bacnet::type::device_status::operational);
-
-		          std::cout << "received read_property_request  response "  << pre::json::to_json(status).dump(2) << std::endl;
-
-		          bacnet::service::read_property_ack ack{s, status};
-		          service_controller_.async_send_response(ack, mi, [](bacnet::error e){     });
-		        }
-		///////////////////////////////////////////////////////////////////////////////
-		        else {
-		          auto error = bacnet::make_error(bacnet::err::error_code::unknown_object, bacnet::err::error_class::object);
-		          service_controller_.async_send_response(error, mi, [](bacnet::error e){     });
-		        }
 		      }
 		    );
 
@@ -184,7 +112,7 @@ struct device {
 
 
 	ServiceController &service_controller_;
-	object_ptr_map_t object_map_;
+	object::object_ptr_map_t object_map_;
 
 };
 
@@ -238,7 +166,7 @@ int main(int argc, char *argv[]) {
 
 
     bacnet::stack::factory<bacnet::stack::ip_v4_server> factory{io_service, ip, port, config};
-    auto device_ = bacnet::device(factory.controller() );
+    auto device_ = bacnet::device<bacnet::stack::detail::ip_v4::service_controller_t>(factory.controller() );
     device_.init();
     device_.start();
 

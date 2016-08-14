@@ -22,7 +22,7 @@ template<typename Error, typename Value>
 struct complex_return {
 
 	Error error;
-	Value Value;
+	Value value;
 
 
 	BOOST_EXPLICIT_OPERATOR_BOOL()

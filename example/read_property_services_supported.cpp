@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     std::string ip{"0.0.0.0"};
 
     uint16_t                    doi{2};
-    uint32_t                    object_instance{doi};
+    uint32_t                    object_instance;
     uint32_t                    object_type{bacnet::type::object_type::device};
     uint32_t                    property{bacnet::type::property::protocol_services_supported::value};
     namespace po = boost::program_options;
@@ -87,15 +87,7 @@ int main(int argc, char *argv[]) {
                                                             std::cout << "error occurred: " << ec <<  std::endl;
                                                           }
                                                           else {
-                                                            try {
-                                                              bacnet::type::services_supported ss{boost::get<bacnet::type::bit_string>(response.property_value)};
-                                                              std::cout << "response: " << ss <<  std::endl;
-                                                     //         std::cout << "response: " << pre::json::to_json(response.property_value).dump(2) <<  std::endl;
-                                                            }
-                                                            catch(const std::exception &e) {
-                                                              std::cout << "exception: " << e.what() <<  std::endl;
-                                                            }
-
+                                                            std::cout << "response: " << pre::json::to_json(response).dump(2) <<  std::endl;
                                                           }
                                                           io_service.stop();
                                                        }

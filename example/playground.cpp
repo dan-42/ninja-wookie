@@ -38,29 +38,9 @@
 #include <boost/system/error_code.hpp>
 
 
-
-
-
 int main(int argc, char *argv[]) {
 
 
-  //bacnet::type::property::supported_properties t;
+  return 0;
 
-/*
-  bacnet::object_ptr_list_t object_list;
-
-  auto ai_ptr = std::make_shared<bacnet::analog_input>();
-  auto ao_ptr = std::make_shared<bacnet::analog_output>();
-  object_list.push_back(ai_ptr);
-  object_list.push_back(ao_ptr);
-
-  uint16_t property_id{0};
-  boost::optional<uint16_t> index;
-  bacnet::binary_data data{};
-
-  for(auto& o : object_list) {
-    o->write_prop(property_id, index, data);
-    o->read_prop(property_id, index);
-  }
-*/
 }
