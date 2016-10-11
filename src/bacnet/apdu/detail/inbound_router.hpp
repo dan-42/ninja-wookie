@@ -13,7 +13,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <boost/variant/static_visitor.hpp>
+//#include <boost/variant/static_visitor.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
 
 
@@ -24,7 +24,7 @@ namespace bacnet { namespace  apdu { namespace  detail {
 using namespace bacnet::apdu;
 
 template<typename CallbackManager, typename RequestManager>
-class inbound_router : public boost::static_visitor<> {
+class inbound_router /* : public boost::static_visitor<> */{
 
 public:
 

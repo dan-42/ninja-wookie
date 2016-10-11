@@ -30,7 +30,7 @@ namespace bacnet { namespace  npdu { namespace  detail {
 using namespace bacnet::npdu;
 
 template<typename CallbackManager>
-class inbound_router : public boost::static_visitor<> {
+class inbound_router /*  : public boost::static_visitor<> */ {
 
 public:
 	inbound_router(CallbackManager& cbm) : callback_manager_(cbm) {

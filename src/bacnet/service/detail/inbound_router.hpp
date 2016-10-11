@@ -13,7 +13,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include <boost/variant/static_visitor.hpp>
+
+//#include <boost/variant/static_visitor.hpp>
+
 #include <bacnet/service/service/services.hpp>
 #include <bacnet/service/detail/callback_manager.hpp>
 #include <bacnet/service/detail/device_manager.hpp>
@@ -26,7 +28,7 @@ namespace bacnet { namespace service { namespace detail {
   using namespace bacnet::apdu;
   using namespace bacnet::service;
 
-  struct inbound_router : boost::static_visitor<> {
+  struct inbound_router /*: boost::static_visitor<> */{
 
     inbound_router(callback_manager& cm, bacnet::service::detail::device_manager& dm) : callback_manager_(cm), device_manager_(dm) {
     }

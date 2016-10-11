@@ -24,7 +24,11 @@
 #include <iostream>
 
 #include <boost/fusion/include/define_struct.hpp>
-#include <boost/variant.hpp>
+//#include <boost/variant.hpp>
+
+#include <mapbox/variant.hpp>
+#include <mapbox/boost_spirit_karma.hpp>
+#include <mapbox/boost_spirit_qi.hpp>
 
 #include <bacnet/detail/common/types.hpp>
 
@@ -35,7 +39,8 @@
 #include <bacnet/npdu/frame/raw.hpp>
 
 namespace bacnet { namespace npdu {
-    typedef boost::variant<
+    typedef mapbox::util::variant <
+   // typedef boost::variant<
         bacnet::npdu::frame_body::apdu,
         bacnet::npdu::frame_body::raw
     > frame_body_t;
