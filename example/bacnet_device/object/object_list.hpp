@@ -70,7 +70,7 @@ public:
     switch(property_id) {
 
     //WOOKIE_BACNET_PROPERYT_CREATE_SWITCH_CASE(" return self().read_prop_impl( ", ", index);  ")
-    WOOKIE_BACNET_PROPERYT_CREATE_SWITCH_CASE("HELLO", "WORLD")
+  //  WOOKIE_BACNET_PROPERYT_CREATE_SWITCH_CASE("HELLO", "WORLD")
 
     }
     return self().read_prop_impl(property_id, index);

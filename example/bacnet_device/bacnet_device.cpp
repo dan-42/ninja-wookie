@@ -47,6 +47,7 @@ struct device {
 
 	void init() {
 		service_controller_.async_receive(
+		    /*
 		      [&](bacnet::service::i_am s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
 		        std::cout << "received i_am" << std::endl;
 		        // no action needed
@@ -55,60 +56,74 @@ struct device {
 		        std::cout << "received who_is" << std::endl;
 		        //no response needed, done automatically in the service-layer
 		      },
-		      [&](bacnet::service::reinitialize_device s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
-
-		        if(    s.password
-		            && s.password.get().value == "12345"
-		            && s.reinitialize_state_of_device.value == 3            ) {
-		          std::cout << "received reinit  success invoked_id " << (int)mi.invoke_id << "  " << mi.address.to_string() << std::endl;
-		          auto success = bacnet::make_success();
-		          service_controller_.async_send_response(success, mi, [](bacnet::error e){
-		            std::cout << "received reinit  response "  << e << std::endl;
-		          });
-		        }
-		        else {
-		          std::cout << "received reinit  error "  << mi.address.to_string() << std::endl;
-		          auto error = bacnet::make_error(bacnet::err::error_code::password_failure, bacnet::err::error_class::device);
-		          service_controller_.async_send_response(error, mi, [](bacnet::error e){
-		            std::cout << "received reinit  response "  << e << std::endl;
-		          });
-		        }
+		      */
+		      /** reinitialize_device  */
+		      [this](bacnet::service::reinitialize_device s, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
+		        this->reinitialize_device(s, ec, mi);
 		      },
 
+		      /** read_property_request  */
+		      [this](bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
+		        this->read_property_request(s, ec, mi);
+		      },
 
-		      [&](bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
-
-		    	 auto object_itr = object_map_.find(s.object_identifier.to_native());
-		    	 if(object_itr == object_map_.end() || (*object_itr).second == nullptr ) {
-		    		 auto error = bacnet::make_error(bacnet::err::error_class::object, bacnet::err::error_code::unknown_object);
-		    		 service_controller_.async_send_response(error, mi, [](bacnet::error e){      });
-		    		 return;
-		    	 }
-		    	 else {
-		    		 auto object_ptr = (*object_itr).second;
-		    		 auto result =  object_ptr->read_prop(s.property_identifier, s.property_array_index);
-
-		    		 if(result) {
-		    		   service_controller_.async_send_response(result.error, mi, [](bacnet::error e){      });
-             }
-		    		 else {
-		    		   bacnet::service::read_property_ack ack{s, result.value};
-		    		   service_controller_.async_send_response(ack, mi, [](bacnet::error e){      });
-		    		 }
-
-		    	 }
-
-		      }
+		      /** read_property_request  */
+          [this](bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
+            this->read_property_request(s, ec, mi);
+          }
 		    );
 
 	}
 
 
+private:
+
+
+	void reinitialize_device(bacnet::service::reinitialize_device s, bacnet::error ec, bacnet::common::protocol::meta_information mi){
+
+    if(    s.password
+        && s.password.get().value == "12345"
+        && s.reinitialize_state_of_device.value == 3            ) {
+      std::cout << "received reinit  success invoked_id " << (int)mi.invoke_id << "  " << mi.address.to_string() << std::endl;
+      auto success = bacnet::make_success();
+      service_controller_.async_send_response(success, mi, [](bacnet::error e){
+        std::cout << "received reinit  response "  << e << std::endl;
+      });
+    }
+    else {
+      std::cout << "received reinit  error "  << mi.address.to_string() << std::endl;
+      auto error = bacnet::make_error(bacnet::err::error_code::password_failure, bacnet::err::error_class::device);
+      service_controller_.async_send_response(error, mi, [](bacnet::error e){
+        std::cout << "received reinit  response "  << e << std::endl;
+      });
+    }
+  }
 
 
 
+	void read_property_request(bacnet::service::read_property_request s, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
 
+    auto object_itr = object_map_.find(s.object_identifier.to_native());
+    if(object_itr == object_map_.end() || (*object_itr).second == nullptr ) {
+      auto error = bacnet::make_error(bacnet::err::error_class::object, bacnet::err::error_code::unknown_object);
+      service_controller_.async_send_response(error, mi, [](bacnet::error e){      });
+      return;
+    }
+    else {
+      auto object_ptr = (*object_itr).second;
+      auto result =  object_ptr->read_prop(s.property_identifier, s.property_array_index);
 
+      if(result) {
+        service_controller_.async_send_response(result.error, mi, [](bacnet::error e){      });
+      }
+      else {
+        bacnet::service::read_property_ack ack{s, result.value};
+        service_controller_.async_send_response(ack, mi, [](bacnet::error e){      });
+      }
+
+    }
+
+   }
 
 
 	ServiceController &service_controller_;

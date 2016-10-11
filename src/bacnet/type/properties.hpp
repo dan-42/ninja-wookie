@@ -416,7 +416,7 @@ static inline void test() {
 }
 // */
 
-
+/*
 
 
 
@@ -773,7 +773,7 @@ static inline void test() {
     case bacnet::type::property::transition::value :  function_start bacnet::type::property::transition{}  function_end       \
     case bacnet::type::property::egress_active::value :  function_start bacnet::type::property::egress_active{}  function_end       \
 
-
+*/
 
 
 
