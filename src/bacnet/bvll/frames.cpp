@@ -18,6 +18,9 @@
  * Authors: Daniel Friedrich
  */
 
+#include <mapbox/boost_spirit_karma.hpp>
+#include <mapbox/boost_spirit_qi.hpp>
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -64,7 +67,8 @@ bacnet::binary_data generate(const possible_bvll_frame& frame) {
     bacnet::binary_data binary_frame;
 
     frame_size fs;
-    uint32_t size = boost::apply_visitor( fs, frame );
+    //uint32_t size = boost::apply_visitor( fs, frame );
+    uint32_t size = mapbox::util::apply_visitor( fs, frame );
     std::back_insert_iterator<bacnet::binary_data> sink(binary_frame);
     bvll_grammar<decltype(sink)> generator(size);
     bool result = false;

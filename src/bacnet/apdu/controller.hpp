@@ -149,7 +149,7 @@ struct controller {
     auto data = apdu.data;
     frame::possible_frame f = frame::parser::parse(std::move(data));
     inbound_router_.meta_information(std::move(meta_info));
-    f.apply_visitor(inbound_router_);
+    mapbox::util::apply_visitor(inbound_router_, f);
   }
 
   void async_send_confirmed_response(bacnet::binary_data payload, bacnet::common::protocol::meta_information meta_info, unconfirmed_response_handler_type handler) {

@@ -43,7 +43,8 @@ public:
 
       meta_information_.network_priority = f.control_field.network_priority();
       meta_information_.npdu_source = f.source;
-      boost::apply_visitor( *this, f.body );
+     // boost::apply_visitor( *this, f.body );
+      mapbox::util::apply_visitor( *this, f.body );
 		}
 
 		/*todo: check if not router is better name*/

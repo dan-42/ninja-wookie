@@ -116,7 +116,8 @@ private:
       //std::cout << "bvll::controller::handle_async_receive()" << std::endl;
       frame::possible_bvll_frame f = parser::parse(std::move(data));
       inbound_router_.sender_endpoint(sender);
-      boost::apply_visitor(inbound_router_, f);
+      //boost::apply_visitor(inbound_router_, f);
+      mapbox::util::apply_visitor( inbound_router_, f );
     }
   }
 

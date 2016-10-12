@@ -26,18 +26,9 @@
 
 #include <cstdint>
 
-#include <boost/variant.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/transform.hpp>
-#include <boost/mpl/remove.hpp>
-#include <boost/mpl/remove_if.hpp>
-#include <boost/mpl/lambda.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/logical.hpp>
-#include <boost/fusion/include/define_struct.hpp>
+#include <mapbox/variant.hpp>
 
 #include <bacnet/service/service/traits.hpp>
-
 
 #include <bacnet/service/service/who_is.hpp>
 #include <bacnet/service/service/i_am.hpp>
@@ -129,49 +120,33 @@ BACnet-Unconfirmed-Service  is request and response
 
 namespace bacnet { namespace service { namespace service {
 
+typedef boost::mpl::vector<
 
 
-  typedef boost::mpl::vector<
-                                who_is,  
-                                i_am,
-
-                                read_property_request,
-                                read_property_ack,
-
-                                reinitialize_device
-                        
-  > possible_services;
-  
+ > possible_services;
 
 
 
+ using supported_service  = mapbox::util::variant<
+                                    who_is,
+                                    i_am,
 
+                                    read_property_request,
+                                    read_property_ack,
 
-
-
-
-  typedef boost::mpl::remove_if<
-    bacnet::service::service::possible_services,
-    boost::mpl::lambda< 
-           boost::mpl::not_<   bacnet::service::service::is_supported< boost::mpl::_1 >  >
-    >::type
-  >::type supported_services;  
-    
-  typedef boost::make_variant_over< bacnet::service::service::supported_services >::type supported_service;
+                                    reinitialize_device
+                                    >;
   
 
 }}}
 
 namespace bacnet { namespace service { namespace service { namespace unconfirmed {
 
-  typedef boost::mpl::remove_if<
-    bacnet::service::service::supported_services,
-    boost::mpl::lambda< 
-        boost::mpl::not_<    bacnet::service::service::is_unconfirmed< boost::mpl::_1 > >
-    >::type
-  >::type services;  
-                                
-  typedef boost::make_variant_over< services >::type service;
+  using service  = mapbox::util::variant<
+                                    who_is,
+                                    i_am
+                                    >;
+
 
 }}}}
 
@@ -179,40 +154,28 @@ namespace bacnet { namespace service { namespace service { namespace unconfirmed
 
 namespace bacnet { namespace service { namespace service { namespace confirmed {
 
- typedef boost::mpl::remove_if<
-    bacnet::service::service::supported_services,
-    boost::mpl::lambda< 
-        boost::mpl::not_<    bacnet::service::service::is_confirmed< boost::mpl::_1 > >
-    >::type
-  >::type services;  
-                                
+using service  = mapbox::util::variant<
+                                    read_property_request,
+                                    read_property_ack,
 
-  typedef boost::make_variant_over< services >::type service;                                
+                                    reinitialize_device
+                                    >;
   
   
   
-  typedef boost::mpl::remove_if<
-    bacnet::service::service::confirmed::services,
-    boost::mpl::lambda< 
-        boost::mpl::not_<    bacnet::service::service::is_request< boost::mpl::_1 > >
-    >::type
-  >::type requests;  
+using request  = mapbox::util::variant<
+                                    read_property_request,
 
-  typedef boost::make_variant_over< requests >::type request;
+                                    reinitialize_device
+                                    >;
   
   
   
   
   
-  typedef boost::mpl::remove_if<
-    bacnet::service::service::confirmed::services,
-    boost::mpl::lambda< 
-        boost::mpl::not_<    bacnet::service::service::is_response< boost::mpl::_1 > >
-    >::type
-  >::type responses;
-
-  typedef boost::make_variant_over< responses >::type response;
-
+using response  = mapbox::util::variant<
+                                    read_property_ack
+                                    >;
 
 
 }}}}
