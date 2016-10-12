@@ -1,8 +1,7 @@
 
 
 cmake_minimum_required(VERSION 3.2)
-project(test-wookie)
-enable_testing()
+
 
 if(TARGET wookie)
   add_library(wookie::wookie ALIAS wookie)

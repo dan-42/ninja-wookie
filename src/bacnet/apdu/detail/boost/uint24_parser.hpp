@@ -33,7 +33,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 // definition the place holder
 namespace boost { namespace spirit { namespace repository { namespace qi {
-BOOST_SPIRIT_TERMINAL(big_24word);
+//BOOST_SPIRIT_TERMINAL(big_24word);
+
+namespace tag {
+  struct big_24word {
+    typedef void is_spirit_tag;
+  };
+}
+
+typedef boost::proto::terminal<tag::big_24word>::type big_24word_type;
+
+big_24word_type const big_24word = {{}};
+
+inline void silence_unused_warnings_big_24word() {
+  (void) big_24word;
+}
+
 }}}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +78,7 @@ struct big_24word_parser
     // This function is called during the actual parsing process
     template <typename Iterator, typename Context
         , typename Skipper, typename Attribute>
+
     bool parse(Iterator& first, Iterator const& last
         , Context&, Skipper const& skipper, Attribute& attr) const
     {

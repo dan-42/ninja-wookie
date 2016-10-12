@@ -30,7 +30,20 @@
 
 
 namespace boost { namespace spirit { namespace repository { namespace karma {
-BOOST_SPIRIT_TERMINAL(big_24word);
+//BOOST_SPIRIT_TERMINAL(big_24word);
+namespace tag {
+  struct big_24word {
+    typedef void is_spirit_tag;
+  };
+}
+
+typedef boost::proto::terminal<tag::big_24word>::type big_24word_type;
+big_24word_type const big_24word = {{}};
+
+inline void silence_unused_warnings_big_24word() {
+  (void) big_24word;
+}
+
 }}}}
 
 
@@ -59,16 +72,10 @@ struct big_24word_generator : boost::spirit::karma::primitive_generator<big_24wo
       boost::endian::endian<boost::spirit::endian::endianness::big, typename attribute<Context>::type, 24> p;
 
 
-#if defined(BOOST_MSVC)
-      // warning C4244: 'argument' : conversion from 'const int' to 'foo', possible loss of data
-#pragma warning(push)
-#pragma warning(disable: 4244)
-#endif
+
       typedef typename attribute<Context>::type attribute_type;
       p = traits::extract_from<attribute_type>(attr, context);
-#if defined(BOOST_MSVC)
-#pragma warning(pop)
-#endif
+
 
       unsigned char const* bytes = reinterpret_cast<unsigned char const*>(&p);
 

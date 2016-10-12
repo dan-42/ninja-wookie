@@ -18,30 +18,111 @@
  * Authors: Daniel Friedrich
  */
 
-#include <bacnet/type/properties.hpp>
-#include <bacnet/stack/factory.hpp>
-#include <exception>
+
 #include <iostream>
+
 #include <string>
-#include <boost/asio.hpp>
-#include <boost/dynamic_bitset.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <bacnet/type/bit_string.hpp>
-#include <bacnet/type/types.hpp>
-#include <bacnet/type/object_property_reference.hpp>
-#include <bacnet/type/confirmed_private_transfer_error.hpp>
-
-
-#include <boost/fusion/adapted/mpl.hpp>
-#include <boost/fusion/include/mpl.hpp>
-
-#include <boost/system/error_code.hpp>
+#include <vector>
+#include <cstdint>
 
 
 
+struct parser_int32 {
+
+  template<typename Iter >
+  inline bool parse(Iter& begin, Iter const& end, uint32_t& attr) {
+    Iter iter = begin;
+    for(int i = 32; i > 0; i-=8 ) {
+      if(iter == end) { return false; }
+      attr |= (*iter) << i;
+      iter++;
+    }
+    begin = iter;
+    return true;
+  }
+
+};
+
+
+
+
+
+struct my_ints {
+
+  uint32_t a{};
+  uint32_t b{};
+  uint32_t c{};
+
+};
+
+
+struct my_ints_parser {
+
+  template<typename Iter >
+  inline bool parse(Iter& begin, Iter const& end, my_ints& attr) {
+    static parser_int32 parser{};
+
+    if(     parser.parse(begin, end, attr.a)
+        &&  parser.parse(begin, end, attr.b)
+        &&  parser.parse(begin, end, attr.c) ) {
+
+      return true;
+    }
+    return  false;
+  }
+
+};
 
 
 int main(int argc, char *argv[]) {
+
+
+  std::vector<uint8_t> binary_data;
+  binary_data.emplace_back(0x01);
+  binary_data.emplace_back(0x01);
+  binary_data.emplace_back(0x01);
+  binary_data.emplace_back(0x01);
+
+  {
+      uint32_t value{0};
+      parser_int32 parser;
+      auto b = binary_data.begin();
+      auto e = binary_data.end();
+      if(parser.parse(b, e, value)) {
+        std::cout << "success value " << value << std::endl;
+      }
+      else {
+        std::cout << "failed" << std::endl;
+      }
+  }
+
+
+  binary_data.emplace_back(0x02);
+  binary_data.emplace_back(0x02);
+  binary_data.emplace_back(0x02);
+  binary_data.emplace_back(0x02);
+  binary_data.emplace_back(0x03);
+  binary_data.emplace_back(0x03);
+  binary_data.emplace_back(0x03);
+  binary_data.emplace_back(0x03);
+
+  {
+      my_ints value;
+      my_ints_parser parser;
+      auto b = binary_data.begin();
+      auto e = binary_data.end();
+      if(parser.parse(b, e, value)) {
+        std::cout << "success value.a " << value.a <<  std::endl;
+        std::cout << "success value.b " << value.b <<  std::endl;
+        std::cout << "success value.c " << value.c <<  std::endl;
+      }
+      else {
+        std::cout << "failed" << std::endl;
+      }
+    }
+
+
+
 
 
   //bacnet::type::property::supported_properties t;
@@ -63,4 +144,7 @@ int main(int argc, char *argv[]) {
     o->read_prop(property_id, index);
   }
 */
+
+
+
 }
