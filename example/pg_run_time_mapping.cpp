@@ -38,26 +38,18 @@
 
 #include <bacnet/type/types.hpp>
 
-typedef boost::mpl::range_c<bacnet::type::property_type, 0, 850> possible_numbers;
 
-struct value_printer {
-  int wished;
-  value_printer(int wished ) : wished(wished) { }
 
-  template< typename U >
-  constexpr void operator()(const U& x)  const {
-    if(x == wished) {
-      typedef std::integral_constant<bacnet::type::property_type, x> X;
-      if(bacnet::type::property::is_property<X>::value ) {
-        std::cout << "property: " << bacnet::type::property::name<X>::value << " id: " << X::value << std::endl;
-      }
-    }
-  }
-};
+#include <type_traits>
+
+
+
 
 int main(int argc, char** argv) {
-  int x = std::atoi(argv[1]);
-  boost::mpl::for_each<possible_numbers>( value_printer(x) );
+  uint32_t x = std::atoi(argv[1]);
+
+
+
+
   return 0;
 }
-

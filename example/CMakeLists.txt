@@ -13,10 +13,10 @@ hunter_add_package(Boost COMPONENTS system filesystem program_options)
 
 
 #hunter_add_package(Boost COMPONENTS system filesystem program_options)
-set(BOOST_ALL_DYN_LINK         ON)
-set(Boost_USE_MULTITHREADED    ON)
-set(Boost_USE_STATIC_LIBS      OFF)
-set(Boost_USE_STATIC_RUNTIME   OFF)
+#set(BOOST_ALL_DYN_LINK         ON)
+#set(Boost_USE_MULTITHREADED    ON)
+#set(Boost_USE_STATIC_LIBS      OFF)
+#set(Boost_USE_STATIC_RUNTIME   OFF)
 
 find_package(Boost CONFIG REQUIRED system filesystem program_options)
 #find_package(Boost 1.61 COMPONENTS filesystem program_options system  REQUIRED )
@@ -26,16 +26,14 @@ include_directories (${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
 
-include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-
 
 add_executable(pg_run_time_mapping pg_run_time_mapping.cpp)
-target_link_libraries(pg_run_time_mapping wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+target_link_libraries(pg_run_time_mapping wookie Boost::boost ${PSAPI_LIBRARIES} pthread)
 set_target_properties(pg_run_time_mapping PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS pg_run_time_mapping DESTINATION bin)
 
 add_executable(playground playground.cpp)
-target_link_libraries(playground wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+target_link_libraries(playground wookie Boost::boost ${PSAPI_LIBRARIES} pthread)
 set_target_properties(playground PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS playground DESTINATION bin)
 
@@ -60,6 +58,7 @@ set_target_properties(who_is PROPERTIES DEBUG_POSTFIX "d")
 install(TARGETS who_is DESTINATION bin)
 
 
+include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(bacnet_device bacnet_device/bacnet_device.cpp)
 target_link_libraries(bacnet_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 set_target_properties(bacnet_device PROPERTIES DEBUG_POSTFIX "d")

@@ -16,7 +16,7 @@
 namespace bacnet { namespace type {
 
 
-namespace object_type {
+struct object_type {
   typedef uint32_t type;
 
   static constexpr uint32_t analog_input              = 0;
@@ -74,9 +74,9 @@ namespace object_type {
   static constexpr uint32_t alert_enrollment          = 52;
   static constexpr uint32_t channel                   = 53;
   static constexpr uint32_t lighting_output           = 54;
-}
+};
 
-/*
+
 template<>
 inline std::string enumerated::to_string<object_type>() const {
   std::stringstream os;
@@ -141,7 +141,7 @@ inline std::string enumerated::to_string<object_type>() const {
   os << "(" << value << ")";
   return os.str();
 }
-*/
+
 
 }}
 
