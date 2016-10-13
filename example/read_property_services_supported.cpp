@@ -76,9 +76,8 @@ int main(int argc, char *argv[]) {
 
     bacnet::type::object_identifier device_id{bacnet::type::object_type::device, doi};
     bacnet::type::object_identifier object_id{object_type, object_instance};
-    bacnet::service::service::read_property_request request;
 
-    request = bacnet::service::service::read_property_request{object_id, property};
+    auto request = bacnet::service::service::read_property_request{object_id, property};
 
     service_controller.start();
 

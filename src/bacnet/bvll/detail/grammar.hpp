@@ -21,6 +21,9 @@
 #ifndef NINJA_WOOKIE_GRAMMAR_HPP
 #define NINJA_WOOKIE_GRAMMAR_HPP
 
+#include <mapbox/boost_spirit_qi.hpp>
+#include <mapbox/boost_spirit_karma.hpp>
+
 
 #include <iostream>
 #include <iomanip>
@@ -28,7 +31,7 @@
 #include <string>
 
 
-#include <boost/variant.hpp>
+//#include <boost/variant.hpp>
 
 
 #include <bacnet/bvll/common/bacnet_ip_address.hpp>
@@ -82,20 +85,20 @@ struct bvll_grammar : grammar<Iterator, possible_bvll_frame()> {
   rule<Iterator, possible_bvll_frame()> possible_bvll_frame_rule;
 
 
-  rule<Iterator, bvlc_result()> bvlc_result_rule;
-  rule<Iterator, write_broadcast_distribution_table()> write_broadcast_distribution_table_rule;
-  rule<Iterator, read_broadcast_distribution_table()> read_broadcast_distribution_table_rule;
-  rule<Iterator, read_broadcast_distribution_table_ack()> read_broadcast_distribution_table_ack_rule;
-  rule<Iterator, forwarded_npdu()> forwarded_npdu_rule;
-  rule<Iterator, register_foreign_device()> register_foreign_device_rule;
-  rule<Iterator, read_foreign_device_table()> read_foreign_device_table_rule;
-  rule<Iterator, read_foreign_device_table_ack()> read_foreign_device_table_ack_rule;
-  rule<Iterator, delete_foreign_device_table_entry()> delete_foreign_device_table_entry_rule;
-  rule<Iterator, distribute_broadcast_to_network()> distribute_broadcast_to_network_rule;
-  rule<Iterator, original_unicast_npdu()> original_unicast_npdu_rule;
-  rule<Iterator, original_broadcast_npdu()> original_broadcast_npdu_rule;
-  rule<Iterator, original_secure_bvll()> original_secure_bvll_rule;
-  rule<Iterator, raw()> raw_rule;
+  rule<Iterator, possible_bvll_frame()> bvlc_result_rule;
+  rule<Iterator, possible_bvll_frame()> write_broadcast_distribution_table_rule;
+  rule<Iterator, possible_bvll_frame()> read_broadcast_distribution_table_rule;
+  rule<Iterator, possible_bvll_frame()> read_broadcast_distribution_table_ack_rule;
+  rule<Iterator, possible_bvll_frame()> forwarded_npdu_rule;
+  rule<Iterator, possible_bvll_frame()> register_foreign_device_rule;
+  rule<Iterator, possible_bvll_frame()> read_foreign_device_table_rule;
+  rule<Iterator, possible_bvll_frame()> read_foreign_device_table_ack_rule;
+  rule<Iterator, possible_bvll_frame()> delete_foreign_device_table_entry_rule;
+  rule<Iterator, possible_bvll_frame()> distribute_broadcast_to_network_rule;
+  rule<Iterator, possible_bvll_frame()> original_unicast_npdu_rule;
+  rule<Iterator, possible_bvll_frame()> original_broadcast_npdu_rule;
+  rule<Iterator, possible_bvll_frame()> original_secure_bvll_rule;
+  rule<Iterator, possible_bvll_frame()> raw_rule;
 
 
   bvlc_result_grammar<Iterator> bvlc_result_grammar_;
@@ -261,7 +264,8 @@ template <>
 struct transform_attribute<bacnet::bvll::frame::possible_bvll_frame const, bacnet::bvll::frame::original_broadcast_npdu, boost::spirit::karma::domain>
 {
   typedef bacnet::bvll::frame::original_broadcast_npdu type;
-  static bacnet::bvll::frame::original_broadcast_npdu pre(bacnet::bvll::frame::possible_bvll_frame const& d) { return boost::get<type>(d); }
+  //static bacnet::bvll::frame::original_broadcast_npdu pre(bacnet::bvll::frame::possible_bvll_frame const& d) { return boost::get<type>(d); }
+  static bacnet::bvll::frame::original_broadcast_npdu pre(bacnet::bvll::frame::possible_bvll_frame const& d) { return mapbox::util::get<type>(d); }
 };
 }}}
 

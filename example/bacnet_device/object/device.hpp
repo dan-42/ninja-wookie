@@ -22,7 +22,15 @@ struct device final : public object<device> {
 
 	template<typename T1, typename T2>
 	inline detail::read_prop_return_type read_prop_impl(T1, T2) {
-		return { bacnet::make_error(bacnet::err::error_class::property, bacnet::err::error_code::unknown_property) , bacnet::type::null{} };
+
+	  uint32_t value = 0;
+	  for(int i = 0; i < 10000; ++i) {
+	    value += T1::value;
+	  }
+	  auto v = bacnet::type::unsigned_integer{value};
+
+	  return { bacnet::make_error(bacnet::err::error_class::property, bacnet::err::error_code::unknown_property) , v };
+		//return { bacnet::make_error(bacnet::err::error_class::property, bacnet::err::error_code::unknown_property) , bacnet::type::null{} };
 	}
 
 

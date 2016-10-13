@@ -22,7 +22,7 @@
 #define NINJA_WOOKIE_INBOUND_ROUTER_HPP
 
 #include <iostream>
-#include <boost/variant/static_visitor.hpp>
+//#include <boost/variant/static_visitor.hpp>
 
 
 #include <bacnet/common/protocol/meta_information.hpp>
@@ -34,7 +34,7 @@
 namespace bacnet { namespace  bvll { namespace  detail {
 
 template<typename CallbackManager>
-class inbound_router : public boost::static_visitor<> {
+class inbound_router /* : public boost::static_visitor<> */ {
 
 public:
 

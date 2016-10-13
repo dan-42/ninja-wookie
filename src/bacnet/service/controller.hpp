@@ -100,7 +100,9 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
     typedef pre::lambda::function_traits<typename std::decay<Handler>::type > callback_traits;
     typedef typename callback_traits::template arg<1> arg_1_t;
     typedef typename std::decay<arg_1_t>::type service_response_type;
-    auto ff = boost::get<service_response_type>(response);
+    //auto ff = boost::get<service_response_type>(response);
+    auto ff = mapbox::util::get<service_response_type>(response);
+
     handler(ec, ff);
   }
 
@@ -132,12 +134,12 @@ public:
         [this](bacnet::apdu::frame::unconfirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
             inbound_router_.meta_information(std::move(mi));
             auto f = bacnet::service::service::detail::parse_unconfirmed(request.service_data);
-            f.apply_visitor(inbound_router_);
+            mapbox::util::apply_visitor(inbound_router_, f);
           },
         [this](bacnet::apdu::frame::confirmed_request request,  bacnet::error ec, bacnet::common::protocol::meta_information mi){
             inbound_router_.meta_information(std::move(mi));
             auto f = bacnet::service::service::detail::parse_confirmed_request(request.service_data);
-            f.apply_visitor(inbound_router_);
+            mapbox::util::apply_visitor(inbound_router_, f);
           }
     );
 

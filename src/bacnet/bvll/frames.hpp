@@ -27,7 +27,10 @@
 #include <string>
 
 
-#include <boost/variant.hpp>
+//#include <boost/variant.hpp>
+
+#include <mapbox/variant.hpp>
+
 
 
 #include <bacnet/bvll/common/bacnet_ip_address.hpp>
@@ -61,7 +64,8 @@
 
 
 namespace bacnet { namespace bvll { namespace frame {
- typedef boost::variant<
+  typedef mapbox::util::variant <
+  //typedef boost::variant<
 			bvlc_result,
 			write_broadcast_distribution_table,
 			read_broadcast_distribution_table,
@@ -89,7 +93,7 @@ namespace bacnet { namespace bvll { namespace frame {
 
 namespace bacnet { namespace bvll { namespace frame {
 
-struct frame_size : public boost::static_visitor<uint32_t> {
+struct frame_size /* : public boost::static_visitor<uint32_t> */ {
 
 
   uint32_t operator()(const bvlc_result &operand) {

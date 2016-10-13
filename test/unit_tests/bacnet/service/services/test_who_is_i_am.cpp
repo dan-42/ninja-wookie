@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /*
      * actual test function
      */
-    auto async_send_from_stack_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+    auto async_send_from_stack_callback_ = [expected_data, expected_ep, ec_succsess](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
 
       bacnet::print(data);
       bacnet::print(expected_data);
@@ -85,14 +85,23 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
 
 
-    /**
-     * sending who is with no limits
-     */
-    bacnet::service::who_is who_is_service{};
 
-    service_controller.async_send(who_is_service, [](const bacnet::error &ec){
+    ios.post([&service_controller](){
+
+      /**
+       * sending who is with no limits
+       */
+      bacnet::service::who_is who_is_service{};
+
+
+      service_controller.async_send(who_is_service, [](const bacnet::error &ec){
+
+      });
+
 
     });
+
+
 
 
     ios.run();
@@ -117,7 +126,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /*
      * actual test function
      */
-    auto async_send_from_stack_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+    auto async_send_from_stack_callback_ = [expected_data, expected_ep, ec_succsess](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
 
       bacnet::print(data);
       bacnet::print(expected_data);
@@ -247,7 +256,7 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /*
      * actual test function
      */
-    auto from_application_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+    auto from_application_callback_ = [expected_data, expected_ep, ec_succsess](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
 
       bacnet::print(data);
       bacnet::print(expected_data);

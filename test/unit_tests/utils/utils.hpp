@@ -10,7 +10,12 @@
 namespace test {
   namespace utils {
 
-    bool compare_binary_data(const bacnet::binary_data&  a, const bacnet::binary_data& b) {
+    bool compare_binary_data(bacnet::binary_data  a, bacnet::binary_data b) {
+      std::cout << "a: ";
+      bacnet::print(a);
+      std::cout << "b: ";
+      bacnet::print(b);
+
       if( a.size() != b.size() ) {
         return false;
       }

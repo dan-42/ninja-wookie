@@ -23,7 +23,11 @@
 
 
 
-#include <boost/variant.hpp>
+//#include <boost/variant.hpp>
+#include <mapbox/variant.hpp>
+#include <mapbox/boost_spirit_karma.hpp>
+#include <mapbox/boost_spirit_qi.hpp>
+
 
 #include <bacnet/apdu/frame/confirmed_request.hpp>
 #include <bacnet/apdu/frame/unconfirmed_request.hpp>
@@ -38,8 +42,8 @@
 
 namespace bacnet { namespace apdu  { namespace frame {
 
-
-typedef boost::variant<
+typedef mapbox::util::variant <
+//typedef boost::variant<
     unconfirmed_request,
     confirmed_request,
     simple_ack,

@@ -30,7 +30,7 @@ namespace bacnet { namespace  npdu { namespace  detail {
 using namespace bacnet::npdu;
 
 template<typename CallbackManager>
-class inbound_router : public boost::static_visitor<> {
+class inbound_router /*  : public boost::static_visitor<> */ {
 
 public:
 	inbound_router(CallbackManager& cbm) : callback_manager_(cbm) {
@@ -43,7 +43,8 @@ public:
 
       meta_information_.network_priority = f.control_field.network_priority();
       meta_information_.npdu_source = f.source;
-      boost::apply_visitor( *this, f.body );
+     // boost::apply_visitor( *this, f.body );
+      mapbox::util::apply_visitor( *this, f.body );
 		}
 
 		/*todo: check if not router is better name*/
