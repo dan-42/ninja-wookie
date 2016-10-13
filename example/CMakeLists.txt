@@ -13,10 +13,10 @@ hunter_add_package(Boost COMPONENTS system filesystem program_options)
 
 
 #hunter_add_package(Boost COMPONENTS system filesystem program_options)
-#set(BOOST_ALL_DYN_LINK         ON)
-#set(Boost_USE_MULTITHREADED    ON)
-#set(Boost_USE_STATIC_LIBS      OFF)
-#set(Boost_USE_STATIC_RUNTIME   OFF)
+set(BOOST_ALL_DYN_LINK         ON)
+set(Boost_USE_MULTITHREADED    ON)
+set(Boost_USE_STATIC_LIBS      OFF)
+set(Boost_USE_STATIC_RUNTIME   OFF)
 
 find_package(Boost CONFIG REQUIRED system filesystem program_options)
 #find_package(Boost 1.61 COMPONENTS filesystem program_options system  REQUIRED )

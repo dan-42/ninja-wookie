@@ -8,8 +8,13 @@ HunterGate(
        # LOCAL
        # URL "https://github.com/dan-42/hunter/archive/v0.12.43-dan.tar.gz"
        # SHA1 "db065c2f01e15d27207f9a3f37799b5b435f4c11"
-        URL "https://github.com/dan-42/hunter/archive/v0.12.44-dan.tar.gz"
-        SHA1 "b2c2510c34d89df7fb63d6f4e9454ea4f09464a6"        
+       # URL "https://github.com/dan-42/hunter/archive/v0.12.44-dan.tar.gz"
+       # SHA1 "b2c2510c34d89df7fb63d6f4e9454ea4f09464a6" 
+        
+        URL "https://github.com/dan-42/hunter/archive/v0.16-alpha.10.tar.gz"
+        SHA1 "a48d4d00dea825cab48fd5896173b6b4824cff78"
+        
+        
 )
 
 
