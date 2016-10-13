@@ -101,7 +101,7 @@ find_package(Boost CONFIG REQUIRED system filesystem)
 
 # pre
 hunter_add_package(lib-cpp-pre)
-find_package(lib-cpp-pre REQUIRED)
+find_package(lib-cpp-pre  REQUIRED)
 include_directories(AFTER ${LIB_CPP_PRE_INCLUDE_DIRS})
 
 # Threads
