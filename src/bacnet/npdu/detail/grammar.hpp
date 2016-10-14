@@ -21,6 +21,8 @@
 #ifndef SRC_BACNET_NPDU_DETAIL_GRAMMAR_HPP_
 #define SRC_BACNET_NPDU_DETAIL_GRAMMAR_HPP_
 
+#include <mapbox/boost_spirit_karma.hpp>
+#include <mapbox/boost_spirit_qi.hpp>
 
 #include <bacnet/detail/common/types.hpp>
 #include <bacnet/npdu/frame.hpp>

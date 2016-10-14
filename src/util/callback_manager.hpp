@@ -16,7 +16,7 @@
 #include <boost/fusion/sequence.hpp>
 #include <boost/fusion/algorithm.hpp>
 
-#include <pre/lambda/function_traits.hpp>
+//#include <pre/lambda/function_traits.hpp>
 #include <util/for_each.hpp>
 
 namespace util { namespace callback {

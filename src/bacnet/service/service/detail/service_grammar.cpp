@@ -18,6 +18,9 @@
  * Authors: Daniel Friedrich
  */
 
+#include <mapbox/boost_spirit_karma.hpp>
+#include <mapbox/boost_spirit_qi.hpp>
+
 #include <bacnet/service/service/detail/service_grammar.hpp>
 #include <bacnet/service/service/detail/service_grammar_impl.hpp>
 
