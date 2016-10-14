@@ -109,6 +109,8 @@ struct controller {
     frame.pdu_type_and_control_information.pdu_type_ = detail::pdu_type::unconfirmed_request;
     frame.service_data = payload;
     auto data = frame::generator::generate(frame);
+    std::cout << "async_send_unconfirmed_request_as_broadcast() ";
+    print(data);
     underlying_controller_.async_send_broadcast(std::move(data), handler);
   }
 

@@ -154,11 +154,11 @@ private:
       tag_rule.name("tag_rule");
       value_rule.name("value_rule");
 
-      /*
+     // /*
       debug(start_rule);
       debug(value_rule);
       debug(tag_rule);
-      */
+     // */
     }
 
     bool extract_size(const uint32_t &unsigned_value) {

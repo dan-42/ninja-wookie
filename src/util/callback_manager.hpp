@@ -16,7 +16,7 @@
 #include <boost/fusion/sequence.hpp>
 #include <boost/fusion/algorithm.hpp>
 
-#include <pre/lambda/function_traits.hpp>
+#include <pre/type_traits/function_traits.hpp>
 #include <util/for_each.hpp>
 
 namespace util { namespace callback {
@@ -27,7 +27,7 @@ template<typename CallbackFusionMap>
     template<typename... Callbacks>
     void set_callbacks(Callbacks... callbacks) {
       ::util::for_each_args([this](auto callback ) {
-        typedef pre::lambda::function_traits<decltype(callback)> callback_traits;
+        typedef pre::type_traits::function_traits<decltype(callback)> callback_traits;
         typedef typename callback_traits::template arg<0> arg_0_t;
         typedef typename std::decay<arg_0_t>::type key;
         boost::fusion::at_key<key>(callback_map) = callback;

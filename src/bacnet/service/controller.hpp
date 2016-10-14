@@ -88,7 +88,7 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
 
   template<typename Handler>
   static inline void invoke(Handler &&handler, bacnet::error ec ) {
-    typedef pre::lambda::function_traits<typename std::decay<Handler>::type > callback_traits;
+    typedef pre::type_traits::function_traits<typename std::decay<Handler>::type > callback_traits;
     typedef typename callback_traits::template arg<1> arg_1_t;
     typedef typename std::decay<arg_1_t>::type service_response_type;
     service_response_type empty_resp{};
@@ -97,7 +97,7 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
 
   template<typename Handler, typename T>
   static inline void invoke(Handler &&handler, bacnet::error ec, T response ) {
-    typedef pre::lambda::function_traits<typename std::decay<Handler>::type > callback_traits;
+    typedef pre::type_traits::function_traits<typename std::decay<Handler>::type > callback_traits;
     typedef typename callback_traits::template arg<1> arg_1_t;
     typedef typename std::decay<arg_1_t>::type service_response_type;
     //auto ff = boost::get<service_response_type>(response);
@@ -176,7 +176,8 @@ public:
   template<typename Service, typename Handler>
   void async_send(Service &&service, Handler handler) {
     auto data =  bacnet::service::service::detail::generate_unconfirmed(service);
-
+    std::cout << "async_send() ";
+    print(data);
     if( bacnet::service::service::detail::is_broadcast_service<typename std::decay<Service>::type>::value) {
       lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), handler);
     }

@@ -106,12 +106,12 @@ namespace bacnet { namespace apdu {  namespace type {
 
 struct simple_tag {
 
-    static const uint8_t extended_tag_number_indication           = 0x0F;
-    static const uint8_t extended_length_value_indication         = 0x05;
-    static const uint8_t opening_tag_indication                   = 0x06;
-    static const uint8_t closing_tag_indication                   = 0x07;
-    static const uint8_t extended_2_bytes_length_value_indication = 0xFE;
-    static const uint8_t extended_4_bytes_length_value_indication = 0xFF;
+    static constexpr uint8_t extended_tag_number_indication           = 0x0F;
+    static constexpr uint8_t extended_length_value_indication         = 0x05;
+    static constexpr uint8_t opening_tag_indication                   = 0x06;
+    static constexpr uint8_t closing_tag_indication                   = 0x07;
+    static constexpr uint8_t extended_2_bytes_length_value_indication = 0xFE;
+    static constexpr uint8_t extended_4_bytes_length_value_indication = 0xFF;
 
     uint8_t length_value_type_         : 3;
     uint8_t is_context_tag_            : 1; //also called: class in the standard
@@ -263,12 +263,12 @@ struct tag_grammar : grammar<Iterator, tag()> {
                         ;
 
       extendet_length_value_rule = (
-                                       omit[byte_(simple_tag::extended_2_bytes_length_value_indication)]
+                                       omit[byte_(uint8_t(simple_tag::extended_2_bytes_length_value_indication))]
                                     >> big_word
                                    )
 
                                  | (
-                                       omit[byte_(simple_tag::extended_4_bytes_length_value_indication)]
+                                       omit[byte_(uint8_t(simple_tag::extended_4_bytes_length_value_indication))]
                                     >> big_dword
                                    )
 
@@ -361,12 +361,12 @@ struct tag_grammar : grammar<Iterator, tag()> {
 
 
       length_value_rule = (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_4_byte, this) == true)
-                            << byte_(simple_tag::extended_4_bytes_length_value_indication)
+                            << byte_(uint8_t(simple_tag::extended_4_bytes_length_value_indication))
                             << big_dword(ref(tag_.length_value_type_))
                           )
 
                         | (    eps( boost::phoenix::bind(&tag_grammar::is_length_extendend_by_2_byte, this) == true)
-                            << byte_(simple_tag::extended_2_bytes_length_value_indication)
+                            << byte_(uint8_t(simple_tag::extended_2_bytes_length_value_indication))
                             << big_word(ref(tag_.length_value_type_))
                           )
 

@@ -48,7 +48,16 @@ using namespace bacnet::service::service;
     unconfirmed_service_grammar() : unconfirmed_service_grammar::base_type(start_rule) {
       start_rule  =  who_is_grammar_
                   |  i_am_grammar_
+                  |  eps
                   ;
+
+      who_is_grammar_.name("who_is_grammar_");
+      i_am_grammar_.name("i_am_grammar_");
+      start_rule.name("unconfirmed_service_grammar::start_rule");
+
+      debug(start_rule);
+      //debug(i_am_grammar_);
+      //debug(who_is_grammar_);
     }
   };
 

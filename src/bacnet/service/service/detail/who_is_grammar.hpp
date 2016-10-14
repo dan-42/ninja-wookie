@@ -58,7 +58,7 @@ struct who_is_grammar : grammar<Iterator, service::who_is()> {
 
   who_is_grammar() : who_is_grammar::base_type(start_rule) {
 
-    start_rule        =  byte_(service::detail::service_choice<service::who_is>::value)
+    start_rule        =  byte_(uint8_t(service::detail::service_choice<service::who_is>::value))
                       >> low_limit_rule
                       >> height_limit_rule;
 
@@ -96,8 +96,8 @@ struct who_is_grammar : grammar<Iterator, service::who_is()> {
 
   rule<Iterator, service::who_is()>  start_rule;
 
-  rule<Iterator, boost::optional<uint32_t>()>  low_limit_rule;
-  rule<Iterator, boost::optional<uint32_t>()>  height_limit_rule;
+  rule<Iterator, uint32_t()>  low_limit_rule;
+  rule<Iterator, uint32_t()>  height_limit_rule;
 
 
   unsigned_integer_grammar<Iterator> tag_0_rule_{0};
@@ -106,13 +106,23 @@ struct who_is_grammar : grammar<Iterator, service::who_is()> {
 
   who_is_grammar() : who_is_grammar::base_type(start_rule) {
 
-    start_rule        =  byte_(service_choice<service::who_is>::value)
-                      << low_limit_rule
-                      << height_limit_rule;
+    start_rule        = // byte_(uint8_t(uncomfirmed_service::who_is))
+                      //<<
+                      -low_limit_rule
+                      << -height_limit_rule
+                      ;
 
-    low_limit_rule    = -tag_0_rule_;
-    height_limit_rule = -tag_1_rule_;
+    low_limit_rule    = tag_0_rule_;
+    height_limit_rule = tag_1_rule_;
 
+
+    start_rule.name("who_is_grammar::start_rule");
+    low_limit_rule.name("who_is_grammar::low_limit_rule");
+    height_limit_rule.name("who_is_grammar::height_limit_rule");
+
+    debug(start_rule);
+    debug(low_limit_rule);
+    debug(height_limit_rule);
 
   }
 

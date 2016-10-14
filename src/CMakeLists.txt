@@ -44,6 +44,7 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -Wno-placement-new # needed for gcc6 and boost 1.61 boost.function
                     )
 
+SET(CMAKE_BUILD_TYPE lol)
 
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
@@ -125,7 +126,7 @@ add_library(wookie ${SOURCES_BACNET_CPP} ${SOURCES_UTIL_CPP} )
 #   * Debug:   -DWOOKIE_DEBUG=1
 #   * Release: -DWOOKIE_DEBUG=0
 #   * other:   -DWOOKIE_DEBUG=0
-#target_compile_definitions(wookie PUBLIC "WOOKIE_DEBUG=$<CONFIG:Debug>")
+target_compile_definitions(wookie PUBLIC "WOOKIE_DEBUG=$<CONFIG:Debug>")
 add_definitions(${WOOKIE_COMPILE_FLAGS})
 
 # Generate:

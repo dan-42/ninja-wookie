@@ -27,6 +27,7 @@
 #include <cstdint>
 
 #include <mapbox/variant.hpp>
+#include <mapbox/variant_io.hpp>
 
 #include <bacnet/service/service/traits.hpp>
 

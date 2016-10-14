@@ -24,12 +24,16 @@
 #include <cstdint>
 
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/io.hpp>
 #include <boost/optional.hpp>
 #include <bacnet/service/service/detail/service_choice.hpp>
 #include <bacnet/service/service/traits.hpp>
 
 
 namespace bacnet { namespace service { namespace service {
+
+using boost::fusion::operator <<;
+
 struct who_is {
 
   who_is() = default;

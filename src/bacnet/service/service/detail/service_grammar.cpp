@@ -56,15 +56,17 @@ bacnet::service::service::confirmed::response bacnet::service::service::detail::
 
 
 bacnet::binary_data bacnet::service::service::detail::generate_unconfirmed(const bacnet::service::service::unconfirmed::service &service) {
-  bacnet::binary_data data;
+  bacnet::binary_data data{};
   bacnet::generate_iterator sink(data);
   bacnet::service::service::detail::generator::unconfirmed_service_grammar<bacnet::generate_iterator> grammar;
   auto success = boost::spirit::karma::generate(sink, grammar, service);
+  std::cout << "generate_unconfirmed() ";
+  print(data);
   if(success) {
     return data;
   }
   else {
-   return bacnet::binary_data{};
+    return bacnet::binary_data{};
   }
 }
 bacnet::binary_data bacnet::service::service::detail::generate_confirmed_request(const bacnet::service::service::confirmed::request &service) {
