@@ -69,7 +69,7 @@ typedef boost::fusion::map<
 
 }
 
-template<class UnderlyingLayerController, typename ApduSize>
+template<class UnderlyingLayerController, typename Config>
 struct controller {
 
   controller(boost::asio::io_service &io_service, UnderlyingLayerController &underlying_controller) :
@@ -125,7 +125,7 @@ struct controller {
     frame::confirmed_request                            frame;
     bacnet::apdu::detail::header::segmentation_t        seg;
     auto invoke_id                                    = request_manager_.get_next_invoke_id(adr);
-    seg.max_accepted_apdu_                            = ApduSize::size_as_enum;
+    seg.max_accepted_apdu_                            = Config::apdu_size::size_as_enum;
     frame.invoke_id                                   = invoke_id;
     frame.segmentation                                = seg;
     frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::confirmed_request;
@@ -159,7 +159,7 @@ struct controller {
 
        frame::complex_ack                                  frame;
        bacnet::apdu::detail::header::segmentation_t        seg;
-       seg.max_accepted_apdu_                            = ApduSize::size_as_enum;
+       seg.max_accepted_apdu_                            = Config::apdu_size::size_as_enum;
        frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::complex_ack;
        frame.original_invoke_id                          = meta_info.invoke_id;
        frame.sequence_number                             = 0;

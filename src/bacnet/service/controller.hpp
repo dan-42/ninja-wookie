@@ -25,8 +25,6 @@
 #include <type_traits>
 #include <chrono>
 #include <iostream>
-#include <boost/system/error_code.hpp>
-#include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/asio/steady_timer.hpp>
@@ -41,9 +39,8 @@
 #include <bacnet/service/service.hpp>
 
 #include <bacnet/service/service/detail/service_grammar.hpp>
-#include <bacnet/common/configuration.hpp>
-
 #include <bacnet/apdu/api.hpp>
+#include <bacnet/common/config.hpp>
 #include <bacnet/type/types.hpp>
 #include <bacnet/error/error.hpp>
 
@@ -100,7 +97,6 @@ struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_r
     typedef pre::type_traits::function_traits<typename std::decay<Handler>::type > callback_traits;
     typedef typename callback_traits::template arg<1> arg_1_t;
     typedef typename std::decay<arg_1_t>::type service_response_type;
-    //auto ff = boost::get<service_response_type>(response);
     auto ff = mapbox::util::get<service_response_type>(response);
 
     handler(ec, ff);
@@ -115,13 +111,13 @@ namespace bacnet { namespace service {
 
     static const std::chrono::milliseconds time_wait_for_i_am_answer{2000};
 
-template<typename UnderlyingLayer, typename ApduSize>
+template<typename UnderlyingLayer, typename Config>
 class controller {
 public:
 
 
 
-  controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer, bacnet::config config):
+  controller(boost::asio::io_service& io_service, UnderlyingLayer& lower_layer, bacnet::common::config config):
                 io_service_(io_service),
                 lower_layer_(lower_layer),
                 inbound_router_(callback_manager_, device_manager_),
@@ -149,9 +145,9 @@ public:
      */
     if(config_.send_i_am_frames) {
       i_am_message_ = service::i_am{device_object_identifier_,
-                                    ApduSize::size_in_bytes,
-                                    bacnet::common::segmentation(bacnet::common::segmentation::segment::both),\
-                                    ApduSize::size_in_bytes
+                                    Config::apdu_size::size_in_bytes,
+                                    bacnet::common::segmentation(Config::segmentation_config::segment_supported),\
+                                    Config::apdu_size::size_in_bytes
                                     };
       callback_manager_.add_who_is_service_callback([this](bacnet::service::who_is service, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         if(!ec)
@@ -317,7 +313,7 @@ private:
   bacnet::service::detail::callback_manager callback_manager_;
   bacnet::service::detail::inbound_router inbound_router_;
   bacnet::type::object_identifier device_object_identifier_;
-  bacnet::config config_;
+  bacnet::common::config config_;
   service::i_am i_am_message_;
 };
 

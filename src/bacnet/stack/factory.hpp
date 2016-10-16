@@ -22,8 +22,9 @@
 #include <bacnet/bvll/controller.hpp>
 #include <bacnet/npdu/controller.hpp>
 #include <bacnet/apdu/controller.hpp>
+#include <bacnet/apdu/config.hpp>
+#include <bacnet/common/config.hpp>
 #include <bacnet/service/controller.hpp>
-#include <bacnet/common/configuration.hpp>
 #include <bacnet/type/types.hpp>
 
 namespace bacnet { namespace stack {
@@ -39,13 +40,13 @@ namespace bacnet { namespace stack {
 namespace detail {
   namespace ip_v4 {
 
-    typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
+    typedef bacnet::apdu::config::default_                                   static_config_t;
 
-    typedef bacnet::transport::ip_v4                                  transporter_t;
-    typedef bacnet::bvll::controller<transporter_t>                   bvll_controller_t;
-    typedef bacnet::npdu::controller<bvll_controller_t>               npdu_controller_t;
-    typedef bacnet::apdu::controller<npdu_controller_t, apdu_size>    apdu_controller_t;
-    typedef bacnet::service::controller<apdu_controller_t, apdu_size> service_controller_t;
+    typedef bacnet::transport::ip_v4                                         transporter_t;
+    typedef bacnet::bvll::controller<transporter_t>                          bvll_controller_t;
+    typedef bacnet::npdu::controller<bvll_controller_t>                      npdu_controller_t;
+    typedef bacnet::apdu::controller<npdu_controller_t, static_config_t>     apdu_controller_t;
+    typedef bacnet::service::controller<apdu_controller_t, static_config_t>  service_controller_t;
   }
  }
 
@@ -60,10 +61,10 @@ struct factory<ip_v4_server> {
              bvll_controller(ios, transporter),
              npdu_controller(bvll_controller),
              apdu_controller(ios, npdu_controller),
-             service_controller(ios, apdu_controller, bacnet::config{}) {
+             service_controller(ios, apdu_controller, bacnet::common::config{}) {
   }
 
-  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port, bacnet::config c) :
+  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port, bacnet::common::config c) :
                transporter(ios, {ip, port} ),
                bvll_controller(ios, transporter),
                npdu_controller(bvll_controller),
@@ -88,13 +89,11 @@ private:
 template<>
 struct factory<ip_v4_client> {
   factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port) :
-             config(bacnet::config{bacnet::common::segmentation{},
-                                   bacnet::configuration::max_segments_accepted::segments_more_then_64,
-                                   1337,    // vendor_id
-                                   1,       // device_object_id
-                                   1,       // network_number
-                                   false,   // send_i_am_frames
-                                   false}), //is_server
+             config(bacnet::common::config{1337,    // vendor_id
+                                           1,       // device_object_id
+                                           1,       // network_number
+                                           false,   // send_i_am_frames
+                                           false}), //is_server
              transporter(ios, {ip, port} ),
              bvll_controller(ios, transporter),
              npdu_controller(bvll_controller),
@@ -102,7 +101,7 @@ struct factory<ip_v4_client> {
              service_controller(ios, apdu_controller, config) {
   }
 
-  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port, bacnet::config c) :
+  factory(boost::asio::io_service &ios, const std::string& ip, uint16_t port, bacnet::common::config c) :
                config(c),
                transporter(ios, {ip, port} ),
                bvll_controller(ios, transporter),
@@ -116,7 +115,7 @@ struct factory<ip_v4_client> {
   }
 
 private:
-    bacnet::config                       config{};
+    bacnet::common::config               config{};
     detail::ip_v4::transporter_t         transporter;
     detail::ip_v4::bvll_controller_t     bvll_controller;
     detail::ip_v4::npdu_controller_t     npdu_controller;

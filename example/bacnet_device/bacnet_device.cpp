@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
     << std::endl;
 
     boost::asio::io_service io_service;
-    bacnet::config config;
+    bacnet::common::config config;
 
     config.device_object_id = doi;
     config.network_number 	= 1;

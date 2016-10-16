@@ -30,8 +30,9 @@
 #include <bacnet/bvll/controller.hpp>
 #include <bacnet/npdu/controller.hpp>
 #include <bacnet/apdu/controller.hpp>
+#include <bacnet/apdu/config.hpp>
 #include <bacnet/service/controller.hpp>
-#include <bacnet/common/configuration.hpp>
+#include <bacnet/common/config.hpp>
 
 BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
 
@@ -77,12 +78,12 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /**
      * setup default stack
      */
-    typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-    bacnet::config config{}; //default config
+    using static_config = bacnet::apdu::config::default_;
+    bacnet::common::config config{}; //default config
 
     npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
-    bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
-    bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
+    bacnet::apdu::controller<decltype(npdu_controller_),   static_config> apdu_controller(ios, npdu_controller_);
+    bacnet::service::controller<decltype(apdu_controller), static_config> service_controller(ios, apdu_controller, config);
 
 
 
@@ -154,12 +155,12 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /**
      * setup default stack
      */
-    typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-    bacnet::config config{}; //default config
+    using static_config = bacnet::apdu::config::default_;
+    bacnet::common::config config{}; //default config
 
     npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
-    bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
-    bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
+    bacnet::apdu::controller<decltype(npdu_controller_),   static_config> apdu_controller(ios, npdu_controller_);
+    bacnet::service::controller<decltype(apdu_controller), static_config> service_controller(ios, apdu_controller, config);
 
 
     /**
@@ -206,12 +207,12 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /**
      * setup default stack
      */
-    typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-    bacnet::config config{}; //default config
+    using static_config = bacnet::apdu::config::default_;
+    bacnet::common::config config{}; //default config
     bvll::controller<decltype(transport_mockup)> bvll_controller_(ios, transport_mockup);
     npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
-    bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
-    bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
+    bacnet::apdu::controller<decltype(npdu_controller_),   static_config> apdu_controller(ios, npdu_controller_);
+    bacnet::service::controller<decltype(apdu_controller), static_config> service_controller(ios, apdu_controller, config);
 
     service_controller.start();
     /**
@@ -284,12 +285,12 @@ BOOST_AUTO_TEST_SUITE( test_services_who_is_i_am )
     /**
      * setup default stack
      */
-    typedef bacnet::configuration::apdu_size::_1476_bytes_ipv4 apdu_size;
-    bacnet::config config{}; //default config
+    using static_config = bacnet::apdu::config::default_;
+    bacnet::common::config config{}; //default config
 
     npdu::controller<decltype(bvll_controller_)> npdu_controller_(bvll_controller_);
-    bacnet::apdu::controller<decltype(npdu_controller_),    apdu_size> apdu_controller(ios, npdu_controller_);
-    bacnet::service::controller<decltype(apdu_controller), apdu_size> service_controller(ios, apdu_controller, config);
+    bacnet::apdu::controller<decltype(npdu_controller_),    static_config> apdu_controller(ios, npdu_controller_);
+    bacnet::service::controller<decltype(apdu_controller),  static_config> service_controller(ios, apdu_controller, config);
 
 
     /**

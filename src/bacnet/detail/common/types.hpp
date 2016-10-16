@@ -28,24 +28,11 @@ typedef std::vector<uint8_t> binary_data;
 
 typedef std::back_insert_iterator<binary_data> generate_iterator;
 
-typedef binary_data::iterator parse_iterator;
+typedef binary_data::iterator                   parse_iterator;
 
 
 }}}
-/*
- *
-  for(auto &c_ : s) {
-        char c = tolower(c_);
-        uint8_t hi{0};
-        uint8_t lo{0};
-        if(c >= 48 && c <= 57) {
-          hi = c - 48;
-        }
-        else if(c >= 97 && c <= 102) {
-          hi = c - 97;
-        }
-      }
- */
+
 
 namespace bacnet {
 
@@ -75,7 +62,6 @@ using detail::common::parse_iterator;
     auto start = s.begin();
     auto end = s.end();
 
-    //auto success = parse(start, end, (*hex8), d);
     auto success = phrase_parse(start, end, (*hex8), space, d);
     if(success) {
       return d;
