@@ -9,13 +9,7 @@
 #define SRC_BACNET_APDU_DETAIL_INBOUND_ROUTER_HPP_
 
 
-
-#include <iostream>
-#include <iomanip>
-
-//#include <boost/variant/static_visitor.hpp>
 #include <bacnet/apdu/frame/frames.hpp>
-
 
 
 namespace bacnet { namespace  apdu { namespace  detail {
@@ -24,7 +18,7 @@ namespace bacnet { namespace  apdu { namespace  detail {
 using namespace bacnet::apdu;
 
 template<typename CallbackManager, typename RequestManager>
-class inbound_router /* : public boost::static_visitor<> */{
+class inbound_router {
 
 public:
 
@@ -77,11 +71,18 @@ public:
   }
 
   void operator()(frame::complex_ack response) {
-    auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
-    if(handler) {
-      bacnet::error ec;
-      meta_information_.invoke_id = response.original_invoke_id;
-      handler(ec, response, meta_information_);
+
+    if( response.pdu_type_and_control_information.is_segmented()) {
+
+    }
+    else {
+
+      auto handler = request_manager_.get_handler_and_purge(meta_information_.address, response.original_invoke_id);
+      if(handler) {
+        bacnet::error ec;
+        meta_information_.invoke_id = response.original_invoke_id;
+        handler(ec, response, meta_information_);
+      }
     }
   }
 

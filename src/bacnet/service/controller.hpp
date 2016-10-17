@@ -146,9 +146,8 @@ public:
     if(config_.send_i_am_frames) {
       i_am_message_ = service::i_am{device_object_identifier_,
                                     Config::apdu_size::size_in_bytes,
-                                    bacnet::common::segmentation(Config::segmentation_config::segment_supported),\
-                                    Config::apdu_size::size_in_bytes
-                                    };
+                                    {Config::segmentation_config::segment_supported},
+                                    Config::apdu_size::size_in_bytes };
       callback_manager_.add_who_is_service_callback([this](bacnet::service::who_is service, bacnet::error ec, bacnet::common::protocol::meta_information mi){
         if(!ec)
           if(  (     !service.device_instance_range_low_limit
@@ -195,11 +194,12 @@ public:
    * handler accepts only possible service responses
    */
   template<typename Service, typename Handler>
-  void async_send(bacnet::common::protocol::mac::address address, Service&& service, Handler handler) {
+  void async_send(device_config device, Service&& service, Handler handler) {
     using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
 
     auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
-    lower_layer_.async_send_confirmed_request(address, std::move(data), [this, handler]
+    //device_manager_.
+    lower_layer_.async_send_confirmed_request(device.address, std::move(data), [this, handler]
                                                                        ( const bacnet::error& ec,
                                                                                bacnet::apdu::frame::complex_ack frame,
                                                                                bacnet::common::protocol::meta_information mi) {
@@ -234,6 +234,7 @@ public:
   void async_receive(Callbacks... callbacks) {
     callback_manager_.set_service_callbacks(callbacks...);
   }
+
   template<typename Service, typename Handler>
   void async_send_response(Service service, bacnet::common::protocol::meta_information mi, Handler handler) {
     auto data =  bacnet::service::service::detail::generate_confirmed_response(std::move(service));
@@ -252,8 +253,8 @@ private:
     typedef std::function<void(boost::asio::steady_timer &timer, bool& is_active)> callback_t;
 
     boost::asio::steady_timer timer;
-    callback_t callback;
-    bool is_active{true};
+    callback_t                callback;
+    bool                      is_active{true};
 
     pending_request(boost::asio::io_service& ios, callback_t cbf) :
       timer(ios), callback(cbf) {
@@ -286,6 +287,7 @@ private:
                                                         async_send(mi.address, service, handler);
                                                       }
                                                      });
+
                    timer.expires_from_now(time_wait_for_i_am_answer);
                    timer.async_wait(
                                        [handler, callback_idx,  this, &is_active]
@@ -307,14 +309,14 @@ private:
   }
 
   std::list< std::shared_ptr<pending_request> > list_of_device_search_requests;
-  boost::asio::io_service& io_service_;
-  UnderlyingLayer &lower_layer_;
-  bacnet::service::detail::device_manager device_manager_;
-  bacnet::service::detail::callback_manager callback_manager_;
-  bacnet::service::detail::inbound_router inbound_router_;
-  bacnet::type::object_identifier device_object_identifier_;
-  bacnet::common::config config_;
-  service::i_am i_am_message_;
+  boost::asio::io_service&                      io_service_;
+  UnderlyingLayer&                              lower_layer_;
+  bacnet::service::detail::device_manager       device_manager_;
+  bacnet::service::detail::callback_manager     callback_manager_;
+  bacnet::service::detail::inbound_router       inbound_router_;
+  bacnet::type::object_identifier               device_object_identifier_;
+  bacnet::common::config                        config_;
+  service::i_am                                 i_am_message_;
 };
 
 

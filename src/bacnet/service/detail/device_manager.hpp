@@ -55,17 +55,17 @@ public:
     }
   }
 
-  std::vector<bacnet::common::protocol::mac::endpoint> get_endpoint( const bacnet::type::object_identifier& object_identifier) {
-    //print_device_list();
-    std::vector<bacnet::common::protocol::mac::endpoint> endpoints;
+  std::vector<bacnet::service::device_config> get_endpoint( const bacnet::type::object_identifier& object_identifier) {
+    std::vector<bacnet::service::device_config> endpoints;
     for(auto& device: devices) {
-      std::cout << "get_endpoint " << device.first << std::endl;
       if(device.first == object_identifier) {
-        endpoints.push_back(device.second.endpoint);
+        bacnet::service::device_config dc{device.second.endpoint.address(), device.second.max_segemnations, device.second.max_apdu_size};
+        endpoints.push_back(dc);
       }
     }
     return endpoints;
   }
+
   void print_device_list() {
     auto formatter_device = boost::format("| %1$+9d | %2$+21d | %3$+6d | %4$_6d | %5$_6d | %6$_8s | %7%\n");
 
@@ -89,11 +89,11 @@ public:
 private:
   struct device {
     bacnet::common::protocol::mac::endpoint endpoint;
-    bacnet::type::object_identifier device_object_identifier;
-    uint32_t max_apdu_size;
-    bacnet::common::segmentation max_segemnations;
-    uint16_t vendor_id;
-    std::chrono::steady_clock::time_point last_update;
+    bacnet::type::object_identifier         device_object_identifier;
+    uint32_t                                max_apdu_size;
+    bacnet::common::segmentation            max_segemnations;
+    uint16_t                                vendor_id;
+    std::chrono::steady_clock::time_point   last_update;
   };
 
 
@@ -118,6 +118,7 @@ private:
               const uint32_t& max_apdu_size,
               const bacnet::common::segmentation& max_segemnations,
               const uint16_t& vendor_id) {
+
     for(auto &device : devices) {
       if(device.second.endpoint == endpoint && device.second.device_object_identifier == object_identifier) {
         device.second.max_apdu_size = max_apdu_size;
@@ -129,8 +130,8 @@ private:
     return false;
   }
 
- // std::list<device> devices;
-    std::multimap<bacnet::type::object_identifier, device> devices;
+
+  std::multimap<bacnet::type::object_identifier, device> devices;
 
 };
 

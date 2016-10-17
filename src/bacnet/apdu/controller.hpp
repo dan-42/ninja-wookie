@@ -120,8 +120,13 @@ struct controller {
    *  * answer received  for the confirmed message, including answer payload
    */
   void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, confirmed_request_handler_type handler) {
-    bacnet::common::protocol::mac::endpoint ep{adr};
 
+    if(payload.size() > Config::apdu_size::size_in_bytes) {
+
+    }
+
+
+    bacnet::common::protocol::mac::endpoint             ep{adr};
     frame::confirmed_request                            frame;
     bacnet::apdu::detail::header::segmentation_t        seg;
     auto invoke_id                                    = request_manager_.get_next_invoke_id(adr);
@@ -130,7 +135,7 @@ struct controller {
     frame.segmentation                                = seg;
     frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::confirmed_request;
     frame.service_data                                = payload;
-    frame.proposed_window_size                        = 1;
+    frame.proposed_window_size                        = 1;//Config::segmentation_config::number_of_segments;
     auto data                                         = frame::generator::generate(frame);
 
 
@@ -155,7 +160,7 @@ struct controller {
   }
 
   void async_send_confirmed_response(bacnet::binary_data payload, bacnet::common::protocol::meta_information meta_info, unconfirmed_response_handler_type handler) {
-        bacnet::common::protocol::mac::endpoint ep{meta_info.address};
+       bacnet::common::protocol::mac::endpoint             ep{meta_info.address};
 
        frame::complex_ack                                  frame;
        bacnet::apdu::detail::header::segmentation_t        seg;

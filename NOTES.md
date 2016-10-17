@@ -74,6 +74,7 @@
   		- try with example-device
   		- [ ] incomming device read_prop Max_APDU_Length_Accepted 
   		- [ ] outgoing include size in BACnet-Confirmed-Request-PDU 
+  		
   		- [ ] set minimum segmentation of device and request
   		- [ ] incomming read devices Max_Segments_Accepted prop
   		
