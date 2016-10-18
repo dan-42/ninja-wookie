@@ -49,21 +49,21 @@ typedef std::map<uint32_t, property_type_map> object_property_type_map;
 
 static type select(uint32_t object_type_id, uint32_t property_id) {
    using bacnet::type::object_type;
-
+   using ot = bacnet::type::object_type::type;
    static object_property_type_map map;
    static type default_fallback_type{type::application_tagged_type};
 
    if(map.empty()) {
 
      map = object_property_type_map {
-         std::make_pair(object_type::device, property_type_map{
-             std::make_pair( bacnet::type::property::object_identifier::value,          type::object_identifier         ),
+         std::make_pair(ot{object_type::device}, property_type_map{
+             std::make_pair(  bacnet::type::property::object_identifier::value,          type::object_identifier         ),
              std::make_pair( bacnet::type::property::object_name::value,                type::character_string          ),
              std::make_pair( bacnet::type::property::object_type::value,                type::enumerated                ),
              std::make_pair( bacnet::type::property::property_list::value,              type::application_tagged_type   )
                            }),
 
-       std::make_pair(object_type::binary_input, property_type_map{
+       std::make_pair(ot{object_type::binary_input}, property_type_map{
              std::make_pair( bacnet::type::property::object_identifier::value,          type::object_identifier         ),
              std::make_pair( bacnet::type::property::object_name::value,                type::character_string          ),
              std::make_pair( bacnet::type::property::object_type::value,                type::enumerated                ),

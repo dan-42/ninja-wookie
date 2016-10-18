@@ -118,7 +118,7 @@ public:
     frame.body      = body;
 
     bacnet::binary_data binary_frame = npdu::detail::generator::generate(std::move(frame));
-    underlying_layer_.async_send(binary_frame, endpoint.get_address(), handler);
+    underlying_layer_.async_send(binary_frame, endpoint.address(), handler);
   }
 
   void start() {

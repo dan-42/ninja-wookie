@@ -238,22 +238,22 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       endpoint() : network_(1), address_(address_ip{})  {
 
       }
-      endpoint(const bacnet::common::protocol::mac::address& address)    : network_(1), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address& address)    : network_(1), address_(address)  {
       }
-      endpoint(const bacnet::common::protocol::mac::address_ip& address) : network_(1), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_ip& address) : network_(1), address_(address)  {
       }
-      endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  : network_(1), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  : network_(1), address_(address)  {
       }
-      endpoint(const bacnet::common::protocol::mac::address_mstp& address)  : network_(1), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_mstp& address)  : network_(1), address_(address)  {
       }
 
-      endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address) : network_(network), address_(address)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address) : network_(network), address_(address)  {
       }
-      endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) : network_(network), address_(address)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) : network_(network), address_(address)  {
       }
-      endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  : network_(network), address_(address)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  : network_(network), address_(address)  {
       }
-      endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address)  : network_(network), address_(address)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address)  : network_(network), address_(address)  {
       }
 
       endpoint(const endpoint& other) : network_(other.network_),
@@ -290,7 +290,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       inline void address(const bacnet::common::protocol::mac::address &adr) { address_ = adr;}
 
       inline uint16_t network() const { return network_;}
-      inline bacnet::common::protocol::mac::address get_address() const { return address_;}
+      inline bacnet::common::protocol::mac::address address() const { return address_;}
 
     private:
       uint16_t network_;

@@ -155,7 +155,8 @@ target_link_libraries(wookie INTERFACE
 
 set_target_properties(wookie
   PROPERTIES
-  INTERFACE_COMPILE_OPTIONS "${WOOKIE_COMPILE_FLAGS}")
+  INTERFACE_COMPILE_OPTIONS "${WOOKIE_COMPILE_FLAGS}"
+  DEBUG_POSTFIX             "")
 
 ####
 # Installation (https://github.com/forexample/package-example)

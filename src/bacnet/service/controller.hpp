@@ -185,14 +185,12 @@ public:
 
 
 
-  template<typename Service, typename Handler>
-  void async_send(bacnet::common::protocol::mac::endpoint mac_endpoint, Service&& service, Handler handler) {
-    auto adr = mac_endpoint.get_address();
-    async_send({adr, bacnet::common::segmentation::segment::none, 1464}, std::move(service), handler);
-  }
-
-  /*
-   * handler accepts only possible service responses
+   /*
+   *  \brief async_send() sends confirmed service, and calls handler on success or any error
+   *
+   *  device config provides device addres, segmentation and apdu_size
+   *  Service must be confirmed service
+   *  handler accepts only possible service responses
    */
   template<typename Service, typename Handler>
   void async_send(device_config device, Service&& service, Handler handler) {
@@ -219,6 +217,14 @@ public:
                                     });
   }
 
+  /*
+  *  \brief async_send() sends whoi_is first if doi unknown, sends confirmed service,
+  *  and calls handler on success or any error
+  *
+  *  doi is used to find the devices endpoint first, via who_is if device is not yet known
+  *  Service must be confirmed service
+  *  handler accepts only possible service responses
+  */
   template<typename Service, typename Handler>
   void async_send(bacnet::type::object_identifier device_object_identifier, Service service, Handler handler) {
     /* lookup doi */
@@ -285,7 +291,8 @@ private:
                                                     (bacnet::service::i_am i_am, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
                                                       if(i_am.i_am_device_identifier == device_object_identifier) {
                                                         timer.cancel();
-                                                        async_send(mi.address, service, handler);
+                                                        device_config dc{mi.address, i_am.segmentation_supported, i_am.max_apdu_length_accepted};
+                                                        async_send(dc, service, handler);
                                                       }
                                                      });
 
