@@ -92,7 +92,22 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
 
 
     class address_mstp {
-        /*  to do  */
+    public:
+      address_mstp() : device_id(0) {}
+      address_mstp(const uint8_t &di) : device_id(di) {}
+
+
+      address_mstp(const address_mstp &other) : device_id(other.device_id) {}
+
+
+      address_mstp& operator=(const address_mstp& rhs) {
+        this->device_id = rhs.device_id;
+        return *this;
+      }
+
+
+
+      uint8_t device_id;
     };
 
 
@@ -126,7 +141,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
                                       address_ipv6_(other.address_ipv6_),
                                       address_mstp_(other.address_mstp_)  {
       }
-
+/*
       address(address&& other)  : type_(other.type_),
                                   address_ip_(other.address_ip_),
                                   address_ipv6_(other.address_ipv6_),
@@ -140,6 +155,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         address_mstp_ = other.address_mstp_;
         return *this;
       }
+      */
       address& operator=(const address& other) {
         type_ = other.type_;
         address_ip_ = other.address_ip_;
@@ -274,7 +290,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       inline void address(const bacnet::common::protocol::mac::address &adr) { address_ = adr;}
 
       inline uint16_t network() const { return network_;}
-      inline bacnet::common::protocol::mac::address address() const { return address_;}
+      inline bacnet::common::protocol::mac::address get_address() const { return address_;}
 
     private:
       uint16_t network_;

@@ -76,25 +76,24 @@ BOOST_AUTO_TEST_SUITE( test_services_reinitialize_device )
      * first we expect a who_is -> send I-Am
      * second we expect a reinitialdevice and send success
      */
-    auto from_application_callback_ = [&state, &transport_mockup](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
-/*
+    auto from_application_callback_ = [&](boost::asio::ip::udp::endpoint ep,  ::bacnet::binary_data data) {
+
       if(state == test_state::who_is) {
         std::cout << "data ";  bacnet::print(data);
         std::cout << "expt ";  bacnet::print(who_is_2_request);
 
-        BOOST_TEST(test::utils::compare_binary_data(who_is_2_request, data), "SEND DATA IS NOT THE SAME as who_is_2_request");
-        BOOST_TEST(broadcast_endpoint == ep, "ENDPOINT is not the expected broadcast_endpoint ");
+    //    BOOST_TEST(test::utils::compare_binary_data(who_is_2_request, data), "SEND DATA IS NOT THE SAME as who_is_2_request");
+    //    BOOST_TEST(broadcast_endpoint == ep, "ENDPOINT is not the expected broadcast_endpoint ");
         state = test_state::reinitialize_device;
         transport_mockup.send_to_application(ec_succsess, unicast_endpoint_device, i_am_answer);
       }
       else if(state == test_state::reinitialize_device) {
         std::cout << "data ";  bacnet::print(data);
         std::cout << "expt ";  bacnet::print(reinitialize_request);
-        BOOST_TEST(test::utils::compare_binary_data(reinitialize_request, data), "SEND DATA IS NOT THE SAME as reinitialize_request");
-        BOOST_TEST(unicast_endpoint_device == ep, "ENDPOINT is not the expected unicast_endpoint_device ");
+    //    BOOST_TEST(test::utils::compare_binary_data(reinitialize_request, data), "SEND DATA IS NOT THE SAME as reinitialize_request");
+    //    BOOST_TEST(unicast_endpoint_device == ep, "ENDPOINT is not the expected unicast_endpoint_device ");
         transport_mockup.send_to_application(ec_succsess, unicast_endpoint_device, reinitialize_device_ack);
       }
-      */
       return ec_succsess;
     };
 

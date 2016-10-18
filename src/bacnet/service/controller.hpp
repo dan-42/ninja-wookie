@@ -187,7 +187,8 @@ public:
 
   template<typename Service, typename Handler>
   void async_send(bacnet::common::protocol::mac::endpoint mac_endpoint, Service&& service, Handler handler) {
-    async_send(mac_endpoint.address(), std::move(service), handler);
+    auto adr = mac_endpoint.get_address();
+    async_send({adr, bacnet::common::segmentation::segment::none, 1464}, std::move(service), handler);
   }
 
   /*

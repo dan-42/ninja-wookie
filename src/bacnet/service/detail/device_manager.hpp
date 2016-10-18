@@ -59,7 +59,7 @@ public:
     std::vector<bacnet::service::device_config> endpoints;
     for(auto& device: devices) {
       if(device.first == object_identifier) {
-        bacnet::service::device_config dc{device.second.endpoint.address(), device.second.max_segemnations, device.second.max_apdu_size};
+        bacnet::service::device_config dc{device.second.endpoint.get_address(), device.second.max_segemnations, device.second.max_apdu_size};
         endpoints.push_back(dc);
       }
     }
@@ -75,7 +75,7 @@ public:
     for(auto& device: devices) {
 
       os << formatter_device % device.second.device_object_identifier.instance_number
-                   % device.second.endpoint.address().to_string()
+                   % device.second.endpoint.get_address().to_string()
                    % device.second.endpoint.network()
                    % device.second.vendor_id
                    % device.second.max_apdu_size

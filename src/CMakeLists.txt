@@ -44,7 +44,7 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -Wno-placement-new # needed for gcc6 and boost 1.61 boost.function
                     )
 
-SET(CMAKE_BUILD_TYPE lol)
+SET(CMAKE_BUILD_TYPE Debug)
 
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
