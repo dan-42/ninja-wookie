@@ -8,6 +8,8 @@
 #include <boost/asio.hpp>
 
 #include <bacnet/detail/common/types.hpp>
+#include <bacnet/common/apdu_size.hpp>
+#include <bacnet/common/segment.hpp>
 
 namespace bacnet {  namespace common { namespace protocol { namespace mac {
     //todo with ipv6
@@ -17,6 +19,8 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
     public:
 
       static constexpr uint16_t default_port = 0xBAC0;
+
+      static constexpr bacnet::common::apdu_size::apdu_size_type default_apdu_size = bacnet::common::apdu_size::_1476_bytes;
 
       static address_ip from_string(const std::string s, uint16_t port = default_port) {
         return address_ip(boost::asio::ip::address_v4::from_string(s), port);
@@ -93,6 +97,8 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
 
     class address_mstp {
     public:
+
+      static constexpr bacnet::common::apdu_size::apdu_size_type default_apdu_size = bacnet::common::apdu_size::_480_bytes;
       address_mstp() : device_id(0) {}
       address_mstp(const uint8_t &di) : device_id(di) {}
 
@@ -141,7 +147,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
                                       address_ipv6_(other.address_ipv6_),
                                       address_mstp_(other.address_mstp_)  {
       }
-/*
+
       address(address&& other)  : type_(other.type_),
                                   address_ip_(other.address_ip_),
                                   address_ipv6_(other.address_ipv6_),
@@ -155,7 +161,7 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
         address_mstp_ = other.address_mstp_;
         return *this;
       }
-      */
+
       address& operator=(const address& other) {
         type_ = other.type_;
         address_ip_ = other.address_ip_;
@@ -234,49 +240,74 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
     };
 
     class endpoint {
+      using segmentation_t  = bacnet::common::segmentation;
+      using address_t       = bacnet::common::protocol::mac::address;
+      using apdu_size_type  = bacnet::common::apdu_size::apdu_size_type;
+
     public:
-      endpoint() : network_(1), address_(address_ip{})  {
+      endpoint() : network_(1), address_(address_ip{}),  segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes) {
 
       }
-      explicit endpoint(const bacnet::common::protocol::mac::address& address)    : network_(1), address_(address)  {
-      }
-      explicit endpoint(const bacnet::common::protocol::mac::address_ip& address) : network_(1), address_(address)  {
-      }
-      explicit endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  : network_(1), address_(address)  {
-      }
-      explicit endpoint(const bacnet::common::protocol::mac::address_mstp& address)  : network_(1), address_(address)  {
+
+      explicit endpoint(const bacnet::common::protocol::mac::address& address, const segmentation_t& seg, const apdu_size_type& size)    :
+                  network_(1), address_(address), segmentation_(seg), apdu_size_(size)  {
       }
 
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address) : network_(network), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address& address)    :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
       }
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) : network_(network), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_ip& address) :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
       }
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  : network_(network), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
       }
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address)  : network_(network), address_(address)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_mstp& address)  :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      }
+
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address) :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      }
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      }
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      }
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address)  :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
       }
 
       endpoint(const endpoint& other) : network_(other.network_),
-                                        address_(other.address_)   {
+                                        address_(other.address_),
+                                        segmentation_(other.segmentation_),
+                                        apdu_size_(other.apdu_size_) {
 
       }
       endpoint(endpoint&& other)  : network_(other.network_),
-                                    address_(other.address_)   {
+                                    address_(other.address_),
+                                    segmentation_(other.segmentation_),
+                                    apdu_size_(other.apdu_size_) {
       }
 
       endpoint& operator=(endpoint&& other) {
-        network_ = other.network_;
-        address_ = other.address_;
+        network_        = other.network_;
+        address_        = other.address_;
+        segmentation_   = other.segmentation_;
+        apdu_size_      = other.apdu_size_;
         return *this;
       }
       endpoint& operator=(const endpoint& other) {
-        network_ = other.network_;
-        address_ = other.address_;
+        network_        = other.network_;
+        address_        = other.address_;
+        segmentation_   = other.segmentation_;
+        apdu_size_      = other.apdu_size_;
         return *this;
       }
 
       friend bool operator==(const endpoint& a1, const endpoint& a2) {
-        if(a1.network_ == a2.network_ && a1.address_ == a2.address_) {
+        if(a1.network_ == a2.network_ && a1.address_ == a2.address_ && a1.segmentation_ == a2.segmentation_ && a1.apdu_size_ == a2.apdu_size_) {
           return true;
         }
         return false;
@@ -288,13 +319,19 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
 
       inline void network(uint16_t net) { network_ = net;}
       inline void address(const bacnet::common::protocol::mac::address &adr) { address_ = adr;}
+      inline void segmentation(const segmentation_t &seg) { segmentation_ = seg;}
+      inline void apdu_size(const uint32_t &size) { apdu_size_ = size;}
 
       inline uint16_t network() const { return network_;}
       inline bacnet::common::protocol::mac::address address() const { return address_;}
+      inline segmentation_t segmentation() const { return segmentation_;}
+      inline uint32_t apdu_size() const { return apdu_size_;}
 
     private:
-      uint16_t network_;
-      bacnet::common::protocol::mac::address address_;
+      uint16_t        network_;
+      address_t       address_;
+      segmentation_t  segmentation_;
+      apdu_size_type  apdu_size_;
     };
 
 

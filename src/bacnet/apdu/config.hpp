@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <bacnet/common/segment.hpp>
+#include <bacnet/common/apdu_size.hpp>
 
 namespace bacnet { namespace apdu { namespace config {
 
@@ -51,18 +52,20 @@ enum class max_segments_accepted : uint8_t {
 
 namespace apdu_size {
 
-  template<uint32_t Size, max_apdu_length_accepted Enum>
+  namespace common = bacnet::common::apdu_size;
+
+  template<common::apdu_size_type Size, max_apdu_length_accepted Enum>
   struct apdu_size_t {
      static constexpr decltype(Size) size_in_bytes = Size;
      static constexpr decltype(Enum) size_as_enum = Enum;
   };
 
-  typedef apdu_size_t<50,   max_apdu_length_accepted::up_to_50_bytes>     _50_bytes_minimal;
-  typedef apdu_size_t<128,  max_apdu_length_accepted::up_to_128_bytes>    _128_bytes;
-  typedef apdu_size_t<206,  max_apdu_length_accepted::up_to_206_bytes>    _206_bytes_lon_talk;
-  typedef apdu_size_t<480,  max_apdu_length_accepted::up_to_480_bytes>    _480_bytes_arcnet;
-  typedef apdu_size_t<1024, max_apdu_length_accepted::up_to_1024_bytes>   _1024_bytes;
-  typedef apdu_size_t<1476, max_apdu_length_accepted::up_to_1476_bytes>   _1476_bytes_ipv4;
+  typedef apdu_size_t<common::_50_bytes,    max_apdu_length_accepted::up_to_50_bytes>     _50_bytes_minimal;
+  typedef apdu_size_t<common::_128_bytes,   max_apdu_length_accepted::up_to_128_bytes>    _128_bytes;
+  typedef apdu_size_t<common::_206_bytes,   max_apdu_length_accepted::up_to_206_bytes>    _206_bytes_lon_talk;
+  typedef apdu_size_t<common::_480_bytes,   max_apdu_length_accepted::up_to_480_bytes>    _480_bytes_arcnet;
+  typedef apdu_size_t<common::_1024_bytes,  max_apdu_length_accepted::up_to_1024_bytes>   _1024_bytes;
+  typedef apdu_size_t<common::_1476_bytes,  max_apdu_length_accepted::up_to_1476_bytes>   _1476_bytes_ipv4;
 
 }
 

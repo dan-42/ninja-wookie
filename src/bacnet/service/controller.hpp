@@ -56,57 +56,6 @@
  *
  */
 
-
-
-namespace bacnet { namespace service { namespace detail {
-
-using namespace bacnet::service;
-
-template<class Service, class Enable = void>
-struct invoke_handler_ {
-
-  static constexpr bool expect_complex_response = false;
-
-  template<typename Handler, typename T>
-  static inline void invoke(Handler &&handler, bacnet::error ec, T response ) {
-      handler(std::move(ec));
-  }
-  template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error ec) {
-    handler(std::move(ec));
-  }
-};
-
-
-template<class Service>
-struct invoke_handler_<Service, typename std::enable_if<  service::has_complex_response<typename std::decay<Service>::type >::value  >::type> {
-
-  static constexpr bool expect_complex_response = true;
-
-  template<typename Handler>
-  static inline void invoke(Handler &&handler, bacnet::error ec ) {
-    typedef pre::type_traits::function_traits<typename std::decay<Handler>::type > callback_traits;
-    typedef typename callback_traits::template arg<1> arg_1_t;
-    typedef typename std::decay<arg_1_t>::type service_response_type;
-    service_response_type empty_resp{};
-    handler(ec, empty_resp);
-  }
-
-  template<typename Handler, typename T>
-  static inline void invoke(Handler &&handler, bacnet::error ec, T response ) {
-    typedef pre::type_traits::function_traits<typename std::decay<Handler>::type > callback_traits;
-    typedef typename callback_traits::template arg<1> arg_1_t;
-    typedef typename std::decay<arg_1_t>::type service_response_type;
-    auto ff = mapbox::util::get<service_response_type>(response);
-
-    handler(ec, ff);
-  }
-
-};
-
-}}}
-
-
 namespace bacnet { namespace service {
 
     static const std::chrono::milliseconds time_wait_for_i_am_answer{2000};
@@ -193,28 +142,29 @@ public:
    *  handler accepts only possible service responses
    */
   template<typename Service, typename Handler>
-  void async_send(device_config device, Service&& service, Handler handler) {
+  void async_send(bacnet::common::protocol::mac::endpoint ep, Service&& service, Handler handler) {
     using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
 
     auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
-    //device_manager_.
-    lower_layer_.async_send_confirmed_request(device.address, std::move(data), [this, handler]
+
+    lower_layer_.async_send_confirmed_request(ep, std::move(data), [this, handler]
                                                                        ( const bacnet::error& ec,
                                                                                bacnet::apdu::frame::complex_ack frame,
                                                                                bacnet::common::protocol::meta_information mi) {
-                                      if(invoker::expect_complex_response) {
-                                        if(ec) {
-                                          invoker::invoke(handler, ec);
-                                        }
-                                        else {
-                                          auto f = bacnet::service::service::detail::parse_confirmed_response(frame.service_ack_data);
-                                          invoker::invoke(handler, ec, f);
-                                        }
-                                      }
-                                      else {
-                                        invoker::invoke(handler, ec);
-                                      }
-                                    });
+
+                                                                        if(invoker::expect_complex_response) {
+                                                                          if(ec) {
+                                                                            invoker::invoke(handler, ec);
+                                                                          }
+                                                                          else {
+                                                                            auto f = bacnet::service::service::detail::parse_confirmed_response(frame.service_ack_data);
+                                                                            invoker::invoke(handler, ec, f);
+                                                                          }
+                                                                        }
+                                                                        else {
+                                                                          invoker::invoke(handler, ec);
+                                                                        }
+                                                                      });
   }
 
   /*
@@ -291,8 +241,9 @@ private:
                                                     (bacnet::service::i_am i_am, bacnet::error ec, bacnet::common::protocol::meta_information mi) {
                                                       if(i_am.i_am_device_identifier == device_object_identifier) {
                                                         timer.cancel();
-                                                        device_config dc{mi.address, i_am.segmentation_supported, i_am.max_apdu_length_accepted};
-                                                        async_send(dc, service, handler);
+
+                                                        bacnet::common::protocol::mac::endpoint ep{mi.address,i_am.segmentation_supported, i_am.max_apdu_length_accepted };
+                                                        async_send(ep, service, handler);
                                                       }
                                                      });
 

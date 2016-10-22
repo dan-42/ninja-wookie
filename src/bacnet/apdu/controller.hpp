@@ -38,7 +38,7 @@
 #include <bacnet/apdu/detail/request_manager.hpp>
 #include <bacnet/error/error.hpp>
 #include <bacnet/npdu/api.hpp>
-
+#include <bacnet/service/detail/invoker.hpp>
 
 
 namespace bacnet { namespace apdu {
@@ -119,17 +119,15 @@ struct controller {
    *  * the message could not be send(internal error)
    *  * answer received  for the confirmed message, including answer payload
    */
-  void async_send_confirmed_request(const bacnet::common::protocol::mac::address& adr, const bacnet::binary_data& payload, confirmed_request_handler_type handler) {
+  void async_send_confirmed_request(const bacnet::common::protocol::mac::endpoint& ep, const bacnet::binary_data& payload, confirmed_request_handler_type handler) {
 
     if(payload.size() > Config::apdu_size::size_in_bytes) {
 
     }
 
-
-    bacnet::common::protocol::mac::endpoint             ep{adr};
     frame::confirmed_request                            frame;
     bacnet::apdu::detail::header::segmentation_t        seg;
-    auto invoke_id                                    = request_manager_.get_next_invoke_id(adr);
+    auto invoke_id                                    = request_manager_.get_next_invoke_id(ep.address());
     seg.max_accepted_apdu_                            = Config::apdu_size::size_as_enum;
     frame.invoke_id                                   = invoke_id;
     frame.segmentation                                = seg;
@@ -140,13 +138,13 @@ struct controller {
 
 
     // xxx don't forget timeout!
-    underlying_controller_.async_send_unicast(ep, std::move(data), [this, adr, invoke_id, handler]( const bacnet::error& ec) {
+    underlying_controller_.async_send_unicast(ep, std::move(data), [this, ep, invoke_id, handler]( const bacnet::error& ec) {
             if(ec) {
-              this->request_manager_.purge_invoke_id(adr, invoke_id);
+              this->request_manager_.purge_invoke_id(ep.address(), invoke_id);
               handler(ec, frame::complex_ack(), bacnet::common::protocol::meta_information());
             }
             else {
-              this->request_manager_.store_handler(adr, invoke_id, handler);
+              this->request_manager_.store_handler(ep.address(), invoke_id, handler);
             }
       });
   }

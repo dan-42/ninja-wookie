@@ -50,17 +50,16 @@ public:
       update(endpoint, object_identifier, max_apdu_size, max_segmentaions, vendor_id);
     }
     else {
-      device_manager::device d{endpoint, object_identifier, max_apdu_size, max_segmentaions, vendor_id, std::chrono::steady_clock::now()};
+      device_manager::device d{endpoint, object_identifier, vendor_id, std::chrono::steady_clock::now()};
       devices.emplace(std::make_pair(object_identifier, std::move(d)));
     }
   }
 
-  std::vector<bacnet::service::device_config> get_endpoint( const bacnet::type::object_identifier& object_identifier) {
-    std::vector<bacnet::service::device_config> endpoints;
+  std::vector<bacnet::common::protocol::mac::endpoint> get_endpoint( const bacnet::type::object_identifier& object_identifier) {
+    std::vector<bacnet::common::protocol::mac::endpoint> endpoints;
     for(auto& device: devices) {
       if(device.first == object_identifier) {
-        bacnet::service::device_config dc{device.second.endpoint.address(), device.second.max_segemnations, device.second.max_apdu_size};
-        endpoints.push_back(dc);
+        endpoints.push_back(device.second.endpoint);
       }
     }
     return endpoints;
@@ -78,8 +77,8 @@ public:
                    % device.second.endpoint.address().to_string()
                    % device.second.endpoint.network()
                    % device.second.vendor_id
-                   % device.second.max_apdu_size
-                   % device.second.max_segemnations
+                   % device.second.endpoint.apdu_size()
+                   % device.second.endpoint.segmentation()
                    % " ";
     }
     os << std::endl;
@@ -90,8 +89,6 @@ private:
   struct device {
     bacnet::common::protocol::mac::endpoint endpoint;
     bacnet::type::object_identifier         device_object_identifier;
-    uint32_t                                max_apdu_size;
-    bacnet::common::segmentation            max_segemnations;
     uint16_t                                vendor_id;
     std::chrono::steady_clock::time_point   last_update;
   };
@@ -121,9 +118,9 @@ private:
 
     for(auto &device : devices) {
       if(device.second.endpoint == endpoint && device.second.device_object_identifier == object_identifier) {
-        device.second.max_apdu_size = max_apdu_size;
-        device.second.max_segemnations = max_segemnations;
-        device.second.vendor_id = vendor_id;
+        device.second.endpoint.apdu_size(max_apdu_size);
+        device.second.endpoint.segmentation(max_segemnations);
+        device.second.vendor_id   = vendor_id;
         device.second.last_update =  std::chrono::steady_clock::now();
       }
     }

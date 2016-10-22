@@ -14,16 +14,6 @@
 
 namespace bacnet { namespace service {
 
-  /* sending a confirmed service with low_level api,
-   * then this information is needed.
-   * Otherwise it is used via a who_is and i_am request first
-   */
-  struct device_config {
-    bacnet::common::protocol::mac::address  address;
-    bacnet::common::segmentation            segmentation;
-    uint32_t                                apdu_size_in_bytes;
-  };
-
 
   typedef std::function<void(bacnet::service::who_is,                   bacnet::error, bacnet::common::protocol::meta_information)>   callback_service_who_is_t;
   typedef std::function<void(bacnet::service::i_am,                     bacnet::error, bacnet::common::protocol::meta_information)>   callback_service_i_am_t;

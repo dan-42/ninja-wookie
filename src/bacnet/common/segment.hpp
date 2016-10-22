@@ -71,6 +71,26 @@ namespace bacnet { namespace common {
         segmented_ = s;
       }
 
+
+
+      friend inline bool operator==(const segmentation& a1, const segmentation& a2) {
+        if(a1.segmented_ == a2.segmented_) {
+          return true;
+        }
+        return false;
+      }
+
+      friend bool operator!=(const segmentation& a1, const segmentation& a2) {
+        return !(a1 == a2);
+      }
+
+      friend inline bool operator<(const segmentation& a1, const segmentation& a2) {
+        if(a1.segmented_ < a2.segmented_) {
+          return true;
+        }
+        return false;
+      }
+
       static inline segmentation from_enumerated(const bacnet::type::enumerated& e) {
         return from_native(e.value);
       }
