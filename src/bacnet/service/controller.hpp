@@ -165,9 +165,19 @@ public:
 
     auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
 
-    //detailed segemnattion is handled in the apdu-layer
-    //but a read-prop is needed to know what the endpoint supports before issuesing a bigger service-request
-    if(Config::segmentation_config::segment_supported.can_segmented_transmit() && data.size() >= ep.apdu_size()) {
+    if( data.size() >= ep.apdu_size()) {
+      if(!Config::segmentation_config::segment_supported.can_segmented_transmit()) {
+         auto e = bacnet::make_error(bacnet::err::error_code::segmentation_support_only_receive, bacnet::err::error_class::internal);
+         invoker::invoke(handler, e);
+         return;
+       }
+
+       if(!ep.segmentation().can_segmented_receive() ) {
+         auto e = bacnet::make_error(bacnet::err::error_code::abort_segmentation_not_supported, bacnet::err::error_class::device);
+         invoker::invoke(handler, e);
+         return;
+       }
+
       read_segment_support_and_execute(std::move(ep), std::move(data), std::move(lower_layer_handler));
     }
     else {

@@ -129,17 +129,7 @@ struct controller {
         return;
       }
 
-      if(Config::segmentation_config::segment_supported == bacnet::common::segmentation::segment::receive) {
-        auto e = bacnet::make_error(bacnet::err::error_code::segmentation_support_only_receive, bacnet::err::error_class::internal);
-        handler(e, frame::complex_ack(), bacnet::common::protocol::meta_information());
-        return;
-      }
 
-      if(!ep.segmentation().can_segmented_receive() ) {
-        auto e = bacnet::make_error(bacnet::err::error_code::abort_segmentation_not_supported, bacnet::err::error_class::device);
-        handler(e, frame::complex_ack(), bacnet::common::protocol::meta_information());
-        return;
-      }
 
 
 
