@@ -121,32 +121,57 @@ struct controller {
    */
   void async_send_confirmed_request(const bacnet::common::protocol::mac::endpoint& ep, const bacnet::binary_data& payload, confirmed_request_handler_type handler) {
 
-    if(payload.size() > Config::apdu_size::size_in_bytes) {
+
+    if(payload.size() > Config::apdu_size::size_in_bytes || payload.size() > ep.apdu_size() ) {
+      if(Config::segmentation_config::segment_supported == bacnet::common::segmentation::segment::none) {
+        auto e = bacnet::make_error(bacnet::err::error_code::segmentation_support_none, bacnet::err::error_class::internal);
+        handler(e, frame::complex_ack(), bacnet::common::protocol::meta_information());
+        return;
+      }
+
+      if(Config::segmentation_config::segment_supported == bacnet::common::segmentation::segment::receive) {
+        auto e = bacnet::make_error(bacnet::err::error_code::segmentation_support_only_receive, bacnet::err::error_class::internal);
+        handler(e, frame::complex_ack(), bacnet::common::protocol::meta_information());
+        return;
+      }
+
+      if(!ep.segmentation().can_segmented_receive() ) {
+        auto e = bacnet::make_error(bacnet::err::error_code::abort_segmentation_not_supported, bacnet::err::error_class::device);
+        handler(e, frame::complex_ack(), bacnet::common::protocol::meta_information());
+        return;
+      }
+
+
+
+
 
     }
+    else {
 
-    frame::confirmed_request                            frame;
-    bacnet::apdu::detail::header::segmentation_t        seg;
-    auto invoke_id                                    = request_manager_.get_next_invoke_id(ep.address());
-    seg.max_accepted_apdu_                            = Config::apdu_size::size_as_enum;
-    frame.invoke_id                                   = invoke_id;
-    frame.segmentation                                = seg;
-    frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::confirmed_request;
-    frame.service_data                                = payload;
-    frame.proposed_window_size                        = 1;//Config::segmentation_config::number_of_segments;
-    auto data                                         = frame::generator::generate(frame);
+      frame::confirmed_request                            frame;
+      bacnet::apdu::detail::header::segmentation_t        seg;
+
+      auto invoke_id                                    = request_manager_.get_next_invoke_id(ep.address());
+      seg.max_accepted_apdu_                            = Config::apdu_size::size_as_enum;
+      frame.invoke_id                                   = invoke_id;
+      frame.segmentation                                = seg;
+      frame.pdu_type_and_control_information.pdu_type_  = detail::pdu_type::confirmed_request;
+      frame.service_data                                = payload;
+      frame.proposed_window_size                        = 1;//Config::segmentation_config::number_of_segments;
+      auto data                                         = frame::generator::generate(frame);
 
 
-    // xxx don't forget timeout!
-    underlying_controller_.async_send_unicast(ep, std::move(data), [this, ep, invoke_id, handler]( const bacnet::error& ec) {
-            if(ec) {
-              this->request_manager_.purge_invoke_id(ep.address(), invoke_id);
-              handler(ec, frame::complex_ack(), bacnet::common::protocol::meta_information());
-            }
-            else {
-              this->request_manager_.store_handler(ep.address(), invoke_id, handler);
-            }
-      });
+      // xxx don't forget timeout!
+      underlying_controller_.async_send_unicast(ep, std::move(data), [this, ep, invoke_id, handler]( const bacnet::error& ec) {
+              if(ec) {
+                this->request_manager_.purge_invoke_id(ep.address(), invoke_id);
+                handler(ec, frame::complex_ack(), bacnet::common::protocol::meta_information());
+              }
+              else {
+                this->request_manager_.store_handler(ep.address(), invoke_id, handler);
+              }
+        });
+    }
   }
 
 

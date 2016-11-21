@@ -114,25 +114,26 @@ public:
   }
 
 
-  /*
-   * make async_send dependent on a bacnet::endpoint, as a generic way to send unidirectional services
+  /* send broadcast services,
    */
   template<typename Service, typename Handler>
   void async_send(Service &&service, Handler handler) {
+    static_assert(bacnet::service::service::detail::is_broadcast_service<typename std::decay<Service>::type>::value == true,
+                                                                "BACNET SERVICE CONTROLLER, only broadcast services allowed");
+
     auto data =  bacnet::service::service::detail::generate_unconfirmed(service);
-    std::cout << "async_send() ";
-    print(data);
-    if( bacnet::service::service::detail::is_broadcast_service<typename std::decay<Service>::type>::value) {
-      lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), handler);
-    }
-    else {
-      std::cerr << "async_send() is not a broadcast service" << std::endl;
-      auto ec = boost::system::errc::make_error_code(boost::system::errc::bad_message);
-      handler(ec);
-    }
+    lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data), handler);
   }
 
+  template<typename Handler>
+  void async_send(bacnet::binary_data &&data, Handler handler) {
+   lower_layer_.async_send_unconfirmed_request_as_broadcast(std::move(data),  std::move(handler));
+  }
 
+  template<typename Handler>
+  void async_send(bacnet::common::protocol::mac::endpoint&& ep, bacnet::binary_data &&data, Handler handler) {
+    lower_layer_.async_send_confirmed_request(std::move(ep), std::move(data),  std::move(handler));
+  }
 
    /*
    *  \brief async_send() sends confirmed service, and calls handler on success or any error
@@ -145,26 +146,33 @@ public:
   void async_send(bacnet::common::protocol::mac::endpoint ep, Service&& service, Handler handler) {
     using invoker = typename bacnet::service::detail::invoke_handler_<Service>;
 
+    auto lower_layer_handler = [this, handler]( const bacnet::error& ec, bacnet::apdu::frame::complex_ack frame, bacnet::common::protocol::meta_information mi) {
+                               if(invoker::expect_complex_response) {
+                                 if(ec) {
+
+                                   invoker::invoke(handler, ec);
+                                 }
+                                 else {
+                                   auto f = bacnet::service::service::detail::parse_confirmed_response(frame.service_ack_data);
+                                   invoker::invoke(handler, ec, f);
+
+                                 }
+                               }
+                               else {
+                                 invoker::invoke(handler, ec);
+                               }
+                             };
+
     auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
 
-    lower_layer_.async_send_confirmed_request(ep, std::move(data), [this, handler]
-                                                                       ( const bacnet::error& ec,
-                                                                               bacnet::apdu::frame::complex_ack frame,
-                                                                               bacnet::common::protocol::meta_information mi) {
-
-                                                                        if(invoker::expect_complex_response) {
-                                                                          if(ec) {
-                                                                            invoker::invoke(handler, ec);
-                                                                          }
-                                                                          else {
-                                                                            auto f = bacnet::service::service::detail::parse_confirmed_response(frame.service_ack_data);
-                                                                            invoker::invoke(handler, ec, f);
-                                                                          }
-                                                                        }
-                                                                        else {
-                                                                          invoker::invoke(handler, ec);
-                                                                        }
-                                                                      });
+    //detailed segemnattion is handled in the apdu-layer
+    //but a read-prop is needed to know what the endpoint supports before issuesing a bigger service-request
+    if(Config::segmentation_config::segment_supported.can_segmented_transmit() && data.size() >= ep.apdu_size()) {
+      read_segment_support_and_execute(std::move(ep), std::move(data), std::move(lower_layer_handler));
+    }
+    else {
+      lower_layer_.async_send_confirmed_request(ep, std::move(data), std::move(lower_layer_handler));
+    }
   }
 
   /*
@@ -213,8 +221,7 @@ private:
     callback_t                callback;
     bool                      is_active{true};
 
-    pending_request(boost::asio::io_service& ios, callback_t cbf) :
-      timer(ios), callback(cbf) {
+    pending_request(boost::asio::io_service& ios, callback_t cbf) : timer(ios), callback(cbf) {
       callback(timer, is_active);
     }
     virtual ~pending_request() { }
@@ -262,12 +269,44 @@ private:
                                                   }
                                                   is_active = false;
                                             });
+
                    bacnet::service::service::who_is wi(device_object_identifier.instance_number);
                    async_send(wi, [](bacnet::error ec) {  });
                 }));
   }
 
+  template<typename Handler>
+  inline void read_segment_support_and_execute(bacnet::common::protocol::mac::endpoint ep, bacnet::binary_data data, Handler handler) {
+
+
+    list_of_pending_requests.emplace_back(std::make_shared<pending_request>(io_service_,
+             [&](boost::asio::steady_timer &timer,  bool& is_active) {
+                  auto doi = device_manager_.get_device_identifier(ep);
+                  service::read_property_request rpr(doi, bacnet::type::property::max_segments_accepted);
+
+                  timer.expires_from_now(time_wait_for_i_am_answer);
+                  timer.async_wait(
+                                      [handler, this, &is_active]
+                                          (boost::system::error_code ec) {
+                                                 if(ec == boost::asio::error::operation_aborted) {   }
+                                                 else if(!ec) {
+                                                   auto e = bacnet::make_error(bacnet::err::error_class::communication, bacnet::err::error_code::bad_destination_device_id);
+                                                 }
+                                                 else {
+
+                                                 }
+                                                 is_active = false;
+                                           });
+
+                  bacnet::service::service::who_is wi(device_object_identifier.instance_number);
+                  async_send(wi, [](bacnet::error ec) {  });
+               }));
+
+
+  }
+
   std::list< std::shared_ptr<pending_request> > list_of_device_search_requests;
+  std::list< std::shared_ptr<pending_request> > list_of_pending_requests;
   boost::asio::io_service&                      io_service_;
   UnderlyingLayer&                              lower_layer_;
   bacnet::service::detail::device_manager       device_manager_;

@@ -27,6 +27,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <bacnet/common/config.hpp>
+
 namespace bacnet { namespace  apdu { namespace detail { namespace  header {
 
 /**
@@ -113,6 +115,14 @@ struct  segmentation_t {
 
   uint8_t max_accepted_apdu() {
     return max_accepted_apdu_;
+  }
+
+  void max_segments(uint8_t s) {
+    max_segments_ = s;
+  }
+
+  void max_accepted_apdu(uint8_t a) {
+    max_accepted_apdu_ = a;
   }
 
 

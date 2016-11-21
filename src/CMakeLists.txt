@@ -16,16 +16,6 @@
 cmake_minimum_required(VERSION 3.2)
 
 
-# If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
-# and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
-# to Debug prior to calling PROJECT()
-# source: http://www.cmake.org/pipermail/cmake/2008-September/023808.html
-IF(DEFINED CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the types of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release."  )
-ELSE()
-    SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the types of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release" )
-ENDIF()
-
 
 
 
@@ -44,7 +34,7 @@ list (INSERT WOOKIE_COMPILE_FLAGS 0
                     -Wno-placement-new # needed for gcc6 and boost 1.61 boost.function
                     )
 
-SET(CMAKE_BUILD_TYPE Debug)
+
 
 IF(CMAKE_BUILD_TYPE STREQUAL Debug)
 

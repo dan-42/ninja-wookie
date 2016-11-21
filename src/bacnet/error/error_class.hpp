@@ -28,6 +28,8 @@ namespace  bacnet { namespace  err {
       static constexpr  uint16_t    vt            =  6;
       static constexpr  uint16_t    communication =  7;
 
+      static constexpr  uint16_t    internal      = 64;
+
 
       static inline std::string to_string(const uint16_t& e_class) noexcept {
         switch(e_class) {
@@ -38,6 +40,7 @@ namespace  bacnet { namespace  err {
           NW_ERROR_SWITCH_CASE_HELPER(security        )
           NW_ERROR_SWITCH_CASE_HELPER(services        )
           NW_ERROR_SWITCH_CASE_HELPER(communication   )
+          NW_ERROR_SWITCH_CASE_HELPER(internal        )
           default: return "error_class(" + std::to_string(e_class) + ")"; break;
         };
       }

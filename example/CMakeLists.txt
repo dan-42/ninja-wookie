@@ -32,7 +32,7 @@ target_link_libraries(pg_run_time_mapping wookie Boost::boost ${PSAPI_LIBRARIES}
 install(TARGETS pg_run_time_mapping DESTINATION bin)
 
 add_executable(playground playground.cpp)
-target_link_libraries(playground wookie Boost::boost ${PSAPI_LIBRARIES} pthread)
+target_link_libraries(playground wookie Boost::boost ${PSAPI_LIBRARIES} pthread) 
 install(TARGETS playground DESTINATION bin)
 
 add_executable(read_property read_property.cpp)

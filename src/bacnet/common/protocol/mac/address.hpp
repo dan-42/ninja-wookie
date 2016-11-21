@@ -245,50 +245,52 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       using apdu_size_type  = bacnet::common::apdu_size::apdu_size_type;
 
     public:
-      endpoint() : network_(1), address_(address_ip{}),  segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes) {
+      endpoint() : network_(1), address_(address_ip{}),  segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(0) {
 
       }
 
-      explicit endpoint(const bacnet::common::protocol::mac::address& address, const segmentation_t& seg, const apdu_size_type& size)    :
-                  network_(1), address_(address), segmentation_(seg), apdu_size_(size)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address& address, const segmentation_t& seg, const apdu_size_type& size, const size_t& supported_segemnts = 0)    :
+                  network_(1), address_(address), segmentation_(seg), apdu_size_(size), supported_segemnts_(supported_segemnts)  {
       }
 
-      explicit endpoint(const bacnet::common::protocol::mac::address& address)    :
-                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address& address, const size_t& supported_segemnts = 0)    :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
-      explicit endpoint(const bacnet::common::protocol::mac::address_ip& address) :
-                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_ip& address, const size_t& supported_segemnts = 0) :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
-      explicit endpoint(const bacnet::common::protocol::mac::address_ipv6& address)  :
-                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_ipv6& address, const size_t& supported_segemnts = 0)  :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
-      explicit endpoint(const bacnet::common::protocol::mac::address_mstp& address)  :
-                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(const bacnet::common::protocol::mac::address_mstp& address, const size_t& supported_segemnts = 0)  :
+                  network_(1), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
 
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address) :
-                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address& address, const size_t& supported_segemnts = 0) :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address) :
-                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ip& address, const size_t& supported_segemnts = 0) :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address)  :
-                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_ipv6& address, const size_t& supported_segemnts = 0)  :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
-      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address)  :
-                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes)  {
+      explicit endpoint(uint16_t network, const bacnet::common::protocol::mac::address_mstp& address, const size_t& supported_segemnts = 0)  :
+                  network_(network), address_(address), segmentation_(segmentation_t::segment::none), apdu_size_(bacnet::common::apdu_size::_50_bytes), supported_segemnts_(supported_segemnts)  {
       }
 
       endpoint(const endpoint& other) : network_(other.network_),
                                         address_(other.address_),
                                         segmentation_(other.segmentation_),
-                                        apdu_size_(other.apdu_size_) {
+                                        apdu_size_(other.apdu_size_),
+                                        supported_segemnts_(other.supported_segemnts_) {
 
       }
       endpoint(endpoint&& other)  : network_(other.network_),
                                     address_(other.address_),
                                     segmentation_(other.segmentation_),
-                                    apdu_size_(other.apdu_size_) {
+                                    apdu_size_(other.apdu_size_),
+                                    supported_segemnts_(other.supported_segemnts_){
       }
 
       endpoint& operator=(endpoint&& other) {
@@ -332,6 +334,8 @@ namespace bacnet {  namespace common { namespace protocol { namespace mac {
       address_t       address_;
       segmentation_t  segmentation_;
       apdu_size_type  apdu_size_;
+      size_t          supported_segemnts_;
+
     };
 
 

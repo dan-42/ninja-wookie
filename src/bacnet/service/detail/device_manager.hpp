@@ -65,6 +65,16 @@ public:
     return endpoints;
   }
 
+  bacnet::type::object_identifier get_device_identifier( const bacnet::common::protocol::mac::endpoint& ep) {
+
+    for(const auto& device: devices) {
+      if(device.second == ep) {
+        return device.first;
+      }
+    }
+    return {};
+  }
+
   void print_device_list() {
     auto formatter_device = boost::format("| %1$+9d | %2$+21d | %3$+6d | %4$_6d | %5$_6d | %6$_8s | %7%\n");
 

@@ -155,7 +155,10 @@ namespace  bacnet { namespace  err {   namespace error_code {
       static constexpr  uint16_t    abort_insufficient_security             = 135;
       static constexpr  uint16_t    abort_security_error                    = 136;
 
-
+      /** user defined **/
+      static constexpr  uint16_t    segmentation_support_none               = 255;
+      static constexpr  uint16_t    segmentation_support_only_transmi       = 256;
+      static constexpr  uint16_t    segmentation_support_only_receive       = 257;
 
 
 
@@ -298,6 +301,12 @@ namespace  bacnet { namespace  err {   namespace error_code {
           NW_ERROR_SWITCH_CASE_HELPER(value_too_long                          )
           NW_ERROR_SWITCH_CASE_HELPER(abort_insufficient_security             )
           NW_ERROR_SWITCH_CASE_HELPER(abort_security_error                    )
+
+          /** user defined **/
+          NW_ERROR_SWITCH_CASE_HELPER(segmentation_support_none               )
+          NW_ERROR_SWITCH_CASE_HELPER(segmentation_support_only_transmi       )
+          NW_ERROR_SWITCH_CASE_HELPER(segmentation_support_only_receive       )
+
 
         default: return "error_code(" + std::to_string(e_code) + ")"; break;
       };
