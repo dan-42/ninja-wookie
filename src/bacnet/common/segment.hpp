@@ -47,20 +47,28 @@ namespace bacnet { namespace common {
 
       }
 
+      static inline bool can_segmented_transmit(segment s)  {
+         if(     s == segment::transmit
+             ||  s == segment::both )   {
+           return true;
+         }
+         return false;
+       }
+
+      static inline bool can_segmented_receive(segment s)  {
+         if(     s == segment::receive
+             ||  s == segment::both )   {
+           return true;
+         }
+         return false;
+       }
+
       inline bool can_segmented_transmit() {
-        if(     segmented_ == segment::transmit
-            ||  segmented_ == segment::both )   {
-          return true;
-        }
-        return false;
+        return can_segmented_transmit(segmented_);
       }
 
       inline bool can_segmented_receive() {
-        if(     segmented_ == segment::receive
-            ||  segmented_ == segment::both )   {
-          return true;
-        }
-        return false;
+        return can_segmented_receive(segmented_);
       }
 
       inline segment segmented() const {
