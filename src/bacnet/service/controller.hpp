@@ -114,6 +114,11 @@ public:
   }
 
 
+  inline UnderlyingLayer& underlying_layer() {
+    return lower_layer_;
+  }
+
+
   /* send broadcast services,
    */
   template<typename Service, typename Handler>
@@ -164,9 +169,9 @@ public:
                              };
 
     auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
-
+/*
     if( data.size() >= ep.apdu_size()) {
-      if(!Config::segmentation_config::segment_supported.can_segmented_transmit()) {
+      if(!Config::segmentation_config::segment_supported::can_segmented_transmit()) {
          auto e = bacnet::make_error(bacnet::err::error_code::segmentation_support_only_receive, bacnet::err::error_class::internal);
          invoker::invoke(handler, e);
          return;
@@ -181,8 +186,9 @@ public:
       read_segment_support_and_execute(std::move(ep), std::move(data), std::move(lower_layer_handler));
     }
     else {
+    */
       lower_layer_.async_send_confirmed_request(ep, std::move(data), std::move(lower_layer_handler));
-    }
+    //}
   }
 
   /*
@@ -291,8 +297,9 @@ private:
 
     list_of_pending_requests.emplace_back(std::make_shared<pending_request>(io_service_,
              [&](boost::asio::steady_timer &timer,  bool& is_active) {
+
                   auto doi = device_manager_.get_device_identifier(ep);
-                  service::read_property_request rpr(doi, bacnet::type::property::max_segments_accepted);
+         //         service::read_property_request rpr(doi, bacnet::type::property::max_segments_accepted);
 
                   timer.expires_from_now(time_wait_for_i_am_answer);
                   timer.async_wait(
@@ -308,8 +315,8 @@ private:
                                                  is_active = false;
                                            });
 
-                  bacnet::service::service::who_is wi(device_object_identifier.instance_number);
-                  async_send(wi, [](bacnet::error ec) {  });
+              //    bacnet::service::service::who_is wi(device_object_identifier.instance_number);
+              //    async_send(wi, [](bacnet::error ec) {  });
                }));
 
 

@@ -51,8 +51,16 @@ add_executable(who_is who_is.cpp)
 target_link_libraries(who_is wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 install(TARGETS who_is DESTINATION bin)
 
+add_executable(who_is_unicast who_is_unicast.cpp)
+target_link_libraries(who_is_unicast wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+install(TARGETS who_is_unicast DESTINATION bin)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 add_executable(bacnet_device bacnet_device/bacnet_device.cpp)
 target_link_libraries(bacnet_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
 install(TARGETS bacnet_device DESTINATION bin)
+
+
+add_executable(id_device id_device.cpp)
+target_link_libraries(id_device wookie ${Boost_LIBRARIES} ${PSAPI_LIBRARIES} pthread)
+install(TARGETS id_device DESTINATION bin)

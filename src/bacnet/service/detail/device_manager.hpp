@@ -68,7 +68,7 @@ public:
   bacnet::type::object_identifier get_device_identifier( const bacnet::common::protocol::mac::endpoint& ep) {
 
     for(const auto& device: devices) {
-      if(device.second == ep) {
+      if(device.second.endpoint == ep) {
         return device.first;
       }
     }
