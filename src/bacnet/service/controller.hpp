@@ -171,7 +171,9 @@ public:
     auto data =  bacnet::service::service::detail::generate_confirmed_request(std::move(service));
 /*
     if( data.size() >= ep.apdu_size()) {
-      if(!Config::segmentation_config::segment_supported::can_segmented_transmit()) {
+      const auto can_segmented_transmit = bacnet::common::segmentation::can_segmented_transmit(Config::segmentation_config::segment_supported);
+
+      if(!can_segmented_transmit) {
          auto e = bacnet::make_error(bacnet::err::error_code::segmentation_support_only_receive, bacnet::err::error_class::internal);
          invoker::invoke(handler, e);
          return;
@@ -299,7 +301,8 @@ private:
              [&](boost::asio::steady_timer &timer,  bool& is_active) {
 
                   auto doi = device_manager_.get_device_identifier(ep);
-         //         service::read_property_request rpr(doi, bacnet::type::property::max_segments_accepted);
+
+                  service::read_property_request rpr{doi, bacnet::type::property::max_segments_accepted::value};
 
                   timer.expires_from_now(time_wait_for_i_am_answer);
                   timer.async_wait(
@@ -315,8 +318,8 @@ private:
                                                  is_active = false;
                                            });
 
-              //    bacnet::service::service::who_is wi(device_object_identifier.instance_number);
-              //    async_send(wi, [](bacnet::error ec) {  });
+
+                  async_send(doi, rpr, [](bacnet::error ec, bacnet::service::service::read_property_ack response) {  });
                }));
 
 
