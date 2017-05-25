@@ -5,8 +5,8 @@
  *      Author: dan
  */
 
-#ifndef TEST_UNIT_TESTS_BACNET_APDU_TYPES_PRIMITIVE_TYPE_HPP_
-#define TEST_UNIT_TESTS_BACNET_APDU_TYPES_PRIMITIVE_TYPE_HPP_
+#ifndef WOOKIE_BACNET_APDU_TYPE_DETAIL_PARSER_PRIMITIVE_TYPE_HPP_
+#define WOOKIE_BACNET_APDU_TYPE_DETAIL_PARSER_PRIMITIVE_TYPE_HPP_
 
 
 #include <cstdint>
@@ -31,8 +31,8 @@ struct primitive_type {
 
   void extract_size_and_check_tag(tag& t, bool& pass) {
     if(   t.is_context_tag()    == is_expecting_context_tag_
-       && t.number()            == tag_number_expected_ ) {
-      length_value_type_ =  t.length_value_type();
+       && t.number              == tag_number_expected_ ) {
+      length_value_type_ =  t.length_value_type;
       pass = true;
     }
     else {
@@ -40,7 +40,7 @@ struct primitive_type {
     }
   }
 
-  void extract_size_and_check_tag(tag& t, bool& pass, uint32_t diff) {
+  void extract_size_check_tag_and_add_offset(tag& t, bool& pass, uint32_t diff) {
     extract_size_and_check_tag(t, pass);
     if(pass) {
       length_value_type_ = length_value_type_ + diff;
@@ -49,8 +49,8 @@ struct primitive_type {
 
   void check_tag(tag& t, bool& pass) {
     if(   t.is_context_tag()    == is_expecting_context_tag_
-       && t.number()            == tag_number_expected_
-       && t.length_value_type() == length_value_type_) {
+       && t.number              == tag_number_expected_
+       && t.length_value_type   == length_value_type_) {
       pass = true;
     }
     else {
@@ -62,4 +62,4 @@ struct primitive_type {
 }}}}}
 
 
-#endif /* TEST_UNIT_TESTS_BACNET_APDU_TYPES_PRIMITIVE_TYPE_HPP_ */
+#endif /* WOOKIE_BACNET_APDU_TYPE_DETAIL_PARSER_PRIMITIVE_TYPE_HPP_ */

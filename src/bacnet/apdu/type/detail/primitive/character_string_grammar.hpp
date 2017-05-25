@@ -28,7 +28,7 @@
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-
+#include <util/boost/spirit/detail/bit_field_grammar.hpp>
 #include <bacnet/type/character_string.hpp>
 #include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
@@ -80,7 +80,7 @@ private:
     value_rule  =  encoding_rule
                 >> string_rule ;
 
-    tag_validation_rule  = omit[tag_grammar_[ boost::phoenix::bind(&character_string_grammar::extract_size_and_check_tag, this, _1, _pass, -1) ] ];
+    tag_validation_rule  = omit[tag_grammar_[ boost::phoenix::bind(&character_string_grammar::extract_size_check_tag_and_add_offset, this, _1, _pass, -1) ] ];
 
     encoding_rule =  byte_[ _val = boost::phoenix::bind(&character_string_grammar::to_encoding_type, this, _1)];
 
@@ -176,7 +176,7 @@ private:
 
   tag get_tag(const character_string &char_string) {
      size_ = char_string.value.size();
-     tag_.length_value_type(size_+1);
+     tag_.length_value_type = size_+1;
      return tag_;
    }
 

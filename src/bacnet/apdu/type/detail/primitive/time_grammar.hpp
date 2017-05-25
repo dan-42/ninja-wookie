@@ -37,7 +37,7 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
-
+using boost::spirit::qi::_1;
 using bacnet::apdu::type::tag;
 using bacnet::type::time;
 
@@ -91,6 +91,7 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
+using boost::spirit::karma::_1;
 using bacnet::apdu::type::tag;
 using bacnet::type::time;
 

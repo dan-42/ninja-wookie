@@ -36,10 +36,10 @@ bool is_equal(const bacnet::apdu::type::tag& a, const bacnet::apdu::type::tag& b
   if(a.is_context_tag() != b.is_context_tag()) {
     return false;
   }
-  if(a.length_value_type() != b.length_value_type()) {
+  if(a.length_value_type != b.length_value_type) {
     return false;
   }
-  if(a.number() != b.number()) {
+  if(a.number != b.number) {
     return false;
   }
   return true;
@@ -129,17 +129,18 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
 
 
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(4);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (4);
     tag_generation_expected.push_back(0xc4);
 
     BOOST_TEST(tag_to_generate.is_context_tag() == false, " context is wrong");
-    BOOST_TEST(tag_to_generate.number() == (uint8_t)12, "number is wrong");
-    BOOST_TEST(tag_to_generate.length_value_type() == (uint32_t)4, "length value is wrong");
+    BOOST_TEST(tag_to_generate.number == (uint8_t)12, "number is wrong");
+    BOOST_TEST(tag_to_generate.length_value_type == (uint32_t)4, "length value is wrong");
 
 
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
+    std::cout << "generated_tag "; bacnet::print(generated_tag);
     BOOST_TEST(is_equal(tag_generation_expected, generated_tag), "fail tag generation failed");
     BOOST_TEST(bacnet::apdu::type::parse(generated_tag, tag_parsed), "fail parse simple tag");
     BOOST_TEST(is_equal(tag_to_generate, tag_parsed), "failed parsed is not expected");
@@ -150,9 +151,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(15);
-    tag_to_generate.length_value_type(4);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (15);
+    tag_to_generate.length_value_type = (4);
 
     tag_generation_expected.push_back(0xf4);
     tag_generation_expected.push_back(0xf);
@@ -173,9 +174,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(16);
-    tag_to_generate.length_value_type(4);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (16);
+    tag_to_generate.length_value_type = (4);
 
     tag_generation_expected.push_back(0xf4);
     tag_generation_expected.push_back(0x10);
@@ -194,9 +195,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(17);
-    tag_to_generate.length_value_type(4);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (17);
+    tag_to_generate.length_value_type = (4);
 
     tag_generation_expected.push_back(0xf4);
     tag_generation_expected.push_back(0x11);
@@ -215,9 +216,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(254);
-    tag_to_generate.length_value_type(4);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (254);
+    tag_to_generate.length_value_type = (4);
 
     tag_generation_expected.push_back(0xf4);
     tag_generation_expected.push_back(0xfe);
@@ -236,9 +237,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(4);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (4);
 
     tag_generation_expected.push_back(0xc4);
 
@@ -252,9 +253,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(5);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (5);
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
 
     tag_generation_expected.push_back(0xc5);
@@ -270,9 +271,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(6);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (6);
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
 
     tag_generation_expected.push_back(0xc5);
@@ -286,9 +287,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(7);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (7);
     generated_tag = bacnet::apdu::type::generate(tag_to_generate);
 
     tag_generation_expected.push_back(0xc5);
@@ -302,9 +303,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(8);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (8);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0x08);
@@ -322,9 +323,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(253);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (253);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xfd);
@@ -341,9 +342,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(254);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (254);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xfe);
@@ -361,9 +362,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(255);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (255);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xfe);
@@ -382,9 +383,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(65534);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (65534);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xfe);
@@ -403,9 +404,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(65535);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (65535);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xfe);
@@ -425,9 +426,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(65536);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (65536);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xff);
@@ -446,9 +447,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(65537);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (65537);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xff);
@@ -469,9 +470,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(4294967294);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (4294967294);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xff);
@@ -492,9 +493,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(12);
-    tag_to_generate.length_value_type(4294967295);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (12);
+    tag_to_generate.length_value_type = (4294967295);
 
     tag_generation_expected.push_back(0xc5);
     tag_generation_expected.push_back(0xff);
@@ -516,9 +517,9 @@ BOOST_AUTO_TEST_CASE( test_case1 ) {
     tag_generation_expected.clear();
     tag_to_generate = decltype(tag_to_generate){};
 
-    tag_to_generate.tag_type(bacnet::apdu::type::tag::type::application);
-    tag_to_generate.number(254);
-    tag_to_generate.length_value_type(4294967295);
+    tag_to_generate.type = bacnet::apdu::type::tag::tag_type::application;
+    tag_to_generate.number = (254);
+    tag_to_generate.length_value_type = (4294967295);
 
     tag_generation_expected.push_back(0xf5);
     tag_generation_expected.push_back(0xfe);

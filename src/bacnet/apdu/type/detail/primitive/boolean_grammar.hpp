@@ -157,10 +157,10 @@ private:
     bool extract_value(const bool &value) {
       value_ = value;
       if(tag_.is_context_tag()) {
-        tag_.length_value_type(1);
+        tag_.length_value_type = 1;
       }
       else {
-        tag_.length_value_type(value ? 1 : 0);
+        tag_.length_value_type  = value ? 1 : 0;
       }
       return true;
     }

@@ -27,7 +27,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
-
+#include <util/boost/spirit/detail/bit_field_grammar.hpp>
 #include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/octet_string.hpp>
@@ -38,6 +38,7 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
+using boost::spirit::qi::_1;
 
 using bacnet::apdu::type::tag;
 
@@ -92,6 +93,7 @@ using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
 using bacnet::apdu::type::tag;
+using boost::spirit::karma::_1;
 
 template<typename Iterator>
 struct octet_string_grammar : grammar<Iterator, bacnet::binary_data()> {
@@ -135,7 +137,7 @@ private:
 
   tag get_tag(const bacnet::binary_data &value) {
     size_ = value.size();
-    tag_.length_value_type(size_);
+    tag_.length_value_type = size_;
     return tag_;
   }
 

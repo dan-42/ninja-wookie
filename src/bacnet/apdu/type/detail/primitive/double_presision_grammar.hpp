@@ -36,7 +36,8 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
-
+using boost::spirit::qi::_1;
+using boost::spirit::qi::_pass;
 using bacnet::apdu::type::tag;
 
 template<typename Iterator>
@@ -63,6 +64,7 @@ struct double_presision_grammar : grammar<Iterator, double()>, primitive_type {
 private:
 
   void setup() {
+    using boost::spirit::qi::_1;
     length_value_type_  = 8;
 
     start_rule          =  tag_validation_rule
@@ -114,6 +116,8 @@ struct double_presision_grammar : grammar<Iterator, double()> {
 private:
 
   void setup() {
+    using boost::spirit::karma::_1;
+
     start_rule    =  tag_rule
                   << value_rule;
 

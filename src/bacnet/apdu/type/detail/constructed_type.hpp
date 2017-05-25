@@ -5,8 +5,8 @@
  *      Author: dan
  */
 
-#ifndef TEST_UNIT_TESTS_BACNET_APDU_TYPES_CONSTRUCTED_TYPE_HPP_
-#define TEST_UNIT_TESTS_BACNET_APDU_TYPES_CONSTRUCTED_TYPE_HPP_
+#ifndef WOOKIE_BACNET_APDU_TYPE_TYPES_CONSTRUCTED_TYPE_HPP_
+#define WOOKIE_BACNET_APDU_TYPE_TYPES_CONSTRUCTED_TYPE_HPP_
 
 
 #include <cstdint>
@@ -29,7 +29,7 @@ struct constructed_type {
   void check_open_tag(tag& t, bool& pass) {
     if(   is_expecting_enclosing_
        && t.is_opening_tag()
-       && t.number()         == tag_number_expected_ ) {
+       && t.number           == tag_number_expected_ ) {
       pass = true;
     }
     else {
@@ -40,7 +40,7 @@ struct constructed_type {
   void check_close_tag(tag& t, bool& pass) {
     if(   is_expecting_enclosing_
        && t.is_closing_tag()
-       && t.number()         == tag_number_expected_ ) {
+       && t.number         == tag_number_expected_ ) {
       pass = true;
     }
     else {
@@ -52,4 +52,4 @@ struct constructed_type {
 }}}}}
 
 
-#endif /* TEST_UNIT_TESTS_BACNET_APDU_TYPES_PRIMITIVE_TYPE_HPP_ */
+#endif /* WOOKIE_BACNET_APDU_TYPE_TYPES_CONSTRUCTED_TYPE_HPP_ */

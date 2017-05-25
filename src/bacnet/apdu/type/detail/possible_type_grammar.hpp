@@ -60,7 +60,7 @@ namespace boost { namespace spirit { namespace traits {
   template <>
   struct assign_to_attribute_from_value<uint8_t, bacnet::apdu::type::tag> {
       static void call(bacnet::apdu::type::tag const& val, uint8_t& attr) {
-          attr = val.number();
+          attr = val.number;
       }
   };
 
@@ -185,7 +185,7 @@ private:
 
     inline void check_nested_tag(const uint8_t& open, const tag& close, bool& pass) {
       if(     close.is_closing_tag()
-          &&  open == close.number()  ) {
+          &&  open == close.number ) {
         pass = true;
       }
       else {
@@ -200,7 +200,7 @@ private:
       else {
         pass = false;
       }
-      return t.number();
+      return t.number;
     }
 
 };
@@ -259,8 +259,8 @@ struct possible_type_grammar : grammar<Iterator, type::possible_type()> {
   }
 
   possible_type_grammar(uint8_t tag_id) : possible_type_grammar::base_type(start_tagged_rule),
-                                          opening_tag_(tag_id, tag::type::opening),
-                                          closing_tag_(tag_id, tag::type::closing) {
+                                          opening_tag_(tag_id, tag::tag_type::opening),
+                                          closing_tag_(tag_id, tag::tag_type::closing) {
     setup();
   }
 

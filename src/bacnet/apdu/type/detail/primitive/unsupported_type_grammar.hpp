@@ -94,8 +94,8 @@ private:
     inline void extract_tag(const tag& t, bool& pass) {
       if(t.is_context_tag() ) {
         pass         = true;
-        data_length_ = t.length_value_type();
-        tag_number_  = t.number();
+        data_length_ = t.length_value_type;
+        tag_number_  = t.number;
       }
       else {
         pass = false;

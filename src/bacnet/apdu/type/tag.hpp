@@ -19,8 +19,8 @@
  */
 
 
-#ifndef NINJA_WOOKIE_TAG_HPP
-#define NINJA_WOOKIE_TAG_HPP
+#ifndef WOOKIE_BACNET_APDU_TYPE_TAG_HPP
+#define WOOKIE_BACNET_APDU_TYPE_TAG_HPP
 
 #include <cstdint>
 #include <boost/fusion/include/adapt_struct.hpp>
@@ -29,7 +29,10 @@
 
 namespace bacnet { namespace apdu {  namespace type {
 
-
+/**
+ * \brief enum application_tag is used for typesafty setting the application tag
+ *
+ */
 enum class  application_tag : uint8_t {
     null                     =  0,
     boolean                  =  1,
@@ -50,109 +53,90 @@ enum class  application_tag : uint8_t {
 };
 
 
-struct tag {
+struct tag final {
 
-    enum class type : uint8_t {
-       application,
-       context,
-       opening,
-       closing
-    };
+  enum class tag_type : uint8_t {
+     application,
+     context,
+     opening,
+     closing
+  };
 
-    uint32_t  length_value_type_{0};
-    uint8_t   number_{0};
-    type      type_{type::application};
+  uint32_t  length_value_type{0};
+  uint8_t   number{0};
+  tag_type  type{tag_type::application};
 
 
-    //easy creation
-    tag()                                             : length_value_type_(0),
-                                                        number_(0),
-                                                        type_{type::application}{
-    }
+  //easy creation
+  tag()                                             : length_value_type(0),
+                                                      number(0),
+                                                      type{tag_type::application}{
+  }
 
-    //normal application tags
-    tag(const application_tag &n)                     : length_value_type_(0),
-                                                        number_(static_cast<decltype(number_)>(n)),
-                                                        type_{type::application} {
-    }
+  //normal application tags
+  tag(const application_tag &n)                     : length_value_type(0),
+                                                      number(static_cast<decltype(number)>(n)),
+                                                      type{tag_type::application} {
+  }
 
   //normal application tags with fixed known length
   tag(const application_tag &n, const uint32_t &length )
-                                                      : length_value_type_(length),
-                                                      number_(static_cast<decltype(number_)>(n)),
-                                                      type_{type::application} {
+                                                    : length_value_type(length),
+                                                    number(static_cast<decltype(number)>(n)),
+                                                    type{tag_type::application} {
   }
 
-    // normal constructed/context id
-    tag(const uint8_t &n              )              : length_value_type_(0),
-                                                       number_(n),
-                                                       type_(type::context)  {
-    }
+  // normal constructed/context id
+  tag(const uint8_t &n              )              : length_value_type(0),
+                                                     number(n),
+                                                     type(tag_type::context)  {
+  }
 
-    // normal constructed/context id
-    tag(const uint8_t &n, const uint32_t &length)    : length_value_type_(length),
-                                                     number_(n),
-                                                     type_(type::context)  {
-    }
+  // normal constructed/context id
+  tag(const uint8_t &n, const uint32_t &length)    : length_value_type(length),
+                                                   number(n),
+                                                   type(tag_type::context)  {
+  }
 
-    //for open and closing tags
-    tag(const uint8_t &n, const type &t)              : length_value_type_(0),
-                                                        number_(n),
-                                                        type_(t)  {
-    }
+  //for open and closing tags
+  tag(const uint8_t &n, const tag_type &t)              : length_value_type(0),
+                                                      number(n),
+                                                      type(t)  {
+  }
 
-     //general purpose
-    tag(const uint8_t &n, const uint32_t &v, const type &t)
-                                                      : length_value_type_(v),
-                                                        number_(n),
-                                                        type_(t){
-    }
-
-
-
-    inline uint8_t number() const { return number_; }
-
-    inline uint32_t length_value_type() const { return length_value_type_; }
-
-    inline type tag_type() const { return type_; }
+   //general purpose
+  tag(const uint8_t &n, const uint32_t &v, const tag_type &t)
+                                                    : length_value_type(v),
+                                                      number(n),
+                                                      type(t){
+  }
 
 
-    inline void number(uint8_t v) { number_ = v; }
+  inline bool is_context_tag() const { return type == tag_type::context; }
 
-    inline void length_value_type(uint32_t v) { length_value_type_ = v; }
+  inline bool is_application_tag() const { return type == tag_type::application; }
 
-    inline void tag_type(type t) { type_ = t; }
+  inline bool is_opening_tag() const { return type == tag_type::opening; }
 
-
-    inline bool is_context_tag() const { return type_ == type::context; }
-
-    inline bool is_application_tag() const { return type_ == type::application; }
-
-    inline bool is_opening_tag() const { return type_ == type::opening; }
-
-    inline bool is_closing_tag() const { return type_ == type::closing; }
-
-
-
-
-    template<typename Out>
-    friend inline Out& operator<<(Out& os, const bacnet::apdu::type::tag &tag_) {
-
-      os  << " number: "            << std::dec << (uint32_t) tag_.number()
-          << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type()
-          << " type: " << tag_.type_;
-      return os;
-    }
+  inline bool is_closing_tag() const { return type == tag_type::closing; }
 };
 
+template<typename Out>
+inline Out& operator<<(Out& os, const tag &tag_) {
+
+  os  << " number: "            << std::dec << (uint32_t) tag_.number
+      << " length_value_type: " << std::dec << (uint32_t) tag_.length_value_type
+      << " type: " << tag_.type;
+  return os;
+}
 
 template<typename Out>
-static inline Out& operator<<(Out& os, const bacnet::apdu::type::tag::type &t) {
+inline Out& operator<<(Out& os, const tag::tag_type &t) {
 
-  if     (t == tag::type::application) os << "application ";
-  else if(t == tag::type::context)     os << "context ";
-  else if(t == tag::type::closing)     os << "closing ";
-  else if(t == tag::type::opening)     os << "closing ";
+  if     (t == tag::tag_type::application) os << "application ";
+  else if(t == tag::tag_type::context)     os << "context ";
+  else if(t == tag::tag_type::closing)     os << "closing ";
+  else if(t == tag::tag_type::opening)     os << "closing ";
   else                                 os << "unknown ";
 
   return os;
@@ -164,9 +148,9 @@ static inline Out& operator<<(Out& os, const bacnet::apdu::type::tag::type &t) {
 
 BOOST_FUSION_ADAPT_STRUCT(
     bacnet::apdu::type::tag,
-    number_,
-    length_value_type_,
-    type_
+    number,
+    length_value_type,
+    type
 );
 
-#endif //NINJA_WOOKIE_TAG_HPP
+#endif //WOOKIE_BACNET_APDU_TYPE_TAG_HPP

@@ -35,6 +35,7 @@
 #include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 #include <bacnet/type/enumerated.hpp>
+#include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 namespace bacnet { namespace  apdu { namespace type { namespace detail { namespace parser {
 
@@ -172,7 +173,7 @@ private:
 
     bool extract_size(const enumerated &enumerated_value) {
       size_ = bacnet::apdu::type::detail::length_helper(enumerated_value.value);
-      tag_.length_value_type(size_);
+      tag_.length_value_type = size_;
       return true;
     }
 

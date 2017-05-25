@@ -36,7 +36,7 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
-
+using boost::spirit::qi::_1;
 using bacnet::apdu::type::tag;
 
 template<typename Iterator>
@@ -117,6 +117,8 @@ struct real_grammar : grammar<Iterator, float()> {
 private:
 
   void setup() {
+    using boost::spirit::karma::_1;
+
     start_rule    =  tag_rule
                   << value_rule;
 

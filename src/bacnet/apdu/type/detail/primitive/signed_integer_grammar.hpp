@@ -28,6 +28,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
+#include <util/boost/spirit/detail/bit_field_grammar.hpp>
 
 #include <bacnet/apdu/detail/boost/uint24_parser.hpp>
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
@@ -46,6 +47,7 @@ using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
 using boost::spirit::qi::_1;
 using boost::phoenix::bind;
+
 
 using boost::spirit::repository::qi::big_24word;
 
@@ -161,7 +163,7 @@ private:
 
     bool extract_size(const int32_t &signed_value) {
       size_ = bacnet::apdu::type::detail::length_helper(signed_value);
-      tag_.length_value_type(size_);
+      tag_.length_value_type = size_;
       return true;
     }
 

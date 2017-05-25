@@ -155,7 +155,7 @@ private:
     bool extract(const object_identifier &v) {
       value_ = v.to_native();
       auto size = bacnet::apdu::type::detail::length_helper(value_);
-      tag_.length_value_type(size);
+      tag_.length_value_type = size;
       return true;
     }
 

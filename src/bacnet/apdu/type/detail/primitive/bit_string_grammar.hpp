@@ -38,7 +38,7 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
-
+using boost::spirit::qi::_1;
 using bacnet::apdu::type::tag;
 using bacnet::type::bit_string;
 
@@ -125,6 +125,7 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::karma;
 using namespace boost::phoenix;
+using boost::spirit::karma::_1;
 using bacnet::apdu::type::tag;
 using bacnet::type::bit_string;
 
@@ -198,13 +199,13 @@ private:
     if(size == 0) {
       unused_bits_   = 0;
       num_of_bytes_  = 0;
-      tag_.length_value_type(1);
+      tag_.length_value_type = 1;
     }
     else {
       unused_bits_   = 8 - (size  % 8);
       num_of_bytes_  = (uint32_t) (size  / 8);
       num_of_bytes_ += (unused_bits_ > 0) ? 1 : 0;
-      tag_.length_value_type(num_of_bytes_ + 1);
+      tag_.length_value_type = num_of_bytes_ + 1;
     }
     return tag_;
   }

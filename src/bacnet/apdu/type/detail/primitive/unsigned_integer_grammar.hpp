@@ -31,7 +31,7 @@
 
 #include <bacnet/apdu/detail/boost/uint24_parser.hpp>
 #include <bacnet/apdu/detail/boost/uint24_generator.hpp>
-
+#include <util/boost/spirit/detail/bit_field_grammar.hpp>
 #include <bacnet/apdu/type/detail/util/tag_grammar.hpp>
 #include <bacnet/apdu/type/detail/primitive_type.hpp>
 
@@ -40,6 +40,8 @@ namespace bacnet { namespace  apdu { namespace type { namespace detail { namespa
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 using namespace boost::phoenix;
+
+
 
 using boost::spirit::qi::bit_field;
 using boost::spirit::qi::rule;
@@ -154,7 +156,8 @@ private:
       tag_rule.name("tag_rule");
       value_rule.name("value_rule");
 
-     // /*
+     //
+      /*
       debug(start_rule);
       debug(value_rule);
       debug(tag_rule);
@@ -163,7 +166,7 @@ private:
 
     bool extract_size(const uint32_t &unsigned_value) {
       size_ = bacnet::apdu::type::detail::length_helper(unsigned_value);
-      tag_.length_value_type(size_);
+      tag_.length_value_type = size_;
       return true;
     }
 
